@@ -1,0 +1,37 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+mkdir -p build
+release_lib=../noise-engine/build/release/librnnoise.a
+sanitized_lib=../noise-engine/build/sanitized/librnnoise.a
+if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
+  echo 'Build ../noise-engine with its ./verify before audio-host verification.' >&2
+  exit 1
+fi
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
+python3 check.py
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test
+./build/routing-test
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$sanitized_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test-sanitized
+./build/routing-test-sanitized
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -c routing.cpp -o build/routing.o
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -c coreaudio_backend.cpp -o build/coreaudio_backend.o
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror -c recording.cpp -o build/recording.o
+ar rcs build/libaudio_host.a build/routing.o build/recording.o build/coreaudio_backend.o
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror control_protocol_test.cpp control_protocol.cpp -o build/control-protocol-test
+./build/control-protocol-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror control_protocol_test.cpp control_protocol.cpp -o build/control-protocol-test-sanitized
+./build/control-protocol-test-sanitized
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror control_wire_fixture.cpp control_protocol.cpp -o build/control-wire-fixture
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror recording_test.cpp recording.cpp control_protocol.cpp -o build/recording-test
+./build/recording-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror recording_test.cpp recording.cpp control_protocol.cpp -o build/recording-test-sanitized
+./build/recording-test-sanitized
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror recording_wire_fixture.cpp recording.cpp control_protocol.cpp -o build/recording-wire-fixture
+python3 recording_wire_check.py
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_test.cpp microphone_test.cpp control_protocol.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-test
+./build/microphone-test-test
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_test.cpp microphone_test.cpp control_protocol.cpp "$sanitized_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-test-sanitized
+./build/microphone-test-test-sanitized
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_wire_fixture.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-wire-fixture
+python3 microphone_test_wire_check.py

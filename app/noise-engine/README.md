@@ -1,0 +1,13 @@
+# Independent noise suppression
+
+This component runs Xiph RNNoise v0.1.1 with its included model. It does not use Krisp code, weights, credentials or services. It is a baseline implementation, with no claim of equivalent speech quality, voice isolation, echo cancellation or accent conversion.
+
+The pinned upstream commit is `6cbfd53eb348a8d394e0757b4025c6ded34eb2b6`, from https://github.com/xiph/rnnoise. The vendored `COPYING` and source notices apply. `vendor/rnnoise/upstream.json` records original file hashes. Local upstream edits add allocation-failure handling, eager FFT allocation and null-safe destruction to `denoise.c`, replace undefined null-pointer traps with `abort()` in `rnn.c`, and initialize FFT allocation state plus check twiddle allocation in `kiss_fft.c`. The old release is deliberate: its model is included as C source under the repository's distribution terms, with no external model download.
+
+`NoiseEngine` processes normalized mono float audio at 48 kHz in 480-sample blocks. Construct and destroy each instance away from the audio callback. Its constructor serializes and warms the upstream shared FFT tables; `process` has no locks, allocation or I/O. Use each instance on only one processing thread. Audio buffering, rate conversion and stream restart are the caller's responsibility. RNNoise has algorithmic delay that must be measured and included in end-to-end routing latency. Input NaNs/infinities become silence and samples are clamped to the normalized range. Output and VAD probability are finite and bounded.
+
+`./verify` builds and runs release plus AddressSanitizer/UndefinedBehaviorSanitizer checks. It checks silence, deterministic separate state, explicit scaling against the C API, in-place processing, finite output, partial-block continuation and attenuation of seeded stationary noise. Seven injected allocation failures cover construction cleanup and recovery; processing after successful construction performs no instrumented allocation. Noise-only attenuation does not establish speech preservation or perceptual quality. No microphone is opened and no system audio configuration is changed.
+
+Remaining work: integrate callback buffering and the independent model identity into the app, measure exact delay, compare real speech and varied noises with the original, and test real-device performance.
+
+`StreamingNoise` adapts arbitrary callback sizes to the engine and adds exactly 480 samples of buffering. Tests compare differently partitioned callbacks against fixed-frame engine output at this offset. Create a fresh adapter for each stream start; no reset allocation occurs on the callback.

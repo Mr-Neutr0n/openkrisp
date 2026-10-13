@@ -1,0 +1,112 @@
+[
+  {
+    "id": "ar-inbound-wb-c",
+    "feature": "configured.accent_reduction.ar-inbound-wb-c",
+    "localFile": "ar_inbound_wb_c_3.12.0_1.0.kef",
+    "sha256": null,
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 6
+  },
+  {
+    "id": "ar-outbound-wb-c",
+    "feature": "configured.accent_reduction.ar-outbound-wb-c",
+    "localFile": "ar_outbound_wb_c_ma_3.11.0_1.0.kef",
+    "sha256": null,
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 6
+  },
+  {
+    "id": "asr",
+    "feature": "configured.asr.asr",
+    "localFile": "asr_eng_6.3.0_1.0.kef",
+    "sha256": null,
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 4
+  },
+  {
+    "id": "nc-inbound-mwb",
+    "feature": "configured.inbound.nc-inbound-mwb",
+    "localFile": "c8.w.m.d15e29_1.0.kef",
+    "sha256": "d1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 0
+  },
+  {
+    "id": "rd-inbound-wb",
+    "feature": "configured.other.rd-inbound-wb",
+    "localFile": "c6.b78b81_1.0.kef",
+    "sha256": "6a7b6e7dd39d9f72a30d1024617a8d75eebce15df2ba80f48f64bfaace8d89b4",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 2
+  },
+  {
+    "id": "diar",
+    "feature": "configured.diarization.diar",
+    "localFile": "diar_2.0.0_1.0.kef",
+    "sha256": "c8918f15aea65c5ed897b46774d54320eeec79144c7f0c97a08da520bb9f101b",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 8
+  },
+  {
+    "id": "nc-outbound-mfb",
+    "feature": "configured.outbound.nc-outbound-mfb",
+    "localFile": "c8.f.m.528d1f-1.0.1_1.0.kef",
+    "sha256": "12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 0
+  },
+  {
+    "id": "nc-outbound-sfb",
+    "feature": "configured.outbound.nc-outbound-sfb",
+    "localFile": "c8.f.s.17aa82-1.0.1_1.0.kef",
+    "sha256": "57fa12b95e02c5f29f093d4f15aca28a09ccdbe2cc3ac8148a95755cac463635",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 0
+  },
+  {
+    "id": "nc-outbound-snb",
+    "feature": "configured.outbound.nc-outbound-snb",
+    "localFile": "c5.n.s.20949d_1.2.kef",
+    "sha256": "b3d2737fae2e6f900f7efb33aa17a3b6e6548e48ebcfbf5bd2f0746eec04c086",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 0
+  },
+  {
+    "id": "hvc-outbound-lfb",
+    "feature": "configured.outbound.hvc-outbound-lfb",
+    "localFile": "hs.c6.f.m.75df8f.berlin.kef",
+    "sha256": "54e2913ea45734adc3323407e43f55b14afade256ab4da6226c2b6e30604cbf4",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 1
+  },
+  {
+    "id": "hvc-outbound-sfb",
+    "feature": "configured.outbound.hvc-outbound-sfb",
+    "localFile": "hs.c6.f.s.de56df.bucharest.kef",
+    "sha256": "b9e29fb9b45b4069460bb1d664bf4112268f03e516ce6a98e09f86a7a0f4a7c3",
+    "license": {
+      "redistribution": "unknown"
+    },
+    "configuredType": 1
+  }
+]

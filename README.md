@@ -1,0 +1,54 @@
+# openkrisp
+
+Private checkpoint repository: [Mr-Neutr0n/openkrisp](https://github.com/Mr-Neutr0n/openkrisp). Work is paused at user request; read [CHECKPOINT.md](CHECKPOINT.md) to resume. This is an independent local reconstruction, with no trial period, paid tiers, subscription checks, or usage quotas. All implemented local features are available without payment. Retained local features from the original paid or hidden feature set are in scope for independent implementation; unfinished features remain unavailable until implemented and verified.
+
+Work in progress. This project builds a desktop app and independent audio and storage components, but no complete Krisp replacement. The approved development driver installation succeeded, but HAL cannot yet resolve its expected devices. Registration diagnosis is in progress. Full parity remains unverified.
+
+The reference is the installed macOS Krisp at `~/Applications/krisp.app`. It changed from 3.16.8 to 3.17.9 during inspection; `version-change-findings.md` separates those identities. REA provides the original-app evidence. New implementation code uses ordinary development tools. GPT 6.1 sol workers contribute separate components and evidence analysis.
+
+## Current implementation
+
+| Component | Implemented | Still missing |
+| --- | --- | --- |
+| `app/audio-transport` | Timestamped mono/stereo rings, same-user shared-memory ABI, stale-producer silence | Audio-service integration, scheduling and latency measurements |
+| `app/local-store` | Completed-session import, transcript search/export, interrupted-save visibility | Recovery actions, original-format comparison |
+| `app/audio-driver` | Virtual devices, hidden companion endpoints and bounded internal audio routing | System-host verification, app capture integration and latency measurements |
+| `app/desktop` | Native history, search, WAV import, playback, transcript export, appearance, an optional floating control panel, model validation, explicit on-device WAV transcription, audio routing, live app-route mute/volume controls explicit recording with pause/resume and history save, and a temporary Original/RNNoise microphone comparison | Full workflow verification, actual audio routing and original UI parity |
+| `app/model-catalog` | Confined file validation, SHA256 checks and explicit license metadata | Model inference integration |
+| `app/noise-engine` | Independent RNNoise processor, arbitrary-size callback adapter and optional mic/speaker processing in the routing helper | Speech-quality comparison and end-to-end latency |
+| `app/audio-host` | Device discovery, private aggregate backend, optional noise suppression, atomic app-route mute/gain, bounded background WAV recording, temporary physical-microphone capture and paired RNNoise processing, and desktop helper integration | Real HAL and hardware verification; original device-volume curve and synchronization |
+| `app/local-transcription` | Strict on-device Speech framework adapter, cancellation and error handling | User-consented OS recognition test, language/quality parity |
+| `verification` | Deterministic audio fixtures and numerical comparison | Original-versus-rebuild stream measurements |
+
+Each directory documents its build and limits. `./verify` runs component checks. No check installs a HAL plug-in or restarts the system audio service. The independent noise engine processes synthetic audio, but original noise cancellation, accent conversion and transcription quality are not reproduced or verified.
+
+Run `./verify` to build and check the components in dependency order, including the desktop app. After the audio helper is built, `app/desktop/build` can rebuild the desktop alone; it rejects a missing or stale helper. The output is `app/desktop/.build/app/Lab Voice.app`. It has an ad-hoc signature for local development. It stores imported sessions under `~/Library/Application Support/Lab Voice/sessions` when launched. REA verified initial rendering, Settings reachability, Light appearance, persistence, and a later Dark/System roundtrip. REA observed the Audio sheet with audio stopped; its lower recording layout, live controls and transcription workflow still require further interactive verification. See `desktop-runtime-findings.md`. Its layout is a temporary independent design.
+
+## Evidence and scope
+
+- `PLAN.md` tracks the requested outcome and unresolved access and model decisions.
+- `feature-parity-ledger.md` maps retained, excluded and unresolved feature groups to implementation evidence and missing acceptance checks. Paid status does not exclude local capabilities.
+- `catalog-current-feature-map.md` groups all 1014 current text keys; `catalog-feature-map.md` retains the earlier 997-key map. Labels do not prove reachable workflows or defaults.
+- `feature-findings.md` and `native-findings.md` map wrapper and native boundaries.
+- `driver-runtime-findings.md` records the original devices' observed declarations.
+- `ui-runtime-map.md` maps observed settings and separates current saved selections from unknown defaults.
+- `audio-controls-findings.md` maps original mute, volume curves and device-control boundaries, including unresolved runtime state.
+- `recording-findings.md` separates original recording features and documents the observed native recorder contracts.
+- `noise-test-findings.md` records original temporary comparison labels and separates them from independent capture and duration choices.
+- `model-provider-contract.md` records the installed addon's recovered call contracts and bounded model-loading probes.
+- `cloud-exclusion-map.md` traces identified telemetry and remote-service boundaries with coverage limits.
+- `parity-verification-plan.md` defines the comparisons still required.
+
+The reconstruction excludes cloud storage, account services, meeting bots, report uploads, and analytics. Both an independent engine and an optional installed-model path are in scope. Bundled Krisp code, models, icons, and raw evidence have not been placed in a public release. Git ignores the private evidence and analysis runtime directories. The requested original-weight publication still requires established redistribution terms. The independent RNNoise source and included model retain their upstream notices under `app/noise-engine/vendor/rnnoise`.
+
+This private repository is an unfinished source checkpoint, not a parity release. It remains in the lab experiment directory.
+
+
+## Recording verification checkpoint
+
+The root `./verify` passed all ten suites with exit 0 after recording integration and lifecycle fixes. Private log: `evidence/combined-verify-recording.log`. The desktop has 32 passing tests. Synthetic Swift-to-C++ pipe tests validate recording commands, PCM16 finalization, active-frame duration and history import. The signed app build and relocated-resource checks pass. No actual audio was captured. The approved driver installation and CoreAudio restart succeeded, but exact endpoint lookup failed, so real routing remains untested pending registration diagnosis.
+
+
+## Temporary microphone comparison verification
+
+The combined `./verify` passed all ten component suites after temporary microphone comparison integration, with 46 desktop tests and signed-bundle checks. Synthetic tests cover the Original/RNNoise pair, cancellation, capture ownership and cleanup retry. Private log: `evidence/combined-verify-microphone-test.log`. Actual microphone capture, audible comparison and permission attribution remain untested. The driver diagnostic restart remains deferred while the user is away.

@@ -1,0 +1,120 @@
+--- a/src/denoise.c
++++ b/src/denoise.c
+@@ -165,10 +165,11 @@
+ 
+ CommonState common;
+ 
+-static void check_init() {
+-  int i;
+-  if (common.init) return;
++static int check_init() {
++  int i;
++  if (common.init) return 0;
+   common.kfft = rnn_fft_alloc_twiddles(2*FRAME_SIZE, NULL, NULL, NULL, 0);
++  if (!common.kfft) return -1;
+   for (i=0;i<FRAME_SIZE;i++)
+     common.half_window[i] = sin(.5*M_PI*sin(.5*M_PI*(i+.5)/FRAME_SIZE) * sin(.5*M_PI*(i+.5)/FRAME_SIZE));
+   for (i=0;i<NB_BANDS;i++) {
+@@ -179,6 +180,7 @@
+     }
+   }
+   common.init = 1;
++  return 0;
+ }
+ 
+ static void dct(float *out, const float *in) {
+@@ -262,7 +264,9 @@
+ }
+ 
+ int rnnoise_init(DenoiseState *st, RNNModel *model) {
++  if (!st) return -1;
+   memset(st, 0, sizeof(*st));
++  if (check_init() != 0) return -1;
+   if (model)
+     st->rnn.model = model;
+   else
+@@ -270,17 +274,26 @@
+   st->rnn.vad_gru_state = calloc(sizeof(float), st->rnn.model->vad_gru_size);
+   st->rnn.noise_gru_state = calloc(sizeof(float), st->rnn.model->noise_gru_size);
+   st->rnn.denoise_gru_state = calloc(sizeof(float), st->rnn.model->denoise_gru_size);
++  if (!st->rnn.vad_gru_state || !st->rnn.noise_gru_state || !st->rnn.denoise_gru_state) {
++    free(st->rnn.vad_gru_state);
++    free(st->rnn.noise_gru_state);
++    free(st->rnn.denoise_gru_state);
++    memset(st, 0, sizeof(*st));
++    return -1;
++  }
+   return 0;
+ }
+ 
+ DenoiseState *rnnoise_create(RNNModel *model) {
+   DenoiseState *st;
+   st = malloc(rnnoise_get_size());
+-  rnnoise_init(st, model);
++  if (!st) return NULL;
++  if (rnnoise_init(st, model) != 0) { free(st); return NULL; }
+   return st;
+ }
+ 
+ void rnnoise_destroy(DenoiseState *st) {
++  if (!st) return;
+   free(st->rnn.vad_gru_state);
+   free(st->rnn.noise_gru_state);
+   free(st->rnn.denoise_gru_state);
+--- a/src/rnn.c
++++ b/src/rnn.c
+@@ -30,6 +30,7 @@
+ #endif
+ 
+ #include <math.h>
++#include <stdlib.h>
+ #include "opus_types.h"
+ #include "common.h"
+ #include "arch.h"
+@@ -102,7 +103,7 @@
+       for (i=0;i<N;i++)
+          output[i] = relu(output[i]);
+    } else {
+-     *(int*)0=0;
++     abort();
+    }
+ }
+ 
+@@ -148,7 +149,7 @@
+       if (gru->activation == ACTIVATION_SIGMOID) sum = sigmoid_approx(WEIGHTS_SCALE*sum);
+       else if (gru->activation == ACTIVATION_TANH) sum = tansig_approx(WEIGHTS_SCALE*sum);
+       else if (gru->activation == ACTIVATION_RELU) sum = relu(WEIGHTS_SCALE*sum);
+-      else *(int*)0=0;
++      else abort();
+       h[i] = z[i]*state[i] + (1-z[i])*sum;
+    }
+    for (i=0;i<N;i++)
+--- a/src/kiss_fft.c
++++ b/src/kiss_fft.c
+@@ -36,6 +36,7 @@
+ #endif
+ 
+ #include "_kiss_fft_guts.h"
++#include <string.h>
+ #define CUSTOM_MODES
+ 
+ /* The guts header contains all the multiplication and addition macros that are defined for
+@@ -448,6 +449,9 @@
+         opus_int16 *bitrev;
+         kiss_twiddle_cpx *twiddles;
+ 
++        memset(st, 0, sizeof(*st));
++        st->shift = -1;
++
+         st->nfft=nfft;
+ #ifdef FIXED_POINT
+         st->scale_shift = celt_ilog2(st->nfft);
+@@ -468,6 +472,8 @@
+               goto fail;
+         } else {
+            st->twiddles = twiddles = (kiss_twiddle_cpx*)KISS_FFT_MALLOC(sizeof(kiss_twiddle_cpx)*nfft);
++           if (twiddles == NULL)
++               goto fail;
+            compute_twiddles(twiddles, nfft);
+            st->shift = -1;
+         }

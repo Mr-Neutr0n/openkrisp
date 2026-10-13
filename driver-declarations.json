@@ -1,0 +1,56 @@
+{
+  "devices": [
+    {
+      "name": "krisp microphone",
+      "uid": "KrispAudioDeviceMic",
+      "direction": "input",
+      "channels": 1,
+      "sample_rate": 48000,
+      "bits_per_channel": 32,
+      "format_fourcc": "lpcm",
+      "format_flags": 9,
+      "bytes_per_frame": 4,
+      "buffer_frames_observed": 480,
+      "buffer_frame_range": [
+        {
+          "max": 480,
+          "min": 15
+        }
+      ],
+      "declared_device_latency_frames": 0,
+      "declared_stream_latency_frames": 0,
+      "declared_safety_offset_frames": 0,
+      "evidence_id": "ev_8c479ebb5f10eda0d5ad1463591ea34d9366cb49d378fa647ccbe2f4bfd64668"
+    },
+    {
+      "name": "krisp speaker",
+      "uid": "KrispAudioDeviceSpeaker",
+      "direction": "output",
+      "channels": 2,
+      "sample_rate": 48000,
+      "bits_per_channel": 32,
+      "format_fourcc": "lpcm",
+      "format_flags": 9,
+      "bytes_per_frame": 8,
+      "buffer_frames_observed": 512,
+      "buffer_frame_range": [
+        {
+          "max": 960,
+          "min": 15
+        }
+      ],
+      "declared_device_latency_frames": 0,
+      "declared_stream_latency_frames": 0,
+      "declared_safety_offset_frames": 0,
+      "evidence_id": "ev_8c479ebb5f10eda0d5ad1463591ea34d9366cb49d378fa647ccbe2f4bfd64668"
+    }
+  ],
+  "status": "original observed declarations, replacement unimplemented",
+  "limits": [
+    "Read-only device declarations at one instant; no audio was captured or processed.",
+    "Names and UIDs select devices but do not authenticate the loaded driver binary.",
+    "Declared latency is not measured end-to-end latency.",
+    "Hidden devices may not appear in the public device list."
+  ],
+  "stopped_snapshot_evidence_id": "ev_9b9a4b956a42a9c36195a15375c818744bda4c49e05677b69ff17eb46843c5bf"
+}

@@ -1,0 +1,4746 @@
+{
+  "artifact_sha256": "fbd6a39ce6fde8685c6ca4c2ca78343aa50551b1bac74f532fd6c5801a23b622",
+  "evidence_bundle": "projects/krisp/evidence/javascript-initial.json",
+  "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+  "coverage": "partial",
+  "native_wrapper_requests": {
+    ".vite/build/node_modules/kr-native-utils/index.js": [
+      {
+        "name": "Initialize",
+        "node_id": "jsrg_node_1132e6a5ed1fc7dc58724f0b3d39936201f89529b9d4e58476c58c6379027a89",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 4
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 14,
+            "line": 4
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils14InitializeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x5280",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "Destroy",
+        "node_id": "jsrg_node_5db99197bbd28f14e78abb885f73b15a9218d1779a9d286b861e248c3c09f8d6",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 23,
+            "line": 5
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 11,
+            "line": 5
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils11DestroyNapiERKN4Napi12CallbackInfoE",
+              "address": "0x6700",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetDeviceID",
+        "node_id": "jsrg_node_d4b75ff719b95034bc3754a58852ea5cdbb39621445e1fa20f9c6565e6e28825",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 31,
+            "line": 6
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 15,
+            "line": 6
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "GetCpuArch",
+        "node_id": "jsrg_node_38ab0f1682310884aa4702440d61858a03bae8c5feeed597680a846f7fa77efd",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 7
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 14,
+            "line": 7
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils14GetCpuArchNapiERKN4Napi12CallbackInfoE",
+              "address": "0x6ba8",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartDeviceRecording",
+        "node_id": "jsrg_node_09cbf364e6b88b3fa0eb5108e697e32af34a342cd48219358c42418294f68844",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 8
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 24,
+            "line": 8
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils24StartDeviceRecordingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x6f7c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "PauseDeviceRecording",
+        "node_id": "jsrg_node_fd2efec805f00b04e194e269dab26e036c7e81ef634aaf5eff42ff017ed0ccd9",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 9
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 24,
+            "line": 9
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils24PauseDeviceRecordingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x7ce0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopDeviceRecording",
+        "node_id": "jsrg_node_90131fbf923a9d8d82877578fbc3fe41f9b1dd583c6ae55f1f6834367a5971f6",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 10
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 23,
+            "line": 10
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils23StopDeviceRecordingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8424",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StoreSecItem",
+        "node_id": "jsrg_node_01ec27fb534bc1756df5d2aa260aeed5674cb3b01033daaef19636c2dcd44062",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 33,
+            "line": 11
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 16,
+            "line": 11
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils16StoreSecItemNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8928",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetSecItemValue",
+        "node_id": "jsrg_node_fc4786df78cfc0526f87141be4475254cd6d64213de7ec430289067886568c52",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 12
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 19,
+            "line": 12
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils19GetSecItemValueNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8e94",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetSecItemRawValue",
+        "node_id": "jsrg_node_12b548705fa76a4d3858c32c08e658ca8313cb83133ef3b0b48d282c46e236c5",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 22,
+            "line": 13
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils22GetSecItemRawValueNapiERKN4Napi12CallbackInfoE",
+              "address": "0x9420",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DiscardSecItem",
+        "node_id": "jsrg_node_d610dcc3a6b5f15a1920e0dc28c5fec3b1dd9ace338f34f558dc8afc482d933e",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 14
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 18,
+            "line": 14
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils18DiscardSecItemNapiERKN4Napi12CallbackInfoE",
+              "address": "0x98ac",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetSecItemAccount",
+        "node_id": "jsrg_node_67959a04b57fa407a5e7f6b65693adefadbe62949ccd8fd6cf1250f11e5f1102",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 15
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 15
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21GetSecItemAccountNapiERKN4Napi12CallbackInfoE",
+              "address": "0x9c60",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DecryptOldValue",
+        "node_id": "jsrg_node_0efb8881ec56d24666ddcd0f8f224be1c163c4f2c9d402fe8f54575b4f6d7d42",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 16
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 19,
+            "line": 16
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils19DecryptOldValueNapiERKN4Napi12CallbackInfoE",
+              "address": "0xa0ec",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "RegisterTroubleshootingNotifications",
+        "node_id": "jsrg_node_cc966de2f490579216c8a14fbd34d1a7ef24c0626ea00286c7802fdf278bc4f8",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 81,
+            "line": 17
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 40,
+            "line": 17
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils40RegisterTroubleshootingNotificationsNapiERKN4Napi12CallbackInfoE",
+              "address": "0xa810",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "UnregisterTroubleshootingNotifications",
+        "node_id": "jsrg_node_3850bdcb1c51dff28d59762f7df4dc4d09b5b276b60612a0e440cd8e6ae60970",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 85,
+            "line": 18
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 42,
+            "line": 18
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils42UnregisterTroubleshootingNotificationsNapiERKN4Napi12CallbackInfoE",
+              "address": "0xae74",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetCertificate",
+        "node_id": "jsrg_node_10465ada694c0a8524d9888fd4132f34d870cd0e2b8e01ed09fd4302a8ffa9ab",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 19
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 18,
+            "line": 19
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils18GetCertificateNapiERKN4Napi12CallbackInfoE",
+              "address": "0xb078",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "FetchKrispDriverVersion",
+        "node_id": "jsrg_node_68550005d2596eead5f1b2c5a71c2505f131507263fd69cf5de70e586b98d673",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 20
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 27,
+            "line": 20
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils27FetchKrispDriverVersionNapiERKN4Napi12CallbackInfoE",
+              "address": "0xb4c8",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "QueryNotificationInfo",
+        "node_id": "jsrg_node_75f890821bdd8675619fb660a5c403f0fd801ac10cf038f4c16469a43873bf6e",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 51,
+            "line": 21
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 25,
+            "line": 21
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils25QueryNotificationInfoNapiERKN4Napi12CallbackInfoE",
+              "address": "0xb64c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetSystemEventInfo",
+        "node_id": "jsrg_node_f74b42d1c5425057e92442ed2cc995b092c8679e52daab45e9e3962b06f74da6",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 22
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 22,
+            "line": 22
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils22GetSystemEventInfoNapiERKN4Napi12CallbackInfoE",
+              "address": "0xb76c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetApplicationInfo",
+        "node_id": "jsrg_node_c757cf33290844503e1262ee1c016b5ed8dc765fbae611f9cbf9ed0b475c3e78",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 23
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 22,
+            "line": 23
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils22GetApplicationInfoNapiERKN4Napi12CallbackInfoE",
+              "address": "0xbb50",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetHardwareInfo",
+        "node_id": "jsrg_node_9e806bbd456556902afd442dd23ddd187ddcb639265fc90704bacb28eb655ca8",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 24
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 19,
+            "line": 24
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils19GetHardwareInfoNapiERKN4Napi12CallbackInfoE",
+              "address": "0xc5ac",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CollectCrashReportData",
+        "node_id": "jsrg_node_d221a4ed615a824a10cf9c1d2b1abe82f02c5649121a9f57563514a30657a216",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 25
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 26,
+            "line": 25
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils26CollectCrashReportDataNapiERKN4Napi12CallbackInfoE",
+              "address": "0xca40",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetServiceStatus",
+        "node_id": "jsrg_node_61c9393b3cacbb82bcbaeaa749208fe9bf5e686914636523f1d9ea4708844c17",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 41,
+            "line": 26
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 20,
+            "line": 26
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils20GetServiceStatusNapiERKN4Napi12CallbackInfoE",
+              "address": "0xcf44",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "IsRebootRequired",
+        "node_id": "jsrg_node_e835cb3ecdfa73cdb9a7dd9e7da4268454faef6760e1c2feb636b98efd11883f",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 41,
+            "line": 27
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 20,
+            "line": 27
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils20IsRebootRequiredNapiERKN4Napi12CallbackInfoE",
+              "address": "0xd4a8",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartAppControl",
+        "node_id": "jsrg_node_1b90bf50ad269ec713bde2ade428b35de799ba0e265ec5d3a9dcde5d9e0c5c52",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 28
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 19,
+            "line": 28
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils19StartAppControlNapiERKN4Napi12CallbackInfoE",
+              "address": "0xdaec",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopAppControl",
+        "node_id": "jsrg_node_af4e4a047d4b71bac3770c348584ad2ec5a3fd5b92b975df3f1763732c8688c7",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 29
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 18,
+            "line": 29
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils18StopAppControlNapiERKN4Napi12CallbackInfoE",
+              "address": "0xe198",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetKrispIsPromotedValue",
+        "node_id": "jsrg_node_39c2d3fdef89eedb0d3486af1b51a32d5efdb6dc083ae1fbd348ea8f74014820",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 30
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 27,
+            "line": 30
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils27SetKrispIsPromotedValueNapiERKN4Napi12CallbackInfoE",
+              "address": "0xe3d4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetPermissionStatus",
+        "node_id": "jsrg_node_d1e1c7a1e6b76348af85f1e38248f5b923ac8597aec9f2aec7f168052a30a1db",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 31
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 23,
+            "line": 31
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils23GetPermissionStatusNapiERKN4Napi12CallbackInfoE",
+              "address": "0xead4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "RequestPermission",
+        "node_id": "jsrg_node_33f5658a8980d54f89264e7680f32957b8458fe0597f3ccfa4010d5d036b0a3b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 32
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 32
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21RequestPermissionNapiERKN4Napi12CallbackInfoE",
+              "address": "0xf050",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetPerformanceMode",
+        "node_id": "jsrg_node_85f592630058804b5b669702413aa45d28d5ca50876e0c0dc877a87a2f94b138",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 33
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 22,
+            "line": 33
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils22GetPerformanceModeNapiERKN4Napi12CallbackInfoE",
+              "address": "0xfed0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "EnableHardwareUtilizationMonitoring",
+        "node_id": "jsrg_node_7ef54d53ec5cf29eb6ee9649b038d667099248249095645a4c1f996687f639f3",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 79,
+            "line": 34
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 39,
+            "line": 34
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils39EnableHardwareUtilizationMonitoringNapiERKN4Napi12CallbackInfoE",
+              "address": "0x10444",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartProcessMonitoring",
+        "node_id": "jsrg_node_de99b63b629d528f30d9b1240865b35ca6dd3ee52860f1e414ee340d52c9c651",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 35
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 26,
+            "line": 35
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils26StartProcessMonitoringNapiERKN4Napi12CallbackInfoE",
+              "address": "0x10b54",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopProcessMonitoring",
+        "node_id": "jsrg_node_2094e01e6578ae7108481896bddeb2dc45a221e4a041b4166613d7cec46ac6c7",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 51,
+            "line": 36
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 25,
+            "line": 36
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils25StopProcessMonitoringNapiERKN4Napi12CallbackInfoE",
+              "address": "0x1137c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DLLProbe",
+        "node_id": "jsrg_node_8b82a8229feb7c38dcffedfd1b666749255b8cb8b5e858fd391c5e7bf836724e",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 25,
+            "line": 37
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 12,
+            "line": 37
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils12DLLProbeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x11584",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetSystemProperty",
+        "node_id": "jsrg_node_40174c158294f12220a521f2d1212ba9c8cfb521aa0814f4b7d93bc3255006e0",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 38
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 38
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21GetSystemPropertyNapiERKN4Napi12CallbackInfoE",
+              "address": "0xf558",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CheckRegKeyExists",
+        "node_id": "jsrg_node_4213fad615122b17c282e362eeb983f152c428b02d69ae6c640eb12b15a11177",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 39
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 39
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21CheckRegKeyExistsNapiERKN4Napi12CallbackInfoE",
+              "address": "0x118c0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetRegKeyValueInt",
+        "node_id": "jsrg_node_2d4a05cadba4ad07feeebcbb4ede76a7f4fefd9336bd92aa3701bfe281ad1a40",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 40
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 40
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21GetRegKeyValueIntNapiERKN4Napi12CallbackInfoE",
+              "address": "0x12008",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetRegKeyValueStr",
+        "node_id": "jsrg_node_687ab38eee087cf609c145a5edeedc02adaec7b127432da0eff294394cb8504f",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 41
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 41
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21GetRegKeyValueStrNapiERKN4Napi12CallbackInfoE",
+              "address": "0x12840",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetRegKeyValueStr",
+        "node_id": "jsrg_node_e6cff47d1c72007dc99727c78f7a66893c9fd3dcae1a1bb5a4c37303656f621b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 42
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 42
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21SetRegKeyValueStrNapiERKN4Napi12CallbackInfoE",
+              "address": "0x130fc",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DeleteRegKeyValue",
+        "node_id": "jsrg_node_bd387d6022a6d3c3a1b81b00ad8534f52f9a16a9de4de56c10a336e3de8d5ec2",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 43
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 43
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21DeleteRegKeyValueNapiERKN4Napi12CallbackInfoE",
+              "address": "0x138c0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetRegKeyValueBin",
+        "node_id": "jsrg_node_6f9e4cf10a59b4737d136d5a18d17d05e6ca3d795145c1955e3c9d54bcfe2feb",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 44
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 44
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21GetRegKeyValueBinNapiERKN4Napi12CallbackInfoE",
+              "address": "0x13fdc",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetRegKeyValueBin",
+        "node_id": "jsrg_node_ce275bfe4665043e5505db7d960297ebc93b7f0a5ef4d2f17b2a64ee186337e7",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 45
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 21,
+            "line": 45
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils21SetRegKeyValueBinNapiERKN4Napi12CallbackInfoE",
+              "address": "0x148e8",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetCursorScreenPoint",
+        "node_id": "jsrg_node_b225d9d6b4554b075d6953c89ec75eb04ff3f8a37361a3aa10000496b9bd1442",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 46
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 24,
+            "line": 46
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils24GetCursorScreenPointNapiERKN4Napi12CallbackInfoE",
+              "address": "0x15160",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "UnzipFiles",
+        "node_id": "jsrg_node_08b44e6e15ab2f4b5bc13b5c23976a1f99bc5aa8a0086c9e113729fa544a27df",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 47
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-native-utils/index.js",
+          "start": {
+            "column": 14,
+            "line": 47
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "subject": {
+            "name": "kr-native-utils.node",
+            "digest": {
+              "sha256": "5c27ba08b8411cceef4dbb18e1e400cae8a5dc760b6a4a686cde48abf3d6a21a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp11NativeUtils14UnzipFilesNapiERKN4Napi12CallbackInfoE",
+              "address": "0x15404",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      }
+    ],
+    ".vite/build/node_modules/kr-audio-dm/index.js": [
+      {
+        "name": "Initialize",
+        "node_id": "jsrg_node_e22a1b66eb585db904648e0891cfa0d6ccade209d018885dce0adbfb8c9d0ebb",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 15
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 14,
+            "line": 15
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM14InitializeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x3148",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "Destroy",
+        "node_id": "jsrg_node_a4973a6b9333f4555282969d1ec1a8c42fd32ae686bf69dfc70cd911b8f11a3c",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 23,
+            "line": 19
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 11,
+            "line": 19
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM11DestroyNapiERKN4Napi12CallbackInfoE",
+              "address": "0x77e0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ConfigureKrispDevice",
+        "node_id": "jsrg_node_dc026aaaa440a52967678a204eef4585fb4d8e6c8fcbc3d349a5e2c405d575b8",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 25
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 24,
+            "line": 25
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM24ConfigureKrispDeviceNapiERKN4Napi12CallbackInfoE",
+              "address": "0x4b18",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ChangeMuteState",
+        "node_id": "jsrg_node_34fa9c907f57625d3cff1deb63897c52941f6f63b27bb106e2ee432e6c70674d",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 31
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 19,
+            "line": 31
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM19ChangeMuteStateNapiERKN4Napi12CallbackInfoE",
+              "address": "0x59f0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetAudioEnhancementState",
+        "node_id": "jsrg_node_06679fe39c131210789386a912e2013be1eeab6136ebdc9e07772c0d34837a05",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 57,
+            "line": 37
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 28,
+            "line": 37
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM28SetAudioEnhancementStateNapiERKN4Napi12CallbackInfoE",
+              "address": "0x632c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetDefaultAudioDevice",
+        "node_id": "jsrg_node_d8f9003e46c43f0fe7b9a03604273c23cf0f66d568a3422e313503f4b2e25579",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 51,
+            "line": 42
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 25,
+            "line": 42
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM25SetDefaultAudioDeviceNapiERKN4Napi12CallbackInfoE",
+              "address": "0x7908",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CollectReportingData",
+        "node_id": "jsrg_node_27fae87c397adb451da82695694eb1b2e4c2f7c9e0c70dd763d6ddfb229f1ddf",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 46
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 24,
+            "line": 46
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM24CollectReportingDataNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8074",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetDeviceVolume",
+        "node_id": "jsrg_node_fbc6355cfc055e61931ba0ceb416c091ef85f66341b562b491f9fc2abb5dee4e",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 51
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 19,
+            "line": 51
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM19SetDeviceVolumeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x6a9c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetDeviceVolume",
+        "node_id": "jsrg_node_c4b0d87ae374b910e26411865cfe8423fc0f3d2d8e95a0a18e75eacade9e5c62",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 56
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 19,
+            "line": 56
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM19GetDeviceVolumeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x7210",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ChangeVolumeMappingDevice",
+        "node_id": "jsrg_node_d7005538fc2d9309db784bdf1c3d8e9d59be07f96a0f86efafe4808130a59a92",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 59,
+            "line": 61
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 29,
+            "line": 61
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM29ChangeVolumeMappingDeviceNapiERKN4Napi12CallbackInfoE",
+              "address": "0x84ac",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetVolumeMappingMode",
+        "node_id": "jsrg_node_afe347f685094e33ab50c531de58bdf215665e012ba5c9a09ded52367c669244",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 65
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 24,
+            "line": 65
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM24SetVolumeMappingModeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8a18",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "PreventVolumeExternalChange",
+        "node_id": "jsrg_node_18a978fe8f5aa4b810d7b9aa6b516760b146ae51da8f9128a068f21aacaa7141",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 63,
+            "line": 70
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 31,
+            "line": 70
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM31PreventVolumeExternalChangeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x928c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DisableVolumeChangePrevention",
+        "node_id": "jsrg_node_6c322c083c1f3391d3d505fa55aa0779f386a169c2420a03b70dc8618208462f",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 67,
+            "line": 75
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 33,
+            "line": 75
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM33DisableVolumeChangePreventionNapiERKN4Napi12CallbackInfoE",
+              "address": "0x9ae4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SetHidControlMode",
+        "node_id": "jsrg_node_3c18b2f5f3232c52c0759821bc30b5044c710f719b1fa9bd02314813e81b1f16",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 79
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 21,
+            "line": 79
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM21SetHidControlModeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x8f50",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetApplicationIconByPID",
+        "node_id": "jsrg_node_65097144fa08ae15e6f13190683c644a08ee8c129ac7dcfe30bc6e45cbc46159",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 83
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 27,
+            "line": 83
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM27GetApplicationIconByPIDNapiERKN4Napi12CallbackInfoE",
+              "address": "0xa340",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "LockKrispMicVolume",
+        "node_id": "jsrg_node_98a382182804d53b513812689f84814ba9d9b4b9ac268b2dfe53ccc11c9a31de",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 88
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 22,
+            "line": 88
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM22LockKrispMicVolumeNapiERKN4Napi12CallbackInfoE",
+              "address": "0xa730",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "UnlockKrispMicVolume",
+        "node_id": "jsrg_node_b335eaea9d58820ad226d61dfef29962256330820b937b2dd4a695547ab867da",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 93
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-audio-dm/index.js",
+          "start": {
+            "column": 24,
+            "line": 93
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "subject": {
+            "name": "kr-audio-dm.node",
+            "digest": {
+              "sha256": "d369e3b3eeca25b1d6eab55b2ec2b2af514ce8878d53d32c1ec85ccad49fe964"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7AudioDM24UnlockKrispMicVolumeNapiERKN4Napi12CallbackInfoE",
+              "address": "0xac6c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      }
+    ],
+    ".vite/build/node_modules/kr-media-sp/index.js": [
+      {
+        "name": "Initialize",
+        "node_id": "jsrg_node_ed720b71aac930c11d72dc2c7c80ea98e60697e206cec075ecd2192802136686",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 4
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 14,
+            "line": 4
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "Destroy",
+        "node_id": "jsrg_node_f25acb248585ba6440005163f9688cc68f6989a601e8371bbed6adfadbf9c7e0",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 31,
+            "line": 5
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 11,
+            "line": 5
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "LoadModels",
+        "node_id": "jsrg_node_a8a8423f579964799c9997e4402b25fb0c890f25f12a2f84ea481bd612a16ac8",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 6
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 14,
+            "line": 6
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP14LoadModelsNapiERKN4Napi12CallbackInfoE",
+              "address": "0x1f7ac",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "LoadASRModel",
+        "node_id": "jsrg_node_b0b05cd5289c97676d5d14cbdeff6d55416818e6f61bd7e16191f17f3f8d7c04",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 41,
+            "line": 7
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 16,
+            "line": 7
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP16LoadASRModelNapiERKN4Napi12CallbackInfoE",
+              "address": "0x1fc28",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartASRProcessing",
+        "node_id": "jsrg_node_e2d8bd862062c5f7fa62f4f8ded06ebc93fb40e6a5b3d0d58a451b01f6794dba",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 8
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 22,
+            "line": 8
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP22StartASRProcessingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x204ac",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "YieldASRResult",
+        "node_id": "jsrg_node_8cd97e46ea1a5b03fe78f84842711da8af77cf4906bd8d54772a7c292713b1fa",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 9
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 18,
+            "line": 9
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP18YieldASRResultNapiERKN4Napi12CallbackInfoE",
+              "address": "0x210a0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopASRProcessing",
+        "node_id": "jsrg_node_990d9f3e858938d215a73a58dd3727f53b95696a52bc2eeacd9a90cfd2f25131",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 51,
+            "line": 10
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 21,
+            "line": 10
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP21StopASRProcessingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x21440",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CreateGraph",
+        "node_id": "jsrg_node_7132f074e690ccd917e6481d4073de2cfb3eb446299d813486e49007b57415eb",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 11
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 15,
+            "line": 11
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP15CreateGraphNapiERKN4Napi12CallbackInfoE",
+              "address": "0x23b6c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartGraph",
+        "node_id": "jsrg_node_119ead2134e69a7e6acf007e90c126f610e7645c190e63025bd4d3d36409e88b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 12
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 14,
+            "line": 12
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP14StartGraphNapiERKN4Napi12CallbackInfoE",
+              "address": "0x24624",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopGraph",
+        "node_id": "jsrg_node_83ad70a514178a39c5edf3889efdaccd7ebcb487877448ace4ee4bb53777e4ab",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 35,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 13,
+            "line": 13
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP13StopGraphNapiERKN4Napi12CallbackInfoE",
+              "address": "0x24f1c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DeleteGraph",
+        "node_id": "jsrg_node_35ab2a208591797bfd88fba17008cc40634339b89c312519cd062bcf06d5116b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 14
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 15,
+            "line": 14
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP15DeleteGraphNapiERKN4Napi12CallbackInfoE",
+              "address": "0x252bc",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ChangeGraphSettings",
+        "node_id": "jsrg_node_f817c5beedfcd2e78a0aa3238981c423dbf0074849fba224449908f5f442d6ee",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 15
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 23,
+            "line": 15
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP23ChangeGraphSettingsNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2565c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CollectReportingData",
+        "node_id": "jsrg_node_cc7f19d3b642cf15b3337deac729b6bec681fad4c7806f2f6a11dc657080f8c4",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 57,
+            "line": 16
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 24,
+            "line": 16
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP24CollectReportingDataNapiERKN4Napi12CallbackInfoE",
+              "address": "0x25978",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "SuspendProcessor",
+        "node_id": "jsrg_node_ec98d6874821b0b64ad9deb20ccf08f0bf3e8cf30c1a662c6c4e0fe802464ad7",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 17
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 20,
+            "line": 17
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP20SuspendProcessorNapiERKN4Napi12CallbackInfoE",
+              "address": "0x25d18",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ResumeProcessor",
+        "node_id": "jsrg_node_ce8ef5c4e1d7171142dbc18a7996889260eb9a8519b456ced7e96a60a0e85987",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 18
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 19,
+            "line": 18
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP19ResumeProcessorNapiERKN4Napi12CallbackInfoE",
+              "address": "0x263a0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ChangeProcessorSettings",
+        "node_id": "jsrg_node_47205442c61e56908a16fe1cd5d6e14fef2c4b7162785f22ad19e071fa203c29",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 63,
+            "line": 19
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 27,
+            "line": 19
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP27ChangeProcessorSettingsNapiERKN4Napi12CallbackInfoE",
+              "address": "0x26a28",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CreateRecording",
+        "node_id": "jsrg_node_25f191c12a1eb9ad1a8ec65dffbbb384080642b3df2617db32c3b9eb537bbc82",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 20
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 19,
+            "line": 20
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP19CreateRecordingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x27318",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DestroyRecording",
+        "node_id": "jsrg_node_87ad1a62e8e861642043d9af3ff503832250ca97a45fbb27f15ea596a80044ae",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 21
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 20,
+            "line": 21
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP20DestroyRecordingNapiERKN4Napi12CallbackInfoE",
+              "address": "0x27d8c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "RedactAudioToMp3",
+        "node_id": "jsrg_node_df333e0e80bbb0544a004f58a3062e8e35f57a62b89c25e89391a9d9740db0fa",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 22
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 20,
+            "line": 22
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP20RedactAudioToMp3NapiERKN4Napi12CallbackInfoE",
+              "address": "0x2812c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "EnableTranslations",
+        "node_id": "jsrg_node_cc206e6cb2acd117b1c03cef580691d742e7a0a252ae92f2be93c9ca839c488a",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 23
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 22,
+            "line": 23
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP22EnableTranslationsNapiERKN4Napi12CallbackInfoE",
+              "address": "0x28d90",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CreateTranslation",
+        "node_id": "jsrg_node_67556e6626d3602ac81812982a5794d92ebbf8bdbd0bac36e203fe4798164d08",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 51,
+            "line": 24
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 21,
+            "line": 24
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP21CreateTranslationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x28e18",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DestroyTranslation",
+        "node_id": "jsrg_node_8154dce78967c8ed2791064e324f0d116e45c8f830207b9f4496e4b0165c9886",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 53,
+            "line": 25
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 22,
+            "line": 25
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP22DestroyTranslationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2a408",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "PlayTranslationText",
+        "node_id": "jsrg_node_2f0be7003cda8d516f3ff60dd3c2f8755a707b6ae3ddb504c7bd1ea7712200e3",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 26
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 23,
+            "line": 26
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP23PlayTranslationTextNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2a808",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "InterruptTranslation",
+        "node_id": "jsrg_node_20654294786d0ba2397a9a5abd4f42890ffc5fad40f92e534355e0edd324b1f4",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 57,
+            "line": 27
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 24,
+            "line": 27
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP24InterruptTranslationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2b150",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CreateRtcTranscriber",
+        "node_id": "jsrg_node_6e8014d9f726d65388e19dd3068b7c9b482d9e639aab21751b2066e1e484102d",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 57,
+            "line": 28
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 24,
+            "line": 28
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP24CreateRtcTranscriberNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2b550",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "DestroyRtcTranscriber",
+        "node_id": "jsrg_node_0f257dfec3bfbdfdfa739af6929b303e2d62038cd5fdfbeb188bd9cf3a7f7675",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 59,
+            "line": 29
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 25,
+            "line": 29
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP25DestroyRtcTranscriberNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2c88c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartDiarization",
+        "node_id": "jsrg_node_e76adc2b29e300294c2d3bede8c134bfdd68b7b76f37f22ab70978c9c4126ac9",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 49,
+            "line": 30
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 20,
+            "line": 30
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP20StartDiarizationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x218f0",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopDiarization",
+        "node_id": "jsrg_node_df84a2736c5adbe2ad0688bfd5d1d7e29332e2bb1d140e98b5119e3fa38492d4",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 47,
+            "line": 31
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 19,
+            "line": 31
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP19StopDiarizationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x220a8",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "PushDiarizationText",
+        "node_id": "jsrg_node_e64422c8e53076e730a743417c69ce4685f0a8499d96bf9d5ef68e4c72a721bc",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 55,
+            "line": 32
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 23,
+            "line": 32
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP23PushDiarizationTextNapiERKN4Napi12CallbackInfoE",
+              "address": "0x22548",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartLanguageDetection",
+        "node_id": "jsrg_node_99a5e7d31f0a8d1a631c659f63b8ab34ca54bfa4217b464b8d6b3eabb6ac8e9e",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 61,
+            "line": 33
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 26,
+            "line": 33
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP26StartLanguageDetectionNapiERKN4Napi12CallbackInfoE",
+              "address": "0x22e50",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopLanguageDetection",
+        "node_id": "jsrg_node_3edd06111d9b569a6b43b49422f68d1396ad3ce7dcea9cfb32715876a5478127",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 59,
+            "line": 34
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 25,
+            "line": 34
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP25StopLanguageDetectionNapiERKN4Napi12CallbackInfoE",
+              "address": "0x23680",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetWssChannelConnectionState",
+        "node_id": "jsrg_node_0b2595239887d7e6d652428ba6dcb6b0837506f732761f03160ea63a9f657b15",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 73,
+            "line": 35
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 32,
+            "line": 35
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP32GetWssChannelConnectionStateNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2cc2c",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "GetWssChannelReachability",
+        "node_id": "jsrg_node_926c472a51686a01c77fd8bbc94ddce31d705d6b19b3418d375baca032c3e762",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 67,
+            "line": 36
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-media-sp/index.js",
+          "start": {
+            "column": 29,
+            "line": 36
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "subject": {
+            "name": "kr-media-sp.node",
+            "digest": {
+              "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp7MediaSP29GetWssChannelReachabilityNapiERKN4Napi12CallbackInfoE",
+              "address": "0x2ccb4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      }
+    ],
+    ".vite/build/node_modules/kr-node-logger/index.js": [
+      {
+        "name": "Initialize",
+        "node_id": "jsrg_node_fbf8d00c51948c98f6dc800d87a28d2084ae1ca75ae47523d62c876ad2626a35",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 4
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 14,
+            "line": 4
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "Destroy",
+        "node_id": "jsrg_node_8b097f7bf669699da6ef48a983278a8b2f1be5178cc2a103a381c749e11abb99",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 23,
+            "line": 5
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 11,
+            "line": 5
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "Log",
+        "node_id": "jsrg_node_780b01c33466ee01fa80fa816b31c4daa54696f42e19dd242eb754ac26146282",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 15,
+            "line": 6
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 7,
+            "line": 6
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "SetLogLevel",
+        "node_id": "jsrg_node_f7d86d20d51bf59d7d99f091f8f5f2e6b029daab693ec8d3f4e99b755965795b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 31,
+            "line": 7
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 15,
+            "line": 7
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "SetPattern",
+        "node_id": "jsrg_node_eabbe7a456dcbd261b95a32dacfb4cbae319b41d50429c7bd21561f26a7ea503",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 8
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 14,
+            "line": 8
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "Flush",
+        "node_id": "jsrg_node_12c36d2e5f12c04849e3b07cd730fde53e556507a465e0f4a712f7313f0967f5",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 19,
+            "line": 9
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 9,
+            "line": 9
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "InitializeNamed",
+        "node_id": "jsrg_node_bdf2469c3bcc963c0b88cd468cb3e4a8dfab58d500ebe29218173692b1ac107b",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 10
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 19,
+            "line": 10
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "DestroyNamed",
+        "node_id": "jsrg_node_aac165070ac42206c677c3bdd227bca39741ce115bd7dc682dac6b3002917366",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 33,
+            "line": 11
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 16,
+            "line": 11
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "LogNamed",
+        "node_id": "jsrg_node_39ee8784b2b6fac09bff8978825432726cb929692a9a2b8c7d451b5d4633ddf6",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 25,
+            "line": 12
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 12,
+            "line": 12
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "SetNamedLogLevel",
+        "node_id": "jsrg_node_26f6dafbe0d5cfc69f83a083106d62ec468cdf2300ce8c1d89fcd8a45612bb94",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 41,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 20,
+            "line": 13
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "SetNamedPattern",
+        "node_id": "jsrg_node_3d1c432f9f7bd37bd5822c39258dbad697b15595a960e8fb5a519702c6da002c",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 14
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 19,
+            "line": 14
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      },
+      {
+        "name": "FlushNamed",
+        "node_id": "jsrg_node_b2378d341379a89f875661e49ce097b27ad553428d925e44ecdd967e0c0f4d0f",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 29,
+            "line": 15
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-node-logger/index.js",
+          "start": {
+            "column": 14,
+            "line": 15
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved"
+      }
+    ],
+    ".vite/build/node_modules/kr-ext-hub/index.js": [
+      {
+        "name": "Initialize",
+        "node_id": "jsrg_node_6ffdaf57595ede75659264a2f3cfb88d96afc33f302958d3a3aa96cbf8747614",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 33,
+            "line": 4
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 14,
+            "line": 4
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub14InitializeNapiERKN4Napi12CallbackInfoE",
+              "address": "0x35f4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "Destroy",
+        "node_id": "jsrg_node_1ef38f5a9c8947dd0d1a0f286be678e9a5e1b80092c1c6581b6d63d84c0aa479",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 27,
+            "line": 5
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 11,
+            "line": 5
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub11DestroyNapiERKN4Napi12CallbackInfoE",
+              "address": "0x4b14",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "ExecuteAction",
+        "node_id": "jsrg_node_9b5b809c23202382d2d86cd8f422f9f902d9efa355ee1f7cf5c675dd3c1963cf",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 39,
+            "line": 6
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 17,
+            "line": 6
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub17ExecuteActionNapiERKN4Napi12CallbackInfoE",
+              "address": "0x4dc4",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "CancelAction",
+        "node_id": "jsrg_node_30c4d7d2d403b92752bdc211d7857fae9a2abf0c73c33f0129681dc33888b976",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 37,
+            "line": 7
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 16,
+            "line": 7
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub16CancelActionNapiERKN4Napi12CallbackInfoE",
+              "address": "0x5984",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StartObservation",
+        "node_id": "jsrg_node_aad7d2edcbf30f4a46c8361b735c1d0e9a098d0b670110e61eab67c86b55618f",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 45,
+            "line": 8
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 20,
+            "line": 8
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub20StartObservationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x5d38",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      },
+      {
+        "name": "StopObservation",
+        "node_id": "jsrg_node_7a8946b647c550940d9f59b9e5787be28c4f35b166299896dd173188928057b8",
+        "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "location": {
+          "end": {
+            "column": 43,
+            "line": 9
+          },
+          "kind": "source-range",
+          "source": ".vite/build/node_modules/kr-ext-hub/index.js",
+          "start": {
+            "column": 19,
+            "line": 9
+          }
+        },
+        "status": "static-property-read",
+        "runtime_verified": false,
+        "native_export_verified": false,
+        "local_cloud_classification": "unresolved",
+        "native_handler_export_verified": true,
+        "native_corroboration": {
+          "evidence_id": "ev_c1ad68ae99baa784d241b972643e14f75234153730354c1a3f9e0c629082712b",
+          "subject": {
+            "name": "kr-ext-hub.node",
+            "digest": {
+              "sha256": "74bba0805543cf997525de1533ea3f872e4a272f39a9217f80a2b372a1ccc395"
+            },
+            "format": "mach-o",
+            "architecture": "arm64",
+            "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-ext-hub/build/Release/kr-ext-hub.node"
+          },
+          "symbols": [
+            {
+              "name": "__ZN5Krisp6ExtHub19StopObservationNapiERKN4Napi12CallbackInfoE",
+              "address": "0x6550",
+              "weak": null,
+              "reexport": false,
+              "source": null
+            }
+          ],
+          "meaning": "Observed Mach-O Napi handler symbol matches the wrapper request. JavaScript export registration and invocation remain unverified.",
+          "integrity": "ASAR companion declared digest mismatch; current local bytes only"
+        }
+      }
+    ]
+  },
+  "feature_questions": [
+    {
+      "question": "Noise cancellation algorithm and quality",
+      "status": "unresolved"
+    },
+    {
+      "question": "Physical and virtual device routing",
+      "status": "unresolved"
+    },
+    {
+      "question": "Local model format and inference interface",
+      "status": "unresolved"
+    },
+    {
+      "question": "Local versus cloud ASR",
+      "status": "unresolved"
+    },
+    {
+      "question": "UI settings, defaults and persistence",
+      "status": "unresolved"
+    },
+    {
+      "question": "Recording format, timing and storage",
+      "status": "unresolved"
+    },
+    {
+      "question": "Account-free initialization",
+      "status": "unresolved"
+    },
+    {
+      "question": "Crash and analytics exclusion boundary",
+      "status": "unresolved"
+    },
+    {
+      "question": "Hotkeys and menu bar behavior",
+      "status": "unresolved"
+    },
+    {
+      "question": "Offline availability of translation and diarization",
+      "status": "unresolved"
+    }
+  ],
+  "native_cross_confirmation": {
+    "matching_handler_symbols": 97,
+    "scope": "exact method spelling followed by Napi in selected observed Mach-O exports",
+    "javascript_registration_verified": false,
+    "runtime_verified": false
+  }
+}

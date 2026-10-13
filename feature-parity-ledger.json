@@ -1,0 +1,2400 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-10-13",
+  "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
+  "purpose": "Gap audit, not completion or runtime parity certification",
+  "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
+  "catalog": {
+    "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+    "path": "projects/krisp/evidence/current-translations.json",
+    "leaf_count": 1014,
+    "assigned_once_count": 1014,
+    "unassigned_keys": [],
+    "claim_limit": "Translation leaves are supporting text. They do not prove reachability, factory defaults, platform support or exhaustive runtime capabilities.",
+    "assignment_validation": "1014 unique keys exactly match retained current catalog. Primary assignments are workflow families. Paid or hidden status alone never excludes a proven local capability; unresolved cloud-backed adaptations are not asserted as requirements."
+  },
+  "prior_catalog_correction": {
+    "old_path": "projects/krisp/catalog-feature-map.json",
+    "old_leaf_count": 997,
+    "old_account_group_count": 94,
+    "note": "Prior 94-label account group plus new version restrictions must not exclude underlying local features. Reassigned concrete local gate-related labels; generic sign-in/upgrade/quota decoration remains excluded as policy UI only. Removed inherited substring false positives: robotic voice is a local audio artifact, not a bot service; generic management/setup labels do not establish cloud-only execution.",
+    "reassigned_existing_keys": {
+      "accent_conversion.main_ui.enforced_by_admin": "accent",
+      "accent_conversion.minutes_expired": "accent",
+      "bvc.bvc_device_enforced_tooltip": "background-voice",
+      "in_person_recording.note_taker.disabled_tooltip": "recording",
+      "companion.live_captions_upgrade.description": "captions",
+      "companion.live_captions_upgrade.title": "captions",
+      "companion.live_captions_upgrade.btn_upgrade": "captions",
+      "nc_block_mic_enforced_al_tooltip": "noise",
+      "nc_block_spk_enforced_al_tooltip": "noise",
+      "note_taker_storage.trial_ended": "storage",
+      "note_taker_storage.trial_ended_body": "storage",
+      "note_taker_storage.type_enforced": "storage",
+      "switch_to_this_mode_disabled_tooltip": "recording",
+      "upgrade_tooltip.record_audio": "recording",
+      "upgrade_tooltip.record_screen": "screen-capture",
+      "report_problem.include_system_information_logout": "diagnostics",
+      "report_problem.sign_out_state_text": "diagnostics",
+      "save_and_sign_out": "lifecycle",
+      "wait_for_sign_out_text": "lifecycle",
+      "sign_out_no_save": "lifecycle"
+    }
+  },
+  "features": [
+    {
+      "id": "account-policy",
+      "feature": "Vendor accounts, subscriptions and enforcement",
+      "scope": "excluded",
+      "implementation_state": "excluded",
+      "catalog_keys": [
+        "account_switch_confirmation.description",
+        "account_switch_confirmation.reject",
+        "account_switch_confirmation.switch_account",
+        "account_switch_confirmation.title",
+        "account_switch_confirmation.window_title",
+        "app_menu_file.invite_teammates",
+        "app_menu_help.sign_out",
+        "auth_failed_device_blocked",
+        "auth_failed_device_license",
+        "auth_failed_device_no_seat",
+        "auth_failed_device_no_team",
+        "auth_failed_device_other",
+        "auth_failed_restricted_version",
+        "auth_failed_restricted_version_title",
+        "auth_failed_text",
+        "auth_required",
+        "authentication.text_something_went_wrong_try_again",
+        "btn_login",
+        "btn_logout",
+        "btn_upgrade",
+        "btn_upgrade_now",
+        "btn_upgrade_to_advanced",
+        "btn_upgrade_to_business",
+        "call_indicator.no_minutes_1",
+        "call_indicator.no_minutes_ac",
+        "call_indicator.no_minutes_nc",
+        "call_started_ac_no_minutes_2",
+        "call_started_no_minutes_1",
+        "call_started_no_minutes_2",
+        "context_menu_fetch_user_profile",
+        "context_menu_sign_out",
+        "daily_free_minutes",
+        "fetch_profile",
+        "free_plan",
+        "loading_account_text",
+        "login_text",
+        "minute_expired_tooltip",
+        "nav_btn_sign_out",
+        "nc_minutes_expired_today",
+        "nc_minutes_left_today",
+        "nc_minutes_range",
+        "nc_minutes_renew_tooltip",
+        "note_taker_tooltip.nc_minutes_expired",
+        "password",
+        "pref_descr_minutes_expired",
+        "pref_descr_minutes_renewed",
+        "pref_descr_stream_end_minutes_expired",
+        "pref_title_minutes_expired",
+        "pref_title_minutes_renewed",
+        "pref_title_stream_end_minutes_expired",
+        "pro",
+        "pro_feature_tooltip",
+        "report_problem.minutes_are_not_renewed",
+        "sign_out_in_progress_text",
+        "signin_process_text",
+        "text_free_plan_subscription",
+        "text_is_signed_out_or_session_expired",
+        "text_krisp_has_signed_out_automatically",
+        "text_krisp_has_signed_out_manually",
+        "text_manual_sign_out",
+        "text_restricted_version_contact_admin_or_switch",
+        "text_sign_in",
+        "tooltip_refresh_standard",
+        "trial_ended.body",
+        "trial_ended.button",
+        "trial_ended.disabled_text",
+        "trial_ended.title",
+        "unable_to_get_account_details",
+        "upgrade_for_feature",
+        "user_name",
+        "web_dashboard.text_auth_description",
+        "web_dashboard.text_auth_page_signing_in",
+        "web_dashboard.text_signing_in",
+        "window_title_proxy_authentication",
+        "window_title_restricted_version",
+        "window_title_sign_in"
+      ],
+      "representative_labels": [
+        {
+          "key": "account_switch_confirmation.description",
+          "text": "You are about to sign in to a different Krisp account. This will log you out of your current account and switch to the new one."
+        },
+        {
+          "key": "account_switch_confirmation.reject",
+          "text": "Reject"
+        },
+        {
+          "key": "account_switch_confirmation.switch_account",
+          "text": "Switch Account"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "No vendor authentication, seat, trial, quota or organization enforcement is implemented or desired.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Confirm local capabilities remain available without any sign-in, trial expiry or plan checks."
+    },
+    {
+      "id": "cloud-bot",
+      "feature": "Cloud storage, meeting bots and remote dashboard services",
+      "scope": "excluded",
+      "implementation_state": "excluded",
+      "catalog_keys": [
+        "bot_joined_indicator",
+        "bot_revoke_disabled_tooltip",
+        "bot_status_changed_default_error_message",
+        "bot_status_changed_joining",
+        "bot_status_changed_kicked_by_host",
+        "bot_status_changed_no_participants",
+        "bot_status_changed_not_admitted",
+        "bot_status_changed_recording",
+        "bot_status_changed_retry",
+        "bot_status_changed_waiting_room",
+        "bot_status_description_error",
+        "bot_status_description_joining",
+        "bot_status_description_waiting",
+        "bot_transcribing_tooltip",
+        "bot_transcribing_tooltip_wrapped",
+        "cloud_store_info",
+        "invite_popup_body",
+        "invite_popup_primary_btn",
+        "invite_popup_title",
+        "note_taker_storage.cloud",
+        "note_taker_storage.cloud_info",
+        "record_with_bot.bot_status_in_meeting",
+        "record_with_bot.bot_status_joining",
+        "record_with_bot.bot_status_revoked_no_rejoin",
+        "record_with_bot.in_progress",
+        "record_with_bot.invalid_link",
+        "record_with_bot.invite",
+        "record_with_bot.invite_bot",
+        "record_with_bot.invite_link",
+        "record_with_bot.invite_link_placeholder",
+        "record_with_bot.invite_ongoing_meeting",
+        "record_with_bot.no_bot",
+        "record_with_bot.record_via_bot",
+        "record_with_bot.retry",
+        "record_with_bot.storage_info",
+        "remove_bot",
+        "revoke_popup_body",
+        "revoke_popup_primary_btn",
+        "revoke_popup_title",
+        "video_record_via_bot",
+        "web_dashboard.dashboard_failed_description",
+        "web_dashboard.dashboard_failed_title",
+        "web_dashboard.offline_body",
+        "web_dashboard.offline_title",
+        "web_dashboard.refresh"
+      ],
+      "representative_labels": [
+        {
+          "key": "bot_joined_indicator",
+          "text": "Works via Bot"
+        },
+        {
+          "key": "bot_revoke_disabled_tooltip",
+          "text": "Recording and Transcribing not available as \nBot was revoked from the meeting"
+        },
+        {
+          "key": "bot_status_changed_default_error_message",
+          "text": "Krisp Bot couldn't join the meeting. "
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "Remote service workflows are deliberately outside scope; related local history and lifecycle functions remain retained elsewhere.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Audit service imports/endpoints and network behavior independently; static catalog cannot prove telemetry absence."
+    },
+    {
+      "id": "external-support",
+      "feature": "Remote support submission, invitations and sales",
+      "scope": "excluded",
+      "implementation_state": "excluded",
+      "catalog_keys": [
+        "accent_conversion.call_center_notice.description",
+        "accent_conversion.call_center_notice.talk_to_sales",
+        "accent_conversion.call_center_notice.title",
+        "app_menu_help.contact_us",
+        "app_menu_help.give_feedback",
+        "app_menu_help.help_center",
+        "app_menu_help.join_slack",
+        "btn_contact_support",
+        "how_was_transcript_text",
+        "how_was_transcript_text_link",
+        "link_privacy_policy",
+        "link_term_of_use",
+        "nav_btn_contact_support",
+        "pref_descr_share_krisp",
+        "pref_title_share_krisp",
+        "report_problem.add_attachment",
+        "report_problem.allowed_file_formats_for_attachment",
+        "report_problem.btn_send_report",
+        "report_problem.could_not_upload_file",
+        "report_problem.max_file_count_pupup",
+        "report_problem.max_file_limit",
+        "report_problem.max_file_size_pupup",
+        "report_problem.not_exceed_limit",
+        "report_problem.report_description",
+        "report_problem.report_description_second",
+        "report_problem.report_process_fail_text",
+        "report_problem.report_process_pending",
+        "report_problem.report_process_success_text",
+        "report_problem.report_process_sync_issue",
+        "report_problem.send_report",
+        "report_problem.total_max_files_sizes_warning",
+        "report_problem.upload_or_drop_file",
+        "report_problem.user_warning_for_recording_report"
+      ],
+      "representative_labels": [
+        {
+          "key": "accent_conversion.call_center_notice.description",
+          "text": "Talk to sales to learn about our Call Center AI solutions."
+        },
+        {
+          "key": "accent_conversion.call_center_notice.talk_to_sales",
+          "text": "Talk to sales"
+        },
+        {
+          "key": "accent_conversion.call_center_notice.title",
+          "text": "Need call-center-grade accent conversion?"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "No remote report upload, sales contact or vendor feedback service.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Ensure local diagnostics/export remains possible separately; do not copy online submission paths."
+    },
+    {
+      "id": "calendar",
+      "feature": "Local agenda, meeting list and join reminders",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "add_agenda",
+        "all_day_event",
+        "all_done_today",
+        "before_meeting",
+        "calendar_reminder_in_min",
+        "calendar_reminder_in_progress",
+        "calendar_reminder_join",
+        "fetch_calendar",
+        "in_person_recording.scheduled_meeting_modal.in_progress",
+        "in_person_recording.scheduled_meeting_modal.start_btn",
+        "in_person_recording.scheduled_meeting_modal.start_new_meeting_btn",
+        "in_person_recording.scheduled_meeting_modal.title",
+        "join",
+        "no_meeting_today",
+        "not_available_calendar_data",
+        "past_meetings",
+        "pref_description_show_calendar_events",
+        "pref_label_events_filters_title",
+        "pref_label_menu_bar_calendar_events",
+        "pref_label_show_all_day_events",
+        "pref_label_show_calendar_events",
+        "pref_label_show_events_without_conferencing",
+        "pref_label_show_events_without_participants",
+        "pref_menu_calendar",
+        "pref_notifications_upcoming_event_body",
+        "pref_notifications_upcoming_event_title",
+        "reminder.consent_helper_text",
+        "reminder.join",
+        "reminder.join_and_take_notes",
+        "reminder.join_and_take_notes_1_line",
+        "reminder.join_and_take_notes_2_line",
+        "reminder.manage_notifications",
+        "reminder.take_notes",
+        "up_next_today",
+        "view_agenda"
+      ],
+      "representative_labels": [
+        {
+          "key": "add_agenda",
+          "text": "Add Agenda"
+        },
+        {
+          "key": "all_day_event",
+          "text": "All-day"
+        },
+        {
+          "key": "all_done_today",
+          "text": "All done for today ✅"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "No calendar/agenda UI or event synchronization exists.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Recover the calendar source and event/filter contract. Retain proven local agenda/reminder behavior. If the original depends on cloud services, omit those services; a new local agenda adaptation is optional and requires a later scope decision."
+    },
+    {
+      "id": "screen-capture",
+      "feature": "Local screen recording and source selection",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "note_taker_tooltip.screen_recording",
+        "note_taker_tooltip.screen_recording_stopped",
+        "note_taker_tooltip.switch_to_screen_recording",
+        "permissions_backdrop.screen_capture_desc",
+        "record_screen",
+        "screen_recording_close_btn",
+        "screen_recording_header_text",
+        "screen_recording_in_progress",
+        "screen_recording_local_info",
+        "screen_recording_paused",
+        "screen_recording_record_btn",
+        "screen_recording_switch_btn",
+        "upgrade_tooltip.record_screen",
+        "web_dashboard.screen_recording_paused",
+        "window_title_screen_recording"
+      ],
+      "representative_labels": [
+        {
+          "key": "screen_recording_local_info",
+          "text": "Screen recording isn't available with\non-device storage. To use it, update\n the storage location in your settings."
+        },
+        {
+          "key": "upgrade_tooltip.record_screen",
+          "text": "Screen Record"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "Paid labels alone do not exclude screen capture. The original on-device-storage restriction leaves its local/service boundary unresolved. No screen-capture implementation exists; a new local equivalent is an optional adaptation, not a confirmed requirement.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Establish original local versus cloud capture/storage boundary and Mac reachability. For confirmed retained local behavior, verify explicit source, macOS permission, pause/stop, audio synchronization, finalization and failures. A replacement for cloud-backed screen recording requires a later scope decision."
+    },
+    {
+      "id": "accent",
+      "feature": "Microphone/speaker accent conversion, variants and sample comparison",
+      "scope": "retained",
+      "implementation_state": "metadata_and_static_probe_only",
+      "catalog_keys": [
+        "accent_conversion.african",
+        "accent_conversion.almost_ready",
+        "accent_conversion.description",
+        "accent_conversion.error.generic",
+        "accent_conversion.error.model_preparation_generic",
+        "accent_conversion.error.model_preparation_no_connection",
+        "accent_conversion.error.no_connection",
+        "accent_conversion.few_moments",
+        "accent_conversion.filipino",
+        "accent_conversion.in_progress.description",
+        "accent_conversion.in_progress.recording",
+        "accent_conversion.in_progress.script",
+        "accent_conversion.in_progress.title",
+        "accent_conversion.indian",
+        "accent_conversion.initial.bvc_warning",
+        "accent_conversion.initial.description",
+        "accent_conversion.initial.important",
+        "accent_conversion.initial.press_to_start",
+        "accent_conversion.initial.title",
+        "accent_conversion.latam",
+        "accent_conversion.main_ui.daily_limit_tooltip",
+        "accent_conversion.main_ui.enforced_by_admin",
+        "accent_conversion.main_ui.mic_issue_tooltip",
+        "accent_conversion.main_ui.mic_unmuted_tooltip",
+        "accent_conversion.main_ui.preparing",
+        "accent_conversion.main_ui.spk_issue_tooltip",
+        "accent_conversion.main_ui.spk_not_selected_tooltip",
+        "accent_conversion.main_ui.spk_unmuted_tooltip",
+        "accent_conversion.mic_title_collapsed",
+        "accent_conversion.mic_title_expanded",
+        "accent_conversion.minutes_expired",
+        "accent_conversion.modal.back",
+        "accent_conversion.modal.skip",
+        "accent_conversion.modal.title",
+        "accent_conversion.pakistani",
+        "accent_conversion.preferences.accent_type",
+        "accent_conversion.preferences.accent_type_african",
+        "accent_conversion.preferences.accent_type_chinese",
+        "accent_conversion.preferences.accent_type_filipino",
+        "accent_conversion.preferences.accent_type_french",
+        "accent_conversion.preferences.accent_type_indian",
+        "accent_conversion.preferences.accent_type_latam",
+        "accent_conversion.preferences.accent_type_russian",
+        "accent_conversion.preferences.coming_soon",
+        "accent_conversion.preferences.preparing",
+        "accent_conversion.preferences.show_accent_conversion",
+        "accent_conversion.preferences.show_accent_conversion_desc",
+        "accent_conversion.preferences.soon",
+        "accent_conversion.preferences.title",
+        "accent_conversion.preparing",
+        "accent_conversion.preparing_models",
+        "accent_conversion.recording_notice",
+        "accent_conversion.retry",
+        "accent_conversion.review.accented_conversation",
+        "accent_conversion.review.description",
+        "accent_conversion.review.off",
+        "accent_conversion.review.on",
+        "accent_conversion.review.problems",
+        "accent_conversion.review.record_again",
+        "accent_conversion.review.title",
+        "accent_conversion.service_error",
+        "accent_conversion.speaker_title_collapsed",
+        "accent_conversion.speaker_title_expanded",
+        "accent_conversion.test_accent",
+        "accent_conversion.thanks",
+        "accent_conversion.title",
+        "accent_free_daily",
+        "accent_localization",
+        "accent_toggle_tooltip",
+        "al_bvc_blocked_warning",
+        "bvc_required_for_accent_tooltip",
+        "call_indicator.accent_conversion",
+        "call_started_al_off_1",
+        "call_started_al_off_2",
+        "call_started_al_title",
+        "companion.test_al",
+        "nav_btn_test_ac",
+        "pref_descr_al_off",
+        "pref_descr_al_on",
+        "pref_descr_call_started_ac",
+        "pref_title_al_off",
+        "pref_title_al_on",
+        "pref_title_call_started_ac",
+        "report_problem.accent_difficulty_in_understanding",
+        "report_problem.accent_lagging_voice",
+        "report_problem.accent_not_working",
+        "report_problem.accent_still_strong_accent",
+        "report_problem.accent_strange_voices",
+        "report_problem.having_issue_with_accent",
+        "text_unmute_krisp_for_test_al",
+        "widget_accent_localization"
+      ],
+      "representative_labels": [
+        {
+          "key": "accent_conversion.mic_title_expanded",
+          "text": "Convert my accent"
+        },
+        {
+          "key": "accent_conversion.speaker_title_expanded",
+          "text": "Convert others' accent"
+        },
+        {
+          "key": "accent_conversion.preferences.show_accent_conversion_desc",
+          "text": "Displays the Accent Conversion feature in the app."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Assets can be discovered/hashed. No conversion inference, variant selection, feature visibility control or comparison UI is implemented.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Recover/implement local streaming contract for each supported direction/variant; measure latency, errors and quality; keep coming-soon variants unproven rather than invent support."
+    },
+    {
+      "id": "captions",
+      "feature": "Live captions and companion controls",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "companion.hide_captions",
+        "companion.live_captions_runtime_error.description",
+        "companion.live_captions_runtime_error.title",
+        "companion.live_captions_upgrade.btn_upgrade",
+        "companion.live_captions_upgrade.description",
+        "companion.live_captions_upgrade.title",
+        "companion.show_captions",
+        "companion.sidebar_title",
+        "companion.test_run_title"
+      ],
+      "representative_labels": [
+        {
+          "key": "companion.show_captions",
+          "text": "Turn on Captions"
+        },
+        {
+          "key": "companion.live_captions_upgrade.description",
+          "text": "This feature is available exclusively on Pro and Business plans."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "Paid captions remain retained. Cross-platform Microsoft runtime text does not establish Mac reachability.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Establish Mac caption availability, live source, timing, pause/cancel, local rendering and permission failure; no plan gate."
+    },
+    {
+      "id": "summary",
+      "feature": "Local meeting notes, summaries and call insights",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "auto_summarization",
+        "auto_summarization_off",
+        "auto_summarization_on",
+        "call_summary_error_title",
+        "call_summary_non_english_body",
+        "call_summary_non_english_title",
+        "call_summary_ready_to_view",
+        "call_summary_short_call_body",
+        "call_summary_short_call_title",
+        "call_summary_view_meeting",
+        "call_summary_view_notes",
+        "last_call_summary_discovery",
+        "last_call_summary_tooltip",
+        "meeting_notes",
+        "meeting_notes_downloading",
+        "meeting_notes_error",
+        "meeting_notes_error_reload",
+        "meeting_notes_error_retry",
+        "meeting_notes_service_error",
+        "notes_banner_text",
+        "notes_privacy",
+        "notes_privacy_text",
+        "pref_descr_call_summary",
+        "pref_description_auto_generate",
+        "pref_info_call_summary",
+        "pref_label_auto_open_notes",
+        "pref_menu_call_insights",
+        "pref_notifications_call_summary_body",
+        "pref_notifications_call_summary_title",
+        "pref_title_call_summary",
+        "saving_meeting_notes",
+        "text_call_insights",
+        "view_notes",
+        "web_dashboard.text_ai_setup_finalize",
+        "your_work_done"
+      ],
+      "representative_labels": [
+        {
+          "key": "notes_privacy_text",
+          "text": "Your audio never leaves your device"
+        },
+        {
+          "key": "pref_description_auto_generate",
+          "text": "Automatically generate notes"
+        },
+        {
+          "key": "pref_label_auto_open_notes",
+          "text": "Auto-open meeting page at call end"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "Local audio claim does not prove summary generation is local. No summary model/inference or meeting recap workflow is implemented.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Recover summary/notes generation boundary, supported languages, short-call behavior and failures. Preserve proven local capabilities; exclude cloud generation. An independent local summary engine is a recommended option, not a confirmed requirement to replace a cloud-backed feature."
+    },
+    {
+      "id": "updates",
+      "feature": "Local installation, repair, restart and version handling",
+      "scope": "retained",
+      "implementation_state": "partial_packaging",
+      "catalog_keys": [
+        "audio_interruption_info",
+        "btn_install",
+        "btn_repair",
+        "btn_repair_krisp",
+        "check_for_update",
+        "check_for_update_title",
+        "context_menu_check_for_update",
+        "dialog_cancel_header",
+        "dialog_confirm_cancel_text",
+        "dialog_please_try_again_later",
+        "dialog_update_error",
+        "dialog_update_failed",
+        "dialog_update_installation_failed",
+        "dialog_update_installation_failed_by_service",
+        "initiating_update",
+        "krisp_update_title",
+        "last_version",
+        "latest_version",
+        "nav_btn_check_for_update",
+        "nav_btn_update_available",
+        "nav_btn_what_is_new",
+        "note_taker_messages.update",
+        "pref_description_auto_update",
+        "pref_label_auto_update",
+        "preparing_install",
+        "reinstall_krisp",
+        "release_notes",
+        "report_problem.receive_error_while_update",
+        "restart_computer",
+        "restart_required",
+        "text_preparing_for_update",
+        "update_available",
+        "update_available_title",
+        "update_krisp_btn",
+        "update_now",
+        "update_pop_up_success",
+        "update_popup_what_is_new",
+        "update_required",
+        "update_text_downloading_percentage",
+        "update_to_latest_version",
+        "using_latest_version",
+        "version_is_outdated",
+        "version_is_outdated_notification",
+        "window_title_force_update"
+      ],
+      "representative_labels": [
+        {
+          "key": "audio_interruption_info",
+          "text": "You might experience an audio interruption while\ninstalling the update."
+        },
+        {
+          "key": "btn_install",
+          "text": "Install"
+        },
+        {
+          "key": "btn_repair",
+          "text": "Repair"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/audio-driver/build",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/build",
+          "exists": true
+        }
+      ],
+      "implementation": "Signed local packaging exists; no repair wizard, updater, version migration or automatic update flow.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Verify authorized driver installation/uninstallation, repair and upgrade rollback; choose independent update mechanism. Vendor network updater is excluded."
+    },
+    {
+      "id": "storage",
+      "feature": "Local transcript/recording storage and location selection",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "error_storage_action",
+        "error_storage_full",
+        "local_store_info",
+        "note_taker_storage.browse_for_location",
+        "note_taker_storage.call_in_progress",
+        "note_taker_storage.choose_new_location",
+        "note_taker_storage.description",
+        "note_taker_storage.local",
+        "note_taker_storage.local_info",
+        "note_taker_storage.location_not_accessible",
+        "note_taker_storage.location_not_available",
+        "note_taker_storage.not_available",
+        "note_taker_storage.select_location",
+        "note_taker_storage.title",
+        "note_taker_storage.trial_ended",
+        "note_taker_storage.trial_ended_body",
+        "note_taker_storage.type_enforced",
+        "note_taker_tooltip.recording_storage_is_full",
+        "report_problem.browse_for_folder",
+        "report_problem.select_log_save_path",
+        "storage_is_full",
+        "transcript_file_name"
+      ],
+      "representative_labels": [
+        {
+          "key": "note_taker_storage.local_info",
+          "text": "Save transcripts and recordings locally on your device. On-device storage currently supports English only."
+        },
+        {
+          "key": "note_taker_storage.trial_ended_body",
+          "text": "This feature is exclusively available on the Business plan."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Private staged saves, inventory and retained recording folder display exist. General library location picker and recovery/import wizard are absent.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Exercise folder selection, inaccessible/missing/full disk, corrupt/partial sessions, call-time setting lock and actual UI import/export/delete. Do not carry Business/trial restrictions."
+    },
+    {
+      "id": "diagnostics",
+      "feature": "Local diagnostics, log export and troubleshooting",
+      "scope": "retained",
+      "implementation_state": "partial_test_harness",
+      "catalog_keys": [
+        "app_menu_help.generate_har",
+        "app_menu_help.stop_har",
+        "app_menu_help.troubleshooting",
+        "context_menu_get_debug_logs",
+        "context_menu_report_problem",
+        "encountered_problem_solution",
+        "krisp_encountered_problem",
+        "krisp_encountered_text",
+        "nav_btn_get_debug_logs",
+        "nav_btn_report_problem",
+        "network_diagnostics.done",
+        "network_diagnostics.title",
+        "recorder.recording_network_log",
+        "recorder.stop_recording_network_log",
+        "report_problem.accent_robotic_voice",
+        "report_problem.audio_quality",
+        "report_problem.btn_get_debug_logs",
+        "report_problem.bv_are_not_canceling",
+        "report_problem.bv_human_voice_not_canceling",
+        "report_problem.bvc_not_compatible_headset",
+        "report_problem.can_not_hear_others",
+        "report_problem.check_network",
+        "report_problem.crashing_or_freezing",
+        "report_problem.describe_the_problem",
+        "report_problem.do_not_see_krisp_device_in_calling_app",
+        "report_problem.do_not_see_krisp_device_in_krisp_app",
+        "report_problem.download_logs",
+        "report_problem.echo_is_not_canceling",
+        "report_problem.file_can_not_be_found",
+        "report_problem.get_log_manually",
+        "report_problem.getting_error",
+        "report_problem.having_issue_with_bvc",
+        "report_problem.hear_my_echo",
+        "report_problem.hide",
+        "report_problem.high_cpu_usage",
+        "report_problem.high_memory_usage",
+        "report_problem.include_network_diagnostics",
+        "report_problem.include_recordings",
+        "report_problem.include_system_information",
+        "report_problem.include_system_information_logout",
+        "report_problem.invalid_format",
+        "report_problem.issue_with_setup",
+        "report_problem.issue_with_updating_or_uninstalling",
+        "report_problem.logs_saved_text",
+        "report_problem.my_voice_breaking",
+        "report_problem.my_voice_is_canceled",
+        "report_problem.my_voice_lagging",
+        "report_problem.not_in_the_list",
+        "report_problem.other",
+        "report_problem.others_can_not_hear_me",
+        "report_problem.others_state_my_audio_volume_is_low",
+        "report_problem.others_state_my_voice_robotic",
+        "report_problem.placeholder_describe_problem",
+        "report_problem.receive_error_while_uninstalling",
+        "report_problem.report_title",
+        "report_problem.run_and_include_network_diagnostics",
+        "report_problem.saving_logs_text",
+        "report_problem.select_from_list",
+        "report_problem.select_issue_title",
+        "report_problem.select_one_of_categories",
+        "report_problem.select_the_date",
+        "report_problem.sign_out_state_text",
+        "report_problem.some_specific_noise",
+        "report_problem.system_performance_issue",
+        "report_problem.test_nc_issue",
+        "report_problem.text_now",
+        "report_problem.text_smt_went_wrong",
+        "report_problem.thanks_for_help",
+        "report_problem.unable_to_turn_nc_toggle_on",
+        "report_problem.view",
+        "report_problem.widget_is_not_responding",
+        "tell_about_issue",
+        "window_title_network_checker",
+        "window_title_report_problem"
+      ],
+      "representative_labels": [
+        {
+          "key": "app_menu_help.generate_har",
+          "text": "Generate HAR file"
+        },
+        {
+          "key": "app_menu_help.stop_har",
+          "text": "Stop generating HAR file"
+        },
+        {
+          "key": "app_menu_help.troubleshooting",
+          "text": "Troubleshooting"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/verification/README.md",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/verification/audio.py",
+          "exists": true
+        }
+      ],
+      "implementation": "Synthetic verification and reports exist; user-facing log export/system diagnostics and troubleshooting wizard do not.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Implement local log bundle with bounded metadata, explicit save and error handling; remote report upload remains excluded."
+    },
+    {
+      "id": "background-voice",
+      "feature": "Background voice cancellation and headset detection/override",
+      "scope": "retained",
+      "implementation_state": "metadata_only",
+      "catalog_keys": [
+        "bvc.ac_active_tooltip_text",
+        "bvc.ac_only_work_with_headset",
+        "bvc.activate_bvc_for_mic",
+        "bvc.active_for_device",
+        "bvc.active_tooltip_text",
+        "bvc.active_whenever_you_use_headphone",
+        "bvc.always_off",
+        "bvc.are_you_sure",
+        "bvc.bvc_device_enforced_tooltip",
+        "bvc.cancel_activation_bvc_for_mic",
+        "bvc.force_activate",
+        "bvc.is_disabled_from_preferences",
+        "bvc.make_sure_to_be_compatible",
+        "bvc.manually_activate",
+        "bvc.not_available",
+        "bvc.not_available_when_toggle_is_off",
+        "bvc.only_work_with_headset",
+        "bvc.turn_on_bvc_manually_for_unrecognized_devices",
+        "bvc_not_enabled_warning",
+        "confirm_using_headset",
+        "nc_bvc_blocked_warning",
+        "noise_shield.bvc_detected",
+        "pref_audio_section_BVC_header_sub_text",
+        "pref_audio_section_BVC_header_text",
+        "text_bvc_confirm_using_headset",
+        "text_bvc_consider_using_headset"
+      ],
+      "representative_labels": [
+        {
+          "key": "bvc.force_activate",
+          "text": "Force activation for"
+        },
+        {
+          "key": "bvc.active_tooltip_text",
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
+        },
+        {
+          "key": "bvc.bvc_device_enforced_tooltip",
+          "text": "Your admin has enforced headset device usage. If this is a headset, please contact your admin to approve the headset."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "RNNoise is not verified nearby-speaker isolation. No headset auto-detection, allowlist/manual confirmation or BVC processor exists.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Recover/implement speaker isolation, headset behavior and manual override; validate speech preservation and nearby voice rejection without admin gate."
+    },
+    {
+      "id": "performance",
+      "feature": "Auto, CPU Optimized, Best NC and restore defaults",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "cpu_optimized_icon_tooltip_text",
+        "hd_voice_icon_tooltip_text",
+        "pref_audio_section_performance_header_text",
+        "pref_audio_section_performance_sub_text",
+        "pref_audio_section_restore_btn_description_text",
+        "pref_audio_section_restore_btn_text",
+        "pref_auto_mode_sub_text",
+        "pref_auto_radio_btn_label_text",
+        "pref_cpu_optimized_radio_btn_label_text",
+        "pref_cpu_optimized_sub_text",
+        "pref_descr_high_system_load",
+        "pref_hd_voice_mode_sub_text",
+        "pref_hd_voice_radio_btn_label_text",
+        "pref_title_high_system_load",
+        "switch_to_auto_mode",
+        "system_overload_icon_tooltip_text"
+      ],
+      "representative_labels": [
+        {
+          "key": "pref_auto_radio_btn_label_text",
+          "text": "Auto"
+        },
+        {
+          "key": "pref_cpu_optimized_radio_btn_label_text",
+          "text": "CPU Optimized"
+        },
+        {
+          "key": "pref_hd_voice_radio_btn_label_text",
+          "text": "Best Noise Cancellation"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "The independent engine has no selectable performance policy, adaptive mode, system-load warning or original-default restore.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Recover policy transitions, resource thresholds and defaults; implement modes and test deadline/CPU behavior. Engine build alone is not mode parity."
+    },
+    {
+      "id": "volume",
+      "feature": "Microphone/speaker mute, gain, lock and sync policies",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "audio_controls.microphone_is_muted",
+        "audio_controls.speaker_is_muted",
+        "audio_controls.text_unmute",
+        "krisp_spk_device_muted",
+        "mic_device_muted",
+        "mic_muted_reminder.description",
+        "mic_muted_reminder.title",
+        "pref_audio_section_krisp_mic_volume_sub_text",
+        "pref_audio_section_krisp_mic_volume_sub_title",
+        "pref_audio_section_mic_volume_title",
+        "pref_audio_section_volume_lock",
+        "pref_audio_section_volume_sync_with_krisp",
+        "pref_audio_section_working_mic_volume_sub_text",
+        "pref_audio_section_working_mic_volume_sub_title",
+        "pref_descr_call_started_mic_muted",
+        "pref_title_call_started_mic_muted",
+        "spk_device_muted",
+        "text_unmute_krisp_for_test_nc",
+        "text_unmute_krisp_for_transcript",
+        "unmute_krisp_spk_device",
+        "unmute_mic_device",
+        "unmute_spk_device",
+        "widget.mute_tooltip",
+        "you_are_muted",
+        "your_mic_is_muted"
+      ],
+      "representative_labels": [
+        {
+          "key": "pref_audio_section_volume_lock",
+          "text": "Lock at optimal level"
+        },
+        {
+          "key": "pref_audio_section_volume_sync_with_krisp",
+          "text": "Sync with Krisp"
+        },
+        {
+          "key": "pref_audio_section_krisp_mic_volume_sub_text",
+          "text": "Automatically adjust microphone volume at call start."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "ev_40c3d30f5402cd2db1686a714fbfa29b4d8397234167ce21d7b91b00ad74717d",
+        "ev_f05fb423432fd2a02f99b0d2fa32fbf0c3f9b5a27a3d0b21915582463d57eec9",
+        "ev_f450cb2b574459e56ac510c77e19f1be1d03fcd2aa396df46f272726073dec84",
+        "ev_093d19187f011b55c87fa0e10469a48280f3284900ee4d065d19c08014bb98de",
+        "ev_f3e85d6dd6819b2918d950cc78196bdaab4ba93e479544ec90db67d24c4d323a"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/audio-host/controls.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "App-route normalized linear attenuation and mute are implemented. Original virtual nonlinear curve, system-device properties, optimal lock, hardware mute/HID and synchronization remain absent.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Validate live control ACKs/output and persistence; separately specify physical versus virtual controls, nonlinear curve/mode, lock level and sync direction."
+    },
+    {
+      "id": "devices",
+      "feature": "Physical and virtual devices, app routing and unavailable states",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "audio_block_mic_title",
+        "audio_block_spk_title",
+        "bluetooth_device_failed_reminder.description",
+        "bluetooth_device_failed_reminder.mic_title",
+        "bluetooth_device_failed_reminder.speaker_title",
+        "call_speaker",
+        "feature_access.full",
+        "feature_access.only_mic",
+        "feature_access.only_spk",
+        "feature_access.partial",
+        "how_to_set_up_mic",
+        "how_to_set_up_spk",
+        "krisp_devices.title",
+        "krisp_mic_and_spk_not_available",
+        "krisp_mic_device_has_issue",
+        "krisp_mic_device_has_issue_no_rec_mac",
+        "krisp_mic_device_has_issue_no_rec_win",
+        "krisp_spk_device_has_issue",
+        "krisp_spk_device_has_issue_no_rec_mac",
+        "krisp_spk_device_has_issue_no_rec_win",
+        "mic_used_outside_default_app",
+        "mic_used_outside_device",
+        "mic_used_outside_select",
+        "mic_used_without_speaker_device",
+        "mic_used_without_speaker_select",
+        "nav_btn_setup_krisp",
+        "no_active_device",
+        "no_audio_access",
+        "no_audio_processing_access_granted",
+        "no_mic_access",
+        "no_mic_available",
+        "no_mic_selected",
+        "no_spk_available",
+        "no_spk_selected",
+        "no_working_mic_available",
+        "no_working_spk_available",
+        "pref_descr_krisp_not_used",
+        "pref_descr_krisp_not_used_transcript",
+        "pref_descr_mic_used_without_speaker",
+        "pref_descr_mic_used_without_speaker_transcript",
+        "pref_notifications_device_setup_reminders_body",
+        "pref_notifications_device_setup_reminders_title",
+        "pref_title_krisp_not_used",
+        "pref_title_mic_used_without_speaker",
+        "text_enable_krisp_mic",
+        "text_enable_krisp_spk",
+        "text_krisp_mic_is_disabled",
+        "text_krisp_mic_is_unavailable",
+        "text_krisp_spk_is_disabled",
+        "text_mic_in_exclusive",
+        "text_mic_is_unhealthy",
+        "text_not_selected_in",
+        "text_not_selected_in_apps",
+        "text_not_setup_in",
+        "text_not_setup_in_apps",
+        "text_not_used",
+        "text_not_used_mic",
+        "text_same_as_system",
+        "text_spk_in_exclusive",
+        "text_spk_is_unhealthy",
+        "text_used_by",
+        "text_used_by_apps",
+        "text_used_inactive",
+        "window_title_onboarding",
+        "works",
+        "works_in"
+      ],
+      "representative_labels": [
+        {
+          "key": "audio_block_mic_title",
+          "text": "Krisp Microphone"
+        },
+        {
+          "key": "audio_block_spk_title",
+          "text": "Krisp Speaker"
+        },
+        {
+          "key": "bluetooth_device_failed_reminder.description",
+          "text": "Try reconnecting."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/audio-driver/driver.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/coreaudio_backend.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/routing.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Independent HAL, transport and explicit route UI exist. Real installed routing, Bluetooth/exclusive access and app-select integration remain unverified.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Approved installed HAL test and actual route must prove channels/formats/timestamps, permission attribution, simultaneous clients, unplug/reconnect, crash recovery and calling-app visibility."
+    },
+    {
+      "id": "noise",
+      "feature": "Microphone/speaker noise cancellation and echo cancellation",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "call_indicator.noise_cancelling",
+        "call_started_nc_off_1",
+        "call_started_nc_off_2",
+        "call_started_noise_cancelling",
+        "in_person_recording.nc_tooltip",
+        "in_person_recording.notifications.nc_unavailable_1",
+        "in_person_recording.notifications.nc_unavailable_2",
+        "mic_nc_on_and_not_streaming",
+        "mic_nc_on_and_streaming",
+        "nc_block_mic_enforced_al_tooltip",
+        "nc_block_spk_enforced_al_tooltip",
+        "nc_off_text",
+        "nc_on_text",
+        "noise_cancellation.mic_title_collapsed",
+        "noise_cancellation.mic_title_expanded",
+        "noise_cancellation.speaker_title_collapsed",
+        "noise_cancellation.speaker_title_expanded",
+        "noise_cancellation.title",
+        "noise_shield.description",
+        "noise_shield.heavy_noise_detected",
+        "noise_shield.medium_noise_detected",
+        "noise_shield.nc_off",
+        "noise_shield.title",
+        "note_taker_tooltip.turn_off_nc",
+        "note_taker_tooltip.turn_on_nc",
+        "pref_audio_section_NC_header_sub_text",
+        "pref_audio_section_NC_header_text",
+        "pref_descr_mic_nc_off",
+        "pref_descr_mic_nc_on",
+        "pref_title_mic_nc_off",
+        "pref_title_mic_nc_on",
+        "spk_nc_on_and_not_streaming",
+        "spk_nc_on_and_streaming",
+        "tooltip_echo_is_off",
+        "tooltip_mic_nc_admin_always_on",
+        "tooltip_spk_nc_admin_always_off",
+        "tooltip_spk_nc_admin_always_on",
+        "tooltip_spk_nc_delay",
+        "tooltip_spk_nc_no_stream_on_mic",
+        "widget.nc_off_tooltip",
+        "widget.nc_on_tooltip",
+        "widget_cancel_noice"
+      ],
+      "representative_labels": [
+        {
+          "key": "call_indicator.noise_cancelling",
+          "text": "Canceling your noise..."
+        },
+        {
+          "key": "call_started_nc_off_1",
+          "text": "Noise Cancellation is "
+        },
+        {
+          "key": "call_started_nc_off_2",
+          "text": "Off"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/noise-engine/noise_engine.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/noise_adapter.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Independent RNNoise microphone/stereo speaker path exists. No integrated AEC or installed original-model inference backend. Noise Shield heavy/medium/background voice detection and feedback labels are also not implemented.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
+    },
+    {
+      "id": "noise-test",
+      "feature": "Local temporary recording and original/processed comparison",
+      "scope": "retained",
+      "implementation_state": "independent_partial_synthetic_verified",
+      "catalog_keys": [
+        "companion.test_nc",
+        "nav_btn_test_nc",
+        "test_my_audio",
+        "test_nc.ac_try",
+        "test_nc.btn_done",
+        "test_nc.cancel_testing",
+        "test_nc.cancel_testing_confirm",
+        "test_nc.error_occurred",
+        "test_nc.issue",
+        "test_nc.magic_time",
+        "test_nc.min_record_info",
+        "test_nc.press_to_record",
+        "test_nc.problem_with_recording",
+        "test_nc.record_again",
+        "test_nc.recording_will_not_leave_device",
+        "test_nc.report_problem",
+        "test_nc.start_to_test_audio",
+        "test_nc.switch_the_toggle_for_magic",
+        "test_nc.text_recording",
+        "test_nc.try_again_later_testing",
+        "test_nc.try_to_clap",
+        "test_nc.vc_is_off",
+        "test_nc.vc_is_on",
+        "test_nc.with_krisp",
+        "test_nc.without_krisp",
+        "window_title_test_nc"
+      ],
+      "representative_labels": [
+        {
+          "key": "test_nc.min_record_info",
+          "text": "Record at least a 5-second sample to hear the difference."
+        },
+        {
+          "key": "test_nc.recording_will_not_leave_device",
+          "text": "Your recording will never leave your device and won’t be saved."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test_coreaudio.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test_cli.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test_wire_fixture.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/microphone_test_wire_check.py",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/control_protocol.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/host.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/ComparisonPlayback.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophonePermission.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Explicit selected-physical-microphone test UI and production helper path now exist. Exact UID, alive48k Float32 read-only format admission and selected first input channel; one bounded capture supplies original and RNNoise outputs. Five-second captured-frame minimum, independent60-second maximum, fractional timestamp progression, automatic maximum completion, callback-stall failure, stop/cancel/EOF/signal/parent cleanup and processing cancellation. Mode0700 private job and exclusive0600 mono PCM16 paired WAV files are validated after matching startup and clean helper exit. Explicit A/B playback preserves position and supports replay. Done/cancel removes only current owned files after confirmed stop; failure retains uncertain cleanup ownership and identifies restart leftovers. No history import/upload or trial gate. Route-stopped/app-route-unmuted admission and60-second capture bound are independent choices, not recovered original constraints. Only known480-frame adapter buffering is trimmed; total RNNoise algorithmic delay remains unmeasured.",
+      "verified_scope": "Backend worker reports release and ASan/UBSan tests plus real-pipe production-loop synthetic fixtures passing; desktop worker/root report46tests and packaging passing. Fixtures exercise real independent RNNoise/file writer/control loop without native capture, OS authorization, playback or UI. Read-only review found no remaining material issue within capture alignment, exact selection, bounds/cancellation, callback ownership, private output and clean-exit completion scope. Root reports combined ./verify exit0 across all10suites, including46desktoptests; retained log projects/krisp/evidence/combined-verify-microphone-test.log. This remains synthetic/build verification, not live acceptance.",
+      "missing_acceptance": "Authorized real selected-device capture/playback and OS microphone attribution; native buffer/format variation, device changes, total processing latency, quality and visual modal/A-B behavior; long or stalled filesystem/error recovery in production. Original test source, raw/mix/DSP/gain/mute order, maximum duration, active-call admission and cleanup remain unknown. Confirm original minimum enforcement separately; do not claim full original NC-test parity.",
+      "independent_review": {
+        "mode": "read-only source review",
+        "runtime_actions": false,
+        "result": "No remaining material issue in bounded review",
+        "limits": "No real microphone, playback, OS prompts, native UI or installed HAL executed. Review is not parity acceptance."
+      },
+      "verification_entry_points": [
+        "projects/krisp/app/audio-host/verify",
+        "projects/krisp/app/desktop/verify"
+      ],
+      "verification_log": "projects/krisp/evidence/combined-verify-microphone-test.log"
+    },
+    {
+      "id": "permissions",
+      "feature": "macOS permission admission and degraded states",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "grant_access",
+        "no_access_granted",
+        "permissions_backdrop.accessibility_desc",
+        "permissions_backdrop.app_calls_rec_desc",
+        "permissions_backdrop.back_to_setup_btn",
+        "permissions_backdrop.close_anyway_btn",
+        "permissions_backdrop.degraded_page_desc",
+        "permissions_backdrop.degraded_page_title",
+        "permissions_backdrop.enable_btn",
+        "permissions_backdrop.mic_desc",
+        "permissions_backdrop.title",
+        "recording_access_granted"
+      ],
+      "representative_labels": [
+        {
+          "key": "grant_access",
+          "text": "Grant access"
+        },
+        {
+          "key": "no_access_granted",
+          "text": "Krisp needs system permissions to work."
+        },
+        {
+          "key": "permissions_backdrop.accessibility_desc",
+          "text": "Integrate and work well with meeting apps."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Explicit microphone Start and selected-file Speech authorization boundaries exist; screen/system-audio/Accessibility workflows are absent.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Exercise actual OS prompts/denial/revocation and helper attribution. Injected permission tests alone do not establish OS behavior."
+    },
+    {
+      "id": "activation",
+      "feature": "Automatic call activation, blocked apps and competing calls",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "auto_open_banner",
+        "call_indicator.call_started_note_taker_off_2",
+        "call_indicator.inform_participants",
+        "call_indicator.meeting_detected",
+        "call_indicator.note_taker",
+        "call_indicator.note_taker_initializing",
+        "call_indicator.off",
+        "call_indicator.open",
+        "call_indicator.take_notes",
+        "call_indicator.taking_notes",
+        "call_indicator.unavailable",
+        "call_started_note_taker_activation_pending",
+        "call_started_note_taker_initializing",
+        "call_started_note_taker_off_1",
+        "call_started_note_taker_off_2",
+        "call_started_note_taker_recording",
+        "call_started_note_taker_stopped",
+        "call_started_note_taker_transcribing",
+        "call_status_notifications",
+        "note_taker_messages.unavailable_blocked_app",
+        "note_taker_messages.unavailable_blocked_app_tooltip",
+        "parallel_call_reminder.description",
+        "parallel_call_reminder.switch_to",
+        "parallel_call_reminder.switched_to",
+        "parallel_call_reminder.title",
+        "pref_descr_call_started",
+        "pref_label_auto_activation_desc",
+        "pref_label_auto_activation_title",
+        "pref_label_auto_activation_toggle_off_tooltip",
+        "pref_label_auto_activation_toggle_on_tooltip",
+        "pref_label_auto_activation_tooltip",
+        "pref_menu_blocked_app_select_apps",
+        "pref_menu_blocked_apps_description",
+        "pref_menu_blocked_apps_footer",
+        "pref_menu_blocked_apps_no_apps",
+        "pref_menu_blocked_apps_title",
+        "pref_title_call_started",
+        "start_note_taking_reminder.always_capture_button",
+        "start_note_taking_reminder.capture_this_button",
+        "start_note_taking_reminder.footer",
+        "start_note_taking_reminder.record_footer",
+        "start_note_taking_reminder.take_note_footer",
+        "start_note_taking_reminder.title"
+      ],
+      "representative_labels": [
+        {
+          "key": "pref_label_auto_activation_desc",
+          "text": "Auto-start AI Note-taker with calling apps when a call begins."
+        },
+        {
+          "key": "pref_menu_blocked_apps_description",
+          "text": "Krisp will not auto-start AI Note Taker when these apps are detected."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [],
+      "implementation": "Routes and recording start only by explicit user click. No call detection, app exclusion list, automatic activation or concurrent-call switch.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Recover local call detection and app identity rules; implement manual/automatic policy, exclusion persistence, competing-call transitions and call-time locking."
+    },
+    {
+      "id": "transcription",
+      "feature": "On-device transcripts, speaker identification and transcript-only lifecycle",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "asr_model_load_error",
+        "click_to_finish_transcription",
+        "click_to_pause_transcription",
+        "click_to_stop_transcription",
+        "dialog_disable_transcript_text",
+        "identifying_speakers_text",
+        "in_person_recording.notifications.transcribing",
+        "no_speech_was_captured_text",
+        "no_transcript_text",
+        "note_taker_messages.note_taker_will_transcribe",
+        "note_taker_tooltip.switch_to_transcription",
+        "note_taker_tooltip.transcribing_is_not_available",
+        "note_taker_tooltip.transcription",
+        "pref_descr_call_transcript",
+        "pref_descr_no_speech_captured",
+        "pref_descr_non_english_detected",
+        "pref_descr_short_call_warning",
+        "pref_info_call_transcript",
+        "pref_title_call_transcript",
+        "pref_title_no_speech_captured",
+        "pref_title_non_english_detected",
+        "pref_title_short_call_warning",
+        "save_call_transcript_text",
+        "save_transcription",
+        "saving_transcript",
+        "speech_data_empty_description",
+        "supports_english_language_text",
+        "switch_off_transcription",
+        "switch_off_transcription_content",
+        "switch_off_transcription_title",
+        "tooltip_save_transcript",
+        "tooltip_search_transcript",
+        "tooltip_transcript_supported_language",
+        "transcribe",
+        "transcribing",
+        "transcript_available_text",
+        "transcript_error_description",
+        "transcript_history_text",
+        "transcript_is_switched_off",
+        "transcript_no_available",
+        "transcript_no_available_description",
+        "transcript_only",
+        "transcription",
+        "transcription_desscription_info",
+        "transcription_error_alert.description",
+        "transcription_error_alert.pill_tooltip",
+        "transcription_error_alert.reconnect_pill_tooltip",
+        "transcription_error_alert.reconnect_title",
+        "transcription_error_alert.title",
+        "transcription_error_reminder.description",
+        "transcription_error_reminder.reconnect_description",
+        "transcription_error_reminder.reconnect_title",
+        "transcription_error_reminder.title",
+        "web_dashboard.transcript_paused",
+        "window_title_calltranscript"
+      ],
+      "representative_labels": [
+        {
+          "key": "pref_info_call_transcript",
+          "text": "Transcripts are private and generated on your device. "
+        },
+        {
+          "key": "identifying_speakers_text",
+          "text": "Identifying the speakers, please wait..."
+        },
+        {
+          "key": "transcription_desscription_info",
+          "text": "Transcriptions are free, private, unlimited and stored on your device."
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Explicit selected-WAV Apple offline recognition exists. No live meeting ASR, diarization, speaker labels, transcript-only capture, live pause/resume, original ASR model inference or automatic recording transcription.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Run authorized real offline recognition; implement live source/timestamp contracts and diarization; resolve conflicting short-call labels before enforcing limits; preserve/edit/export timing."
+    },
+    {
+      "id": "recording",
+      "feature": "Meeting audio recording and live/in-person notes",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "ai_assistant_title",
+        "allowed_to_switched_on",
+        "audio_recording_in_progress",
+        "audio_recording_paused",
+        "btn_accept_record",
+        "click_to_finish_recording",
+        "click_to_pause_recording",
+        "click_to_stop_recording",
+        "in_person_recording.ac_tooltip",
+        "in_person_recording.long_meeting_dialog.description",
+        "in_person_recording.long_meeting_dialog.ok_btn",
+        "in_person_recording.long_meeting_dialog.title",
+        "in_person_recording.new_meeting_dialog.continue_btn",
+        "in_person_recording.new_meeting_dialog.description",
+        "in_person_recording.new_meeting_dialog.save_and_switch_btn",
+        "in_person_recording.new_meeting_dialog.title",
+        "in_person_recording.note_taker.call_tooltip",
+        "in_person_recording.note_taker.disabled_tooltip",
+        "in_person_recording.note_taker.off_tooltip",
+        "in_person_recording.note_taker.record_btn",
+        "in_person_recording.note_taker.stop_btn",
+        "in_person_recording.notifications.ac_unavailable_1",
+        "in_person_recording.notifications.ac_unavailable_2",
+        "in_person_recording.notifications.recording",
+        "in_person_recording.tt_tooltip",
+        "note_taker_messages.manage",
+        "note_taker_messages.meeting_saved",
+        "note_taker_messages.note_taker_is_off",
+        "note_taker_messages.note_taker_will_record",
+        "note_taker_messages.restarting",
+        "note_taker_messages.service_error",
+        "note_taker_messages.unavailable_note_taker",
+        "note_taker_messages.unavailable_timeout",
+        "note_taker_off",
+        "note_taker_saving",
+        "note_taker_stopped",
+        "note_taker_tooltip.note_taker_activation_pending",
+        "note_taker_tooltip.note_taker_issue",
+        "note_taker_tooltip.note_taker_stopped",
+        "note_taker_tooltip.preparing_note_taker",
+        "note_taker_tooltip.recording",
+        "note_taker_tooltip.recording_is_not_available",
+        "note_taker_tooltip.switch_to_audio_recording",
+        "note_taker_tooltip.turn_on",
+        "pref_menu_note_taker",
+        "record_audio",
+        "recording_onboarding_info",
+        "recording_onboarding_title",
+        "reminder_switch_to_recording",
+        "switch_to_this_mode_disabled_tooltip",
+        "upgrade_tooltip.record_audio",
+        "web_dashboard.audio_recording_paused",
+        "widget.live_recording_tooltip",
+        "window_title_recording_consent"
+      ],
+      "representative_labels": [
+        {
+          "key": "click_to_pause_recording",
+          "text": "Pause Recording"
+        },
+        {
+          "key": "in_person_recording.long_meeting_dialog.description",
+          "text": "Krisp supports recordings of up to 4 hours. Your recording was saved successfully."
+        },
+        {
+          "key": "upgrade_tooltip.record_audio",
+          "text": "Audio Record"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "ev_03e31793b114208efefd2e68567f4341ad706c16f1bd65c44fbcbcf7688f3102",
+        "ev_40ab92b005f05d1ca15e14b38419d9339ff5e6ebab8122c1c42d08f414ba06a7",
+        "ev_f5df68333651c84d4ff750f1a8f2b785ca8eac0c0baf7a4d84c6353cc0cd9d53",
+        "ev_b861f861d6fd5d73f723fda8b3a71fdd1a9a72d7cb6350823cd37d3735988d92"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/audio-host/recording.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/route_cli.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Manual processed stereo headroom mix, pause/resume/finalization and save-to-library exist. No original mix/order parity, live-notes mode, scheduled meeting association or save-and-switch workflow.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Exercise actual user recording path and valid saved output; test failed/unknown ACKs, route interruption, disk failures and retained recovery. Classify the original four-hour live/in-person limit as a reference observation: determine resource/format constraint versus commercial quota. Do not add a usage quota; explain any genuine independent technical bound. No paid gate."
+    },
+    {
+      "id": "consent",
+      "feature": "Participant notification templates and audio announcements",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "custom_notify_about_using_krisp_message_prefix",
+        "default_notify_about_using_krisp_text",
+        "indicator_inform_participants",
+        "pref_invalid_notify_about_using_krisp_text",
+        "pref_label_notify_about_using_krisp",
+        "pref_label_notify_about_using_krisp_text_mac",
+        "pref_label_notify_about_using_krisp_text_win",
+        "pref_notification_on_off_warning_button",
+        "pref_notification_on_off_warning_text",
+        "recording_announcement_reminder.error_desc",
+        "recording_announcement_reminder.error_title",
+        "recording_announcement_reminder.playing_desc",
+        "recording_announcement_reminder.playing_title",
+        "recording_announcement_reminder.skip_button",
+        "recording_announcement_reminder.waiting_desc",
+        "recording_announcement_reminder.waiting_title",
+        "recording_consent.header",
+        "recording_consent.notify_all_participants_description",
+        "recording_consent.notify_all_participants_title",
+        "recording_consent.secure_recording_description",
+        "recording_consent.secure_recording_title"
+      ],
+      "representative_labels": [
+        {
+          "key": "custom_notify_about_using_krisp_message_prefix",
+          "text": "Krisp.ai: "
+        },
+        {
+          "key": "default_notify_about_using_krisp_text",
+          "text": "Just a heads-up, I'm using Krisp.ai to transcribe and take notes in this meeting."
+        },
+        {
+          "key": "indicator_inform_participants",
+          "text": "Inform participants"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "No local reminder/template preference, countdown announcement or skip/error UI exists.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Implement explicit notification reminder/announcement and cancellation, mute/setup errors; define timing without sending messages to external participants automatically."
+    },
+    {
+      "id": "widget",
+      "feature": "Floating widget, talk time and speaking assistance",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "nav_btn_hide_widget",
+        "nav_btn_show_widget",
+        "pref_descr_speaking_assistant",
+        "pref_description_show_widget",
+        "pref_info_speaking_assistant",
+        "pref_label_show_meeting_time",
+        "pref_label_show_meeting_title",
+        "pref_label_show_widget",
+        "pref_title_speaking_assistant",
+        "text_call_duration",
+        "text_talk_time",
+        "widget.hide_for_now",
+        "widget.right_click_to_show_popover",
+        "widget_close_text",
+        "widget_talk_time_tooltip",
+        "widget_tooltip.turn_off_al",
+        "widget_tooltip.turn_on_al",
+        "widget_tooltip.you_talked"
+      ],
+      "representative_labels": [
+        {
+          "key": "pref_label_show_widget",
+          "text": "Show widget"
+        },
+        {
+          "key": "text_talk_time",
+          "text": "Talk Time"
+        },
+        {
+          "key": "pref_title_speaking_assistant",
+          "text": "Speaking Assistant"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Stable shared NSPanel widget uses real AudioRouteController and RecordingController state, explicit persisted show/hide default off, mute ACK/error status and Stop audio. Closing only hides. This independent default is not an original default. Auto-show at call start, next-call Hide-for-now, meeting title/time, talk time, captions and speaking assistance remain absent.",
+      "verified_scope": "Root/worker report desktop ./verify passed36tests including injected panel/controller close-during-pending-recording coverage. Source inspected. Actual native panel/visual runtime and real audio remain unverified.",
+      "missing_acceptance": "Run native panel visual/state/close tests when allowed; validate actual mute/stop behavior; implement original call-triggered visibility, hide-for-now restoration, meeting title/time and measured talk time/speaking assistance separately."
+    },
+    {
+      "id": "lifecycle",
+      "feature": "App menus, startup, sleep/wake and save-before-exit",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "about_copy_right_text",
+        "app_menu_edit.title",
+        "app_menu_file.hide",
+        "app_menu_file.title",
+        "app_menu_help.quit_completely",
+        "app_menu_help.title",
+        "app_menu_view.dev_tools_dashboard",
+        "app_menu_view.enter_full_screen",
+        "app_menu_view.exit_full_screen",
+        "app_menu_view.force_reload",
+        "app_menu_view.reload",
+        "app_menu_view.title",
+        "btn_open_meetings",
+        "btn_quit",
+        "context_menu_about",
+        "context_menu_krisp",
+        "context_menu_quit",
+        "context_menu_relaunch",
+        "context_menu_settings",
+        "context_menu_sleep",
+        "context_menu_wake",
+        "nav_btn_about",
+        "nav_btn_activity",
+        "nav_btn_preferences",
+        "nav_btn_quit",
+        "nav_btn_relaunch",
+        "pref_description_launch_at_startup",
+        "pref_label_launch_at_startup",
+        "pref_label_open_meetings_window_at_launch",
+        "pref_menu_app",
+        "pref_menu_audio",
+        "pref_menu_general",
+        "pref_menu_notifications",
+        "pref_menu_open_web_settings",
+        "pref_menu_system",
+        "pref_menu_voice",
+        "preferences_text",
+        "quit_confirmation_header",
+        "quit_confirmation_text",
+        "quit_in_progress_text",
+        "relaunch_no_save",
+        "save_and_quit",
+        "save_and_relaunch",
+        "save_and_sign_out",
+        "sign_out_no_save",
+        "skip_this_version",
+        "text_open_settings",
+        "text_version",
+        "version_no_longer_supported",
+        "wait_for_quit_text",
+        "wait_for_relaunch_text",
+        "wait_for_sign_out_text",
+        "window_title_about",
+        "window_title_preferences",
+        "your_version"
+      ],
+      "representative_labels": [
+        {
+          "key": "about_copy_right_text",
+          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
+        },
+        {
+          "key": "app_menu_edit.title",
+          "text": "Edit"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Native app/Settings and orderly helper shutdown exist. Startup login item, meeting-window startup, sleep/wake controls and save-before-relaunch workflow are absent.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Exercise quit during recording, stuck helper cleanup and crash exit; implement selected startup and relaunch/save policy with persistence. Original developer-tools/reload actions remain unimplemented candidates."
+    },
+    {
+      "id": "notifications",
+      "feature": "Call-start states, health warnings and notification preferences",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "call_health_warning_notifications",
+        "pref_notifications_functional",
+        "pref_notifications_on_off_indicator_body",
+        "pref_notifications_on_off_indicator_title",
+        "reminder_do_not_show",
+        "reminder_report",
+        "reminder_show_me_how",
+        "text_control_notifications",
+        "text_notification"
+      ],
+      "representative_labels": [
+        {
+          "key": "call_health_warning_notifications",
+          "text": "System"
+        },
+        {
+          "key": "pref_notifications_functional",
+          "text": "Functional"
+        },
+        {
+          "key": "pref_notifications_on_off_indicator_body",
+          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "Inline errors are present, but original functional/system notification families and per-warning opt-out controls are absent.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Implement local event-to-notification rules, Do-not-show-again persistence and call-start NC/recording/transcription indicators."
+    },
+    {
+      "id": "connectivity",
+      "feature": "Local network/proxy diagnostics and offline errors",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "cant_find_page_text",
+        "check_internet",
+        "connect",
+        "connecting_to",
+        "connection_trying_again",
+        "could_not_connect_internet",
+        "dialog_check_internet_connection",
+        "krisp_could_not_sync",
+        "krisp_is_offline",
+        "network_error_try_again_btn",
+        "no_connection",
+        "proxy_page_descr",
+        "tooltip_refresh_fail"
+      ],
+      "representative_labels": [
+        {
+          "key": "cant_find_page_text",
+          "text": "Can’t find the page?"
+        },
+        {
+          "key": "check_internet",
+          "text": "Please check your internet connection"
+        },
+        {
+          "key": "connect",
+          "text": "Connect"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [],
+      "implementation": "The app has no network client or proxy flow; service-specific connectivity is excluded, local diagnostic export can remain useful.",
+      "verified_scope": "Catalog/static candidate only; no implementation verification.",
+      "missing_acceptance": "Separate vendor transport/proxy requirements from standalone local error behavior; do not add network dependency to local audio/notes."
+    },
+    {
+      "id": "common-ui",
+      "feature": "Shared labels, appearance and reusable dialogs",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "12_hour",
+        "1_hour",
+        "30_mins",
+        "4_hour",
+        "8_hour",
+        "are_you_sure",
+        "beta_label",
+        "btn_cancel",
+        "btn_got_it",
+        "btn_i_agree",
+        "btn_no",
+        "btn_not_now",
+        "btn_ok",
+        "btn_try_again",
+        "btn_yes",
+        "continue_action",
+        "dialog_are_you_sure_header",
+        "dialog_btn_cancel",
+        "dialog_btn_cancel_now",
+        "dialog_btn_resume",
+        "dialog_btn_try_again",
+        "dialog_btn_turn_off",
+        "dismiss",
+        "do_not_save",
+        "do_not_show_again",
+        "dont_show_btn",
+        "enable",
+        "fresh_out_of_the_oven",
+        "general_error_text",
+        "got_it_next_text",
+        "got_it_text",
+        "learn_more",
+        "loading_taking_long",
+        "loading_text",
+        "new",
+        "now",
+        "off_action",
+        "pause_action",
+        "please_try_again_later",
+        "remind_me_later",
+        "remind_me_later_popup",
+        "required_field",
+        "required_field_indicator",
+        "resume_action",
+        "save_now_text",
+        "save_text",
+        "text_inactive",
+        "text_off",
+        "text_unavailable",
+        "turn_off",
+        "will_take_few_seconds",
+        "you_text"
+      ],
+      "representative_labels": [
+        {
+          "key": "12_hour",
+          "text": "12 hours"
+        },
+        {
+          "key": "1_hour",
+          "text": "1 hour"
+        },
+        {
+          "key": "30_mins",
+          "text": "30 mins"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "System/Light/Dark persist in AppStorage; independent dialogs and library shell exist. Generic labels are supporting UI, not 59 features.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "missing_acceptance": "Verify current screen reachability and dark/light rendering; map dialog errors to implemented actions rather than count translated strings as feature completion."
+    },
+    {
+      "id": "installed-model-inference",
+      "feature": "User-selected installed Krisp NC provider",
+      "scope": "retained",
+      "implementation_state": "isolated_probe_only",
+      "original_evidence_ids": [
+        "ev_577f43a8dd53c48ab08a04142dbf57b9ff04ef5c188d7542aef488f8d024a8fe",
+        "ev_5a9e5ce9d60f512f388eb9ddcc1625cacc86c3f286f430eb5da4062f7e7d21d3",
+        "ev_c782fa8d2f7a5c6eab1f9209ceb2bca4fc525257c6e59670acf042c90daf0032"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift",
+          "exists": true
+        }
+      ],
+      "catalog_keys": [],
+      "representative_labels": [],
+      "implementation": "Catalog only in app. Isolated sandboxed addon initialization loads an installed NC model; generator graph fails before sample processing. Prepared LabVoice graph remains unrun.",
+      "verified_scope": "Model-load logs and processor construction only, current identity-bound static/parser probes. No completed native samples.",
+      "missing_acceptance": "Approved installed synthetic source and graph start, finite finalized NC output, bypass comparison, network denial and identity checks, integrated provider selection/failure cleanup. Do not copy or publish weights."
+    },
+    {
+      "id": "independent-model-provider",
+      "feature": "Independent local model provider and asset validation",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "original_evidence_ids": [
+        "ev_89741bd0eebf862f38d26b4698f7686d6fd774157f966f3f8096b704b672eac6"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift",
+          "exists": true
+        }
+      ],
+      "catalog_keys": [],
+      "representative_labels": [],
+      "implementation": "Manifest/path/hash validation and metadata UI; RNNoise is fixed integrated noise provider. User-selected manifests do not enable arbitrary inference.",
+      "verified_scope": "Fixture validation/build contracts documented; metadata is not inference readiness.",
+      "missing_acceptance": "Define compatible independent inference adapters and selected-provider runtime, asset ownership/license provenance, model changes and unsupported feature errors."
+    },
+    {
+      "id": "voice-translation",
+      "feature": "Voice Translation and translated-text playback",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "catalog_keys": [
+        "report_problem.test_voice_interpreter_issue"
+      ],
+      "representative_labels": [
+        {
+          "key": "report_problem.test_voice_interpreter_issue",
+          "text": "Having Problem with Voice Translation"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "ev_9d50689e7c21e8ee795702e6530ac10449eb05a44b7abd684e9ab88ecfff3dd9"
+      ],
+      "implemented_code": [],
+      "implementation": "Current native inventory exposes CreateTranslation, DestroyTranslation, EnableTranslations, PlayTranslationText and InterruptTranslation N-API symbols. These do not establish local processing or Mac UI reachability.",
+      "verified_scope": "Static inventory and label only; no runtime contract or completeness claim.",
+      "missing_acceptance": "Recover actual translation/ASR/TTS service boundary, input/output languages, Mac reachability and playback/mute contract. Retain confirmed local capabilities and exclude remote services. An independent local replacement for cloud translation is an optional adaptation requiring a later scope decision."
+    },
+    {
+      "id": "file-processing",
+      "feature": "User-selected file transcription/processing",
+      "scope": "unresolved",
+      "implementation_state": "independent_partial",
+      "catalog_keys": [
+        "app_menu_file.file_upload"
+      ],
+      "representative_labels": [
+        {
+          "key": "app_menu_file.file_upload",
+          "text": "Upload a file"
+        }
+      ],
+      "original_evidence_ids": [
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift",
+          "exists": true
+        }
+      ],
+      "implementation": "Independent selected-WAV import/offline transcription exists. Original Upload a file label does not establish whether bytes go to a server, supported input types or output workflow.",
+      "verified_scope": "Injected selected-file controller/package tests documented; original upload route and real OS transcription unverified.",
+      "missing_acceptance": "Trace original file-upload handler before claiming a local/cloud contract. Existing independent selected-WAV processing stays local. Rebuilding a cloud-backed upload workflow locally is not a confirmed requirement."
+    },
+    {
+      "id": "analytics-telemetry",
+      "feature": "Analytics, crash upload and remote event reporting",
+      "scope": "excluded",
+      "implementation_state": "excluded",
+      "catalog_keys": [],
+      "representative_labels": [],
+      "original_evidence_ids": [
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+      ],
+      "implemented_code": [],
+      "implementation": "Do not integrate vendor Sentry/event/remote reporting. Local diagnostic log export remains retained. Silent telemetry does not need a translated label.",
+      "verified_scope": "Historical static JS Sentry operations/call names documented in cloud-exclusion-map; incomplete static evidence, no claim of absence of all telemetry.",
+      "missing_acceptance": "Audit dependencies and runtime network denial where installed native code is invoked; establish intentional local logging boundaries without cloud event delivery."
+    }
+  ],
+  "paid_or_hidden_local_candidates": [
+    {
+      "feature_id": "captions",
+      "key": "companion.live_captions_upgrade.description",
+      "text": "This feature is available exclusively on Pro and Business plans.",
+      "scope": "retained",
+      "implementation_state": "unimplemented",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "storage",
+      "key": "note_taker_storage.trial_ended_body",
+      "text": "This feature is exclusively available on the Business plan.",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "recording",
+      "key": "upgrade_tooltip.record_audio",
+      "text": "Audio Record",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "screen-capture",
+      "key": "upgrade_tooltip.record_screen",
+      "text": "Screen Record",
+      "scope": "unresolved",
+      "implementation_state": "unimplemented",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "accent",
+      "key": "accent_toggle_tooltip",
+      "text": "Accent Conversion is not available with your current plan",
+      "scope": "retained",
+      "implementation_state": "metadata_and_static_probe_only",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "accent",
+      "key": "accent_conversion.preferences.show_accent_conversion_desc",
+      "text": "Displays the Accent Conversion feature in the app.",
+      "scope": "retained",
+      "implementation_state": "metadata_and_static_probe_only",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "background-voice",
+      "key": "bvc.bvc_device_enforced_tooltip",
+      "text": "Your admin has enforced headset device usage. If this is a headset, please contact your admin to approve the headset.",
+      "scope": "retained",
+      "implementation_state": "metadata_only",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "noise",
+      "key": "tooltip_mic_nc_admin_always_on",
+      "text": "Microphone noise cancellation is set\nto be always on by your administrator",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "recording",
+      "key": "in_person_recording.note_taker.disabled_tooltip",
+      "text": "This note-taking option is\ndisabled by admin.",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    },
+    {
+      "feature_id": "recording",
+      "key": "switch_to_this_mode_disabled_tooltip",
+      "text": "This note-taking option is \ndisabled by admin.",
+      "scope": "retained",
+      "implementation_state": "independent_partial",
+      "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
+    }
+  ],
+  "additional_outstanding_local_candidates": [
+    "Local AEC and echo-reference alignment",
+    "Background voice isolation and manual unrecognized-headset activation",
+    "Accent conversion for microphone and others, variant selection and original/converted sample playback",
+    "Live captions; platform availability unresolved",
+    "Live meeting ASR, transcript-only capture and diarization",
+    "Summary/notes/insights/recap generation boundary; independent local engine optional if original is cloud-backed",
+    "Screen recording local/cloud boundary; independent local adaptation optional",
+    "Auto/CPU Optimized/Best NC modes and restore defaults",
+    "Optimal mic volume lock, hardware volume/mute and sync policy",
+    "Automatic activation, blocked apps, competing calls and call-time preference lock",
+    "In-person/live notes, scheduled meeting association and save/switch; classify the original four-hour limit without importing a usage quota",
+    "Participant audio announcement and local reminders",
+    "Floating widget, talk time and speaking assistance",
+    "Agenda/filter/join reminders source boundary; independent local adaptation optional if original is cloud-backed",
+    "Local logs, troubleshooting/repair and original developer/reload menu affordances",
+    "Launch at startup, sleep/wake and save-before-relaunch",
+    "Temporary microphone NC test now implemented and synthetic-tested; live/visual acceptance and original comparison contract remain outstanding",
+    "User-selected installed NC inference backend and arbitrary independent provider adapters",
+    "Voice Translation and translated-text playback; local/service dependency and Mac reachability unresolved",
+    "Noise Shield heavy/medium noise and background voice feedback",
+    "Original user-selected file Upload workflow; transport dependency unresolved"
+  ],
+  "implementation_source_sha256": {
+    "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
+    "projects/krisp/app/desktop/build": "5f6de557dbc2db66355e2ddb3e933911f957a87a9c635814c9c0b342db914e43",
+    "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "ffb09a7a35ffa264256c34ea3bc22253c37c1ade4d3fcf49a991a5348a886a00",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "4201865b5a96c9c9eb2afe79a705b78352a9562286f536261f6600c6481bab97",
+    "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
+    "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
+    "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift": "ba2a1b8342403879dd5b217805a65b2c14a6bbd9c7f4bbad5c4f0548340b3244",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "ef6ea3500c5d31811ea79145f1c0004c6d151ef0e744213ed86ca8bfa4681f82",
+    "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
+    "projects/krisp/app/audio-host/coreaudio_backend.cpp": "4c14674f3ebe682c98c20b8071065747c9d9eed98098ddd32c5d99093d302d61",
+    "projects/krisp/app/audio-host/routing.cpp": "b23260404d915ef6fe9e65570f43b7965aba66d53178651401620c6eafe5f8e7",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "7ac361b584f18e35698005a5c4dc486919ead3e9b4f0da13b8cff32aebc90e75",
+    "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
+    "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
+    "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
+    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "2046750265ec25fa59aed7f470d9f91e1b464106614376e7c7e88d0468c12723",
+    "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
+    "projects/krisp/app/audio-host/route_cli.cpp": "643f8234365c51788c0f334b67e118b13fe59705c98f927c26c0a09cca297576",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "bc4570fd307a14c0287d41dffecf98279bac6ebd2017efb76fb6035555bb2684",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fd8c301dfb965e6eb2e4dc759ebf15b436a5bf524d80dcee83eba0f358e557d4",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "6ae19499b56706ae9ba2624ce78f57a28714e7371113f892989a400f94e0c064",
+    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "9adb3724e39a0a6590e4dd9498a65f8317335c7b888e3585de4a0b8ed412e943",
+    "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
+    "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift": "9c15b0f90017c546e5d67422904a60bd7c3aa0551193c11177dde4a88f368021",
+    "projects/krisp/app/audio-host/microphone_test.hpp": "a18f5190c3fd93d87ef40cd241dce0784386f762a7e4a99a2a7600c5eeff6162",
+    "projects/krisp/app/audio-host/microphone_test.cpp": "1c14fd0793c351398abb2cf02381a2f525119c566d26f83ee6cc97e22fdb2585",
+    "projects/krisp/app/audio-host/microphone_test_coreaudio.cpp": "2ce1231972a2f7bdd898d9327d42da497196d4db52c859445118f23c67bcf24e",
+    "projects/krisp/app/audio-host/microphone_test_cli.cpp": "8da899167b2325bd1f7bcb704cfb371a67fc403541228c772b67da998debbcde",
+    "projects/krisp/app/audio-host/microphone_test_test.cpp": "7f2208f9cfd840bd02eeb25e4124c855ce2d526545ef6452dcf292a9f3164e95",
+    "projects/krisp/app/audio-host/microphone_test_wire_fixture.cpp": "104b0317817109fe838b05935d82b77b0450eb9b097278dcf275e7f609a3c751",
+    "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
+    "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
+    "projects/krisp/app/audio-host/host.cpp": "459f3e6b9973048ac668c8bb3c649437fcc25da84d6573fb26f2fb0800ca3db5",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "abe94dbff1b939f07d4ad8b7e8824718b5995ae882171821c8749cceabe85551",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
+    "projects/krisp/app/desktop/Sources/LabVoice/ComparisonPlayback.swift": "08321c9b89e34a7d9ed53fe494e3c8179f6574ae226eeb239c57c383d4422971",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift": "d6b8f3134793ba415d4e680af85d576ff07587b91d768bd68f81f5b9b3e1dd5d",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophonePermission.swift": "4e676900a6d79625619008b8d0ee97f521da37898c68ba5f41c8dc612db14e16",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestTests.swift": "97f470c292136fc7ebc7ab4f85a130b6d337c5051c1e038ba52a77dc16d40e18",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d"
+  },
+  "read_only_audit_limits": [
+    "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
+    "Used retained REA original evidence only, plus independent source inspection.",
+    "Existing tests/build reports establish contract/fixture behavior, not a new test run in this audit.",
+    "No complete static/dynamic network audit; absence of catalog telemetry labels does not establish absence of telemetry.",
+    "Paid/account labels do not exclude established local capabilities. Unknown cloud boundaries require investigation; local replacements for cloud-backed functions are optional recommendations, not confirmed requirements.",
+    "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
+  ],
+  "missing_code_paths": [],
+  "source_snapshot_note": "Code fingerprints identify each referenced independent file at the final audit snapshot, including the stable widget checkpoint. They are not a runtime identity or completion certificate; future changes require rechecking scope/verification.",
+  "artifact_identity_registry": {
+    "current_catalog": {
+      "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+      "subject_sha256": "2af082b5bb26e71a540d08d200d56e12993fc50395b1d7d2ea989e38963c373d",
+      "version_evidence_id": "ev_3a54568811b26cf5484325645d4ec772d8a425f658baf6e523ffd035b522b820",
+      "version": "3.17.9",
+      "limit": "Main executable subject identity accompanies REA plist catalog read; not an invented catalog-file digest."
+    },
+    "historical_js": {
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "artifact_sha256": "fbd6a39ce6fde8685c6ca4c2ca78343aa50551b1bac74f532fd6c5801a23b622",
+      "version": "Earlier installation, before external update to3.17.9",
+      "limit": "Partial semantic graph; names alone do not establish actual invocation or current call graph."
+    },
+    "current_mediasp": {
+      "evidence_id": "ev_9d50689e7c21e8ee795702e6530ac10449eb05a44b7abd684e9ab88ecfff3dd9",
+      "artifact_sha256": "adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755",
+      "limit": "Static/parser/model-load probes only; no successful sample processing."
+    },
+    "current_audio_dm": {
+      "evidence_ids": [
+        "ev_40c3d30f5402cd2db1686a714fbfa29b4d8397234167ce21d7b91b00ad74717d",
+        "ev_f05fb423432fd2a02f99b0d2fa32fbf0c3f9b5a27a3d0b21915582463d57eec9"
+      ],
+      "artifact_sha256": "ef833e13e87064f51cbb547295b1c65138871906bcae651160b0daeeb3fcb3e6",
+      "limit": "Focused static disassembly, before/after digests, no setter invocation."
+    },
+    "current_native_utils": {
+      "evidence_ids": [
+        "ev_03e31793b114208efefd2e68567f4341ad706c16f1bd65c44fbcbcf7688f3102",
+        "ev_40ab92b005f05d1ca15e14b38419d9339ff5e6ebab8122c1c42d08f414ba06a7"
+      ],
+      "artifact_sha256": "17eb466b1092c37b0bbc8e04d4a29163a9fbef1a5e1e802be7c842dd59bc94ea",
+      "limit": "Focused static DeviceRecorder contract; not proof of meeting recording caller/format."
+    },
+    "installed_original_hal": {
+      "evidence_ids": [
+        "ev_f450cb2b574459e56ac510c77e19f1be1d03fcd2aa396df46f272726073dec84",
+        "ev_093d19187f011b55c87fa0e10469a48280f3284900ee4d065d19c08014bb98de",
+        "ev_f3e85d6dd6819b2918d950cc78196bdaab4ba93e479544ec90db67d24c4d323a"
+      ],
+      "artifact_sha256": "50751bd7a50f4f8f2e2f116769cad75aab9b811344b7711174f41ce2ca695c30",
+      "limit": "Static virtual-device curve/IO branches, no original audio execution."
+    }
+  },
+  "scope_counts": {
+    "workflow_families": {
+      "excluded": 4,
+      "unresolved": 6,
+      "retained": 22
+    },
+    "catalog_leaves": {
+      "excluded": 154,
+      "unresolved": 100,
+      "retained": 760
+    },
+    "warning": "Counts measure audit assignment, not feature completeness or runtime coverage."
+  },
+  "semantic_corrections_after_prior_map_review": {
+    "report_problem.accent_robotic_voice": "diagnostics",
+    "report_problem.others_state_my_voice_robotic": "diagnostics",
+    "pref_menu_open_web_settings": "lifecycle",
+    "web_dashboard.text_ai_setup_finalize": "summary",
+    "switch_to_auto_mode": "performance",
+    "tooltip_refresh_standard": "account-policy",
+    "tooltip_refresh_fail": "connectivity",
+    "dialog_cancel_header": "updates",
+    "dialog_confirm_cancel_text": "updates",
+    "dialog_please_try_again_later": "updates",
+    "restart_required": "updates"
+  },
+  "label_assignment_semantics": "A gate/error/button label supports investigation of its underlying capability; it is not an instruction to reproduce trial, quota, admin or paid UI. Generic removed gates do not exclude proven local functionality. Unresolved cloud-backed functions are not automatically converted into local implementation requirements.",
+  "candidate_list_semantics": "Lists include confirmed local gaps and unresolved candidates. Cloud-backed local adaptations are suggestions pending boundary evidence and a later scope decision, not claimed user requirements."
+}

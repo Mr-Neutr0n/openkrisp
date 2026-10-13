@@ -1,0 +1,299 @@
+import Foundation
+import Combine
+import AVFoundation
+import AppKit
+
+enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
+
+@MainActor final class AudioRouteController: ObservableObject {
+    static let shared = AudioRouteController()
+    let recording: RecordingController
+    private let captureAdmission = AudioCaptureAdmission.shared
+    private var admissionObservation: AnyCancellable?
+    private var recordingObservation: AnyCancellable?
+    @Published private(set) var inventory: AudioInventory?
+    @Published private(set) var loading = false
+    @Published private(set) var phase: AudioRoutePhase = .idle
+    @Published private(set) var activeOptions: AudioRouteOptions?
+    @Published private(set) var error: String?
+    @Published var inputUID = ""
+    @Published var outputUID = ""
+    @Published var microphoneNoise = false
+    @Published var speakerNoise = false
+    @Published private(set) var desiredControls = AudioControlSnapshot()
+    @Published private(set) var confirmedControls: AudioControlSnapshot?
+    @Published private(set) var controlPending = false
+    @Published private(set) var controlError: String?
+    private var controlSequence: UInt64 = 0
+    private var controlFlight: (sequence: UInt64, snapshot: AudioControlSnapshot)?
+    private var controlDeadline: Task<Void, Never>?
+    private let controlTimeout: UInt64
+    private let readInventory: () async throws -> AudioInventory
+    private let stopInventory: () async -> Bool
+    private let authorization: () -> AVAuthorizationStatus
+    private let requestAuthorization: () async -> Bool
+    private let factory: () throws -> any AudioHelperChild
+    private let startupTimeout: UInt64
+    private let stopTimeout: UInt64
+    private var child: (any AudioHelperChild)?
+    private var operationID: UUID?
+    private var startTask: Task<Void, Never>?
+    private var deadline: Task<Void, Never>?
+    var controlsEditable: Bool { captureAdmission.owner != .microphoneTest && !loading && (phase == .idle || phase == .running) }
+    var controlStatus: String {
+        if phase == .idle { return "Selected controls will apply at Start." }
+        if controlPending { return "Control update pending…" }
+        if controlError != nil { return "Latest controls are not confirmed." }
+        if confirmedControls != nil { return "Controls accepted for upcoming callbacks." }
+        return "Waiting for control confirmation…"
+    }
+    var engaged: Bool { phase != .idle || loading || recording.busy }
+    var statusTitle: String {
+        switch phase {
+        case .idle: return "Audio stopped"
+        case .authorizing: return "Waiting for microphone permission…"
+        case .starting: return "Starting audio…"
+        case .running: return "Audio running"
+        case .stopping: return "Stopping audio…"
+        }
+    }
+    var canStart: Bool {
+        guard phase == .idle, !loading, !recording.busy, captureAdmission.available, let inventory, inventory.driverPresent else { return false }
+        return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
+            inventory.devices.contains { $0.uid == outputUID && $0.alive == 1 && $0.nominalRate == 48000 && $0.output.channels == 2 }
+    }
+    init() {
+        recording = RecordingController()
+        let services = AudioHelperServices()
+        readInventory = { try await services.inventory() }
+        stopInventory = { await services.stopInventory() }
+        authorization = { MicrophonePermission.status() }
+        requestAuthorization = { await MicrophonePermission.request() }
+        factory = { try AudioHelperServices.makeChild() }
+        startupTimeout = 10_000_000_000; stopTimeout = 10_000_000_000; controlTimeout = 2_000_000_000
+        observeRecording()
+    }
+    init(readInventory: @escaping () async throws -> AudioInventory,
+         stopInventory: @escaping () async -> Bool = { true },
+         authorization: @escaping () -> AVAuthorizationStatus,
+         requestAuthorization: @escaping () async -> Bool,
+         factory: @escaping () throws -> any AudioHelperChild,
+         startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil) {
+        self.recording = recording ?? RecordingController()
+        self.readInventory = readInventory; self.stopInventory = stopInventory
+        self.authorization = authorization; self.requestAuthorization = requestAuthorization
+        self.factory = factory; self.startupTimeout = startupTimeout; self.stopTimeout = stopTimeout; self.controlTimeout = controlTimeout
+        observeRecording()
+    }
+    private func observeRecording() {
+        admissionObservation = captureAdmission.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        recordingObservation = recording.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+    }
+    func refresh() async {
+        guard phase == .idle, !loading else { return }
+        loading = true; error = nil
+        defer { loading = false }
+        do {
+            let result = try await readInventory()
+            inventory = result
+            if !result.devices.contains(where: { $0.uid == inputUID && $0.input.channels > 0 }) { inputUID = "" }
+            if !result.devices.contains(where: { $0.uid == outputUID && $0.output.channels > 0 }) { outputUID = "" }
+        } catch { inventory = nil; self.error = error.localizedDescription }
+    }
+    // No permission request or --route launch occurs until this explicit Start action.
+    func start() {
+        guard canStart else { return }
+        let options = AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
+                                        microphoneNoise: microphoneNoise, speakerNoise: speakerNoise)
+        let initialControls = desiredControls
+        let id = UUID()
+        guard captureAdmission.acquire(id, owner: .route) else { return }
+        operationID = id; error = nil; controlError = nil
+        resetControlSession(); phase = .authorizing
+        startTask = Task { [weak self] in
+            guard let self, self.operationID == id, !Task.isCancelled else { return }
+            let status = self.authorization()
+            var permitted = status == .authorized
+            if status == .notDetermined { permitted = await self.requestAuthorization() }
+            guard self.operationID == id, !Task.isCancelled else { return }
+            guard permitted else {
+                self.error = "Microphone permission is required to start audio. Allow Lab Voice in macOS privacy settings."
+                self.clear(); return
+            }
+            do {
+                let process = try self.factory()
+                self.child = process; self.phase = .starting
+                try process.launch(arguments: options.arguments + ["--control-stdin", "--operation-id", id.uuidString] + initialControls.startupArguments, line: { [weak self] line in
+                    self?.line(line, expected: options, initialControls: initialControls, id: id)
+                }, exit: { [weak self] event in self?.exited(event, id: id) })
+                if self.operationID == id, self.phase == .starting {
+                    self.deadline = Task { [weak self] in
+                        do { try await Task.sleep(nanoseconds: self?.startupTimeout ?? 0) } catch { return }
+                        guard let self, self.operationID == id, self.phase == .starting else { return }
+                        self.error = "The audio helper did not confirm startup. Stopping it."
+                        self.deadline = nil // Stop must not cancel its own timeout task before awaiting exit.
+                        _ = await self.stop()
+                    }
+                }
+            } catch {
+                guard self.operationID == id else { return }
+                self.error = "Cannot start audio helper: \(error.localizedDescription)"; self.clear()
+            }
+        }
+    }
+    private func line(_ line: String, expected: AudioRouteOptions, initialControls: AudioControlSnapshot, id: UUID) {
+        guard operationID == id else { return }
+        if recording.receive(line, operationID: id) { return }
+        guard child?.running == true else { return }
+        if phase == .running, let data = line.data(using: .utf8),
+           let ack = try? JSONDecoder().decode(AudioControlAcknowledgment.self, from: data), ack.type == "controls-ack" {
+            acknowledge(ack, id: id); return
+        }
+        guard phase == .starting,
+              let data = line.data(using: .utf8), let ready = try? JSONDecoder().decode(AudioStartup.self, from: data),
+              ready.event == "route_started" else { return }
+        guard ready.options == expected, ready.operationID == id.uuidString, ready.controls == initialControls, initialControls.valid else {
+            error = "The audio helper confirmed a different device or processing configuration. Stopping it."
+            Task { [weak self] in
+                guard let self, self.operationID == id else { return }
+                _ = await self.stop()
+            }; return
+        }
+        deadline?.cancel(); deadline = nil
+        activeOptions = ready.options; confirmedControls = ready.controls; phase = .running
+        recording.attach(operationID: id) { [weak self] bytes in
+            guard let self, self.operationID == id, self.phase == .running || self.phase == .stopping,
+                  let process = self.child else { throw AudioHelperError.controlChannelClosed }
+            try process.send(bytes)
+        }
+    }
+    func setMicrophoneMuted(_ muted: Bool) {
+        var next = desiredControls; next.microphone.muted = muted; updateControls(next)
+    }
+    func setSpeakerMuted(_ muted: Bool) {
+        var next = desiredControls; next.speaker.muted = muted; updateControls(next)
+    }
+    func setMicrophonePercent(_ value: Double) {
+        guard value.isFinite else { return }
+        var next = desiredControls; next.microphone.gain = Double(Float(min(100, max(0, value)) / 100)); updateControls(next)
+    }
+    func setSpeakerPercent(_ value: Double) {
+        guard value.isFinite else { return }
+        var next = desiredControls; next.speaker.gain = Double(Float(min(100, max(0, value)) / 100)); updateControls(next)
+    }
+    private func updateControls(_ next: AudioControlSnapshot) {
+        guard controlsEditable, next.valid, next != desiredControls else { return }
+        desiredControls = next; controlError = nil
+        publishLatestControls()
+    }
+    func retryControls() {
+        guard phase == .running, !controlPending else { return }
+        controlError = nil; publishLatestControls(force: true)
+    }
+    private func publishLatestControls(force: Bool = false) {
+        guard phase == .running, let id = operationID, let process = child, process.running,
+              controlFlight == nil, desiredControls.valid,
+              force || desiredControls != confirmedControls else { return }
+        guard controlSequence < 9_007_199_254_740_991 else {
+            controlError = "The control sequence is exhausted. Stop and restart audio."; return
+        }
+        controlSequence += 1
+        let sequence = controlSequence, snapshot = desiredControls
+        controlFlight = (sequence, snapshot); controlPending = true
+        do { try process.send(AudioControlCommand(id: id, sequence: sequence, snapshot: snapshot).line()) }
+        catch {
+            guard operationID == id, controlFlight?.sequence == sequence else { return }
+            controlFlight = nil; controlPending = false
+            controlError = "Cannot send controls. \(error.localizedDescription)"; return
+        }
+        guard operationID == id, controlFlight?.sequence == sequence else { return }
+        controlDeadline = Task { [weak self] in
+            do { try await Task.sleep(nanoseconds: self?.controlTimeout ?? 0) } catch { return }
+            guard let self, self.operationID == id, self.phase == .running,
+                  self.controlFlight?.sequence == sequence else { return }
+            self.controlFlight = nil; self.controlPending = false; self.controlDeadline = nil
+            self.confirmedControls = nil
+            self.controlError = "The helper did not confirm the latest controls. Current published values are unknown. Retry or stop audio."
+        }
+    }
+    private func acknowledge(_ ack: AudioControlAcknowledgment, id: UUID) {
+        guard operationID == id, phase == .running, ack.operationID == id.uuidString,
+              let request = controlFlight, ack.sequence == request.sequence else { return }
+        controlDeadline?.cancel(); controlDeadline = nil
+        controlFlight = nil; controlPending = false
+        guard ack.accepted else {
+            controlError = "Control update rejected. " + (ack.error ?? "No reason supplied.")
+            return
+        }
+        guard let snapshot = ack.snapshot, snapshot.valid, snapshot == request.snapshot else {
+            controlError = "The helper confirmed different control values. Stopping audio."
+            Task { [weak self] in
+                guard let self, self.operationID == id else { return }
+                _ = await self.stop()
+            }
+            return
+        }
+        confirmedControls = snapshot; controlError = nil
+        publishLatestControls() // One queued snapshot: the newest slider positions.
+    }
+    private func resetControlSession() {
+        controlDeadline?.cancel(); controlDeadline = nil
+        controlFlight = nil; controlPending = false; confirmedControls = nil; controlSequence = 0
+    }
+    private func exited(_ event: HelperExit, id: UUID) {
+        guard operationID == id else { return }
+        let stopping = phase == .stopping
+        if event.status != 0 {
+            error = event.diagnostic.isEmpty ? "The audio helper exited with status \(event.status)." : event.diagnostic
+        } else if !stopping {
+            error = activeOptions == nil ? "The audio helper exited before confirming startup." : "The audio route ended."
+        }
+        Task { await recording.helperExited(operationID: id) }
+        clear()
+    }
+    private func clear() {
+        deadline?.cancel(); deadline = nil
+        startTask?.cancel(); startTask = nil
+        resetControlSession()
+        if let operationID { captureAdmission.release(operationID) }
+        operationID = nil; child = nil; activeOptions = nil; phase = .idle
+    }
+    func stop() async -> Bool {
+        if loading, !(await stopInventory()) {
+            error = "The device query helper did not exit. Try Stop again before quitting."; return false
+        }
+        deadline?.cancel(); deadline = nil
+        startTask?.cancel(); startTask = nil
+        guard let process = child else {
+            await recording.finishAfterExit()
+            clear(); return true
+        }
+        let id = operationID
+        phase = .stopping; resetControlSession()
+        await recording.prepareForRouteStop()
+        process.terminate()
+        let ended = await process.waitForExit(timeoutNanoseconds: stopTimeout)
+        guard ended else {
+            error = "The audio helper did not exit after Stop. Try Stop again before quitting."
+            return false
+        }
+        if let id { await recording.helperExited(operationID: id) }
+        if operationID == id { clear() }
+        return true
+    }
+}
+
+@MainActor final class LabVoiceApplicationDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        let audio = AudioRouteController.shared
+        let test = MicrophoneTestController.shared
+        guard audio.engaged || test.engaged else { return .terminateNow }
+        Task {
+            let testEnded: Bool
+            if test.engaged { testEnded = await test.cancelAndCleanup() } else { testEnded = true }
+            let audioEnded = await audio.stop()
+            sender.reply(toApplicationShouldTerminate: testEnded && audioEnded)
+        }
+        return .terminateLater
+    }
+}

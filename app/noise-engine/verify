@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+mkdir -p build
+for mode in release sanitized; do
+  flags="-O2"
+  if [ "$mode" = sanitized ]; then flags="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"; fi
+  mkdir -p "build/$mode"
+  for name in denoise rnn rnn_data rnn_reader pitch kiss_fft celt_lpc; do
+    clang -mmacosx-version-min=12.0 -std=c11 -D_DARWIN_C_SOURCE -DRNNOISE_BUILD $flags -Ivendor/rnnoise/include -Ivendor/rnnoise/src -c "vendor/rnnoise/src/$name.c" -o "build/$mode/$name.o"
+  done
+  ar rcs "build/$mode/librnnoise.a" build/"$mode"/*.o
+  clang++ -mmacosx-version-min=12.0 -std=c++20 $flags -Ivendor/rnnoise/include verify.cpp "build/$mode/librnnoise.a" -o "build/$mode/check"
+  "build/$mode/check"
+done
+mkdir -p build/faults
+for name in denoise rnn rnn_data rnn_reader pitch kiss_fft celt_lpc; do
+  clang -mmacosx-version-min=12.0 -std=c11 -D_DARWIN_C_SOURCE -DRNNOISE_BUILD -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Dmalloc=lab_malloc -Dcalloc=lab_calloc -Dfree=lab_free -Ivendor/rnnoise/include -Ivendor/rnnoise/src -c "vendor/rnnoise/src/$name.c" -o "build/faults/$name.o"
+done
+clang -mmacosx-version-min=12.0 -std=c11 -fsanitize=address,undefined -Ivendor/rnnoise/include verify_allocations.c build/faults/*.o -o build/faults/check
+for failure in 0 1 2 3 4 5 6; do build/faults/check "$failure"; done

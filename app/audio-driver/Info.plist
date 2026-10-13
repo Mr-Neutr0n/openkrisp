@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>dev.hari.labvoice.audio</string>
+<key>CFBundleName</key><string>Lab Voice Audio</string>
+<key>CFBundleExecutable</key><string>LabVoiceAudio</string>
+<key>CFBundlePackageType</key><string>BNDL</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>CFBundleShortVersionString</key><string>0.1</string>
+<key>CFPlugInDynamicRegistration</key><false/>
+<key>CFPlugInFactories</key><dict><key>0DBBC67E-7FBA-4CEB-A492-B8CDFA17711E</key><string>LabVoiceFactory</string></dict>
+<key>CFPlugInTypes</key><dict><key>443ABAB8-E7B3-491A-B985-BEB9187030DB</key><array><string>0DBBC67E-7FBA-4CEB-A492-B8CDFA17711E</string></array></dict>
+</dict></plist>

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
+./verification/verify
+./app/audio-transport/verify
+./app/local-store/verify
+./app/audio-driver/verify
+./app/audio-driver/hal-test/verify
+./app/local-transcription/verify
+./app/model-catalog/verify
+./app/noise-engine/verify
+./app/audio-host/verify
+./app/desktop/verify

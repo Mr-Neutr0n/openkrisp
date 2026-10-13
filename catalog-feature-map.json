@@ -1,0 +1,1743 @@
+{
+  "catalog_evidence_id": "ev_ece7c942d90e27f063fd1be188d354a1a8d0f289e59aadea32bb6dc209566fa7",
+  "source": "evidence/translations.json normalized_result.value",
+  "leaf_count": 997,
+  "coverage": "All catalog leaf keys assigned once. Classification describes candidate reconstruction scope, not observed execution.",
+  "limitations": [
+    "Labels do not prove reachability, defaults, persistence, constraints enforcement or processing behavior.",
+    "The catalog is not a complete runtime feature inventory.",
+    "Cross-platform and coming-soon labels occur.",
+    "Native companion bytes have ASAR declared digest mismatches. Native support describes current local bytes.",
+    "No network requests, app execution or live account data were used.",
+    "User-facing strings cannot establish the absence or full boundary of silent analytics, telemetry or crash reporting."
+  ],
+  "groups": [
+    {
+      "id": "account-policy",
+      "classification": "excluded",
+      "title": "Accounts, licensing, plans and administrative policy",
+      "note": "Sign-in, seat allocation, daily limits, subscriptions and admin enforcement are outside the requested local reconstruction.",
+      "keys": [
+        "accent_conversion.main_ui.enforced_by_admin",
+        "accent_conversion.minutes_expired",
+        "account_switch_confirmation.description",
+        "account_switch_confirmation.reject",
+        "account_switch_confirmation.switch_account",
+        "account_switch_confirmation.title",
+        "account_switch_confirmation.window_title",
+        "app_menu_file.invite_teammates",
+        "app_menu_help.sign_out",
+        "auth_failed_device_blocked",
+        "auth_failed_device_license",
+        "auth_failed_device_no_seat",
+        "auth_failed_device_no_team",
+        "auth_failed_device_other",
+        "auth_failed_text",
+        "auth_required",
+        "authentication.text_something_went_wrong_try_again",
+        "btn_login",
+        "btn_logout",
+        "btn_upgrade",
+        "btn_upgrade_now",
+        "btn_upgrade_to_advanced",
+        "btn_upgrade_to_business",
+        "bvc.bvc_device_enforced_tooltip",
+        "call_indicator.no_minutes_1",
+        "call_indicator.no_minutes_ac",
+        "call_indicator.no_minutes_nc",
+        "call_started_ac_no_minutes_2",
+        "call_started_no_minutes_1",
+        "call_started_no_minutes_2",
+        "companion.live_captions_upgrade.btn_upgrade",
+        "companion.live_captions_upgrade.description",
+        "companion.live_captions_upgrade.title",
+        "context_menu_fetch_user_profile",
+        "context_menu_sign_out",
+        "daily_free_minutes",
+        "fetch_profile",
+        "free_plan",
+        "in_person_recording.note_taker.disabled_tooltip",
+        "loading_account_text",
+        "login_text",
+        "minute_expired_tooltip",
+        "nav_btn_sign_out",
+        "nc_block_mic_enforced_al_tooltip",
+        "nc_block_spk_enforced_al_tooltip",
+        "nc_minutes_expired_today",
+        "nc_minutes_left_today",
+        "nc_minutes_range",
+        "nc_minutes_renew_tooltip",
+        "note_taker_storage.trial_ended",
+        "note_taker_storage.trial_ended_body",
+        "note_taker_storage.type_enforced",
+        "note_taker_tooltip.nc_minutes_expired",
+        "password",
+        "pref_descr_minutes_expired",
+        "pref_descr_minutes_renewed",
+        "pref_descr_stream_end_minutes_expired",
+        "pref_title_minutes_expired",
+        "pref_title_minutes_renewed",
+        "pref_title_stream_end_minutes_expired",
+        "pro",
+        "pro_feature_tooltip",
+        "report_problem.include_system_information_logout",
+        "report_problem.minutes_are_not_renewed",
+        "report_problem.sign_out_state_text",
+        "save_and_sign_out",
+        "sign_out_in_progress_text",
+        "sign_out_no_save",
+        "signin_process_text",
+        "switch_to_this_mode_disabled_tooltip",
+        "text_free_plan_subscription",
+        "text_is_signed_out_or_session_expired",
+        "text_krisp_has_signed_out_automatically",
+        "text_krisp_has_signed_out_manually",
+        "text_manual_sign_out",
+        "text_sign_in",
+        "tooltip_mic_nc_admin_always_on",
+        "tooltip_spk_nc_admin_always_off",
+        "tooltip_spk_nc_admin_always_on",
+        "trial_ended.body",
+        "trial_ended.button",
+        "trial_ended.disabled_text",
+        "trial_ended.title",
+        "unable_to_get_account_details",
+        "upgrade_for_feature",
+        "upgrade_tooltip.record_audio",
+        "upgrade_tooltip.record_screen",
+        "user_name",
+        "wait_for_sign_out_text",
+        "web_dashboard.text_auth_description",
+        "web_dashboard.text_auth_page_signing_in",
+        "web_dashboard.text_signing_in",
+        "window_title_proxy_authentication",
+        "window_title_sign_in"
+      ],
+      "representative_quotes": [
+        {
+          "key": "accent_conversion.main_ui.enforced_by_admin",
+          "text": "This Accent Conversion\n option is disabled by admin."
+        },
+        {
+          "key": "accent_conversion.minutes_expired",
+          "text": "Daily Accent Conversion\nminutes used up. Upgrade to\ncontinue."
+        },
+        {
+          "key": "account_switch_confirmation.description",
+          "text": "You are about to sign in to a different Krisp account. This will log you out of your current account and switch to the new one."
+        }
+      ],
+      "support": [],
+      "key_count": 94
+    },
+    {
+      "id": "cloud-bot",
+      "classification": "excluded",
+      "title": "Cloud storage, meeting bots and web dashboard",
+      "note": "Cloud storage, remote bot attendance and web dashboard access are explicit exclusions.",
+      "keys": [
+        "bot_joined_indicator",
+        "bot_revoke_disabled_tooltip",
+        "bot_status_changed_default_error_message",
+        "bot_status_changed_joining",
+        "bot_status_changed_kicked_by_host",
+        "bot_status_changed_no_participants",
+        "bot_status_changed_not_admitted",
+        "bot_status_changed_recording",
+        "bot_status_changed_retry",
+        "bot_status_changed_waiting_room",
+        "bot_status_description_error",
+        "bot_status_description_joining",
+        "bot_status_description_waiting",
+        "bot_transcribing_tooltip",
+        "bot_transcribing_tooltip_wrapped",
+        "cloud_store_info",
+        "invite_popup_body",
+        "invite_popup_primary_btn",
+        "invite_popup_title",
+        "note_taker_storage.cloud",
+        "note_taker_storage.cloud_info",
+        "pref_menu_open_web_settings",
+        "record_with_bot.bot_status_in_meeting",
+        "record_with_bot.bot_status_joining",
+        "record_with_bot.bot_status_revoked_no_rejoin",
+        "record_with_bot.in_progress",
+        "record_with_bot.invalid_link",
+        "record_with_bot.invite",
+        "record_with_bot.invite_bot",
+        "record_with_bot.invite_link",
+        "record_with_bot.invite_link_placeholder",
+        "record_with_bot.invite_ongoing_meeting",
+        "record_with_bot.no_bot",
+        "record_with_bot.record_via_bot",
+        "record_with_bot.retry",
+        "record_with_bot.storage_info",
+        "remove_bot",
+        "report_problem.accent_robotic_voice",
+        "report_problem.others_state_my_voice_robotic",
+        "revoke_popup_body",
+        "revoke_popup_primary_btn",
+        "revoke_popup_title",
+        "video_record_via_bot",
+        "web_dashboard.audio_recording_paused",
+        "web_dashboard.dashboard_failed_description",
+        "web_dashboard.dashboard_failed_title",
+        "web_dashboard.offline_body",
+        "web_dashboard.offline_title",
+        "web_dashboard.refresh",
+        "web_dashboard.screen_recording_paused",
+        "web_dashboard.text_ai_setup_finalize",
+        "web_dashboard.transcript_paused"
+      ],
+      "representative_quotes": [
+        {
+          "key": "cloud_store_info",
+          "text": "Your transcripts and recordings are securely stored in the cloud and accessible from any device."
+        },
+        {
+          "key": "record_with_bot.record_via_bot",
+          "text": "Send Bot"
+        },
+        {
+          "key": "web_dashboard.offline_body",
+          "text": "Oops! It looks like you're not connected. Check your connection and refresh to continue."
+        }
+      ],
+      "support": [],
+      "key_count": 52
+    },
+    {
+      "id": "external-support",
+      "classification": "excluded",
+      "title": "Report submission, feedback and external links",
+      "note": "Remote report submission, feedback and third-party links are excluded. Local log export has a separate group.",
+      "keys": [
+        "app_menu_help.contact_us",
+        "app_menu_help.give_feedback",
+        "app_menu_help.help_center",
+        "app_menu_help.join_slack",
+        "btn_contact_support",
+        "how_was_transcript_text",
+        "how_was_transcript_text_link",
+        "link_privacy_policy",
+        "link_term_of_use",
+        "nav_btn_contact_support",
+        "pref_descr_share_krisp",
+        "pref_title_share_krisp",
+        "report_problem.add_attachment",
+        "report_problem.allowed_file_formats_for_attachment",
+        "report_problem.btn_send_report",
+        "report_problem.could_not_upload_file",
+        "report_problem.max_file_count_pupup",
+        "report_problem.max_file_limit",
+        "report_problem.max_file_size_pupup",
+        "report_problem.not_exceed_limit",
+        "report_problem.report_description",
+        "report_problem.report_description_second",
+        "report_problem.report_process_fail_text",
+        "report_problem.report_process_pending",
+        "report_problem.report_process_success_text",
+        "report_problem.report_process_sync_issue",
+        "report_problem.send_report",
+        "report_problem.total_max_files_sizes_warning",
+        "report_problem.upload_or_drop_file",
+        "report_problem.user_warning_for_recording_report"
+      ],
+      "representative_quotes": [
+        {
+          "key": "app_menu_help.contact_us",
+          "text": "Contact us"
+        },
+        {
+          "key": "app_menu_help.give_feedback",
+          "text": "Give Feedback"
+        },
+        {
+          "key": "app_menu_help.help_center",
+          "text": "Open help center"
+        }
+      ],
+      "support": [],
+      "key_count": 30
+    },
+    {
+      "id": "calendar",
+      "classification": "ambiguous",
+      "title": "Calendar, agenda, meeting history and join reminders",
+      "note": "Catalog names meeting events, event filters and join actions. Calendar source, account dependence and offline history are unknown.",
+      "keys": [
+        "add_agenda",
+        "all_day_event",
+        "all_done_today",
+        "before_meeting",
+        "calendar_reminder_in_min",
+        "calendar_reminder_in_progress",
+        "calendar_reminder_join",
+        "fetch_calendar",
+        "in_person_recording.scheduled_meeting_modal.in_progress",
+        "in_person_recording.scheduled_meeting_modal.start_btn",
+        "in_person_recording.scheduled_meeting_modal.start_new_meeting_btn",
+        "in_person_recording.scheduled_meeting_modal.title",
+        "join",
+        "no_meeting_today",
+        "not_available_calendar_data",
+        "past_meetings",
+        "pref_description_show_calendar_events",
+        "pref_label_events_filters_title",
+        "pref_label_menu_bar_calendar_events",
+        "pref_label_show_all_day_events",
+        "pref_label_show_calendar_events",
+        "pref_label_show_events_without_conferencing",
+        "pref_label_show_events_without_participants",
+        "pref_menu_calendar",
+        "pref_notifications_upcoming_event_body",
+        "pref_notifications_upcoming_event_title",
+        "reminder.consent_helper_text",
+        "reminder.join",
+        "reminder.join_and_take_notes",
+        "reminder.join_and_take_notes_1_line",
+        "reminder.join_and_take_notes_2_line",
+        "reminder.manage_notifications",
+        "reminder.take_notes",
+        "up_next_today",
+        "view_agenda"
+      ],
+      "representative_quotes": [
+        {
+          "key": "add_agenda",
+          "text": "Add Agenda"
+        },
+        {
+          "key": "all_day_event",
+          "text": "All-day"
+        },
+        {
+          "key": "all_done_today",
+          "text": "All done for today ✅"
+        }
+      ],
+      "support": [],
+      "key_count": 35
+    },
+    {
+      "id": "screen-capture",
+      "classification": "ambiguous",
+      "title": "Screen recording and capture permissions",
+      "note": "A shipped message says screen recording is unavailable with on-device storage. A local capture equivalent is a design choice until the cloud dependency is traced.",
+      "keys": [
+        "note_taker_tooltip.screen_recording",
+        "note_taker_tooltip.screen_recording_stopped",
+        "note_taker_tooltip.switch_to_screen_recording",
+        "permissions_backdrop.screen_capture_desc",
+        "record_screen",
+        "screen_recording_close_btn",
+        "screen_recording_header_text",
+        "screen_recording_in_progress",
+        "screen_recording_local_info",
+        "screen_recording_paused",
+        "screen_recording_record_btn",
+        "screen_recording_switch_btn",
+        "window_title_screen_recording"
+      ],
+      "representative_quotes": [
+        {
+          "key": "screen_recording_local_info",
+          "text": "Screen recording isn't available with\non-device storage. To use it, update\n the storage location in your settings."
+        },
+        {
+          "key": "permissions_backdrop.screen_capture_desc",
+          "text": "Capture screen and video in meetings."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        }
+      ],
+      "key_count": 13
+    },
+    {
+      "id": "accent",
+      "classification": "ambiguous",
+      "title": "Accent conversion, language variants and tests",
+      "note": "Mic and speaker conversion, tests, headset constraints and model preparation are named. Download requirements and offline inference are not proven. Accent variant labels can include coming-soon choices.",
+      "keys": [
+        "accent_conversion.african",
+        "accent_conversion.almost_ready",
+        "accent_conversion.description",
+        "accent_conversion.error.generic",
+        "accent_conversion.error.model_preparation_generic",
+        "accent_conversion.error.model_preparation_no_connection",
+        "accent_conversion.error.no_connection",
+        "accent_conversion.few_moments",
+        "accent_conversion.filipino",
+        "accent_conversion.in_progress.description",
+        "accent_conversion.in_progress.recording",
+        "accent_conversion.in_progress.script",
+        "accent_conversion.in_progress.title",
+        "accent_conversion.indian",
+        "accent_conversion.initial.bvc_warning",
+        "accent_conversion.initial.description",
+        "accent_conversion.initial.important",
+        "accent_conversion.initial.press_to_start",
+        "accent_conversion.initial.title",
+        "accent_conversion.latam",
+        "accent_conversion.main_ui.daily_limit_tooltip",
+        "accent_conversion.main_ui.mic_issue_tooltip",
+        "accent_conversion.main_ui.mic_unmuted_tooltip",
+        "accent_conversion.main_ui.preparing",
+        "accent_conversion.main_ui.spk_issue_tooltip",
+        "accent_conversion.main_ui.spk_not_selected_tooltip",
+        "accent_conversion.main_ui.spk_unmuted_tooltip",
+        "accent_conversion.mic_title_collapsed",
+        "accent_conversion.mic_title_expanded",
+        "accent_conversion.modal.back",
+        "accent_conversion.modal.skip",
+        "accent_conversion.modal.title",
+        "accent_conversion.pakistani",
+        "accent_conversion.preferences.accent_type",
+        "accent_conversion.preferences.accent_type_african",
+        "accent_conversion.preferences.accent_type_chinese",
+        "accent_conversion.preferences.accent_type_filipino",
+        "accent_conversion.preferences.accent_type_french",
+        "accent_conversion.preferences.accent_type_indian",
+        "accent_conversion.preferences.accent_type_latam",
+        "accent_conversion.preferences.accent_type_russian",
+        "accent_conversion.preferences.coming_soon",
+        "accent_conversion.preferences.preparing",
+        "accent_conversion.preferences.show_accent_conversion",
+        "accent_conversion.preferences.show_accent_conversion_desc",
+        "accent_conversion.preferences.soon",
+        "accent_conversion.preferences.title",
+        "accent_conversion.preparing",
+        "accent_conversion.preparing_models",
+        "accent_conversion.recording_notice",
+        "accent_conversion.retry",
+        "accent_conversion.review.accented_conversation",
+        "accent_conversion.review.description",
+        "accent_conversion.review.off",
+        "accent_conversion.review.on",
+        "accent_conversion.review.problems",
+        "accent_conversion.review.record_again",
+        "accent_conversion.review.title",
+        "accent_conversion.service_error",
+        "accent_conversion.speaker_title_collapsed",
+        "accent_conversion.speaker_title_expanded",
+        "accent_conversion.test_accent",
+        "accent_conversion.thanks",
+        "accent_conversion.title",
+        "accent_free_daily",
+        "accent_localization",
+        "accent_toggle_tooltip",
+        "al_bvc_blocked_warning",
+        "bvc_required_for_accent_tooltip",
+        "call_indicator.accent_conversion",
+        "call_started_al_off_1",
+        "call_started_al_off_2",
+        "call_started_al_title",
+        "companion.test_al",
+        "nav_btn_test_ac",
+        "pref_descr_al_off",
+        "pref_descr_al_on",
+        "pref_descr_call_started_ac",
+        "pref_title_al_off",
+        "pref_title_al_on",
+        "pref_title_call_started_ac",
+        "report_problem.accent_difficulty_in_understanding",
+        "report_problem.accent_lagging_voice",
+        "report_problem.accent_not_working",
+        "report_problem.accent_still_strong_accent",
+        "report_problem.accent_strange_voices",
+        "report_problem.having_issue_with_accent",
+        "text_unmute_krisp_for_test_al",
+        "widget.accent_on_tooltip",
+        "widget_accent_localization"
+      ],
+      "representative_quotes": [
+        {
+          "key": "accent_conversion.mic_title_expanded",
+          "text": "Convert my accent"
+        },
+        {
+          "key": "accent_conversion.speaker_title_expanded",
+          "text": "Convert others' accent"
+        },
+        {
+          "key": "accent_conversion.error.model_preparation_no_connection",
+          "text": "Failed to prepare models. Please check your internet connection and try again."
+        },
+        {
+          "key": "accent_conversion.recording_notice",
+          "text": "Your recording will never leave you device and won’t be saved."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        }
+      ],
+      "key_count": 90
+    },
+    {
+      "id": "captions",
+      "classification": "ambiguous",
+      "title": "Live captions and companion panel",
+      "note": "Captions are named. This Mac catalog also contains a Microsoft Visual C++ error, so platform reachability cannot be assumed.",
+      "keys": [
+        "companion.hide_captions",
+        "companion.live_captions_runtime_error.description",
+        "companion.live_captions_runtime_error.title",
+        "companion.show_captions",
+        "companion.sidebar_title",
+        "companion.test_run_title"
+      ],
+      "representative_quotes": [
+        {
+          "key": "companion.show_captions",
+          "text": "Turn on Captions"
+        },
+        {
+          "key": "companion.live_captions_runtime_error.title",
+          "text": "Microsoft Visual C++ Runtime is missing or not installed correctly."
+        }
+      ],
+      "support": [],
+      "key_count": 6
+    },
+    {
+      "id": "summary",
+      "classification": "ambiguous",
+      "title": "AI notes, summaries and call insights",
+      "note": "Labels name summaries, notes, auto-open behavior, insights and summary errors. Local generation and dependencies remain unknown.",
+      "keys": [
+        "auto_summarization",
+        "auto_summarization_off",
+        "auto_summarization_on",
+        "call_summary_error_title",
+        "call_summary_non_english_body",
+        "call_summary_non_english_title",
+        "call_summary_short_call_body",
+        "call_summary_short_call_title",
+        "call_summary_view_meeting",
+        "last_call_summary_discovery",
+        "last_call_summary_tooltip",
+        "meeting_notes",
+        "meeting_notes_downloading",
+        "meeting_notes_error",
+        "meeting_notes_error_reload",
+        "meeting_notes_error_retry",
+        "meeting_notes_service_error",
+        "notes_banner_text",
+        "notes_privacy",
+        "notes_privacy_text",
+        "pref_descr_call_summary",
+        "pref_description_auto_generate",
+        "pref_info_call_summary",
+        "pref_label_auto_open_notes",
+        "pref_menu_call_insights",
+        "pref_notifications_call_summary_body",
+        "pref_notifications_call_summary_title",
+        "pref_title_call_summary",
+        "saving_meeting_notes",
+        "text_call_insights",
+        "view_notes",
+        "your_work_done"
+      ],
+      "representative_quotes": [
+        {
+          "key": "auto_summarization",
+          "text": "Auto-summarization"
+        },
+        {
+          "key": "auto_summarization_off",
+          "text": "Auto-summarization is Off"
+        },
+        {
+          "key": "auto_summarization_on",
+          "text": "Your meetings will be Auto-\nsummarized"
+        }
+      ],
+      "support": [],
+      "key_count": 32
+    },
+    {
+      "id": "updates",
+      "classification": "ambiguous",
+      "title": "Updates, repair and installation",
+      "note": "Local repair and restart actions are candidates. Vendor update checks and downloads cross the network boundary and should be replaced by independent distribution decisions.",
+      "keys": [
+        "audio_interruption_info",
+        "btn_install",
+        "btn_repair",
+        "btn_repair_krisp",
+        "check_for_update",
+        "check_for_update_title",
+        "context_menu_check_for_update",
+        "dialog_update_error",
+        "dialog_update_failed",
+        "dialog_update_installation_failed",
+        "dialog_update_installation_failed_by_service",
+        "initiating_update",
+        "krisp_update_title",
+        "last_version",
+        "latest_version",
+        "nav_btn_check_for_update",
+        "nav_btn_update_available",
+        "nav_btn_what_is_new",
+        "note_taker_messages.update",
+        "pref_description_auto_update",
+        "pref_label_auto_update",
+        "preparing_install",
+        "reinstall_krisp",
+        "release_notes",
+        "report_problem.receive_error_while_update",
+        "restart_computer",
+        "text_preparing_for_update",
+        "update_available",
+        "update_available_title",
+        "update_krisp_btn",
+        "update_now",
+        "update_pop_up_success",
+        "update_popup_what_is_new",
+        "update_required",
+        "update_text_downloading_percentage",
+        "update_to_latest_version",
+        "using_latest_version",
+        "version_is_outdated",
+        "version_is_outdated_notification",
+        "window_title_force_update"
+      ],
+      "representative_quotes": [
+        {
+          "key": "audio_interruption_info",
+          "text": "You might experience an audio interruption while\ninstalling the update."
+        },
+        {
+          "key": "btn_install",
+          "text": "Install"
+        },
+        {
+          "key": "btn_repair",
+          "text": "Repair"
+        }
+      ],
+      "support": [],
+      "key_count": 40
+    },
+    {
+      "id": "storage",
+      "classification": "candidate_local",
+      "title": "Local transcript and recording storage",
+      "note": "Folder selection, inaccessible or missing folders, local storage and storage-full errors are named. English-only support is a catalog statement, not a verified runtime limit.",
+      "keys": [
+        "error_storage_action",
+        "error_storage_full",
+        "local_store_info",
+        "note_taker_storage.browse_for_location",
+        "note_taker_storage.call_in_progress",
+        "note_taker_storage.choose_new_location",
+        "note_taker_storage.description",
+        "note_taker_storage.local",
+        "note_taker_storage.local_info",
+        "note_taker_storage.location_not_accessible",
+        "note_taker_storage.location_not_available",
+        "note_taker_storage.not_available",
+        "note_taker_storage.select_location",
+        "note_taker_storage.title",
+        "note_taker_tooltip.recording_storage_is_full",
+        "report_problem.browse_for_folder",
+        "report_problem.select_log_save_path",
+        "storage_is_full",
+        "transcript_file_name"
+      ],
+      "representative_quotes": [
+        {
+          "key": "note_taker_storage.local_info",
+          "text": "Save transcripts and recordings locally on your device. On-device storage currently supports English only."
+        },
+        {
+          "key": "note_taker_storage.call_in_progress",
+          "text": "This setting is locked during calls. End your call to change storage location."
+        },
+        {
+          "key": "note_taker_storage.location_not_accessible",
+          "text": "Permission denied. The app can’t save files to the selected folder."
+        },
+        {
+          "key": "note_taker_storage.location_not_available",
+          "text": "Selected folder doesn't exist. Please choose a valid folder on your device."
+        }
+      ],
+      "support": [],
+      "key_count": 19
+    },
+    {
+      "id": "diagnostics",
+      "classification": "candidate_local",
+      "title": "Local troubleshooting, logs and diagnostic errors",
+      "note": "The catalog names local log export and issue categories for routing, noise, echo, accent, volume, lag, CPU, memory and crashes. Network diagnostics need a local-only boundary.",
+      "keys": [
+        "app_menu_help.generate_har",
+        "app_menu_help.stop_har",
+        "app_menu_help.troubleshooting",
+        "context_menu_get_debug_logs",
+        "context_menu_report_problem",
+        "encountered_problem_solution",
+        "krisp_encountered_problem",
+        "krisp_encountered_text",
+        "nav_btn_get_debug_logs",
+        "nav_btn_report_problem",
+        "network_diagnostics.done",
+        "network_diagnostics.title",
+        "recorder.recording_network_log",
+        "recorder.stop_recording_network_log",
+        "report_problem.audio_quality",
+        "report_problem.btn_get_debug_logs",
+        "report_problem.bv_are_not_canceling",
+        "report_problem.bv_human_voice_not_canceling",
+        "report_problem.bvc_not_compatible_headset",
+        "report_problem.can_not_hear_others",
+        "report_problem.check_network",
+        "report_problem.crashing_or_freezing",
+        "report_problem.describe_the_problem",
+        "report_problem.do_not_see_krisp_device_in_calling_app",
+        "report_problem.do_not_see_krisp_device_in_krisp_app",
+        "report_problem.download_logs",
+        "report_problem.echo_is_not_canceling",
+        "report_problem.file_can_not_be_found",
+        "report_problem.get_log_manually",
+        "report_problem.getting_error",
+        "report_problem.having_issue_with_bvc",
+        "report_problem.hear_my_echo",
+        "report_problem.hide",
+        "report_problem.high_cpu_usage",
+        "report_problem.high_memory_usage",
+        "report_problem.include_network_diagnostics",
+        "report_problem.include_recordings",
+        "report_problem.include_system_information",
+        "report_problem.invalid_format",
+        "report_problem.issue_with_setup",
+        "report_problem.issue_with_updating_or_uninstalling",
+        "report_problem.logs_saved_text",
+        "report_problem.my_voice_breaking",
+        "report_problem.my_voice_is_canceled",
+        "report_problem.my_voice_lagging",
+        "report_problem.not_in_the_list",
+        "report_problem.other",
+        "report_problem.others_can_not_hear_me",
+        "report_problem.others_state_my_audio_volume_is_low",
+        "report_problem.placeholder_describe_problem",
+        "report_problem.receive_error_while_uninstalling",
+        "report_problem.report_title",
+        "report_problem.run_and_include_network_diagnostics",
+        "report_problem.saving_logs_text",
+        "report_problem.select_from_list",
+        "report_problem.select_issue_title",
+        "report_problem.select_one_of_categories",
+        "report_problem.select_the_date",
+        "report_problem.some_specific_noise",
+        "report_problem.system_performance_issue",
+        "report_problem.test_nc_issue",
+        "report_problem.test_voice_interpreter_issue",
+        "report_problem.text_now",
+        "report_problem.text_smt_went_wrong",
+        "report_problem.thanks_for_help",
+        "report_problem.unable_to_turn_nc_toggle_on",
+        "report_problem.view",
+        "report_problem.widget_is_not_responding",
+        "tell_about_issue",
+        "window_title_network_checker",
+        "window_title_report_problem"
+      ],
+      "representative_quotes": [
+        {
+          "key": "app_menu_help.generate_har",
+          "text": "Generate HAR file"
+        },
+        {
+          "key": "app_menu_help.stop_har",
+          "text": "Stop generating HAR file"
+        },
+        {
+          "key": "app_menu_help.troubleshooting",
+          "text": "Troubleshooting"
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "observation": "Native permissions, process control, recording and troubleshooting handler symbols."
+        }
+      ],
+      "key_count": 71
+    },
+    {
+      "id": "background-voice",
+      "classification": "candidate_local",
+      "title": "Background voice cancellation and headset compatibility",
+      "note": "Nearby voice removal, headset detection and manual activation are named. Native DSP quality and actual device compatibility remain unknown.",
+      "keys": [
+        "bvc.ac_active_tooltip_text",
+        "bvc.ac_only_work_with_headset",
+        "bvc.activate_bvc_for_mic",
+        "bvc.active_for_device",
+        "bvc.active_tooltip_text",
+        "bvc.active_whenever_you_use_headphone",
+        "bvc.always_off",
+        "bvc.are_you_sure",
+        "bvc.cancel_activation_bvc_for_mic",
+        "bvc.force_activate",
+        "bvc.is_disabled_from_preferences",
+        "bvc.make_sure_to_be_compatible",
+        "bvc.manually_activate",
+        "bvc.not_available",
+        "bvc.not_available_when_toggle_is_off",
+        "bvc.only_work_with_headset",
+        "bvc.turn_on_bvc_manually_for_unrecognized_devices",
+        "bvc_not_enabled_warning",
+        "confirm_using_headset",
+        "nc_bvc_blocked_warning",
+        "noise_shield.bvc_detected",
+        "pref_audio_section_BVC_header_sub_text",
+        "pref_audio_section_BVC_header_text",
+        "text_bvc_confirm_using_headset",
+        "text_bvc_consider_using_headset"
+      ],
+      "representative_quotes": [
+        {
+          "key": "bvc.only_work_with_headset",
+          "text": "Background Voice Cancellation \nonly works with a headset."
+        },
+        {
+          "key": "bvc.turn_on_bvc_manually_for_unrecognized_devices",
+          "text": "Turn on Background Voice \nCancellation manually for \nunrecognized devices."
+        },
+        {
+          "key": "bvc.make_sure_to_be_compatible",
+          "text": "Make sure a headset is selected.\nUsing Background Voice Cancellation with other microphones may cause audio degradation."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        }
+      ],
+      "key_count": 25
+    },
+    {
+      "id": "performance",
+      "classification": "candidate_local",
+      "title": "Audio performance modes, load warnings and defaults",
+      "note": "Catalog names Auto, CPU Optimized and Best Noise Cancellation modes, system-load alerts and restore defaults. Numeric thresholds and default values are not established.",
+      "keys": [
+        "cpu_optimized_icon_tooltip_text",
+        "hd_voice_icon_tooltip_text",
+        "pref_audio_section_performance_header_text",
+        "pref_audio_section_performance_sub_text",
+        "pref_audio_section_restore_btn_description_text",
+        "pref_audio_section_restore_btn_text",
+        "pref_auto_mode_sub_text",
+        "pref_auto_radio_btn_label_text",
+        "pref_cpu_optimized_radio_btn_label_text",
+        "pref_cpu_optimized_sub_text",
+        "pref_descr_high_system_load",
+        "pref_hd_voice_mode_sub_text",
+        "pref_hd_voice_radio_btn_label_text",
+        "pref_title_high_system_load",
+        "system_overload_icon_tooltip_text"
+      ],
+      "representative_quotes": [
+        {
+          "key": "pref_auto_mode_sub_text",
+          "text": "Adjusts Noise Cancellation mode to give the best experience for your conditions."
+        },
+        {
+          "key": "pref_cpu_optimized_sub_text",
+          "text": "Provides good Noise Cancellation while saving battery and power."
+        },
+        {
+          "key": "pref_hd_voice_mode_sub_text",
+          "text": "Provides the best Noise Cancellation. May consume more battery."
+        },
+        {
+          "key": "pref_audio_section_restore_btn_description_text",
+          "text": "This will restore settings for optimal audio clarity."
+        }
+      ],
+      "support": [],
+      "key_count": 15
+    },
+    {
+      "id": "volume",
+      "classification": "candidate_local",
+      "title": "Microphone and speaker mute and volume",
+      "note": "Volume lock, sync, call-start adjustment and mute controls are named. Native handlers corroborate control boundaries, not exact behavior.",
+      "keys": [
+        "audio_controls.microphone_is_muted",
+        "audio_controls.speaker_is_muted",
+        "audio_controls.text_unmute",
+        "krisp_spk_device_muted",
+        "mic_device_muted",
+        "mic_muted_reminder.description",
+        "mic_muted_reminder.title",
+        "pref_audio_section_krisp_mic_volume_sub_text",
+        "pref_audio_section_krisp_mic_volume_sub_title",
+        "pref_audio_section_mic_volume_title",
+        "pref_audio_section_volume_lock",
+        "pref_audio_section_volume_sync_with_krisp",
+        "pref_audio_section_working_mic_volume_sub_text",
+        "pref_audio_section_working_mic_volume_sub_title",
+        "pref_descr_call_started_mic_muted",
+        "pref_title_call_started_mic_muted",
+        "spk_device_muted",
+        "text_unmute_krisp_for_test_nc",
+        "text_unmute_krisp_for_transcript",
+        "unmute_krisp_spk_device",
+        "unmute_mic_device",
+        "unmute_spk_device",
+        "widget.mute_tooltip",
+        "you_are_muted",
+        "your_mic_is_muted"
+      ],
+      "representative_quotes": [
+        {
+          "key": "pref_audio_section_volume_lock",
+          "text": "Lock at optimal level"
+        },
+        {
+          "key": "pref_audio_section_volume_sync_with_krisp",
+          "text": "Sync with Krisp"
+        },
+        {
+          "key": "pref_audio_section_krisp_mic_volume_sub_text",
+          "text": "Automatically adjust microphone volume at call start."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "observation": "Native audio device, mute and volume N-API handler symbols."
+        }
+      ],
+      "key_count": 25
+    },
+    {
+      "id": "devices",
+      "classification": "candidate_local",
+      "title": "Physical and virtual audio devices, app routing and setup",
+      "note": "Virtual microphone and speaker, physical device selection, unavailable or disabled devices, Bluetooth failures, app selection and exclusive-access warnings are named.",
+      "keys": [
+        "audio_block_mic_title",
+        "audio_block_spk_title",
+        "bluetooth_device_failed_reminder.description",
+        "bluetooth_device_failed_reminder.mic_title",
+        "bluetooth_device_failed_reminder.speaker_title",
+        "call_speaker",
+        "feature_access.full",
+        "feature_access.only_mic",
+        "feature_access.only_spk",
+        "feature_access.partial",
+        "how_to_set_up_mic",
+        "how_to_set_up_spk",
+        "krisp_devices.title",
+        "krisp_mic_and_spk_not_available",
+        "krisp_mic_device_has_issue",
+        "krisp_mic_device_has_issue_no_rec_mac",
+        "krisp_mic_device_has_issue_no_rec_win",
+        "krisp_spk_device_has_issue",
+        "krisp_spk_device_has_issue_no_rec_mac",
+        "krisp_spk_device_has_issue_no_rec_win",
+        "mic_used_outside_default_app",
+        "mic_used_outside_device",
+        "mic_used_outside_select",
+        "mic_used_without_speaker_device",
+        "mic_used_without_speaker_select",
+        "nav_btn_setup_krisp",
+        "no_active_device",
+        "no_audio_access",
+        "no_audio_processing_access_granted",
+        "no_mic_access",
+        "no_mic_available",
+        "no_mic_selected",
+        "no_spk_available",
+        "no_spk_selected",
+        "no_working_mic_available",
+        "no_working_spk_available",
+        "pref_descr_krisp_not_used",
+        "pref_descr_krisp_not_used_transcript",
+        "pref_descr_mic_used_without_speaker",
+        "pref_descr_mic_used_without_speaker_transcript",
+        "pref_notifications_device_setup_reminders_body",
+        "pref_notifications_device_setup_reminders_title",
+        "pref_title_krisp_not_used",
+        "pref_title_mic_used_without_speaker",
+        "text_enable_krisp_mic",
+        "text_enable_krisp_spk",
+        "text_krisp_mic_is_disabled",
+        "text_krisp_mic_is_unavailable",
+        "text_krisp_spk_is_disabled",
+        "text_mic_in_exclusive",
+        "text_mic_is_unhealthy",
+        "text_not_selected_in",
+        "text_not_selected_in_apps",
+        "text_not_setup_in",
+        "text_not_setup_in_apps",
+        "text_not_used",
+        "text_not_used_mic",
+        "text_same_as_system",
+        "text_spk_in_exclusive",
+        "text_spk_is_unhealthy",
+        "text_used_by",
+        "text_used_by_apps",
+        "text_used_inactive",
+        "window_title_onboarding",
+        "works",
+        "works_in"
+      ],
+      "representative_quotes": [
+        {
+          "key": "audio_block_mic_title",
+          "text": "Krisp Microphone"
+        },
+        {
+          "key": "audio_block_spk_title",
+          "text": "Krisp Speaker"
+        },
+        {
+          "key": "bluetooth_device_failed_reminder.description",
+          "text": "Try reconnecting."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_4cf13e26f268ec8f71085eb3d490dee1e91b5efbc12dff8a3669ed551efa6ca4",
+          "observation": "Native audio device, mute and volume N-API handler symbols."
+        }
+      ],
+      "key_count": 66
+    },
+    {
+      "id": "noise",
+      "classification": "candidate_local",
+      "title": "Mic and speaker noise cancellation and echo",
+      "note": "Catalog names inbound and outbound noise cancellation, echo-related warnings and call-state indicators. Native AEC symbols corroborate an echo boundary.",
+      "keys": [
+        "call_indicator.noise_cancelling",
+        "call_started_nc_off_1",
+        "call_started_nc_off_2",
+        "call_started_noise_cancelling",
+        "in_person_recording.nc_tooltip",
+        "in_person_recording.notifications.nc_unavailable_1",
+        "in_person_recording.notifications.nc_unavailable_2",
+        "mic_nc_on_and_not_streaming",
+        "mic_nc_on_and_streaming",
+        "nc_off_text",
+        "nc_on_text",
+        "noise_cancellation.mic_title_collapsed",
+        "noise_cancellation.mic_title_expanded",
+        "noise_cancellation.speaker_title_collapsed",
+        "noise_cancellation.speaker_title_expanded",
+        "noise_cancellation.title",
+        "noise_shield.description",
+        "noise_shield.heavy_noise_detected",
+        "noise_shield.medium_noise_detected",
+        "noise_shield.nc_off",
+        "noise_shield.title",
+        "note_taker_tooltip.turn_off_nc",
+        "note_taker_tooltip.turn_on_nc",
+        "pref_audio_section_NC_header_sub_text",
+        "pref_audio_section_NC_header_text",
+        "pref_descr_mic_nc_off",
+        "pref_descr_mic_nc_on",
+        "pref_title_mic_nc_off",
+        "pref_title_mic_nc_on",
+        "spk_nc_on_and_not_streaming",
+        "spk_nc_on_and_streaming",
+        "tooltip_echo_is_off",
+        "tooltip_spk_nc_delay",
+        "tooltip_spk_nc_no_stream_on_mic",
+        "widget.nc_off_tooltip",
+        "widget.nc_on_tooltip",
+        "widget_cancel_noice"
+      ],
+      "representative_quotes": [
+        {
+          "key": "call_indicator.noise_cancelling",
+          "text": "Canceling your noise..."
+        },
+        {
+          "key": "call_started_nc_off_1",
+          "text": "Noise Cancellation is "
+        },
+        {
+          "key": "call_started_nc_off_2",
+          "text": "Off"
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        },
+        {
+          "evidence_id": "ev_f2e74c223103fdf553f18045b9e2493be2cb54ae62b7a47d5682c079f1206435",
+          "observation": "AEC stream processing and WebRTC EchoCanceller3 symbols."
+        }
+      ],
+      "key_count": 37
+    },
+    {
+      "id": "noise-test",
+      "classification": "candidate_local",
+      "title": "Audio test recording and comparison",
+      "note": "Catalog names at least a five-second sample, original versus processed playback, repeat recording and local unsaved samples.",
+      "keys": [
+        "companion.test_nc",
+        "nav_btn_test_nc",
+        "test_my_audio",
+        "test_nc.ac_try",
+        "test_nc.btn_done",
+        "test_nc.cancel_testing",
+        "test_nc.cancel_testing_confirm",
+        "test_nc.error_occurred",
+        "test_nc.issue",
+        "test_nc.magic_time",
+        "test_nc.min_record_info",
+        "test_nc.press_to_record",
+        "test_nc.problem_with_recording",
+        "test_nc.record_again",
+        "test_nc.recording_will_not_leave_device",
+        "test_nc.report_problem",
+        "test_nc.start_to_test_audio",
+        "test_nc.switch_the_toggle_for_magic",
+        "test_nc.text_recording",
+        "test_nc.try_again_later_testing",
+        "test_nc.try_to_clap",
+        "test_nc.vc_is_off",
+        "test_nc.vc_is_on",
+        "test_nc.with_krisp",
+        "test_nc.without_krisp",
+        "window_title_test_nc"
+      ],
+      "representative_quotes": [
+        {
+          "key": "test_nc.min_record_info",
+          "text": "Record at least a 5-second sample to hear the difference."
+        },
+        {
+          "key": "test_nc.recording_will_not_leave_device",
+          "text": "Your recording will never leave your device and won’t be saved."
+        },
+        {
+          "key": "test_nc.without_krisp",
+          "text": "Without Krisp"
+        },
+        {
+          "key": "test_nc.with_krisp",
+          "text": "With Krisp ✨"
+        }
+      ],
+      "support": [],
+      "key_count": 26
+    },
+    {
+      "id": "permissions",
+      "classification": "candidate_local",
+      "title": "macOS permission setup and degraded operation",
+      "note": "Microphone, others' audio, screen capture and Accessibility are named. Native permission handlers corroborate a boundary; actual prompts and fallback states require runtime evidence.",
+      "keys": [
+        "grant_access",
+        "no_access_granted",
+        "permissions_backdrop.accessibility_desc",
+        "permissions_backdrop.app_calls_rec_desc",
+        "permissions_backdrop.back_to_setup_btn",
+        "permissions_backdrop.close_anyway_btn",
+        "permissions_backdrop.degraded_page_desc",
+        "permissions_backdrop.degraded_page_title",
+        "permissions_backdrop.enable_btn",
+        "permissions_backdrop.mic_desc",
+        "permissions_backdrop.title",
+        "recording_access_granted"
+      ],
+      "representative_quotes": [
+        {
+          "key": "permissions_backdrop.mic_desc",
+          "text": "Transcribe what you say and remove noises."
+        },
+        {
+          "key": "permissions_backdrop.app_calls_rec_desc",
+          "text": "Transcribe what others say."
+        },
+        {
+          "key": "permissions_backdrop.accessibility_desc",
+          "text": "Integrate and work well with meeting apps."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "observation": "Native permissions, process control, recording and troubleshooting handler symbols."
+        }
+      ],
+      "key_count": 12
+    },
+    {
+      "id": "activation",
+      "classification": "candidate_local",
+      "title": "Automatic activation, blocked apps and competing calls",
+      "note": "Automatic call activation, blocked apps, switch-between-call messages and start indicators are named. Detection rules, supported apps and defaults remain unknown.",
+      "keys": [
+        "auto_open_banner",
+        "call_indicator.call_started_note_taker_off_2",
+        "call_indicator.inform_participants",
+        "call_indicator.meeting_detected",
+        "call_indicator.note_taker",
+        "call_indicator.note_taker_initializing",
+        "call_indicator.off",
+        "call_indicator.open",
+        "call_indicator.take_notes",
+        "call_indicator.taking_notes",
+        "call_indicator.unavailable",
+        "call_started_note_taker_activation_pending",
+        "call_started_note_taker_initializing",
+        "call_started_note_taker_off_1",
+        "call_started_note_taker_off_2",
+        "call_started_note_taker_recording",
+        "call_started_note_taker_stopped",
+        "call_started_note_taker_transcribing",
+        "call_status_notifications",
+        "note_taker_messages.unavailable_blocked_app",
+        "note_taker_messages.unavailable_blocked_app_tooltip",
+        "parallel_call_reminder.description",
+        "parallel_call_reminder.switch_to",
+        "parallel_call_reminder.switched_to",
+        "parallel_call_reminder.title",
+        "pref_descr_call_started",
+        "pref_label_auto_activation_desc",
+        "pref_label_auto_activation_title",
+        "pref_label_auto_activation_toggle_off_tooltip",
+        "pref_label_auto_activation_toggle_on_tooltip",
+        "pref_label_auto_activation_tooltip",
+        "pref_menu_blocked_app_select_apps",
+        "pref_menu_blocked_apps_description",
+        "pref_menu_blocked_apps_footer",
+        "pref_menu_blocked_apps_no_apps",
+        "pref_menu_blocked_apps_title",
+        "pref_title_call_started",
+        "start_note_taking_reminder.always_capture_button",
+        "start_note_taking_reminder.capture_this_button",
+        "start_note_taking_reminder.footer",
+        "start_note_taking_reminder.record_footer",
+        "start_note_taking_reminder.take_note_footer",
+        "start_note_taking_reminder.title"
+      ],
+      "representative_quotes": [
+        {
+          "key": "pref_label_auto_activation_desc",
+          "text": "Auto-start AI Note-taker with calling apps when a call begins."
+        },
+        {
+          "key": "pref_menu_blocked_apps_description",
+          "text": "Krisp will not auto-start AI Note Taker when these apps are detected."
+        },
+        {
+          "key": "pref_label_auto_activation_toggle_off_tooltip",
+          "text": "This setting is locked during calls. End your call to enable Automatic activation."
+        }
+      ],
+      "support": [],
+      "key_count": 43
+    },
+    {
+      "id": "transcription",
+      "classification": "candidate_local",
+      "title": "On-device transcription, language handling and speaker identification",
+      "note": "The catalog explicitly says transcripts are generated on the device. Search, save, history, pause, resume, English support, no-speech errors and speaker identification are named. Available ASR models remain unknown.",
+      "keys": [
+        "asr_model_load_error",
+        "click_to_finish_transcription",
+        "click_to_pause_transcription",
+        "click_to_stop_transcription",
+        "dialog_disable_transcript_text",
+        "identifying_speakers_text",
+        "in_person_recording.notifications.transcribing",
+        "no_speech_was_captured_text",
+        "no_transcript_text",
+        "note_taker_messages.note_taker_will_transcribe",
+        "note_taker_tooltip.switch_to_transcription",
+        "note_taker_tooltip.transcribing_is_not_available",
+        "note_taker_tooltip.transcription",
+        "pref_descr_call_transcript",
+        "pref_descr_no_speech_captured",
+        "pref_descr_non_english_detected",
+        "pref_descr_short_call_warning",
+        "pref_info_call_transcript",
+        "pref_title_call_transcript",
+        "pref_title_no_speech_captured",
+        "pref_title_non_english_detected",
+        "pref_title_short_call_warning",
+        "save_call_transcript_text",
+        "save_transcription",
+        "saving_transcript",
+        "speech_data_empty_description",
+        "supports_english_language_text",
+        "switch_off_transcription",
+        "switch_off_transcription_content",
+        "switch_off_transcription_title",
+        "tooltip_save_transcript",
+        "tooltip_search_transcript",
+        "tooltip_transcript_supported_language",
+        "transcribe",
+        "transcribing",
+        "transcript_available_text",
+        "transcript_error_description",
+        "transcript_history_text",
+        "transcript_is_switched_off",
+        "transcript_no_available",
+        "transcript_no_available_description",
+        "transcript_only",
+        "transcription",
+        "transcription_desscription_info",
+        "window_title_calltranscript"
+      ],
+      "representative_quotes": [
+        {
+          "key": "pref_info_call_transcript",
+          "text": "Transcripts are private and generated on your device. "
+        },
+        {
+          "key": "identifying_speakers_text",
+          "text": "Identifying the speakers, please wait..."
+        },
+        {
+          "key": "supports_english_language_text",
+          "text": "Supports only English language"
+        },
+        {
+          "key": "asr_model_load_error",
+          "text": "Note Taker couldn't start due to insufficient system memory. Please close unused applications to free up memory, then click"
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        }
+      ],
+      "key_count": 45
+    },
+    {
+      "id": "recording",
+      "classification": "candidate_local",
+      "title": "Audio recording, live in-person notes and capture state",
+      "note": "Audio recording, transcript-only mode, live notes, mode switching, pause, finish and save are named. Live recording has a stated four-hour limit and disables noise cancellation, accent conversion and talk time.",
+      "keys": [
+        "ai_assistant_title",
+        "allowed_to_switched_on",
+        "audio_recording_in_progress",
+        "audio_recording_paused",
+        "btn_accept_record",
+        "click_to_finish_recording",
+        "click_to_pause_recording",
+        "click_to_stop_recording",
+        "in_person_recording.ac_tooltip",
+        "in_person_recording.long_meeting_dialog.description",
+        "in_person_recording.long_meeting_dialog.ok_btn",
+        "in_person_recording.long_meeting_dialog.title",
+        "in_person_recording.new_meeting_dialog.continue_btn",
+        "in_person_recording.new_meeting_dialog.description",
+        "in_person_recording.new_meeting_dialog.save_and_switch_btn",
+        "in_person_recording.new_meeting_dialog.title",
+        "in_person_recording.note_taker.call_tooltip",
+        "in_person_recording.note_taker.off_tooltip",
+        "in_person_recording.note_taker.record_btn",
+        "in_person_recording.note_taker.stop_btn",
+        "in_person_recording.notifications.ac_unavailable_1",
+        "in_person_recording.notifications.ac_unavailable_2",
+        "in_person_recording.notifications.recording",
+        "in_person_recording.tt_tooltip",
+        "note_taker_messages.manage",
+        "note_taker_messages.meeting_saved",
+        "note_taker_messages.note_taker_is_off",
+        "note_taker_messages.note_taker_will_record",
+        "note_taker_messages.restarting",
+        "note_taker_messages.service_error",
+        "note_taker_messages.unavailable_note_taker",
+        "note_taker_messages.unavailable_timeout",
+        "note_taker_off",
+        "note_taker_saving",
+        "note_taker_stopped",
+        "note_taker_tooltip.note_taker_activation_pending",
+        "note_taker_tooltip.note_taker_issue",
+        "note_taker_tooltip.note_taker_stopped",
+        "note_taker_tooltip.preparing_note_taker",
+        "note_taker_tooltip.recording",
+        "note_taker_tooltip.recording_is_not_available",
+        "note_taker_tooltip.switch_to_audio_recording",
+        "note_taker_tooltip.turn_on",
+        "pref_menu_note_taker",
+        "record_audio",
+        "recording_onboarding_info",
+        "recording_onboarding_title",
+        "reminder_switch_to_recording",
+        "widget.live_recording_tooltip",
+        "window_title_recording_consent"
+      ],
+      "representative_quotes": [
+        {
+          "key": "in_person_recording.long_meeting_dialog.description",
+          "text": "Krisp supports recordings of up to 4 hours. Your recording was saved successfully."
+        },
+        {
+          "key": "in_person_recording.nc_tooltip",
+          "text": "Noise Cancellation is disabled\nduring Live Recording."
+        },
+        {
+          "key": "in_person_recording.ac_tooltip",
+          "text": "Accent Conversion is disabled\nduring Live Recording."
+        },
+        {
+          "key": "in_person_recording.tt_tooltip",
+          "text": "Talk Time is disabled\nduring Live Recording."
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+          "observation": "Native media graph, model, recording, ASR, diarization and translation handlers. Individual catalog paths are not proven to call these handlers."
+        }
+      ],
+      "key_count": 50
+    },
+    {
+      "id": "consent",
+      "classification": "candidate_local",
+      "title": "Participant notification and recording announcement",
+      "note": "Notification templates and consent reminders are named. Announcement timing and call-app integration remain unknown.",
+      "keys": [
+        "custom_notify_about_using_krisp_message_prefix",
+        "default_notify_about_using_krisp_text",
+        "indicator_inform_participants",
+        "pref_invalid_notify_about_using_krisp_text",
+        "pref_label_notify_about_using_krisp",
+        "pref_label_notify_about_using_krisp_text_mac",
+        "pref_label_notify_about_using_krisp_text_win",
+        "pref_notification_on_off_warning_button",
+        "pref_notification_on_off_warning_text",
+        "recording_announcement_reminder.error_desc",
+        "recording_announcement_reminder.error_title",
+        "recording_announcement_reminder.playing_desc",
+        "recording_announcement_reminder.playing_title",
+        "recording_announcement_reminder.skip_button",
+        "recording_announcement_reminder.waiting_desc",
+        "recording_announcement_reminder.waiting_title",
+        "recording_consent.header",
+        "recording_consent.notify_all_participants_description",
+        "recording_consent.notify_all_participants_title",
+        "recording_consent.secure_recording_description",
+        "recording_consent.secure_recording_title"
+      ],
+      "representative_quotes": [
+        {
+          "key": "custom_notify_about_using_krisp_message_prefix",
+          "text": "Krisp.ai: "
+        },
+        {
+          "key": "default_notify_about_using_krisp_text",
+          "text": "Just a heads-up, I'm using Krisp.ai to transcribe and take notes in this meeting."
+        },
+        {
+          "key": "indicator_inform_participants",
+          "text": "Inform participants"
+        }
+      ],
+      "support": [],
+      "key_count": 21
+    },
+    {
+      "id": "widget",
+      "classification": "candidate_local",
+      "title": "Floating widget, captions toggle and meeting display",
+      "note": "Widget visibility, automatic show, hide for now, title/time display, talk time and speaking assistance are named. Talk-time calculation is not established.",
+      "keys": [
+        "nav_btn_hide_widget",
+        "nav_btn_show_widget",
+        "pref_descr_speaking_assistant",
+        "pref_description_show_widget",
+        "pref_info_speaking_assistant",
+        "pref_label_show_meeting_time",
+        "pref_label_show_meeting_title",
+        "pref_label_show_widget",
+        "pref_title_speaking_assistant",
+        "text_call_duration",
+        "text_talk_time",
+        "widget.hide_for_now",
+        "widget.right_click_to_show_popover",
+        "widget_close_text",
+        "widget_talk_time_tooltip",
+        "widget_tooltip.turn_off_al",
+        "widget_tooltip.turn_on_al",
+        "widget_tooltip.you_talked"
+      ],
+      "representative_quotes": [
+        {
+          "key": "pref_description_show_widget",
+          "text": "Show Krisp widget at the start of each meeting."
+        },
+        {
+          "key": "widget_talk_time_tooltip",
+          "text": "Time you have talked on this meeting"
+        },
+        {
+          "key": "pref_info_speaking_assistant",
+          "text": "May use more CPU."
+        }
+      ],
+      "support": [],
+      "key_count": 18
+    },
+    {
+      "id": "lifecycle",
+      "classification": "candidate_local",
+      "title": "App menus, lifecycle, startup and window controls",
+      "note": "Preferences, menu commands, startup, sleep/wake, save-before-exit and relaunch states are named. Developer-tools labels may not be public runtime commands.",
+      "keys": [
+        "about_copy_right_text",
+        "app_menu_edit.title",
+        "app_menu_file.file_upload",
+        "app_menu_file.hide",
+        "app_menu_file.title",
+        "app_menu_help.quit_completely",
+        "app_menu_help.title",
+        "app_menu_view.dev_tools_dashboard",
+        "app_menu_view.enter_full_screen",
+        "app_menu_view.exit_full_screen",
+        "app_menu_view.force_reload",
+        "app_menu_view.reload",
+        "app_menu_view.title",
+        "btn_open_meetings",
+        "btn_quit",
+        "context_menu_about",
+        "context_menu_krisp",
+        "context_menu_quit",
+        "context_menu_relaunch",
+        "context_menu_settings",
+        "context_menu_sleep",
+        "context_menu_wake",
+        "nav_btn_about",
+        "nav_btn_activity",
+        "nav_btn_preferences",
+        "nav_btn_quit",
+        "nav_btn_relaunch",
+        "pref_description_launch_at_startup",
+        "pref_label_launch_at_startup",
+        "pref_label_open_meetings_window_at_launch",
+        "pref_menu_app",
+        "pref_menu_audio",
+        "pref_menu_general",
+        "pref_menu_notifications",
+        "pref_menu_system",
+        "pref_menu_voice",
+        "preferences_text",
+        "quit_confirmation_header",
+        "quit_confirmation_text",
+        "quit_in_progress_text",
+        "relaunch_no_save",
+        "save_and_quit",
+        "save_and_relaunch",
+        "skip_this_version",
+        "text_open_settings",
+        "text_version",
+        "version_no_longer_supported",
+        "wait_for_quit_text",
+        "wait_for_relaunch_text",
+        "window_title_about",
+        "window_title_preferences",
+        "your_version"
+      ],
+      "representative_quotes": [
+        {
+          "key": "about_copy_right_text",
+          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
+        },
+        {
+          "key": "app_menu_edit.title",
+          "text": "Edit"
+        },
+        {
+          "key": "app_menu_file.file_upload",
+          "text": "Upload a file"
+        }
+      ],
+      "support": [
+        {
+          "evidence_id": "ev_d5a7c268a91fe74d0e1be67ea708c3c5c726c11cb293ee43f1ef2a3bcbe401dd",
+          "observation": "Native permissions, process control, recording and troubleshooting handler symbols."
+        }
+      ],
+      "key_count": 52
+    },
+    {
+      "id": "notifications",
+      "classification": "candidate_local",
+      "title": "Notification controls and reminders",
+      "note": "Catalog names functional, call-health and setup notifications plus dismissal controls. Delivery path and defaults remain unknown.",
+      "keys": [
+        "call_health_warning_notifications",
+        "pref_notifications_functional",
+        "pref_notifications_on_off_indicator_body",
+        "pref_notifications_on_off_indicator_title",
+        "reminder_do_not_show",
+        "reminder_report",
+        "reminder_show_me_how",
+        "text_control_notifications",
+        "text_notification"
+      ],
+      "representative_quotes": [
+        {
+          "key": "call_health_warning_notifications",
+          "text": "System"
+        },
+        {
+          "key": "pref_notifications_functional",
+          "text": "Functional"
+        },
+        {
+          "key": "pref_notifications_on_off_indicator_body",
+          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
+        }
+      ],
+      "support": [],
+      "key_count": 9
+    },
+    {
+      "id": "connectivity",
+      "classification": "ambiguous",
+      "title": "Connectivity, sync and proxy errors",
+      "note": "Error labels refer to connectivity and sync. A local equivalent must trace each caller to decide which failures disappear with cloud exclusion.",
+      "keys": [
+        "cant_find_page_text",
+        "check_internet",
+        "connect",
+        "connecting_to",
+        "connection_trying_again",
+        "could_not_connect_internet",
+        "dialog_check_internet_connection",
+        "krisp_could_not_sync",
+        "krisp_is_offline",
+        "network_error_try_again_btn",
+        "no_connection",
+        "proxy_page_descr"
+      ],
+      "representative_quotes": [
+        {
+          "key": "cant_find_page_text",
+          "text": "Can’t find the page?"
+        },
+        {
+          "key": "check_internet",
+          "text": "Please check your internet connection"
+        },
+        {
+          "key": "connect",
+          "text": "Connect"
+        }
+      ],
+      "support": [],
+      "key_count": 12
+    },
+    {
+      "id": "common-ui",
+      "classification": "candidate_local",
+      "title": "Common actions, settings labels and transient status",
+      "note": "Shared buttons, duration choices, status text and generic errors support the preceding groups. They are not independent capability claims.",
+      "keys": [
+        "12_hour",
+        "1_hour",
+        "30_mins",
+        "4_hour",
+        "8_hour",
+        "are_you_sure",
+        "beta_label",
+        "btn_cancel",
+        "btn_got_it",
+        "btn_i_agree",
+        "btn_no",
+        "btn_not_now",
+        "btn_ok",
+        "btn_try_again",
+        "btn_yes",
+        "continue_action",
+        "dialog_are_you_sure_header",
+        "dialog_btn_cancel",
+        "dialog_btn_cancel_now",
+        "dialog_btn_resume",
+        "dialog_btn_try_again",
+        "dialog_btn_turn_off",
+        "dialog_cancel_header",
+        "dialog_confirm_cancel_text",
+        "dialog_please_try_again_later",
+        "dismiss",
+        "do_not_save",
+        "do_not_show_again",
+        "dont_show_btn",
+        "enable",
+        "fresh_out_of_the_oven",
+        "general_error_text",
+        "got_it_next_text",
+        "got_it_text",
+        "learn_more",
+        "loading_taking_long",
+        "loading_text",
+        "new",
+        "now",
+        "off_action",
+        "pause_action",
+        "please_try_again_later",
+        "remind_me_later",
+        "remind_me_later_popup",
+        "required_field",
+        "required_field_indicator",
+        "restart_required",
+        "resume_action",
+        "save_now_text",
+        "save_text",
+        "switch_to_auto_mode",
+        "text_inactive",
+        "text_off",
+        "text_unavailable",
+        "tooltip_refresh_fail",
+        "tooltip_refresh_standard",
+        "turn_off",
+        "will_take_few_seconds",
+        "you_text"
+      ],
+      "representative_quotes": [
+        {
+          "key": "12_hour",
+          "text": "12 hours"
+        },
+        {
+          "key": "1_hour",
+          "text": "1 hour"
+        },
+        {
+          "key": "30_mins",
+          "text": "30 mins"
+        }
+      ],
+      "support": [],
+      "key_count": 59
+    }
+  ],
+  "cross_check": {
+    "feature_checklist": "feature-checklist.json",
+    "native_findings": "native-findings.md",
+    "matching_native_handler_symbols": 97,
+    "runtime_verified": false,
+    "javascript_registration_verified": false
+  }
+}

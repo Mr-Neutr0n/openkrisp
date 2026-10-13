@@ -1,0 +1,28 @@
+{
+  "oldLeafCount": 997,
+  "newLeafCount": 1014,
+  "added": {
+    "accent_conversion.call_center_notice.description": "Talk to sales to learn about our Call Center AI solutions.",
+    "accent_conversion.call_center_notice.talk_to_sales": "Talk to sales",
+    "accent_conversion.call_center_notice.title": "Need call-center-grade accent conversion?",
+    "auth_failed_restricted_version": "Your organization doesn't allow this version of Krisp. Please contact your admin.",
+    "auth_failed_restricted_version_title": "App version not allowed",
+    "call_summary_ready_to_view": "Ready to view",
+    "call_summary_view_notes": "View notes",
+    "text_restricted_version_contact_admin_or_switch": "Your admin doesn't allow this Krisp version. Contact your admin or sign in with another account.",
+    "transcription_error_alert.description": "Full transcript will be ready after the call.",
+    "transcription_error_alert.pill_tooltip": "Live transcription ran into\n an issue, reload to resume",
+    "transcription_error_alert.reconnect_pill_tooltip": "Transcription ran into an\n issue, reload to resume",
+    "transcription_error_alert.reconnect_title": "Transcription ran into an issue",
+    "transcription_error_alert.title": "Live transcription ran into an issue",
+    "transcription_error_reminder.description": "Full transcript will be ready after the call.",
+    "transcription_error_reminder.reconnect_description": "We couldn\u2019t reconnect. Reload to resume transcription.",
+    "transcription_error_reminder.reconnect_title": "Transcription ran into an issue",
+    "transcription_error_reminder.title": "Live transcription ran into an issue",
+    "window_title_restricted_version": "App version not allowed"
+  },
+  "removed": {
+    "widget.accent_on_tooltip": "Accent Conversion ON"
+  },
+  "changed": {}
+}

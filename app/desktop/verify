@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import pathlib
+import plistlib
+import subprocess
+
+root = pathlib.Path(__file__).resolve().parent
+subprocess.run(["swift", "test", "--package-path", str(root)], check=True)
+subprocess.run([str(root / "build")], check=True)
+app = root / ".build" / "app" / "Lab Voice.app"
+with (app / "Contents" / "Info.plist").open("rb") as handle:
+    info = plistlib.load(handle)
+assert info["CFBundleIdentifier"] == "dev.labvoice.desktop"
+assert info["LSMinimumSystemVersion"] == "12.0"
+assert info["CFBundleExecutable"] == "LabVoice"
+assert info["NSSpeechRecognitionUsageDescription"].strip()
+assert info["NSMicrophoneUsageDescription"].strip()
+binary = app / "Contents" / "MacOS" / "LabVoice"
+architecture = subprocess.check_output(["lipo", "-archs", str(binary)], text=True).strip()
+assert architecture == "arm64", architecture
+commands = subprocess.check_output(["otool", "-l", str(binary)], text=True)
+assert "minos 12.0" in commands
+subprocess.run(["codesign", "--verify", "--deep", "--strict", str(app)], check=True)
+helper = app / "Contents" / "Resources" / "helper" / "audio-host"
+subprocess.run(["codesign", "--verify", "--strict", str(helper)], check=True)
+assert subprocess.check_output(["lipo", "-archs", str(helper)], text=True).strip() == "arm64"
+helper_commands = subprocess.check_output(["otool", "-l", str(helper)], text=True)
+assert "minos 12.0" in helper_commands
+notice = helper.parent / "notices" / "RNNoise-COPYING"
+assert notice.read_bytes() == (root.parent / "noise-engine" / "vendor" / "rnnoise" / "COPYING").read_bytes()
+resource = app / "Contents" / "Resources" / "ModelCatalog_ModelCatalog.bundle"
+assert resource.is_dir()
+# Copy out of the package build tree so no SwiftPM absolute build-path fallback
+# can satisfy the signed app resource check.
+import tempfile
+import shutil
+with tempfile.TemporaryDirectory(prefix="labvoice-bundle-check-") as temporary:
+    relocated = pathlib.Path(temporary) / app.name
+    shutil.copytree(app, relocated)
+    subprocess.run(["codesign", "--verify", "--deep", "--strict", str(relocated)], check=True)
+    subprocess.run([str(relocated / "Contents" / "MacOS" / "LabVoice"), "--verify-model-catalog"], check=True)
+    relocated_helper = relocated / "Contents" / "Resources" / "helper" / "audio-host"
+    subprocess.run(["codesign", "--verify", "--strict", str(relocated_helper)], check=True)
+    # Only metadata listing is allowed here. Never run --route or request mic access.
+    import json
+    devices = json.loads(subprocess.check_output([str(relocated_helper), "--list"], text=True))
+    assert devices["operation"] == "read_only_inventory"
+    assert len(devices["companion_devices"]) == 2
+print("Verified ARM64 bundle, macOS 12 deployment target, metadata, and ad-hoc signature.")
+print("Headless resource check passed. No UI launch, visual QA, or interactive workflow tests performed.")
+print("Controller tests use injected permission, recognition and route processes. No OS prompt, recognition or live route ran.")

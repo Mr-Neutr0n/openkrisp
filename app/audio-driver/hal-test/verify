@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+import pathlib
+import plistlib
+import subprocess
+
+root = pathlib.Path(__file__).resolve().parent
+build = root / "build"
+app = build / "LabVoiceHALTest.app"
+macos = app / "Contents" / "MacOS"
+macos.mkdir(parents=True, exist_ok=True)
+binary = macos / "LabVoiceHALTest"
+subprocess.run(["clang++", "-std=c++20", "-mmacosx-version-min=12.0", "-O2", "-Wall", "-Wextra", "-Werror", "-pthread",
+                str(root / "hal_test.cpp"), "-framework", "CoreAudio", "-framework", "CoreFoundation", "-o", str(binary)], check=True)
+with (app / "Contents" / "Info.plist").open("wb") as handle:
+    plistlib.dump({"CFBundleIdentifier": "dev.hari.labvoice.haltest", "CFBundleName": "Lab Voice HAL Test",
+                   "CFBundleExecutable": "LabVoiceHALTest", "CFBundlePackageType": "APPL", "CFBundleVersion": "1", "LSMinimumSystemVersion": "12.0",
+                   "NSMicrophoneUsageDescription": "Validate synthetic audio through Lab Voice virtual microphone and monitor endpoints. No physical microphone is opened."}, handle)
+subprocess.run(["codesign", "--force", "--sign", "-", str(app)], check=True)
+subprocess.run(["codesign", "--verify", "--strict", str(app)], check=True)
+subprocess.run([str(binary), "--self-test"], check=True)
+san = build / "sanitized-check"
+subprocess.run(["clang++", "-std=c++20", "-mmacosx-version-min=12.0", "-O1", "-g", "-Wall", "-Wextra", "-Werror", "-pthread",
+                "-fsanitize=address,undefined", str(root / "hal_test.cpp"), "-framework", "CoreAudio", "-framework", "CoreFoundation", "-o", str(san)], check=True)
+subprocess.run([str(san), "--self-test"], check=True)
+print("Built signed HAL helper; mock callbacks pass. No inventory or device I/O executed.")
+print(binary)

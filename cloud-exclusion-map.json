@@ -1,0 +1,2982 @@
+{
+  "source": "evidence/javascript-initial.json",
+  "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+  "catalog_evidence_id": "ev_ece7c942d90e27f063fd1be188d354a1a8d0f289e59aadea32bb6dc209566fa7",
+  "artifact_sha256": "fbd6a39ce6fde8685c6ca4c2ca78343aa50551b1bac74f532fd6c5801a23b622",
+  "observed_sentry_property_operations": [
+    {
+      "node_id": "jsrg_node_121e54e0915c4b03cd2942c05723fb14cc0c94b419e73d4992a049d8b583fbb9",
+      "kind": "expression",
+      "label": "read:/closeSentryGracefully",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "closeSentryGracefully"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 29353,
+          "line": 3
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapPreload-Bv38cy6d.js",
+        "start": {
+          "column": 29329,
+          "line": 3
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_199016903ffd8527976e4d5128452103a0253c9891e86387a5478501f82e2e2f",
+      "kind": "expression",
+      "label": "write:/_sentryDebugIds",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "_sentryDebugIds"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 567,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapPreload-Bv38cy6d.js",
+        "start": {
+          "column": 550,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_1e0f4bead89c584ca5dbfe3d4e00068be34bfbb1876b572ee6472b1ab6ddd0f6",
+      "kind": "expression",
+      "label": "read:/_sentryDebugIds",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "_sentryDebugIds"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 556,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/webWindowPreload.js",
+        "start": {
+          "column": 539,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_1f3d7517e13f4e0ec84381aa7192f97ae2a00cbce3f7b925112393d773599b41",
+      "kind": "expression",
+      "label": "read:/_sentryDebugIds",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "_sentryDebugIds"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 1017,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/index.js",
+        "start": {
+          "column": 1000,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_1fd8e223456bd506b966bfdfda9586057cae4dd5f354836d7445c93375dd1aa9",
+      "kind": "expression",
+      "label": "read:/captureSentryMessage",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "captureSentryMessage"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 27067,
+          "line": 3
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapPreload-Bv38cy6d.js",
+        "start": {
+          "column": 27027,
+          "line": 3
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_28deddb7fd53e38b56e129c9eec1020d20aa9afffdd87edd93310a7f33e403b5",
+      "kind": "expression",
+      "label": "write:/__SENTRY_IPC__",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "__SENTRY_IPC__"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 12173,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/webWindowPreload.js",
+        "start": {
+          "column": 12152,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_39386acc7401e16ec9faa4a0f7fc18ae65ace8e3e3362090e44d01a08afa1351",
+      "kind": "expression",
+      "label": "write:/_sentryDebugIdIdentifier",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "_sentryDebugIdIdentifier"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 1076,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/index.js",
+        "start": {
+          "column": 1050,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_51fdb55a4a50d0382e485e9fc43b898be0f216b081c5c235131f139648d1ba9a",
+      "kind": "expression",
+      "label": "write:/_sentryDebugIdIdentifier",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "_sentryDebugIdIdentifier"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 615,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/webWindowPreload.js",
+        "start": {
+          "column": 589,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_7a615cf0db19677967f8f8f1fda0ae45d34a9c430de55879616cdee288b4c6b9",
+      "kind": "expression",
+      "label": "write:/SENTRY_RELEASE",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "SENTRY_RELEASE"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 935,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/index.js",
+        "start": {
+          "column": 919,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_b6c3a43307c694aa02500ce4bc72ae7aec99421decc689b44a8c0055c5abac9b",
+      "kind": "expression",
+      "label": "read:/captureSentryException",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "captureSentryException"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 27017,
+          "line": 3
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapPreload-Bv38cy6d.js",
+        "start": {
+          "column": 26975,
+          "line": 3
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_b77b611e7dd6abb228287521ab1eae157d395a1518254a8faf9228ddaa6635f6",
+      "kind": "expression",
+      "label": "write:/_sentryDebugIds",
+      "properties": {
+        "operation_kind": "write",
+        "property_path": [
+          "_sentryDebugIds"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 538,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/webWindowPreload.js",
+        "start": {
+          "column": 521,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    },
+    {
+      "node_id": "jsrg_node_c970eaa7a5d59e28269a7e8014dcb954ec87306f9528e408ace78f8a92d11b9a",
+      "kind": "expression",
+      "label": "read:/__SENTRY_IPC__",
+      "properties": {
+        "operation_kind": "read",
+        "property_path": [
+          "__SENTRY_IPC__"
+        ]
+      },
+      "location": {
+        "end": {
+          "column": 12195,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/webWindowPreload.js",
+        "start": {
+          "column": 12174,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Static property operation. Invocation, payload and transport are unverified."
+    }
+  ],
+  "sentry_modules": [
+    {
+      "node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+      "properties": {
+        "container_sha256": "fbd6a39ce6fde8685c6ca4c2ca78343aa50551b1bac74f532fd6c5801a23b622",
+        "export_names": [
+          "*",
+          "AudioEnhancementState",
+          "DefaultDeviceRole",
+          "FilePlayerPlaybackError",
+          "MediaFileMode",
+          "ProcessorIds",
+          "ProcessorType",
+          "RtcTransport",
+          "SentryTestMode",
+          "VolumeMappingMode",
+          "checkFeatureMap",
+          "getAugmentedNamespace",
+          "getCrashFilePath",
+          "getDriverAppLogPath",
+          "getStringFromBus",
+          "hasArgument",
+          "krispFilesDomains",
+          "krispMediaGatewayDomains",
+          "prependPathDirs",
+          "requireSrc",
+          "rtcAudioEncodingFromString",
+          "version"
+        ],
+        "export_relationships": 97,
+        "import_relationships": 8,
+        "logical_module_key": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "module_format": "commonjs",
+        "omitted_export_names": 0,
+        "path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "semantic_role": "source-module"
+      },
+      "location": {
+        "end": {
+          "column": 0,
+          "line": 27
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 0,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_e0164b17975a10e457fc08332d365096e2461d2d54f8b47b0d6b2a572981c9a9",
+      "label": ".vite/build/SentryShutdown-CqVxTKDF.js",
+      "properties": {
+        "container_sha256": "fbd6a39ce6fde8685c6ca4c2ca78343aa50551b1bac74f532fd6c5801a23b622",
+        "export_names": [
+          "*"
+        ],
+        "export_relationships": 2,
+        "import_relationships": 0,
+        "logical_module_key": ".vite/build/SentryShutdown-CqVxTKDF.js",
+        "module_format": "commonjs",
+        "omitted_export_names": 0,
+        "path": ".vite/build/SentryShutdown-CqVxTKDF.js",
+        "semantic_role": "source-module"
+      },
+      "location": {
+        "end": {
+          "column": 0,
+          "line": 2
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryShutdown-CqVxTKDF.js",
+        "start": {
+          "column": 0,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    }
+  ],
+  "mixed_bundle_named_exports": [
+    {
+      "node_id": "jag_node_0d377d1515550ef1535496ea1f1f48fd0f0fe28f25a88ba0b59d4b262b986e89",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:AudioEnhancementState",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "AudioEnhancementState",
+        "imported_name": null,
+        "local_name": "U_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 630,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 598,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_1f8f0548c0b5678a4da8016f5cd821a1c3d4b0b94744aeb3d48a2d92440b9260",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:hasArgument",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "hasArgument",
+        "imported_name": null,
+        "local_name": "mS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2027,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2005,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_53ba47e1476f95d777897713159e216cb6406d0645b093b3cdab1884d27d7fc8",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:MediaFileMode",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "MediaFileMode",
+        "imported_name": null,
+        "local_name": "z_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1018,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 994,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_589d5603aa45477908adea7e57e522f6c81c141dd922cb09e405036ce8455c2d",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:SentryTestMode",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "SentryTestMode",
+        "imported_name": null,
+        "local_name": "Pt",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1393,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1368,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_5f5794dce56e6f040c98af6a243e3f35f0a2df05e4260e0f5ca48460ed443b25",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:ProcessorType",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "ProcessorType",
+        "imported_name": null,
+        "local_name": "j_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1224,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1200,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_61a8d08dbbc018d3f4457703b4cd6f2d56984d3ffed7ab7d73cd63603ae7402a",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:checkFeatureMap",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "checkFeatureMap",
+        "imported_name": null,
+        "local_name": "ZS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1568,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1542,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_652c7bd357ed3e4acbdd535c05062b867298ce4d764570b3bd735456c86cd32f",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:getCrashFilePath",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "getCrashFilePath",
+        "imported_name": null,
+        "local_name": "VS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1728,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1701,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_6aa31ff33ad20659c811d1cb0fcf8e49667ab15dad538ca29adafaa255f0a6df",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:getAugmentedNamespace",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "getAugmentedNamespace",
+        "imported_name": null,
+        "local_name": "SS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1700,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1668,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_6df9f6f90688d263d1843cdd1bee7cd5258e46a6b5cc4314984f3771825ba0dd",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:RtcTransport",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "RtcTransport",
+        "imported_name": null,
+        "local_name": "Z_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1287,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1264,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_6f6617cbf2e0bebec4164bffb678f3622d44b1fbaa7ec975f607735a12c61cf0",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:krispMediaGatewayDomains",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "krispMediaGatewayDomains",
+        "imported_name": null,
+        "local_name": "_T",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2210,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2175,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_812475d9224d20d7c23d698d808cc12fa9492a222d2409986482fa899489d78c",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:VolumeMappingMode",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "VolumeMappingMode",
+        "imported_name": null,
+        "local_name": "br",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1482,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1454,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_84ba7b1ddd14ad84035dbbec7ddf7b0f5ec6259beef04d058c2dfb26e382e34d",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:rtcAudioEncodingFromString",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "rtcAudioEncodingFromString",
+        "imported_name": null,
+        "local_name": "iT",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2437,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2400,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_882edafc859c941d26b751f13fd37adcb17e1f993485e5c7daed5f18e56b4116",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:ProcessorIds",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "ProcessorIds",
+        "imported_name": null,
+        "local_name": "k",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1199,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1177,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_9716323c2f94f8041b60a1cfdcac66094c451f33c666d8110ccd76d08cfeb838",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:getDriverAppLogPath",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "getDriverAppLogPath",
+        "imported_name": null,
+        "local_name": "FS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1799,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1769,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_9830590f38d55c6b9e440b4567f7c306f17de543c5732f7b3a3d41e1b715114e",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:version",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "version",
+        "imported_name": null,
+        "local_name": "O_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2496,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2478,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_9d6681bd8bba5bd77504009c18c0dc239d8236c9ea029f07cdb37f55f6b2d7a7",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:FilePlayerPlaybackError",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "FilePlayerPlaybackError",
+        "imported_name": null,
+        "local_name": "eE",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 854,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 820,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_aec90133cb60622ffdec82cd17d2c69ab4bbdec508fb5a889bcfa7ccf0258943",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:DefaultDeviceRole",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "DefaultDeviceRole",
+        "imported_name": null,
+        "local_name": "V_",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 779,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 751,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_c0fc42fe21104ed73f21b48f5ea548498dc5a2468cffeb9ae87572e3a452a761",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:getStringFromBus",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "getStringFromBus",
+        "imported_name": null,
+        "local_name": "$S",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 1985,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1958,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_e6336863f8e1d3cdefcca6b616c8ef2a175557673e16313eda9a1d345e4c411a",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:krispFilesDomains",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "krispFilesDomains",
+        "imported_name": null,
+        "local_name": "lT",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2174,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2146,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_e754cb81a9bd675486dc110991ed472ecf291b5e9640da4491aafb21f0c7fbf4",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:prependPathDirs",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "prependPathDirs",
+        "imported_name": null,
+        "local_name": "BS",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2337,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2311,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_ee1c54d423a6acfada3e8dc90719da4cfd0b264df00a6ceec26d72fa47589c96",
+      "label": ".vite/build/SentryManagerMain-BCbY-HkL.js:requireSrc",
+      "properties": {
+        "declared_specifier": null,
+        "exported_name": "requireSrc",
+        "imported_name": null,
+        "local_name": "YE",
+        "module_path": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "relationship_kind": "commonjs-export",
+        "semantic_role": "export-binding"
+      },
+      "location": {
+        "end": {
+          "column": 2379,
+          "line": 26
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 2358,
+          "line": 26
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    }
+  ],
+  "sentry_module_references": [
+    {
+      "node_id": "jag_node_7200f35727868d745679b3b3b04afbdf69f4ca757173903928efc543439f6911",
+      "label": "os",
+      "properties": {
+        "declared_specifier": "os",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 1217,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1201,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_90a08252eab55e494be72dca75974feb09b1368e512b090809cdcc2957a38013",
+      "label": "fs",
+      "properties": {
+        "declared_specifier": "fs",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 856,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 841,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_9bcb4239f7a4c64f93436ae76fd89743ad4213e2b4df5656731878ef01759509",
+      "label": "node:diagnostics_channel",
+      "properties": {
+        "declared_specifier": "node:diagnostics_channel",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 1027,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 989,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_b2f0485e166a18347bc4c5171b3868d888818b580021dded8b5017ea2f1ff992",
+      "label": "node:readline",
+      "properties": {
+        "declared_specifier": "node:readline",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 1265,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1238,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_c82f5598ab7f49a0d315771da8312c78e6a7d8f78c1f3d0ef078bb4ffcfebf75",
+      "label": "node:child_process",
+      "properties": {
+        "declared_specifier": "node:child_process",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 889,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 857,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_d6489f94f7f2ac9861ba87e8e87cce77154ad07a38d4884fe0d43dc000322f83",
+      "label": "zlib",
+      "properties": {
+        "declared_specifier": "zlib",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 988,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 970,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_db1ae46e2fd70924e42cc2fd9abc7cb760a5fbe53e79b1cb06c154146a796563",
+      "label": "worker_threads",
+      "properties": {
+        "declared_specifier": "worker_threads",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 1120,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1092,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    },
+    {
+      "node_id": "jag_node_fe5b8564e9ebb21d70c320abbddf60d4f4b7d195e6ad3985349dbe8d3fe76cb8",
+      "label": "node:util",
+      "properties": {
+        "declared_specifier": "node:util",
+        "resolution_status": "external",
+        "semantic_role": "module-reference"
+      },
+      "location": {
+        "end": {
+          "column": 1051,
+          "line": 1
+        },
+        "kind": "source-range",
+        "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+        "start": {
+          "column": 1028,
+          "line": 1
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+    }
+  ],
+  "sentry_import_edges": [
+    {
+      "edge_id": "jag_edge_00bd1f62e474d8f2b6843ff9392a62e8e668032b2cc6235dd8417f22ed680ce8",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_ccafb6a1a48d5a8028bba300328069024bbfcad504b0313546fd04aad2864c5a",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "url"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 19434,
+            "line": 23
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 19420,
+            "line": 23
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_00f13bae51006f67f32cf7634da9bb0003bb7f498b02c737c50727b583473c78",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_04afe9efd6646609ba031d20a0ddadea9eba192fccce15d56c9839f12608087a",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(808))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 803,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 788,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_0144ba9abe4c69d2366993f0cfdd17a5e81e542781230a285fd1066e010d2431",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_d6489f94f7f2ac9861ba87e8e87cce77154ad07a38d4884fe0d43dc000322f83",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "zlib",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 988,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 970,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_021b62a577b58dbc185f00876cffdc21bcdb9d617fd5af1ba995681d10c6c958",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_f24673a8fd016b065e5aefac63cb5c3786ba8e8e296ae720964ea0c1a473ef8e",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2357))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1180,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1164,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_084d7e7889fa2b4ce7554bf351b21b39c05041f5633191850737d2495000c73c",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_021f8fc04a7659e3c82560242327a8c9bfbdec878e07411837773481681e7d4d",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "node:util"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1051,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1031,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_1897a10917795965af3187c79ea0bb6fe04429046fffb0370019ad44abcdad81",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_b2f0485e166a18347bc4c5171b3868d888818b580021dded8b5017ea2f1ff992",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "node:readline",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1265,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1238,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_1cb7a5b0d7cf3f9a8c1a86d7fd224e1b99156e0a78406a6eedfa6d21f57bf2a1",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_5c433023dd18c0a8d92205ec88b59dcaf506e8225f4a8955170083fbb11017f4",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "worker_threads"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1120,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1095,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_1cfe226113fc759417e056d7d60d093b59bc50f6f533412f32d8949b8ad919f8",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_e4a41a4dc9d7195f4768152e0d11db7142f2f4ca93156efc04a75d7e44039006",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "import(e(3422))",
+          "reference_kind": "dynamic-import",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 51561,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 51546,
+            "line": 13
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_22be50703af40c6bf944961f47ca9ea9bb8004cec1e30f15eb49046e5bbd969f",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_4fe302f894ba478ddb880e9613dd3d7ceac5c2728d9dc8ecf928c784623481f4",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(1775))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1200,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1184,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_2c2e33fab57ad8c75c2d94a198d7e8841d71af70657cd6f5a68992f6bc12655e",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_7200f35727868d745679b3b3b04afbdf69f4ca757173903928efc543439f6911",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "os",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1217,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1201,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_4407d36aedb2cc00494010239cb67618108ed7a9e9e8de524b4e8494b3b9a9ef",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_cc040057f8e662b215c552752611a4cb53dd6306032e0abd5bb5127bfb349cd9",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "import(o(3422))",
+          "reference_kind": "dynamic-import",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 52627,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 52612,
+            "line": 13
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_48287578970527ec817f81905b8b3ed3fb0f302f95c1b3f188d965cfdb585b57",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_208d53ddc42f966729a78f8ee15724277f0c165cb58d6d32059514be2e0cae40",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "zlib"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 988,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 973,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_4c17996f6612ea52333661cb630bf081a160837599b198fe7e8448f956dae968",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_919570beffbd74eb874791f32ecc25e22a0ecf1aaebc9f12f6cb2be0b32e112a",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2375))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 929,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 913,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_536496dbdd5f23fdcd53a2e55b8d3be422575655e522747d3c9d3fc68d34fb0c",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_2e8ad5071e0ac7596038129a3f09e30219f916fb43c0f6c3b3fde58495420391",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "os"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1217,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1204,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_5722a91f3452eb27ccb6708c6be308db1e490c1e716268066f368d736f99f69c",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_c82f5598ab7f49a0d315771da8312c78e6a7d8f78c1f3d0ef078bb4ffcfebf75",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "node:child_process",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 889,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 857,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_599f25b916ccdc3a775613f5f2f29e0282f9372a9e3619800a12c2e9f642fccb",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_277019d0f7c4bb3466ab0682a1b5e5377bc402a8ccf36bcce6b8f58003bd4df0",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "node:child_process"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 889,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 860,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_59f7391bf3cc07c9048019c9f346c934124d52121ef9afbbdd363337eb38df8a",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_c756d975b91d4a72fe30d990fa49f8be6481e0620bb57a1a54eaab7710b75064",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2179))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 840,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 824,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_5de896eaf03d21574c29ba70473067369140dfb62abca267d2cb5caaf35dc4fa",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_e5fb4cbbce0e65a9e1dde4513856d81c947a8d6d315accf43a87d74248c783a7",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(1194))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1160,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1144,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_70cb1e52b172d296c22aa8b489e8ee8c05057c0c35728a2c0251d44f1c0d5b94",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_421fb56a2008276458f06cc5d592f0981d3aac5fe379af03141e0255fbee3643",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(1265))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1285,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1269,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_715ea1e9fd1d576ca90f0d9ed925f180e5836c44015aef85660232774d6daf93",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_e1531308a23c34dc54b4ad1132d0f77371d0b345585bf3c35b2b3d5d0b958f57",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2962))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1237,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1221,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_7b4513dc7a8423e67c59b0cf3d112d49cbc8bd64fee98fc529e165461bec036f",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_1ba90cc695395394317a4e1b2b95ddd262926a320772075aab2bbfbedcdc1169",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "node:diagnostics_channel"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1027,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 992,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_81bb5bd030e54bc329cbde0fb4845ff9670ad0416db8434a821df11b2357a546",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_de64db487fe077f3857843efdacdb2e9b805c118f6e0a6568e44822122035b86",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(3928))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1091,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1075,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_83a86eb7153daeaae033c961eccb4db88cf847613f6dd2a0939ab86107006d84",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_29c9e9b9c9b49d5f6c91a58dfbb071d0f7032ae7a19702c31d136d8cd7211de0",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "fs"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 856,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 843,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_86c93c2476bf7bf37ea6fcf1415727c217f1ab20a314db62b6acb14ef9c90bb8",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_db1ae46e2fd70924e42cc2fd9abc7cb760a5fbe53e79b1cb06c154146a796563",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "worker_threads",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1120,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1092,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_8b98ced941dbbd84c0558111c8e69c711371e2d144e01995fdfb29e21427a105",
+      "source_node_id": "jag_node_e0164b17975a10e457fc08332d365096e2461d2d54f8b47b0d6b2a572981c9a9",
+      "target_node_id": "jag_node_36aac550b8749ca05fb7d3a1e5a0d067c417d07e9043b84e243978fbcd440732",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(t(358))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 699,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryShutdown-CqVxTKDF.js",
+          "start": {
+            "column": 684,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_8e659938852ca342f49d6bcd4d3476a52ed9d18d94dc1d30faa713767fa69a0b",
+      "source_node_id": "jag_node_e0164b17975a10e457fc08332d365096e2461d2d54f8b47b0d6b2a572981c9a9",
+      "target_node_id": "jag_node_4c61323f220a133c30189445cad84b8a44bd50157ceb2bad2d31ace12ba6d5ef",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(t(339))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 717,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryShutdown-CqVxTKDF.js",
+          "start": {
+            "column": 702,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_93b4c726dcef73c77e2541dab9b0bcff298fe04fbddb56b5acac0d769e2e84e1",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_cec4cd80cab7c9c70dd9d9ef9cd81b767b19251e5d8da123891104fd87821d42",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2612))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1140,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1124,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_a0602cea32f6307d88bdb72f4446e79f3ab8232f76f3482ed083fc6dcd46afaa",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_fe5b8564e9ebb21d70c320abbddf60d4f4b7d195e6ad3985349dbe8d3fe76cb8",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "node:util",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1051,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1028,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_a2370992082bf29704ed0d604f254718bdff85ed11f53aaf84865ecd318bb5c2",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_9bcb4239f7a4c64f93436ae76fd89743ad4213e2b4df5656731878ef01759509",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "node:diagnostics_channel",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1027,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 989,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_b58c502cb56f58e724fa79e2a1a7632682903451e4b3da1ed66528e2a731fadb",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_9782363a38b101af2deab84376e70fc85f901d0138f9acf77891c222d4a84234",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(927))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 821,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 806,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_c798fb955e11077b111ed7ba3c356d35cacfdfb578fe006ff9d08e2be6843aa4",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_6341e0a43462a9006046abe327a3f545153fabee4f2069acea6fbfe6d9590369",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2474))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 969,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 953,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_ca0b01b87b8e3198c521b6bc69eb054cf6fc3cced03d47416080a54e33a55afb",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_e527367c2cbf1ade085ffc34704dfc8dad6371feb473389930fd70780d27ba83",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "import(n(3422))",
+          "reference_kind": "dynamic-import",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 53768,
+            "line": 13
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 53753,
+            "line": 13
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_e0a91f6f57788ca4ae6262f3cdf02e06a7766e2f42fdc94fc3ba71ec8a6d944f",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_331064005f88c606930593896beaafc0efdad09f2c2185509b7b477cab53f6f8",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(4034))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 909,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 893,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_e36e4d7ff5edd3663e08ff639903627379964ccc2645f4ff8a1c7e7f75ca84fe",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_d0f71cf5125dd0240d6bca1297f644c8e52f466b5103feb4411a92579e767ea5",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(2021))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 949,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 933,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_e3b2b89ddd17c9cedfc796bb242eb972ac3587dc710559bee70c8e77a5187b01",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_a74972cd621dd94c58fa9a8e112ac90f336b767fe6517e3df0054610e3d06027",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": "require(s(3222))",
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": null
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1071,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1055,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_e42e5b1b93714bb9a5998fe589c3df078d5a9314a26d14b85678c0bb3f1d17b3",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_a6bd9e164bd227bcf286cbdc9f92461eb6fd33f9261e48823d373d6298cafb6f",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "expression": null,
+          "reference_kind": "require",
+          "resolution": "unresolved",
+          "specifier": "node:readline"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 1265,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 1241,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    },
+    {
+      "edge_id": "jag_edge_f332e6ae629786ebc77629b26c0c51128f8297dc7b7c3c7a4552972d46b93472",
+      "source_node_id": "jag_node_54013cf3d51b66fc82e927701086d10f440648b061e48909f9d2c1c66b814198",
+      "target_node_id": "jag_node_90a08252eab55e494be72dca75974feb09b1368e512b090809cdcc2957a38013",
+      "relation": "imports",
+      "target_properties": [
+        {
+          "declared_specifier": "fs",
+          "resolution_status": "external",
+          "semantic_role": "module-reference"
+        }
+      ],
+      "location": {
+        "available": true,
+        "value": {
+          "end": {
+            "column": 856,
+            "line": 1
+          },
+          "kind": "source-range",
+          "source": ".vite/build/SentryManagerMain-BCbY-HkL.js",
+          "start": {
+            "column": 841,
+            "line": 1
+          }
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "authority": "static-relationship-inference",
+      "state": "inferred"
+    }
+  ],
+  "retained_endpoint_candidates": [
+    {
+      "node_id": "jag_node_0e02278a24b7b7b9bb045c104cfac92cf6e6df2911b90c9f2f32c1a8a507aefd",
+      "label": "weeks",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:get",
+        "value": "weeks"
+      },
+      "location": {
+        "end": {
+          "column": 682119,
+          "line": 128
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/main_window/assets/index-CAmVYtnC.js",
+        "start": {
+          "column": 682102,
+          "line": 128
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_1b7a28e58286187aa3a65d90b18cc9f078ae528d3adc9d84eaf36b704ba66a08",
+      "label": "/",
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": "/"
+      },
+      "location": {
+        "end": {
+          "column": 6572,
+          "line": 742
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapApp-BiqTUzCg.js",
+        "start": {
+          "column": 6564,
+          "line": 742
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_26c50ae23e82044068b9c65cdeb323a0deec4a22fe3b7c27507e8dfc4c7c01cd",
+      "label": "minutes",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:get",
+        "value": "minutes"
+      },
+      "location": {
+        "end": {
+          "column": 676882,
+          "line": 111
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/widget/assets/index-Dt3zCG4z.js",
+        "start": {
+          "column": 676863,
+          "line": 111
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_389dc7f90bd553adcf33487fddd5a56e5ce917f2397a3fb8d14732e5c91122a7",
+      "label": "seconds",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:get",
+        "value": "seconds"
+      },
+      "location": {
+        "end": {
+          "column": 681687,
+          "line": 128
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/main_window/assets/index-CAmVYtnC.js",
+        "start": {
+          "column": 681668,
+          "line": 128
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_3a02014cdb033fae813f099626c0286a63ab61e461e62127b3735e201b18a08f",
+      "label": "network endpoint",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:S.[computed@117067].get",
+        "value": "X-Sentry-Rate-Limits"
+      },
+      "location": {
+        "end": {
+          "column": 17911,
+          "line": 15
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/notification_indicator/assets/index-D3xnSGho.js",
+        "start": {
+          "column": 17873,
+          "line": 15
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_5f7de2fc7a3d8060ab6d5c17e66546d4a550b70cb5e6c85d4985691353ab8c53",
+      "label": "Retry-After",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:u.[computed@1524228].get",
+        "value": "Retry-After"
+      },
+      "location": {
+        "end": {
+          "column": 23617,
+          "line": 46
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/main_window/assets/index-CAmVYtnC.js",
+        "start": {
+          "column": 23588,
+          "line": 46
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_71249058be7c1684f1fcbf89fc2479ccbea1e06f1cd5b3a180a0354b6849d69f",
+      "label": "route endpoint",
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": "/Krisp.AppService.InstallService/Execute"
+      },
+      "location": {
+        "end": {
+          "column": 137050,
+          "line": 674
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapApp-BiqTUzCg.js",
+        "start": {
+          "column": 137003,
+          "line": 674
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Local service route candidate; host and transport unresolved."
+    },
+    {
+      "node_id": "jag_node_7fe6a7cf7aa130bb192c5255275d703369f199f2a7a78d9620051123c9ea966f",
+      "label": "network endpoint",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:d.get",
+        "value": "sentry.sample_rand"
+      },
+      "location": {
+        "end": {
+          "column": 21747,
+          "line": 10
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/web_window/assets/index-B-pUdwQb.js",
+        "start": {
+          "column": 21720,
+          "line": 10
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_84d0b632b83a7936f1c8ea4ca8730584474f9592f598af1209e63bf2db5223b6",
+      "label": null,
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": ""
+      },
+      "location": {
+        "end": {
+          "column": 185660,
+          "line": 768
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapApp-BiqTUzCg.js",
+        "start": {
+          "column": 185653,
+          "line": 768
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_84d0b632b83a7936f1c8ea4ca8730584474f9592f598af1209e63bf2db5223b6",
+      "label": null,
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": ""
+      },
+      "location": {
+        "end": {
+          "column": 24273,
+          "line": 87
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapApp-BiqTUzCg.js",
+        "start": {
+          "column": 24266,
+          "line": 87
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_b2b73394b3320c71ae52e0e2482cfa7d04a6b8bce8335f8ff1d01a0f50bc8e5c",
+      "label": "years",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:get",
+        "value": "years"
+      },
+      "location": {
+        "end": {
+          "column": 677427,
+          "line": 111
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/widget/assets/index-Dt3zCG4z.js",
+        "start": {
+          "column": 677410,
+          "line": 111
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_b8288f869e6be7235473e99d1bf5870294df755b790acff005ef8adfb99f1fd7",
+      "label": "seconds",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:get",
+        "value": "seconds"
+      },
+      "location": {
+        "end": {
+          "column": 43392,
+          "line": 678
+        },
+        "kind": "source-range",
+        "source": ".vite/build/BootstrapApp-BiqTUzCg.js",
+        "start": {
+          "column": 43373,
+          "line": 678
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_e2aedca437d833045e90f234b93bc056d908680579898acc33af0276ee7693a4",
+      "label": null,
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": ""
+      },
+      "location": {
+        "end": {
+          "column": 773014,
+          "line": 128
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/main_window/assets/index-CAmVYtnC.js",
+        "start": {
+          "column": 773007,
+          "line": 128
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_e2aedca437d833045e90f234b93bc056d908680579898acc33af0276ee7693a4",
+      "label": null,
+      "properties": {
+        "endpoint_kind": "route",
+        "mechanism": "property:path",
+        "value": ""
+      },
+      "location": {
+        "end": {
+          "column": 773119,
+          "line": 128
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/main_window/assets/index-CAmVYtnC.js",
+        "start": {
+          "column": 773112,
+          "line": 128
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    },
+    {
+      "node_id": "jag_node_eb50c9ae3738d621db2d8bd16a4ed17ae9c89e87f94b5b434d9b73ace0557ed9",
+      "label": "sentry.dsc",
+      "properties": {
+        "endpoint_kind": "network",
+        "mechanism": "call:d.get",
+        "value": "sentry.dsc"
+      },
+      "location": {
+        "end": {
+          "column": 21523,
+          "line": 10
+        },
+        "kind": "source-range",
+        "source": ".vite/renderer/web_window/assets/index-B-pUdwQb.js",
+        "start": {
+          "column": 21504,
+          "line": 10
+        }
+      },
+      "evidence_id": "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+      "interpretation": "Heuristic endpoint classification only. This value is not a verified network destination."
+    }
+  ],
+  "native_network_boundaries": [
+    {
+      "source": "evidence/native/daily-macho.json",
+      "evidence_id": "ev_99203e8788bb23c3a6613415e79affe0b66e1cfeb94d12ca7fea0a82cf922fc4",
+      "subject": {
+        "name": "libdaily-core-sdk-wrapper.dylib",
+        "digest": {
+          "sha256": "efaa4ee8bbab5a24c2a81b259946cfc871958e6d2141a8d27464deaceb9110a2"
+        },
+        "format": "mach-o",
+        "architecture": "arm64",
+        "local_path": "/Users/harikp/Applications/krisp.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libdaily-core-sdk-wrapper.dylib"
+      },
+      "selected_symbols": [
+        {
+          "section": "exports",
+          "name": "__ZN10daily_core7metrics6native24UnstableTelemetrySession18send_meeting_event28_$u7b$$u7b$closure$u7d$$u7d$10__CALLSITE17hfb68b8d690461fd6E",
+          "address": "0x185ce48",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "__ZN10daily_core7metrics6native24UnstableTelemetrySession18send_meeting_event28_$u7b$$u7b$closure$u7d$$u7d$10__CALLSITE4META17hfafaf6b91e021a84E",
+          "address": "0x17a2ef0",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "__ZN15daily_telemetry11WebRtcStats41get_stream_based_mini_data_logging_stream17h2da274bd9a13f4e4E",
+          "address": "0x84aee8",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_join",
+          "address": "0x23b470",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_recording_fns",
+          "address": "0x3f12c0",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_start_recording",
+          "address": "0x3f5e7c",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_start_transcription",
+          "address": "0x3f71d4",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_stop_recording",
+          "address": "0x3f6204",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_stop_transcription",
+          "address": "0x3f76d8",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_telemetry_fns",
+          "address": "0xf1f78",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_transcription_fns",
+          "address": "0x3f12f8",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_update_recording",
+          "address": "0x3f64bc",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "_daily_core_call_client_update_transcription",
+          "address": "0x3f77cc",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        }
+      ],
+      "network_dependencies": [
+        {
+          "path": "@rpath/libdaily-core-sdk-wrapper.dylib",
+          "kind": "LC_ID_DYLIB",
+          "current_version": "0.0.0",
+          "compatibility_version": "0.0.0"
+        }
+      ],
+      "interpretation": "Static imports, exports and dependencies. No caller path, execution, destination or payload is established."
+    },
+    {
+      "source": "evidence/native/kr-media-sp-macho.json",
+      "evidence_id": "ev_82a288cac329f8c56c70b229dab17784b6f6ae35d0d61b7bde9ed4b7015715d1",
+      "subject": {
+        "name": "kr-media-sp.node",
+        "digest": {
+          "sha256": "168928030a95579e68bfabb7716a9211779d3bcaa18e88be8df43c55ba61385a"
+        },
+        "format": "mach-o",
+        "architecture": "arm64",
+        "local_path": "/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node"
+      },
+      "selected_symbols": [
+        {
+          "section": "exports",
+          "name": "__ZN5Krisp7MediaSP21CreateTranslationNapiERKN4Napi12CallbackInfoE",
+          "address": "0x28e18",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "__ZN5Krisp7MediaSP22EnableTranslationsNapiERKN4Napi12CallbackInfoE",
+          "address": "0x28d90",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "__ZN5Krisp7MediaSP24CreateRtcTranscriberNapiERKN4Napi12CallbackInfoE",
+          "address": "0x2b550",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        },
+        {
+          "section": "exports",
+          "name": "__ZN5Krisp7MediaSP25DestroyRtcTranscriberNapiERKN4Napi12CallbackInfoE",
+          "address": "0x2c88c",
+          "weak": null,
+          "reexport": false,
+          "source": null
+        }
+      ],
+      "network_dependencies": [
+        {
+          "path": "@rpath/libdaily-core-sdk-wrapper.dylib",
+          "kind": "LC_LOAD_DYLIB",
+          "current_version": "0.0.0",
+          "compatibility_version": "0.0.0"
+        },
+        {
+          "path": "@rpath/libsioclient_tls.3.dylib",
+          "kind": "LC_LOAD_DYLIB",
+          "current_version": "3.1.0",
+          "compatibility_version": "3.0.0"
+        },
+        {
+          "path": "@rpath/libkrisp-curl-wss-wrapper.0.dylib",
+          "kind": "LC_LOAD_DYLIB",
+          "current_version": "0.0.0",
+          "compatibility_version": "0.0.0"
+        }
+      ],
+      "interpretation": "Static imports, exports and dependencies. No caller path, execution, destination or payload is established."
+    }
+  ],
+  "unresolved_request_candidates": [
+    {
+      "node_id": "jsrg_node_e31c86de04e18fa96dfa2c92ebc8c8acc8fa9dcfd25b9bc4e2bc6d81f5bef28c",
+      "reason": "resource-limit",
+      "detail": ".vite/build/preload.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/build/preload.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/build/preload.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_afc1955b8a46fabda5da46dbe71a54714665dd8ab608aa48f00790d5db263767",
+      "reason": "resource-limit",
+      "detail": ".vite/build/SentryManagerMain-BCbY-HkL.js: Resource constraint during analyze_javascript_application: Semantic graph for .vite/build/SentryManagerMain-BCbY-HkL.js exceeds the parent's remaining result budget; static and module facts were retained",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/build/SentryManagerMain-BCbY-HkL.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_d4cfcf1e8d749dc3065768ee388702c2df07019d2a947e77fd8d420e43d0741a",
+      "reason": "resource-limit",
+      "detail": ".vite/build/BootstrapApp-BiqTUzCg.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/build/BootstrapApp-BiqTUzCg.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/build/BootstrapApp-BiqTUzCg.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_19c18745452ed395062377939d5df9a56c18c9586f351556a5ed1e399258e261",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/widget/assets/index-Dt3zCG4z.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/widget/assets/index-Dt3zCG4z.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/widget/assets/index-Dt3zCG4z.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_1e11dd9293e5d91b2c24f27b1b132f350b29799bdb242acb0f3e9e17f68668d8",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/notification_reminder/assets/index-CPilth7p.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/notification_reminder/assets/index-CPilth7p.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/notification_reminder/assets/index-CPilth7p.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_2b70a971c9efbe260e557ce4f7afe30ffe02005406674bcd89114b155c9b2da9",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/main_window/assets/index-CAmVYtnC.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/main_window/assets/index-CAmVYtnC.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/main_window/assets/index-CAmVYtnC.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_7befa4b5876abab37224324b0d42c765b65657ed95c3997337d9646408f327b8",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/web_window/assets/index-B-pUdwQb.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/web_window/assets/index-B-pUdwQb.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/web_window/assets/index-B-pUdwQb.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_d1f87b79042838b3501e36b01c4e619fb37e6cef77ccfe2f0c019d13c37821b6",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/notification_indicator/assets/index-D3xnSGho.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/notification_indicator/assets/index-D3xnSGho.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/notification_indicator/assets/index-D3xnSGho.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_68719d7b07b44c35a09f7dc450e7d094aedfe59511ceb94cf7307e77ef1f0023",
+      "reason": "resource-limit",
+      "detail": ".vite/renderer/companion/assets/index-g6AFnWdL.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/renderer/companion/assets/index-g6AFnWdL.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/renderer/companion/assets/index-g6AFnWdL.js"
+      }
+    },
+    {
+      "node_id": "jsrg_node_cc607033311baf0c996fbb95f95060899c67f45fb5b6d8bb1751a692fa7c773e",
+      "reason": "resource-limit",
+      "detail": ".vite/build/index-CnqXFUZx.js: Resource constraint during analyze_javascript_application: Owned JavaScript worker exhausted its heap while analyzing .vite/build/index-CnqXFUZx.js during semantic",
+      "location": {
+        "kind": "artifact-path",
+        "path": ".vite/build/index-CnqXFUZx.js"
+      }
+    }
+  ],
+  "coverage": {
+    "semantic_status": "partial",
+    "semantic_truncated": true,
+    "parsed_javascript_files": 19,
+    "relevant_files": 37,
+    "retained_request_relations": 0,
+    "unknown_request_candidates": 10
+  },
+  "implementation_actions": [
+    {
+      "boundary": "Sentry capture hooks and IPC",
+      "action": "Build local error logging independently. Omit captureSentryMessage, captureSentryException, __SENTRY_IPC__, debug ID registration and remote flush from the reconstruction. Preserve ordinary error display and shutdown sequencing.",
+      "basis": "Observed static property operations. Exact call ownership remains unresolved."
+    },
+    {
+      "boundary": "Mixed Sentry-named bundle",
+      "action": "Preserve independently implemented audio/media enums and utility behavior. Do not remove an entire chunk based on its filename.",
+      "basis": "SentryManagerMain exports AudioEnhancementState, MediaFileMode, hasArgument, prependPathDirs and requireSrc alongside SentryTestMode."
+    },
+    {
+      "boundary": "Native Daily and remote media clients",
+      "action": "Use independently licensed local audio capture and local ASR. Do not import Daily telemetry, remote RTC transcription or Socket.IO/WebSocket clients for the local reconstruction.",
+      "basis": "Static native symbols and dependencies. Exact exercised paths remain unknown."
+    },
+    {
+      "boundary": "Account, cloud storage, meeting bots and report upload",
+      "action": "Remove sign-in gates, remote sync, bot attendance and report upload. Keep local folder storage and log export as separate implementations.",
+      "basis": "Translation evidence supplies user-facing scope only. Concrete JavaScript endpoints remain unresolved."
+    },
+    {
+      "boundary": "Model acquisition, updates, calendar and screen capture",
+      "action": "Keep these unresolved until exact local/network callers are traced. Package approved local assets or provide explicit independent acquisition. Implement local screen capture independently if required by the user.",
+      "basis": "Catalog text identifies internet-dependent model preparation and a cloud-storage screen-recording limitation."
+    },
+    {
+      "boundary": "Privacy verification",
+      "action": "Test the independent build through real local capture, processing, recording and quit paths while monitoring outbound sockets. Verify no analytics SDKs, crash upload, cloud model API or automatic updater enters the final build.",
+      "basis": "Verification requirement, not a claim about the original app or a completed test."
+    }
+  ],
+  "limitations": [
+    "Source JavaScript semantic coverage is partial and truncated. Large bootstrap, preload and renderer bundles exhausted heap or parent result budget.",
+    "Retained request-family relations are zero; this is incomplete coverage, not evidence of no requests.",
+    "Obfuscated require expressions and dynamic members remain unresolved.",
+    "No concrete HTTP or WebSocket remote host was recovered in the retained endpoint-node subset. Header names, date units and local routes are not remote hosts.",
+    "No complete product-analytics event inventory or vendor identification is established.",
+    "Sentry debug markers identify instrumentation, not proof that any event was sent.",
+    "Five native companions mismatch their ASAR declared digests. Native evidence concerns current local bytes.",
+    "No original app execution, credentials, user account content or live traffic was used."
+  ]
+}
