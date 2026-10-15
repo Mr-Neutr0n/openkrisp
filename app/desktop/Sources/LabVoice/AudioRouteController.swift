@@ -90,7 +90,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         recordingObservation = recording.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
     func refresh() async {
-        guard phase == .idle, !loading else { return }
+        guard phase == .idle, !loading, !QuitGate.shared.quitting else { return }
         loading = true; error = nil
         defer { loading = false }
         do {
@@ -285,15 +285,35 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
 }
 
 @MainActor final class LabVoiceApplicationDelegate: NSObject, NSApplicationDelegate {
+    private var quitTask: Task<Void, Never>?
+    private lazy var quit = QuitCoordinator(snapshot: {
+        let audio = AudioRouteController.shared, test = MicrophoneTestController.shared
+        let recording = audio.recording
+        let saved = recording.savedSessionID != nil && !recording.busy
+        let recordingActivity = recording.busy ? recording.libraryActivityID : nil
+        return QuitSnapshot(recordingActive: recording.busy, audioEngaged: audio.engaged,
+                            testEngaged: test.engaged,
+                            otherWork: LibraryLocation.shared.switching || LibraryLocation.shared.activities.keys.contains { $0 != recordingActivity } || AudioCaptureAdmission.shared.owner == .recordingRecovery,
+                            recordingSaved: saved, recordingFailure: saved ? nil : recording.error,
+                            stopFailure: audio.error, testFailure: test.error)
+    }, confirmSave: {
+        let alert = NSAlert()
+        alert.messageText = "Save the recording and quit?"
+        alert.informativeText = "Lab Voice will stop audio, finalize this recording and save it to your library before quitting. If saving fails, the app will stay open."
+        alert.addButton(withTitle: "Save and quit"); alert.addButton(withTitle: "Cancel")
+        return alert.runModal() == .alertFirstButtonReturn
+    }, stopAudio: { await AudioRouteController.shared.stop() },
+       cleanupTest: { await MicrophoneTestController.shared.cancelAndCleanup() })
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        let audio = AudioRouteController.shared
-        let test = MicrophoneTestController.shared
-        guard audio.engaged || test.engaged else { return .terminateNow }
-        Task {
-            let testEnded: Bool
-            if test.engaged { testEnded = await test.cancelAndCleanup() } else { testEnded = true }
-            let audioEnded = await audio.stop()
-            sender.reply(toApplicationShouldTerminate: testEnded && audioEnded)
+        guard quitTask == nil else { return .terminateLater }
+        quitTask = Task {
+            let approved = await quit.request()
+            if !approved, let reason = quit.reason {
+                let alert = NSAlert(); alert.messageText = "Lab Voice is staying open"
+                alert.informativeText = reason; alert.addButton(withTitle: "OK"); alert.runModal()
+            }
+            quitTask = nil
+            sender.reply(toApplicationShouldTerminate: approved)
         }
         return .terminateLater
     }

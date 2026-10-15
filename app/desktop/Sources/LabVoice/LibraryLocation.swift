@@ -32,7 +32,7 @@ actor LibraryLocationInspector {
     private let inspect: (LibraryLocationSnapshot) async throws -> Void
     private var admissionObservation: AnyCancellable?
     var displayPath: String { snapshot.unavailableReason ?? snapshot.root.path }
-    var canSwitch: Bool { !switching && activities.isEmpty && AudioCaptureAdmission.shared.available }
+    var canSwitch: Bool { !QuitGate.shared.quitting && !switching && activities.isEmpty && AudioCaptureAdmission.shared.available }
     init(defaults: UserDefaults = .standard, defaultRoot: URL? = nil,
          inspect: ((LibraryLocationSnapshot) async throws -> Void)? = nil) {
         self.defaults = defaults
@@ -51,7 +51,7 @@ actor LibraryLocationInspector {
         admissionObservation = AudioCaptureAdmission.shared.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
     func begin(_ reason: String) throws -> LibraryActivity {
-        guard !switching else { throw LibraryLocationError.busy }
+        guard !switching, !QuitGate.shared.quitting else { throw LibraryLocationError.busy }
         let activity = LibraryActivity(id: UUID(), location: snapshot)
         activities[activity.id] = reason
         return activity

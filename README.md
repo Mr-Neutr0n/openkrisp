@@ -76,3 +76,8 @@ Added explicit ServiceManagement registration controls with actual OS status and
 ## Finalized recording recovery
 
 Audio can review retained independent recording folders and explicitly save a copy of validated finalized audio into the selected library. Sources remain untouched. Partial WAVs and `.pending` imports are not repaired. Desktop verification passed 86 tests and packaging checks; native recovery UI and real audio remain unverified. See `recovery-findings.md` and `CHECKPOINT.md`.
+
+
+## Save before quit
+
+Normal Quit now confirms Save and quit for active recordings and checks that saving succeeded. Failed saves keep the app open. Pending library/recovery/diagnostic work blocks quit, and shutdown blocks new work. Desktop verification passed 97 tests and packaging checks. Native dialogs and actual OS termination remain unverified. See `quit-findings.md` and `CHECKPOINT.md`.

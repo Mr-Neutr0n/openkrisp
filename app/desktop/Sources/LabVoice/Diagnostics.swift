@@ -36,6 +36,10 @@ actor DiagnosticsWriter {
     }
     func save(to url: URL) async {
         guard !saving else { return }
+        guard let work = QuitGate.shared.beginWork() else {
+            failed = true; message = "Finish or cancel quitting before starting a diagnostic export."; return
+        }
+        defer { QuitGate.shared.endWork(work) }
         saving = true; message = "Saving diagnostics locally…"; failed = false
         defer { saving = false }
         log.append(component: .app, code: .exportStarted, severity: .info)

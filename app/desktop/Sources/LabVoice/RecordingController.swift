@@ -47,7 +47,8 @@ private struct RecordingResult: Decodable {
     private var stoppingRoute = false
     private var failureToken: UUID?
     var busy: Bool { phase != .idle || settling }
-    var canStart: Bool { operation != nil && !busy && !stoppingRoute }
+    var libraryActivityID: UUID? { libraryActivity?.id }
+    var canStart: Bool { operation != nil && !busy && !stoppingRoute && !QuitGate.shared.quitting }
     init(storage: any RecordingStoring = RecordingStorage(), timeout: UInt64 = 10_000_000_000, location: LibraryLocation? = nil) {
         self.location = location ?? .shared
         self.storage = storage; self.timeout = timeout
