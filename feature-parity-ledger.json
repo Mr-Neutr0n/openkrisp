@@ -2002,11 +2002,25 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Startup.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/StartupTests.swift",
+          "exists": true
         }
       ],
-      "implementation": "Native app/Settings and orderly helper shutdown exist. Startup login item, meeting-window startup, sleep/wake controls and save-before-relaunch workflow are absent.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Exercise quit during recording, stuck helper cleanup and crash exit; implement selected startup and relaunch/save policy with persistence. Original developer-tools/reload actions remain unimplemented candidates."
+      "implementation": "Native app/Settings and orderly helper shutdown exist. Explicit launch-at-login control uses SMAppService.mainApp on macOS13+, reads actual OS status, and registers/unregisters only on user action. macOS12 is explicitly unsupported. A shared controller reports enabled, not registered, approval required, not found and unknown without a saved desired preference. Meeting-window startup, sleep/wake controls and save-before-relaunch workflow remain absent.",
+      "verified_scope": "Five injected-service startup tests cover distinct statuses, refresh without mutation, explicit enable/disable and approval, action/read failures, stale refresh rejection, duplicate-action admission and app-activation refresh. Bounded read-only review found no material issue. Worker reports full desktop ./verify exit0 with73tests, ARM64/macOS12 release build, ad-hoc signatures and resource checks; retained local log projects/krisp/app/desktop/.build/startup-verify.log. No actual SMAppService registration/unregistration, login/reboot, Settings UI or original runtime acceptance was performed. This remains partial lifecycle implementation, not full parity.",
+      "missing_acceptance": "Validate actual login-item registration/approval/unregistration and user-login behavior on supported macOS with explicit authorization. Original defaults and hidden/window behavior remain unknown. Exercise quit during recording, stuck helper cleanup and crash exit; meeting-window launch, sleep/wake and relaunch/save policy remain outstanding. Original developer-tools/reload actions remain unimplemented candidates.",
+      "supporting_findings": "projects/krisp/startup-findings.md",
+      "verification_log": "projects/krisp/app/desktop/.build/startup-verify.log"
     },
     {
       "id": "notifications",
@@ -2386,7 +2400,7 @@
     "Floating widget, talk time and speaking assistance",
     "Agenda/filter/join reminders source boundary; independent local adaptation optional if original is cloud-backed",
     "Historical debug logs and detailed troubleshooting/repair plus original developer/reload menus; independent current-run diagnostic report now implemented and fixture-tested",
-    "Launch at startup, sleep/wake and save-before-relaunch",
+    "Launch-at-login now implemented with injected-service tests; actual registration/login acceptance, meeting-window startup, sleep/wake and save-before-relaunch remain outstanding",
     "Temporary microphone NC test now implemented and synthetic-tested; live/visual acceptance and original comparison contract remain outstanding",
     "User-selected installed NC inference backend and arbitrary independent provider adapters",
     "Voice Translation and translated-text playback; local/service dependency and Mac reachability unresolved",
@@ -2416,7 +2430,7 @@
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "6a22b35c247f267b64860b98eae28e09a4a3f1bd95a334b5859355cfbffb13bf",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fd8c301dfb965e6eb2e4dc759ebf15b436a5bf524d80dcee83eba0f358e557d4",
     "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "fac388cece5b9f3960a18d64ba4a792cdc3954ef94f3206263ae3ef4625fbaa0",
-    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "27a3face6e1939cb2c3cce0b74cbc98fcd0cd1070442c9c48416a2fdbbffaf21",
+    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "652932d96a1c929967d81751c5e6d1eff24c96a63dddda45f5948aaf50551741",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift": "9c15b0f90017c546e5d67422904a60bd7c3aa0551193c11177dde4a88f368021",
@@ -2445,7 +2459,9 @@
     "projects/krisp/app/desktop/Sources/LabVoice/DiagnosticReport.swift": "c16f328f061fb30d6e82fe312583e621f0c2ecf4e5a57cd70df66009f89ec572",
     "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift": "3484143234e9070297f5209616480034d7aa9fc671e18c113479ec96c61b259d",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticReportTests.swift": "8f3a677b1ac94cd5716e36d5813c788fd20945dcd8a5c896cdba561f9225ca76",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift": "cf3d05f09e152668748aea0efc11aefd1b96dfd57821cdde9ebb96db3d42c0de"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift": "cf3d05f09e152668748aea0efc11aefd1b96dfd57821cdde9ebb96db3d42c0de",
+    "projects/krisp/app/desktop/Sources/LabVoice/Startup.swift": "4765cb5e70d321771c581d92287e932b8162575e099b9f723e4361cb8a71e720",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/StartupTests.swift": "b40bc14b13244335b03e0f812806f63fe2d70dba2231f6f7bec89fa103445ba2"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

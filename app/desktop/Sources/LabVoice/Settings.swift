@@ -69,6 +69,7 @@ struct AppSettingsView: View {
     @ObservedObject var library: LibraryModel
     @ObservedObject var audio: AudioRouteController
     @ObservedObject private var widget = FloatingWidgetController.shared
+    @ObservedObject private var startup = StartupController.shared
     @ObservedObject private var libraryLocation = LibraryLocation.shared
     var showDone = false
     @AppStorage("appearance") private var appearance: AppAppearance = .system
@@ -119,6 +120,7 @@ struct AppSettingsView: View {
                 if showDone { Button("Done") { dismiss() } }
             }
             TabView {
+                ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                     Text("App").font(.headline)
                     Text("Appearance")
@@ -131,6 +133,13 @@ struct AppSettingsView: View {
                     Text("A floating panel shows this app's audio and recording state. Closing it hides the panel; audio continues until Stop.")
                         .font(.caption).foregroundColor(.secondary)
                     Divider()
+                    Toggle("Launch at login", isOn: Binding(get: { startup.status.registered }, set: { value in Task { await startup.setEnabled(value) } }))
+                        .disabled(!startup.canChange)
+                    Text(startup.status.message).font(.caption).foregroundColor(.secondary)
+                    if startup.changing { ProgressView().controlSize(.small) }
+                    if let error = startup.error { Text(error).font(.caption).foregroundColor(.red) }
+                    Button("Refresh login status") { Task { await startup.refresh() } }.disabled(startup.changing)
+                    Divider()
                     Text("Storage location").font(.headline)
                     Text(libraryLocation.displayPath).font(.caption).textSelection(.enabled)
                     Button("Choose library folder…") {
@@ -141,7 +150,8 @@ struct AppSettingsView: View {
                         .font(.caption).foregroundColor(.secondary)
                     if let error = libraryLocation.error { Text(error).font(.caption).foregroundColor(.red).textSelection(.enabled) }
                     Spacer()
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(20).tabItem { Text("App") }
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(20)
+                }.tabItem { Text("App") }
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Local model assets").font(.headline)
                     Text("Validation only. Inference backend unavailable. No model is enabled for processing.")
@@ -214,5 +224,6 @@ struct AppSettingsView: View {
             }
         }.padding(16).frame(width: 720, height: 620)
         .preferredColorScheme(appearance.colorScheme)
+        .task { await startup.refresh() }
     }
 }
