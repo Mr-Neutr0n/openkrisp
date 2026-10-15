@@ -121,6 +121,7 @@ struct DiagnosticsView: View {
                 }
                 Text("Description, optional.").font(.caption)
                 TextEditor(text: $controller.description).frame(height: 90).border(Color.secondary.opacity(0.3))
+                    .accessibilityLabel("Issue description, optional")
                 Toggle("Include when the issue occurred", isOn: $controller.includeOccurrenceDate)
                 if controller.includeOccurrenceDate { DatePicker("Issue date", selection: $controller.occurrenceDate) }
                 Toggle("Include macOS version and processor architecture", isOn: $controller.includeSystemInformation)

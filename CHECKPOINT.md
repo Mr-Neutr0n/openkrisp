@@ -22,7 +22,7 @@ The last combined `./verify` completed with exit 0 across all ten component suit
 
 The private local log is `evidence/combined-verify-library-location.log`, SHA256 `cffc5e3331f99263e4d92f4cd9ad97e41d98651b99070da6fca9a9850a4e7cce`. It is excluded from Git. The feature ledger now records 52 implementation source fingerprints.
 
-After diagnostics integration, the desktop `./verify` passed 68 tests, signed ARM64/macOS 12 packaging and relocated-resource checks. The other nine components are unchanged from the combined pass above. Private log: `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings and Diagnostics in the built app and captured the form/current status with audio stopped. Native save/sample picker workflows remain unverified.
+After diagnostics integration, the desktop `./verify` passed 68 tests, signed ARM64/macOS 12 packaging and relocated-resource checks. The other nine components are unchanged from the combined pass above. Private log: `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings and Diagnostics in the built app and captured the form/current status with audio stopped. Native save/sample picker workflows remain unverified. A later label-only accessibility change names the issue description editor explicitly; its release build passed. VoiceOver behavior has not been exercised.
 
 ## Exact Mac state
 

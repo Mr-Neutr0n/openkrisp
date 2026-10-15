@@ -2443,7 +2443,7 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingStorageTests.swift": "b61dee39c875157c8ccb4cfd0cdf817e276c2a35e2dcb8e0c4bbaef759d68f0c",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift": "f75388e49bf30c1dd2b47cbf1692d8866381917bf9b1bd43ec78847d6cf8dfa3",
     "projects/krisp/app/desktop/Sources/LabVoice/DiagnosticReport.swift": "c16f328f061fb30d6e82fe312583e621f0c2ecf4e5a57cd70df66009f89ec572",
-    "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift": "3a21f1030fe781b2d1106becbd796b091dc85194fc6b6123809f398b8d0e317b",
+    "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift": "3484143234e9070297f5209616480034d7aa9fc671e18c113479ec96c61b259d",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticReportTests.swift": "8f3a677b1ac94cd5716e36d5813c788fd20945dcd8a5c896cdba561f9225ca76",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift": "cf3d05f09e152668748aea0efc11aefd1b96dfd57821cdde9ebb96db3d42c0de"
   },
