@@ -97,3 +97,5 @@ Eight coordinator/gate tests and three independent route/recording integration t
 Native installed-model investigation: [factory](native-frame-factory-findings.md), [frame processing](native-frame-processing-findings.md) and [configuration](native-nc-configuration-findings.md) now have static REA contracts. Installed-model inference remains isolated-probe-only, with no completed native output.
 
 The next static pass establishes [synchronous dispatch](native-frame-dispatch-findings.md), [descriptor values and lifetime](native-descriptor-lifetime-findings.md), and [selected close semantics](native-stream-close-findings.md). The selected NC finalizer does not flush delayed output. Native runtime inference remains unverified.
+
+Experimental [native probe support](app/native-model-probe/README.md) now validates borrowed-result copying and output bounds in independent fixtures. This does not load Krisp or establish installed-model inference.

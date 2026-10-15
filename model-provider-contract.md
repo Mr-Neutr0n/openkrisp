@@ -278,3 +278,12 @@ This does not resolve concurrent use, factory ABI or complete file draining. The
 
 
 The descriptor follow-up establishes an eight-byte duration/rate value and sample count `floor(durationMs * rate / 1000)`. A direct adapter must keep this descriptor stable and recreate the processor when changing it; selected NC descriptor-update and finalization callbacks are no-ops. `native-nc-callback-construction-findings.md` identifies the direct typed factory as the shorter candidate than rebuilding KMS and its `std::function` context. The next bounded task is to recover the supplier's packed return type and the stats-plus-vector result type from their consumers, then review a typed C++ shim. No shim or processing attempt is included in this checkpoint.
+
+
+## Typed callback probe support, 2026-10-15
+
+`native-supplier-value-findings.md` resolves the supplier return as eight bytes: four one-byte flags and Float32 suppression level at offset 4, returned in ARM64 x0. `native-result-value-findings.md` resolves the borrowed result as a 40-byte prefix followed by a 24-byte libc++ float vector. A collector can ignore the prefix and copy samples during the synchronous callback; the SDK owns and destroys the payload after return.
+
+`app/native-model-probe` now contains these ABI carriers and an independent bounded result collector. Release and AddressSanitizer/UndefinedBehaviorSanitizer fixtures verify copied ownership after the source vector is mutated/freed, exact frame size, finite values and output limits. No original library is loaded by verification. Host clang++ confirms the observed libc++ string/vector/shared-pointer sizes, but host agreement alone does not prove a foreign factory call.
+
+The next step is a separately compiled ABI fixture for the full typed factory/callback signature and shared ownership, followed by a reviewed isolated native probe. `native-direct-adapter-design.md` records actual export resolution and the evidence for representing the unused first factory argument without reconstructing SDK state. This checkpoint contains no factory invocation, processed native samples or app backend integration.
