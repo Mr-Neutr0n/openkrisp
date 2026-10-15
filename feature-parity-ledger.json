@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-13",
+  "snapshot_date": "2026-10-15",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -824,7 +824,7 @@
       "id": "diagnostics",
       "feature": "Local diagnostics, log export and troubleshooting",
       "scope": "retained",
-      "implementation_state": "partial_test_harness",
+      "implementation_state": "independent_partial_fixture_verified",
       "catalog_keys": [
         "app_menu_help.generate_har",
         "app_menu_help.stop_har",
@@ -920,17 +920,69 @@
       ],
       "implemented_code": [
         {
-          "path": "projects/krisp/verification/README.md",
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/DiagnosticReport.swift",
           "exists": true
         },
         {
-          "path": "projects/krisp/verification/audio.py",
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticReportTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift",
           "exists": true
         }
       ],
-      "implementation": "Synthetic verification and reports exist; user-facing log export/system diagnostics and troubleshooting wizard do not.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Implement local log bundle with bounded metadata, explicit save and error handling; remote report upload remains excluded."
+      "implementation": "Settings Diagnostics exports an independent versioned local folder with report.json and optional explicitly selected sample.wav. New folder/files are exclusive0700/0600; existing output is not overwritten. Typed current audio/recording/library/microphone-test/control state and capped128-event current-run code history omit automatically collected raw messages, transcripts, device IDs, paths and system logs. User description is included as entered, bounded8192UTF8bytes; category is one of audio/recording/library/transcription/other. Issue occurrence date and OS-version/architecture inclusion default off; sample defaults nil. Only user-selected finalized PCM16 mono/stereo RIFF/WAVE is opened/copied, with descriptor validation, metadata and changed-source rejection. No automatic capture/library scan/vendor-log reading/network/HAR/upload. Current status/recovery guidance is local. This is a current-run troubleshooting report, not historical debug logs, original schema/format or full original issue taxonomy. Cancellation API is tested in core exporter; no cancellation UI is promised.",
+      "verified_scope": "Eight initial focused exporter tests and four initial controller tests reported passed; final desktop ./verify exit0 with68tests plus release signed bundle/resources reported by worker. Fixtures cover bounds/options, deterministic JSON/private output, exclusive collision, byte-exact explicit sample and metadata, malformed/symlink samples, cancellation/cleanup ownership, failure/retry and fixed-code lifecycle events without private raw messages. Bounded read-only reviewer found no material issue in optional-content/snapshot/export ownership scope. No original UI/log/recording access, OS audio, network diagnostics or native save-picker runtime. Root confirmed desktop log with68tests and packaging passed. Other nine components unchanged from preceding combined pass. Root REA opened Diagnostics and observed form/current status with audio stopped; native save/sample picker workflows remain unverified.",
+      "missing_acceptance": "Interactive native diagnostic/save/sample pickers and visible error states; real disk exhaustion/unavailable volumes/abrupt-exit partial output, large-sample performance and selection consent. Original historical log sources, format/retention/redaction, system fields/defaults, sample source/server binding, date filtering, full subcategory hierarchy and local retry/cancel semantics remain unknown. General image/video/log attachments and detailed engine troubleshooting recipes are not implemented. Vendor upload, analytics and active network/HAR capture remain excluded. Do not label independent JSON bundle as original log compatibility.",
+      "independent_review": {
+        "mode": "read-only stable source review",
+        "runtime_actions": false,
+        "result": "No remaining material issue in bounded report snapshot/optional-content/output ownership scope",
+        "limits": "No native picker, actual user samples, real audio, network/system collection or original runtime exercised; core cancellation API is not UI cancellation."
+      },
+      "verification_entry_points": [
+        "projects/krisp/app/desktop/verify"
+      ],
+      "verification_logs": [
+        {
+          "path": "projects/krisp/app/desktop/.build/diagnostics-verify.log",
+          "status": "reported_passed_68_tests_and_packaging"
+        }
+      ],
+      "supporting_findings": "projects/krisp/diagnostics-findings.md"
     },
     {
       "id": "background-voice",
@@ -2333,7 +2385,7 @@
     "Participant audio announcement and local reminders",
     "Floating widget, talk time and speaking assistance",
     "Agenda/filter/join reminders source boundary; independent local adaptation optional if original is cloud-backed",
-    "Local logs, troubleshooting/repair and original developer/reload menu affordances",
+    "Historical debug logs and detailed troubleshooting/repair plus original developer/reload menus; independent current-run diagnostic report now implemented and fixture-tested",
     "Launch at startup, sleep/wake and save-before-relaunch",
     "Temporary microphone NC test now implemented and synthetic-tested; live/visual acceptance and original comparison contract remain outstanding",
     "User-selected installed NC inference backend and arbitrary independent provider adapters",
@@ -2354,17 +2406,17 @@
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "4c14674f3ebe682c98c20b8071065747c9d9eed98098ddd32c5d99093d302d61",
     "projects/krisp/app/audio-host/routing.cpp": "b23260404d915ef6fe9e65570f43b7965aba66d53178651401620c6eafe5f8e7",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "ff22f2e66e8991572feac24b527b3f172fc236bec69cad83f08a6feaec68b6e0",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "9d1d578abb235a20a7229e2e0a19a56021313dbacb864c2ad41482e1496ee138",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
-    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "8e159a18c745d3082b63c9565ab52223d0ec65ccbe879b38662264df242a8e56",
+    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "27e8f2bf044d21f73d28e3077b018da9121bafcc36054720bd6d9b02605f2299",
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
     "projects/krisp/app/audio-host/route_cli.cpp": "643f8234365c51788c0f334b67e118b13fe59705c98f927c26c0a09cca297576",
-    "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "2a9560ac34829770d56279d30b3d9713fae1e55ebd297eec7c104bf6f984fcc9",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "6a22b35c247f267b64860b98eae28e09a4a3f1bd95a334b5859355cfbffb13bf",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fd8c301dfb965e6eb2e4dc759ebf15b436a5bf524d80dcee83eba0f358e557d4",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "b7c6795d23d50876ee2a24c15182b924be255d3df02d453402dc25878ed16069",
-    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "f01f5c19450d902b437fa0f12bfc063de685f2041d613a4cee4b73095fba4d13",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "fac388cece5b9f3960a18d64ba4a792cdc3954ef94f3206263ae3ef4625fbaa0",
+    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "27a3face6e1939cb2c3cce0b74cbc98fcd0cd1070442c9c48416a2fdbbffaf21",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift": "9c15b0f90017c546e5d67422904a60bd7c3aa0551193c11177dde4a88f368021",
@@ -2377,7 +2429,7 @@
     "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
     "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
     "projects/krisp/app/audio-host/host.cpp": "459f3e6b9973048ac668c8bb3c649437fcc25da84d6573fb26f2fb0800ca3db5",
-    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "618b884e1bddaf1dd2481fc79b5bd3a390755d018feea66f943e32f46505e214",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "7ca02e333ed2f1a78f84ebba3f41df490273a5f4564e0cf3cd6e0a08aee3c1c0",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
     "projects/krisp/app/desktop/Sources/LabVoice/ComparisonPlayback.swift": "08321c9b89e34a7d9ed53fe494e3c8179f6574ae226eeb239c57c383d4422971",
@@ -2386,10 +2438,14 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestTests.swift": "97f470c292136fc7ebc7ab4f85a130b6d337c5051c1e038ba52a77dc16d40e18",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d",
     "projects/krisp/app/local-store/Tests/LocalStoreTests/LocalStoreTests.swift": "12deb03ab60fbcc39860eef8d63472e832077ba7971f236d37775d0e552832ab",
-    "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift": "6c265b0aa203248ec4eeeda1f6d836d5ef0712c260d5fb929a1ef7ec875a097d",
+    "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift": "a3bca3a8742591508eddd1fcccdee268be2fccdc453892d14fbf578af2c0646d",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift": "1f129523cd99a5ba92bee68dab946c5b2caccd05c91c9c59a81374fecf0a321f",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingStorageTests.swift": "b61dee39c875157c8ccb4cfd0cdf817e276c2a35e2dcb8e0c4bbaef759d68f0c",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift": "f75388e49bf30c1dd2b47cbf1692d8866381917bf9b1bd43ec78847d6cf8dfa3"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift": "f75388e49bf30c1dd2b47cbf1692d8866381917bf9b1bd43ec78847d6cf8dfa3",
+    "projects/krisp/app/desktop/Sources/LabVoice/DiagnosticReport.swift": "c16f328f061fb30d6e82fe312583e621f0c2ecf4e5a57cd70df66009f89ec572",
+    "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift": "3a21f1030fe781b2d1106becbd796b091dc85194fc6b6123809f398b8d0e317b",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticReportTests.swift": "8f3a677b1ac94cd5716e36d5813c788fd20945dcd8a5c896cdba561f9225ca76",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift": "cf3d05f09e152668748aea0efc11aefd1b96dfd57821cdde9ebb96db3d42c0de"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -2473,5 +2529,6 @@
     "restart_required": "updates"
   },
   "label_assignment_semantics": "A gate/error/button label supports investigation of its underlying capability; it is not an instruction to reproduce trial, quota, admin or paid UI. Generic removed gates do not exclude proven local functionality. Unresolved cloud-backed functions are not automatically converted into local implementation requirements.",
-  "candidate_list_semantics": "Lists include confirmed local gaps and unresolved candidates. Cloud-backed local adaptations are suggestions pending boundary evidence and a later scope decision, not claimed user requirements."
+  "candidate_list_semantics": "Lists include confirmed local gaps and unresolved candidates. Cloud-backed local adaptations are suggestions pending boundary evidence and a later scope decision, not claimed user requirements.",
+  "original_evidence_checkpoint_date": "2026-10-13"
 }

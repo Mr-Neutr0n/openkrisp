@@ -66,6 +66,8 @@ actor CatalogWorker {
 
 struct AppSettingsView: View {
     @ObservedObject var catalog: CatalogModel
+    @ObservedObject var library: LibraryModel
+    @ObservedObject var audio: AudioRouteController
     @ObservedObject private var widget = FloatingWidgetController.shared
     @ObservedObject private var libraryLocation = LibraryLocation.shared
     var showDone = false
@@ -208,6 +210,7 @@ struct AppSettingsView: View {
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(16)
                     }
                 }.padding(12).tabItem { Text("Models") }
+                DiagnosticsView(audio: audio, library: library).tabItem { Text("Diagnostics") }
             }
         }.padding(16).frame(width: 720, height: 620)
         .preferredColorScheme(appearance.colorScheme)

@@ -52,8 +52,8 @@ actor LibraryWorker: LibraryWorking {
     @Published var sessions: [Session] = []
     @Published var selection: UUID?
     @Published var query = ""
-    @Published var busy = false
-    @Published var error: String?
+    @Published var busy = false { didSet { if busy != oldValue { DiagnosticEventLog.shared.append(component: .library, code: busy ? .started : .stopped, severity: .info) } } }
+    @Published var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .library, code: .operationFailed, severity: .error) } } }
     @Published var warning = ""
     @Published var playing = false
     private let worker: any LibraryWorking
@@ -368,7 +368,7 @@ struct LibraryView: View {
         .onReceive(NotificationCenter.default.publisher(for: .localRecordingSaved)) { _ in model.recordingDidSave() }
         .onChange(of: model.selection) { _ in Task { await model.stop() } }
         .sheet(isPresented: $showingAudio) { AudioView(audio: audio) }
-        .sheet(isPresented: $showingSettings) { AppSettingsView(catalog: catalog, showDone: true) }
+        .sheet(isPresented: $showingSettings) { AppSettingsView(catalog: catalog, library: model, audio: audio, showDone: true) }
         .sheet(isPresented: $importing) { ImportView(model: model) }
         .alert(deleting == nil ? "Operation failed" : "Delete local session?",
                isPresented: Binding(get: { deleting != nil || (model.error != nil && !importing) },
@@ -425,6 +425,6 @@ struct LibraryView: View {
                 Button("Hide widget") { widget.hide() }.disabled(!widget.isVisible)
             }
         }
-        Settings { AppSettingsView(catalog: catalog).preferredColorScheme(appearance.colorScheme) }
+        Settings { AppSettingsView(catalog: catalog, library: model, audio: audio).preferredColorScheme(appearance.colorScheme) }
     }
 }

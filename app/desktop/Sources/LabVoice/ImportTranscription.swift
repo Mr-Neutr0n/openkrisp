@@ -15,9 +15,9 @@ struct TranscriptionLanguage: Identifiable {
 }
 
 @MainActor final class ImportTranscription: ObservableObject {
-    @Published private(set) var busy = false
+    @Published private(set) var busy = false { didSet { if busy != oldValue { DiagnosticEventLog.shared.append(component: .transcription, code: busy ? .started : .stopped, severity: .info) } } }
     @Published private(set) var status = ""
-    @Published private(set) var error: String?
+    @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .transcription, code: .operationFailed, severity: .error) } } }
     @Published private(set) var completedText: String?
     private let authorization: () -> SpeechAuthorization
     private let requestAuthorization: () async throws -> SpeechAuthorization

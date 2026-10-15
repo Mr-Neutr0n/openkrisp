@@ -15,11 +15,11 @@ private struct TestResult: Decodable {
 
 @MainActor final class MicrophoneTestController: ObservableObject {
     static let shared = MicrophoneTestController()
-    @Published private(set) var phase: MicrophoneTestPhase = .idle
+    @Published private(set) var phase: MicrophoneTestPhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .microphoneTest, code: phase == .idle ? .stopped : (phase == .capturing ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var inputName: String?
     @Published private(set) var frames: UInt64 = 0
     @Published private(set) var status = "Choose a microphone and start a temporary test."
-    @Published private(set) var error: String?
+    @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .microphoneTest, code: .operationFailed, severity: .error) } } }
     @Published private(set) var retainedPaths: [String] = []
     @Published private(set) var variant: ComparisonVariant = .original
     @Published private(set) var playing = false

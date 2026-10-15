@@ -27,9 +27,9 @@ private struct RecordingResult: Decodable {
 }
 
 @MainActor final class RecordingController: ObservableObject {
-    @Published private(set) var phase: RecordingPhase = .idle
+    @Published private(set) var phase: RecordingPhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .recording, code: phase == .idle ? .stopped : (phase == .recording ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var message = "Recording is off."
-    @Published private(set) var error: String?
+    @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .recording, code: .operationFailed, severity: .error) } } }
     @Published private(set) var retainedPaths: [String] = []
     @Published private(set) var savedSessionID: UUID?
     @Published private(set) var settling = false

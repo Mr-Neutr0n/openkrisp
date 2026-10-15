@@ -1,10 +1,11 @@
 # Checkpoint: resumed 2026-10-15
 
-Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include the completed library-location feature. The original pause tag remains available.
+Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection and local diagnostics. The original pause tag remains available.
 
 ## Completed implementation
 
 - Native macOS desktop library: persisted folder selection, finalized WAV import, playback, search, transcript export/delete, appearance and model-file validation.
+- Local diagnostic report export with bounded current-run event codes, optional issue date/system metadata and an explicitly selected PCM16 WAV sample.
 - Explicit selected-WAV on-device Apple Speech adapter, with no cloud fallback.
 - Independent RNNoise microphone/speaker processing and private audio routing helper.
 - Independent virtual audio driver, timestamped transport and synthetic HAL test tools.
@@ -19,7 +20,9 @@ No trial, subscription or payment gate exists in the independent implementation.
 
 The last combined `./verify` completed with exit 0 across all ten component suites, including 54 desktop tests and 12 local-store tests. Release, ASan/UBSan, synthetic helper pipe integration, ARM64/macOS 12 packaging, signatures and relocated-resource checks passed. No real microphone capture or audible playback ran. Earlier REA observations verified limited desktop appearance and navigation, not the newly added widget or comparison UI.
 
-The private local log is `evidence/combined-verify-library-location.log`, SHA256 `cffc5e3331f99263e4d92f4cd9ad97e41d98651b99070da6fca9a9850a4e7cce`. It is excluded from Git. The feature ledger records 48 implementation source fingerprints checked at this checkpoint.
+The private local log is `evidence/combined-verify-library-location.log`, SHA256 `cffc5e3331f99263e4d92f4cd9ad97e41d98651b99070da6fca9a9850a4e7cce`. It is excluded from Git. The feature ledger now records 52 implementation source fingerprints.
+
+After diagnostics integration, the desktop `./verify` passed 68 tests, signed ARM64/macOS 12 packaging and relocated-resource checks. The other nine components are unchanged from the combined pass above. Private log: `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings and Diagnostics in the built app and captured the form/current status with audio stopped. Native save/sample picker workflows remain unverified.
 
 ## Exact Mac state
 
@@ -27,7 +30,11 @@ The diagnostic independent driver is installed at `/Library/Audio/Plug-Ins/HAL/L
 
 Do not reinstall just to restart. After Hari resumes and is available for administrator approval, follow `app/audio-driver/install-notes.md`: revalidate the installed tree, restart once, run the read-only discovery probe and inspect actual service traces. Only if exact endpoints are usable, proceed with the previously approved bounded synthetic HAL test and live routing plan. Otherwise diagnose or use the exact-match rollback. Private rollback script: `evidence/remove-trace-driver.py`. Never rely on stale PIDs.
 
-## Latest implementation: library folder selection
+## Local diagnostics
+
+Settings exports a new private folder containing deterministic JSON and an optional explicitly selected PCM16 mono/stereo WAV copy. Optional date/system metadata are off by default. Reports contain typed current status and bounded event codes from this app run. No upload, historical log collection or automatic recording occurs. Export rejects existing destinations, malformed samples and destination replacement; failure cleanup removes only its owned files. Ten exporter tests and four controller tests are included in the 68-test desktop pass. Original report schema, all issue categories and general attachments remain gaps.
+
+## Library folder selection
 
 The Settings folder picker now validates and persists an existing library folder before switching. History reopens at that location; prior files stay unchanged. Missing, inaccessible or invalid saved paths show an error without silently creating or choosing another library. Imports, transcription, recording and other active writes block switching. Old dialog actions and asynchronous results cannot affect a newly selected library.
 

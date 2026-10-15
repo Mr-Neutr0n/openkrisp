@@ -59,3 +59,10 @@ The combined `./verify` passed all ten component suites after temporary micropho
 Implemented persisted existing-folder selection and reopen without data migration or fallback. Shared admission covers active library work, transcription, capture and recording; stale dialogs/results carry revision checks. Recording preparation validates and retains the admitted destination store through final save, rejects same-path replacement and retains failed staging. Missing or invalid preferences remain recoverable through the chooser.
 
 The root `./verify` passed all ten component suites with exit 0, including 54 desktop and 12 local-store tests. Eight focused desktop location tests cover real temporary library imports, restart persistence, missing-folder recovery, stale dialog/results, cancelled authorization and replaced recording destinations. Both independent reviews accepted the changes. Private log: `evidence/combined-verify-library-location.log`. Native picker interaction, real audio routing and original parity remain unverified. No administrator or live audio action ran.
+
+
+## Local diagnostics checkpoint, 2026-10-15
+
+Implemented private local report export with bounded typed current-run events/status, optional occurrence date/system metadata and an explicitly selected PCM16 mono/stereo WAV sample. Existing destinations and replaced output directories fail without overwriting user files; cleanup tracks owned files. No cloud upload or automatic capture exists.
+
+Desktop `./verify` passed 68 tests plus signed ARM64/macOS 12 packaging and relocated-resource checks. Other nine components remain unchanged from the preceding combined verification. Private log `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings/Diagnostics and observed the native form/current status with audio stopped (evidence `ev_c6e9c71877d065d8aee3a404e566c8bc43611817c26e89c4e7011e48d7899d5b`). Save/sample picker workflows, historical log parity and original report schema remain unverified. No audio or administrator action ran.

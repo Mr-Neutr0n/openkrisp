@@ -13,9 +13,9 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private var recordingObservation: AnyCancellable?
     @Published private(set) var inventory: AudioInventory?
     @Published private(set) var loading = false
-    @Published private(set) var phase: AudioRoutePhase = .idle
+    @Published private(set) var phase: AudioRoutePhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: phase == .idle ? .stopped : (phase == .running ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var activeOptions: AudioRouteOptions?
-    @Published private(set) var error: String?
+    @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
     @Published var inputUID = ""
     @Published var outputUID = ""
     @Published var microphoneNoise = false
@@ -23,7 +23,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published private(set) var desiredControls = AudioControlSnapshot()
     @Published private(set) var confirmedControls: AudioControlSnapshot?
     @Published private(set) var controlPending = false
-    @Published private(set) var controlError: String?
+    @Published private(set) var controlError: String? { didSet { if controlError != nil && controlError != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
     private var controlSequence: UInt64 = 0
     private var controlFlight: (sequence: UInt64, snapshot: AudioControlSnapshot)?
     private var controlDeadline: Task<Void, Never>?
@@ -117,6 +117,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             if status == .notDetermined { permitted = await self.requestAuthorization() }
             guard self.operationID == id, !Task.isCancelled else { return }
             guard permitted else {
+                DiagnosticEventLog.shared.append(component: .audio, code: .permissionDenied, severity: .warning)
                 self.error = "Microphone permission is required to start audio. Allow Lab Voice in macOS privacy settings."
                 self.clear(); return
             }

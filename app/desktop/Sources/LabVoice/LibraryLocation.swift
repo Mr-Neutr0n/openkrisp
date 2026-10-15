@@ -26,7 +26,7 @@ actor LibraryLocationInspector {
     static let preferenceKey = "libraryDirectory"
     @Published private(set) var snapshot: LibraryLocationSnapshot
     @Published private(set) var switching = false
-    @Published private(set) var error: String?
+    @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .library, code: .operationFailed, severity: .error) } } }
     @Published private(set) var activities: [UUID: String] = [:]
     private let defaults: UserDefaults
     private let inspect: (LibraryLocationSnapshot) async throws -> Void
@@ -83,6 +83,7 @@ actor LibraryLocationInspector {
             // Admission remains held throughout inspection, so no operation can bind the old root here.
             defaults.set(candidate.root.path, forKey: Self.preferenceKey)
             snapshot = candidate
+            DiagnosticEventLog.shared.append(component: .library, code: .locationChanged, severity: .info)
             return true
         } catch { self.error = "Folder was not changed. " + describe(error); return false }
     }
