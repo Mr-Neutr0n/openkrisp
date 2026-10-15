@@ -790,11 +790,31 @@
         {
           "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecovery.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecoveryController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift",
+          "exists": true
         }
       ],
-      "implementation": "Settings now chooses an existing local library folder. Strict LocalStore admission requires an existing plain readable/writable/searchable directory, without mkdir/chmod/probe, migration, deletion or fallback. Preference commits after successful admission; invalid/missing/inaccessible saved paths remain unavailable until explicit recovery. Shared switching/activity/capture admission blocks incompatible work across windows. History results and presentation-time import/export/delete actions use library revisions; stale work cannot redirect a delayed action to a new library. Confirmed same-revision history recovery clears unavailable errors. Cancelled Speech authorization releases only its own library lease and late authorization cannot start recognition. Recording prepare validates and retains a LocalStore destination until terminal completion, detecting disappearance/replacement at save and retaining failed staging. Other history operations reopen the selected path; persistence is a path, not a bookmark or permanent volume identity. Existing independent staged saves, history/search/playback/export/delete and retained-stage display remain; no original-file compatibility, automatic move or recovery wizard.",
-      "verified_scope": "Backend selected-root fixtures and desktop8focused location tests reported passed; desktop full ./verify exit0 with54tests plus signed release packaging/resources. Tests exercise real temporary independent libraries, nonmutation/reopen, invalid preferences/no fallback, missing/inaccessible/replaced roots, stale history/dialog actions, active imports/capture admission, recording pinning and cancelled permission leases. Bounded read-only review found no remaining material issue. Native folder-picker UI, actual calls/audio, removable-volume runtime and original parity were not exercised. Root combined ./verify completed exit0 across all10suites, including54desktoptests, retained in projects/krisp/evidence/combined-verify-library-location.log. This is fixture/build verification, not native runtime acceptance.",
-      "missing_acceptance": "Interactive native folder chooser/cancel and multiwindow rendering; actual inaccessible/unmounted-volume recovery and long I/O/disk-full behavior; real audio/recording integration and original call-time lock detection remain unverified. Independent path persistence, choose/reopen and no-migration semantics are explicit choices because original defaults, folder callbacks, move/reopen/persistence/schema are unknown. Comprehensive staging recovery/import UI and vendor-library compatibility remain absent. No Business/trial restriction or storage quota.",
+      "implementation": "Settings now chooses an existing local library folder. Strict LocalStore admission requires an existing plain readable/writable/searchable directory, without mkdir/chmod/probe, migration, deletion or fallback. Preference commits after successful admission; invalid/missing/inaccessible saved paths remain unavailable until explicit recovery. Shared switching/activity/capture admission blocks incompatible work across windows. History results and presentation-time import/export/delete actions use library revisions; stale work cannot redirect a delayed action to a new library. Confirmed same-revision history recovery clears unavailable errors. Cancelled Speech authorization releases only its own library lease and late authorization cannot start recognition. Recording prepare validates and retains a LocalStore destination until terminal completion, detecting disappearance/replacement at save and retaining failed staging. Other history operations reopen the selected path; persistence is a path, not a bookmark or permanent volume identity. Existing independent staged saves, history/search/playback/export/delete and retained-stage display remain; no original-file compatibility, automatic move or recovery wizard. Explicit retained-stage review and confirmed save-copy now admit only unchanged finalized independent 48kHz stereo PCM16 WAVs from fixed staging paths into the pinned current library. Source remains; repeated confirmation creates a new session. Temporary cleanup failures identify the retained temporary path.",
+      "verified_scope": "Backend selected-root fixtures and desktop8focused location tests reported passed; desktop full ./verify exit0 with54tests plus signed release packaging/resources. Tests exercise real temporary independent libraries, nonmutation/reopen, invalid preferences/no fallback, missing/inaccessible/replaced roots, stale history/dialog actions, active imports/capture admission, recording pinning and cancelled permission leases. Bounded read-only review found no remaining material issue. Native folder-picker UI, actual calls/audio, removable-volume runtime and original parity were not exercised. Root combined ./verify completed exit0 across all10suites, including54desktoptests, retained in projects/krisp/evidence/combined-verify-library-location.log. This is fixture/build verification, not native runtime acceptance. Recovery checkpoint: nine synthetic backend filesystem tests and four controller tests passed, including finalized byte-exact copy/source preservation, strict admission, changed source, replaced destination, owned temporary cleanup, stale confirmations and shared capture/library admission. Worker reports desktop ./verify exit0 with86tests plus signed release/resource checks, log projects/krisp/app/desktop/.build/recovery-verify.log. Read-only review found no remaining material issue in bounded recovery scope. No partial-WAV salvage, LocalStore .pending recovery, original crash parity, native recovery UI or live audio acceptance is claimed.",
+      "missing_acceptance": "Interactive native folder chooser/cancel and multiwindow rendering; actual inaccessible/unmounted-volume recovery and long I/O/disk-full behavior; real audio/recording integration and original call-time lock detection remain unverified. Independent path persistence, choose/reopen and no-migration semantics are explicit choices because original defaults, folder callbacks, move/reopen/persistence/schema are unknown. Finalized-stage copy is now implemented; partial-WAV salvage, LocalStore .pending recovery and vendor-library compatibility remain absent. No Business/trial restriction or storage quota.",
       "independent_review": {
         "mode": "read-only stable source review",
         "runtime_actions": false,
@@ -818,7 +838,9 @@
           "path": "projects/krisp/evidence/combined-verify-library-location.log",
           "status": "reported_passed_10_suites_including_54_desktop_tests_exit0"
         }
-      ]
+      ],
+      "recovery_findings": "projects/krisp/recovery-findings.md",
+      "recovery_verification_log": "projects/krisp/app/desktop/.build/recovery-verify.log"
     },
     {
       "id": "diagnostics",
@@ -1803,11 +1825,33 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecovery.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecoveryController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift",
+          "exists": true
         }
       ],
-      "implementation": "Manual processed stereo headroom mix, pause/resume/finalization and save-to-library exist. No original mix/order parity, live-notes mode, scheduled meeting association or save-and-switch workflow.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Exercise actual user recording path and valid saved output; test failed/unknown ACKs, route interruption, disk failures and retained recovery. Classify the original four-hour live/in-person limit as a reference observation: determine resource/format constraint versus commercial quota. Do not add a usage quota; explain any genuine independent technical bound. No paid gate."
+      "implementation": "Manual processed stereo headroom mix, pause/resume/finalization and save-to-library exist. No original mix/order parity, live-notes mode, scheduled meeting association or save-and-switch workflow. Explicit retained-stage review and confirmed save-copy now admit only unchanged finalized independent 48kHz stereo PCM16 WAVs from fixed staging paths into the pinned current library. Source remains; repeated confirmation creates a new session. Temporary cleanup failures identify the retained temporary path.",
+      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing. Recovery checkpoint: nine synthetic backend filesystem tests and four controller tests passed, including finalized byte-exact copy/source preservation, strict admission, changed source, replaced destination, owned temporary cleanup, stale confirmations and shared capture/library admission. Worker reports desktop ./verify exit0 with86tests plus signed release/resource checks, log projects/krisp/app/desktop/.build/recovery-verify.log. Read-only review found no remaining material issue in bounded recovery scope. No partial-WAV salvage, LocalStore .pending recovery, original crash parity, native recovery UI or live audio acceptance is claimed.",
+      "missing_acceptance": "Exercise actual user recording path and valid saved output; test failed/unknown ACKs, route interruption, disk failures and live retained-copy integration. Classify the original four-hour live/in-person limit as a reference observation: determine resource/format constraint versus commercial quota. Do not add a usage quota; explain any genuine independent technical bound. No paid gate.",
+      "recovery_findings": "projects/krisp/recovery-findings.md",
+      "recovery_verification_log": "projects/krisp/app/desktop/.build/recovery-verify.log"
     },
     {
       "id": "consent",
@@ -2014,13 +2058,39 @@
         {
           "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/StartupTests.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecovery.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecoveryController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift",
+          "exists": true
         }
       ],
-      "implementation": "Native app/Settings and orderly helper shutdown exist. Explicit launch-at-login control uses SMAppService.mainApp on macOS13+, reads actual OS status, and registers/unregisters only on user action. macOS12 is explicitly unsupported. A shared controller reports enabled, not registered, approval required, not found and unknown without a saved desired preference. Meeting-window startup, sleep/wake controls and save-before-relaunch workflow remain absent.",
-      "verified_scope": "Five injected-service startup tests cover distinct statuses, refresh without mutation, explicit enable/disable and approval, action/read failures, stale refresh rejection, duplicate-action admission and app-activation refresh. Bounded read-only review found no material issue. Worker reports full desktop ./verify exit0 with73tests, ARM64/macOS12 release build, ad-hoc signatures and resource checks; retained local log projects/krisp/app/desktop/.build/startup-verify.log. No actual SMAppService registration/unregistration, login/reboot, Settings UI or original runtime acceptance was performed. This remains partial lifecycle implementation, not full parity.",
+      "implementation": "Native app/Settings and orderly helper shutdown exist. Explicit launch-at-login control uses SMAppService.mainApp on macOS13+, reads actual OS status, and registers/unregisters only on user action. macOS12 is explicitly unsupported. A shared controller reports enabled, not registered, approval required, not found and unknown without a saved desired preference. Meeting-window startup, sleep/wake controls and save-before-relaunch workflow remain absent. Explicit retained-stage review and confirmed save-copy now admit only unchanged finalized independent 48kHz stereo PCM16 WAVs from fixed staging paths into the pinned current library. Source remains; repeated confirmation creates a new session. Temporary cleanup failures identify the retained temporary path.",
+      "verified_scope": "Five injected-service startup tests cover distinct statuses, refresh without mutation, explicit enable/disable and approval, action/read failures, stale refresh rejection, duplicate-action admission and app-activation refresh. Bounded read-only review found no material issue. Worker reports full desktop ./verify exit0 with73tests, ARM64/macOS12 release build, ad-hoc signatures and resource checks; retained local log projects/krisp/app/desktop/.build/startup-verify.log. No actual SMAppService registration/unregistration, login/reboot, Settings UI or original runtime acceptance was performed. This remains partial lifecycle implementation, not full parity. Recovery checkpoint: nine synthetic backend filesystem tests and four controller tests passed, including finalized byte-exact copy/source preservation, strict admission, changed source, replaced destination, owned temporary cleanup, stale confirmations and shared capture/library admission. Worker reports desktop ./verify exit0 with86tests plus signed release/resource checks, log projects/krisp/app/desktop/.build/recovery-verify.log. Read-only review found no remaining material issue in bounded recovery scope. No partial-WAV salvage, LocalStore .pending recovery, original crash parity, native recovery UI or live audio acceptance is claimed.",
       "missing_acceptance": "Validate actual login-item registration/approval/unregistration and user-login behavior on supported macOS with explicit authorization. Original defaults and hidden/window behavior remain unknown. Exercise quit during recording, stuck helper cleanup and crash exit; meeting-window launch, sleep/wake and relaunch/save policy remain outstanding. Original developer-tools/reload actions remain unimplemented candidates.",
       "supporting_findings": "projects/krisp/startup-findings.md",
-      "verification_log": "projects/krisp/app/desktop/.build/startup-verify.log"
+      "verification_log": "projects/krisp/app/desktop/.build/startup-verify.log",
+      "recovery_findings": "projects/krisp/recovery-findings.md",
+      "recovery_verification_log": "projects/krisp/app/desktop/.build/recovery-verify.log"
     },
     {
       "id": "notifications",
@@ -2428,7 +2498,7 @@
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
     "projects/krisp/app/audio-host/route_cli.cpp": "643f8234365c51788c0f334b67e118b13fe59705c98f927c26c0a09cca297576",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "6a22b35c247f267b64860b98eae28e09a4a3f1bd95a334b5859355cfbffb13bf",
-    "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fd8c301dfb965e6eb2e4dc759ebf15b436a5bf524d80dcee83eba0f358e557d4",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
     "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "fac388cece5b9f3960a18d64ba4a792cdc3954ef94f3206263ae3ef4625fbaa0",
     "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "652932d96a1c929967d81751c5e6d1eff24c96a63dddda45f5948aaf50551741",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
@@ -2447,7 +2517,7 @@
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
     "projects/krisp/app/desktop/Sources/LabVoice/ComparisonPlayback.swift": "08321c9b89e34a7d9ed53fe494e3c8179f6574ae226eeb239c57c383d4422971",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift": "d6b8f3134793ba415d4e680af85d576ff07587b91d768bd68f81f5b9b3e1dd5d",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift": "020c65688f66d1572beec320570c38767bdca1d3b712e32f340cea5657c3456e",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophonePermission.swift": "4e676900a6d79625619008b8d0ee97f521da37898c68ba5f41c8dc612db14e16",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestTests.swift": "97f470c292136fc7ebc7ab4f85a130b6d337c5051c1e038ba52a77dc16d40e18",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d",
@@ -2461,7 +2531,11 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticReportTests.swift": "8f3a677b1ac94cd5716e36d5813c788fd20945dcd8a5c896cdba561f9225ca76",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/DiagnosticsControllerTests.swift": "cf3d05f09e152668748aea0efc11aefd1b96dfd57821cdde9ebb96db3d42c0de",
     "projects/krisp/app/desktop/Sources/LabVoice/Startup.swift": "4765cb5e70d321771c581d92287e932b8162575e099b9f723e4361cb8a71e720",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/StartupTests.swift": "b40bc14b13244335b03e0f812806f63fe2d70dba2231f6f7bec89fa103445ba2"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/StartupTests.swift": "b40bc14b13244335b03e0f812806f63fe2d70dba2231f6f7bec89fa103445ba2",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecovery.swift": "c5a44955362d61c7f9e826e449071ad1d2d7de040351bf9914d236d7d0059c7f",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecoveryController.swift": "0fbf1c9bc856e6c404ff6e2ec99b435efc702d173cad109edc9337ce1f8558e9",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryTests.swift": "0699bd37de60a424bcae3cd5a988ab8ff7f0057fc5cd2d2533e161c2c99718fd",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift": "a5a23e39a0a4521d6836ae17dc202f102068dc2b778c41fae10b098a3e2275de"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

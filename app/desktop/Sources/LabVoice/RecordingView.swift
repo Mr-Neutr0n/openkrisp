@@ -32,13 +32,39 @@ struct RecordingView: View {
 
 struct RetainedRecordingNotice: View {
     @ObservedObject var recording: RecordingController
+    @ObservedObject private var recovery = RecordingRecoveryController.shared
+    @State private var confirmation: RecordingRecoveryRequest?
     var body: some View {
-        if !recording.retainedPaths.isEmpty {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(recording.retainedPaths.count) recording staging folder(s) remain. They are not saved sessions. No files were deleted automatically.")
-                Text("Inspect these folders before manually importing a finalized WAV. Partial files may be invalid.")
+        VStack(alignment: .leading, spacing: 4) {
+                if !recording.retainedPaths.isEmpty { Text("\(recording.retainedPaths.count) recording staging folder(s) remain. They are not saved sessions. No files were deleted automatically.") }
+                Text("Partial files may be invalid. Recovery only copies validated finalized audio and never repairs or deletes these folders.")
+                Button("Review retained recordings") { Task { await recovery.scan() } }.disabled(!recovery.canRecover)
+                if !recovery.canRecover && !recovery.busy { Text("Stop audio and finish recording or microphone-test cleanup before recovery.") }
+                if recovery.busy { ProgressView().controlSize(.small) }
+                Text(recovery.message)
+                if let error = recovery.error { Text(error).foregroundColor(.red).textSelection(.enabled) }
+                ForEach(recovery.items) { item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.title)
+                        Text(item.directory.path).textSelection(.enabled)
+                        switch item.eligibility {
+                        case .finalized:
+                            Text(String(format: "%.2f seconds · finalized 48 kHz stereo PCM16", item.durationSeconds))
+                            Button("Save copy to library…") { confirmation = recovery.request(for: item) }.disabled(!recovery.canRecover)
+                        case .invalid(let reason): Text("Not eligible: " + reason)
+                        }
+                    }
+                }
                 ForEach(recording.retainedPaths, id: \.self) { path in Text(path).textSelection(.enabled) }
             }.font(.caption).foregroundColor(.orange)
-        }
+                .alert("Save a copy to the current library?", isPresented: Binding(get: { confirmation != nil }, set: { if !$0 { confirmation = nil } })) {
+                    Button("Cancel", role: .cancel) { confirmation = nil }
+                    Button("Save copy") {
+                        if let request = confirmation { Task { await recovery.saveCopy(request) } }
+                        confirmation = nil
+                    }
+                } message: {
+                    Text("The retained source stays untouched. Each confirmed save creates a new session, including repeated saves of the same recording.")
+                }
     }
 }

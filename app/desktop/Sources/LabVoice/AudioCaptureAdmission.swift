@@ -4,7 +4,7 @@ import Combine
 /// Main-actor ownership covers permission waits and uncertain cleanup, across every window.
 @MainActor final class AudioCaptureAdmission: ObservableObject {
     static let shared = AudioCaptureAdmission()
-    enum Owner: Equatable { case route, microphoneTest }
+    enum Owner: Equatable { case route, microphoneTest, recordingRecovery }
     @Published private(set) var operationID: UUID?
     private(set) var owner: Owner?
     var available: Bool { operationID == nil }

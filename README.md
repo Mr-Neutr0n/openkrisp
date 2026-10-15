@@ -71,3 +71,8 @@ Desktop `./verify` passed 68 tests plus signed ARM64/macOS 12 packaging and relo
 ## Launch-at-login verification
 
 Added explicit ServiceManagement registration controls with actual OS status and activation refresh. macOS 12 reports this feature unavailable. Desktop verification passed 73 tests and packaging checks. Native registration, approval and launch after login remain unverified; development did not change login items. See `startup-findings.md` and `CHECKPOINT.md`.
+
+
+## Finalized recording recovery
+
+Audio can review retained independent recording folders and explicitly save a copy of validated finalized audio into the selected library. Sources remain untouched. Partial WAVs and `.pending` imports are not repaired. Desktop verification passed 86 tests and packaging checks; native recovery UI and real audio remain unverified. See `recovery-findings.md` and `CHECKPOINT.md`.
