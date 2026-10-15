@@ -1,10 +1,10 @@
-# Paused checkpoint: 2026-10-13
+# Checkpoint: resumed 2026-10-15
 
-Hari requested a pause and a private GitHub checkpoint. The persistent goal is paused. All workers stopped. Do not resume implementation, live audio or administrator actions until Hari asks.
+Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include the completed library-location feature. The original pause tag remains available.
 
 ## Completed implementation
 
-- Native macOS desktop library: finalized WAV import, playback, search, transcript export/delete, appearance and model-file validation.
+- Native macOS desktop library: persisted folder selection, finalized WAV import, playback, search, transcript export/delete, appearance and model-file validation.
 - Explicit selected-WAV on-device Apple Speech adapter, with no cloud fallback.
 - Independent RNNoise microphone/speaker processing and private audio routing helper.
 - Independent virtual audio driver, timestamped transport and synthetic HAL test tools.
@@ -17,9 +17,9 @@ No trial, subscription or payment gate exists in the independent implementation.
 
 ## Verification
 
-The last combined `./verify` completed with exit 0 across all ten component suites, including 46 desktop tests. Release, ASan/UBSan, synthetic helper pipe integration, ARM64/macOS 12 packaging, signatures and relocated-resource checks passed. No real microphone capture or audible playback ran. Earlier REA observations verified limited desktop appearance and navigation, not the newly added widget or comparison UI.
+The last combined `./verify` completed with exit 0 across all ten component suites, including 54 desktop tests and 12 local-store tests. Release, ASan/UBSan, synthetic helper pipe integration, ARM64/macOS 12 packaging, signatures and relocated-resource checks passed. No real microphone capture or audible playback ran. Earlier REA observations verified limited desktop appearance and navigation, not the newly added widget or comparison UI.
 
-The private local log is `evidence/combined-verify-microphone-test.log`, SHA256 `19fefe223e9e5e34d3e06747b60217750474592f446ebe0dd324f84f4d1b4e34`. It is excluded from Git. The feature ledger records 43 implementation source fingerprints checked at this checkpoint.
+The private local log is `evidence/combined-verify-library-location.log`, SHA256 `cffc5e3331f99263e4d92f4cd9ad97e41d98651b99070da6fca9a9850a4e7cce`. It is excluded from Git. The feature ledger records 48 implementation source fingerprints checked at this checkpoint.
 
 ## Exact Mac state
 
@@ -27,16 +27,20 @@ The diagnostic independent driver is installed at `/Library/Audio/Plug-Ins/HAL/L
 
 Do not reinstall just to restart. After Hari resumes and is available for administrator approval, follow `app/audio-driver/install-notes.md`: revalidate the installed tree, restart once, run the read-only discovery probe and inspect actual service traces. Only if exact endpoints are usable, proceed with the previously approved bounded synthetic HAL test and live routing plan. Otherwise diagnose or use the exact-match rollback. Private rollback script: `evidence/remove-trace-driver.py`. Never rely on stale PIDs.
 
-## Next implementation step
+## Latest implementation: library folder selection
 
-Local library folder selection was planned only. No implementation or tests were changed for it. Read `storage-location-findings.md`. Proposed work is a persisted folder choice, strict reopen without silent fallback, shared busy admission, selected-root recording saves and protection from stale async results. Existing-data migration semantics are unknown; do not silently move/delete prior sessions.
+The Settings folder picker now validates and persists an existing library folder before switching. History reopens at that location; prior files stay unchanged. Missing, inaccessible or invalid saved paths show an error without silently creating or choosing another library. Imports, transcription, recording and other active writes block switching. Old dialog actions and asynchronous results cannot affect a newly selected library.
+
+Recording preparation validates and retains the destination store identity through completion. A removed or replaced destination fails the save while preserving staging. History operations reopen by path/revision; they do not persist an inode identity across app restarts. The native picker interaction has not been exercised. Eight focused desktop tests and independent review passed; the combined verification also passed.
+
+The next work should follow the retained gaps in `feature-parity-ledger.md`. Driver discovery remains the critical runtime prerequisite. Avoid treating further synthetic tests as proof of full audio parity.
 
 ## Remaining major work
 
 - Resolve driver discovery and verify real microphone/speaker routing, cleanup, timing and audio quality.
 - Verify and integrate installed original-model inference locally. Current catalog validation is not inference.
 - Accent conversion, background-voice isolation, AEC, live ASR/captions, speaker labels and other retained features remain incomplete.
-- Complete storage selection, activation, lifecycle, diagnostics, notification and widget workflows from the feature ledger.
+- Complete storage recovery, activation, lifecycle, diagnostics, notification and widget workflows from the feature ledger.
 - Complete original-versus-rebuild interaction and audio comparisons. Do not infer parity from passing synthetic tests.
 
 ## Repository and local files
@@ -47,4 +51,4 @@ The source remains at `/Users/harikp/Developer/solo/reverse-engineering-lab/proj
 
 Raw REA evidence, original binaries/models/assets, generated audio, build outputs and analysis runtime are excluded. RNNoise source and its included model are included with upstream notices. Original Krisp weight redistribution terms are unresolved. Some historical evidence references and fingerprint keys use the enclosing lab-relative `projects/krisp/` prefix. These are provenance paths, not required checkout locations.
 
-Use this file with `feature-parity-ledger.md`, `PLAN.md` and the component README files to resume. Historical PLAN entries describe previous states; this checkpoint is the current pause state.
+Use this file with `feature-parity-ledger.md`, `PLAN.md` and the component README files to resume. Historical PLAN entries describe previous states. This file records the latest verified source checkpoint; native runtime and full parity remain incomplete.

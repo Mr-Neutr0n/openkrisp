@@ -23,10 +23,13 @@ struct TranscriptionLanguage: Identifiable {
     private let requestAuthorization: () async throws -> SpeechAuthorization
     private let recognize: (UserSelectedWAV, String) async throws -> OfflineTranscript
     private let cancelRecognition: () -> Void
+    private let location: LibraryLocation
+    private var libraryActivity: LibraryActivity?
     private var operationID: UUID?
     private var task: Task<Void, Never>?
 
     init() {
+        location = .shared
         let transcriber = OfflineTranscriber()
         authorization = { OfflineTranscriber.authorizationStatus }
         requestAuthorization = { try await OfflineTranscriber.requestAuthorization() }
@@ -37,7 +40,8 @@ struct TranscriptionLanguage: Identifiable {
     init(authorization: @escaping () -> SpeechAuthorization,
          requestAuthorization: @escaping () async throws -> SpeechAuthorization,
          recognize: @escaping (UserSelectedWAV, String) async throws -> OfflineTranscript,
-         cancelRecognition: @escaping () -> Void) {
+         cancelRecognition: @escaping () -> Void, location: LibraryLocation? = nil) {
+        self.location = location ?? .shared
         self.authorization = authorization
         self.requestAuthorization = requestAuthorization
         self.recognize = recognize
@@ -51,15 +55,19 @@ struct TranscriptionLanguage: Identifiable {
         let selected: UserSelectedWAV
         do { selected = try UserSelectedWAV(userSelectedURL: file) }
         catch { self.error = "Choose a readable, finalized WAV file."; return }
+        guard let activity = try? location.begin("Transcription") else { error = "Finish changing the library folder before transcribing."; return }
         let id = UUID()
+        libraryActivity = activity
         operationID = id
         busy = true; error = nil; completedText = nil
         status = "Preparing transcription…"
+        let location = self.location
         task = Task { [weak self] in
+            defer { location.end(activity) }
             guard let self, self.operationID == id, !Task.isCancelled else { return }
             defer {
                 if self.operationID == id {
-                    self.operationID = nil; self.task = nil; self.busy = false
+                    self.operationID = nil; self.task = nil; self.busy = false; self.libraryActivity = nil
                 }
             }
             do {
@@ -89,6 +97,7 @@ struct TranscriptionLanguage: Identifiable {
         }
     }
     func cancel() {
+        if let libraryActivity { location.end(libraryActivity); self.libraryActivity = nil }
         operationID = nil
         task?.cancel(); task = nil
         cancelRecognition()

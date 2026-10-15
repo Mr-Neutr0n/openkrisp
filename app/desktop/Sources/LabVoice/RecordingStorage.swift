@@ -8,6 +8,7 @@ struct RecordingJob: Codable, Equatable, Sendable {
     let operationID: UUID
     let directory: URL
     let startedAt: Date
+    let libraryLocation: LibraryLocationSnapshot?
     var wav: URL { directory.appendingPathComponent("recording.wav") }
     var title: String { "Route recording " + startedAt.formatted(date: .abbreviated, time: .shortened) }
 }
@@ -20,14 +21,18 @@ struct RecordingSave: Sendable {
 enum RecordingStorageError: Error { case invalidDirectory, invalidCompletion }
 
 protocol RecordingStoring: Sendable {
-    func prepare(operationID: UUID) async throws -> RecordingJob
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot) async throws -> RecordingJob
+    func releaseDestination(_ job: RecordingJob) async
     func retainedDirectories() async throws -> [String]
     func retainFailure(_ job: RecordingJob, message: String) async throws
     func saveCompleted(_ job: RecordingJob, path: String, frames: UInt64, sampleRate: Double, channels: UInt32) async throws -> RecordingSave
 }
 
+extension RecordingStoring { func releaseDestination(_ job: RecordingJob) async {} }
+
 /// All filesystem and AVAudioFile work stays on this actor, away from the main thread.
 actor RecordingStorage: RecordingStoring {
+    private var destinations: [UUID: LocalStore] = [:]
     private let applicationSupportOverride: URL?
     private let stagingOverride: URL?
     private let storeOverride: URL?
@@ -46,7 +51,12 @@ actor RecordingStorage: RecordingStoring {
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: root.path)
         return root
     }
-    func prepare(operationID: UUID) throws -> RecordingJob {
+    func prepare(operationID: UUID) throws -> RecordingJob { try prepareJob(operationID: operationID, location: nil) }
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot) throws -> RecordingJob {
+        try prepareJob(operationID: operationID, location: location)
+    }
+    private func prepareJob(operationID: UUID, location: LibraryLocationSnapshot?) throws -> RecordingJob {
+        let admitted = try storeOverride == nil ? location?.open() : nil
         let root = try stagingOverride ?? base().appendingPathComponent("recording-staging", isDirectory: true)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true,
                                                attributes: [.posixPermissions: 0o700])
@@ -55,10 +65,12 @@ actor RecordingStorage: RecordingStoring {
         let directory = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false,
                                                attributes: [.posixPermissions: 0o700])
-        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date())
+        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date(), libraryLocation: location)
         try privateWrite(JSONEncoder().encode(job), to: directory.appendingPathComponent("job.json"))
+        if let admitted { destinations[job.id] = admitted }
         return job
     }
+    func releaseDestination(_ job: RecordingJob) { destinations.removeValue(forKey: job.id) }
     func retainedDirectories() throws -> [String] {
         let root = try stagingOverride ?? base().appendingPathComponent("recording-staging", isDirectory: true)
         guard FileManager.default.fileExists(atPath: root.path) else { return [] }
@@ -75,6 +87,7 @@ actor RecordingStorage: RecordingStoring {
         try privateWrite(Data(message.utf8), to: job.directory.appendingPathComponent("failure-" + UUID().uuidString + ".txt"))
     }
     func saveCompleted(_ job: RecordingJob, path: String, frames: UInt64, sampleRate: Double, channels: UInt32) throws -> RecordingSave {
+        defer { destinations.removeValue(forKey: job.id) }
         guard path == job.wav.path, frames > 0, frames <= UInt64(Int64.max), sampleRate == 48000, channels == 2 else {
             throw RecordingStorageError.invalidCompletion
         }
@@ -95,8 +108,11 @@ actor RecordingStorage: RecordingStoring {
         let audio = try AVAudioFile(forReading: job.wav)
         guard audio.length == Int64(frames), audio.fileFormat.sampleRate == sampleRate,
               audio.fileFormat.channelCount == channels, audio.fileFormat.commonFormat == .pcmFormatInt16 else { throw RecordingStorageError.invalidCompletion }
-        let root = try storeOverride ?? base().appendingPathComponent("sessions", isDirectory: true)
-        let session = try LocalStore(root: root).save(title: job.title, startedAt: job.startedAt,
+        let store: LocalStore
+        if let storeOverride { store = try LocalStore(root: storeOverride) }
+        else if let admitted = destinations[job.id] { store = admitted }
+        else { throw RecordingStorageError.invalidCompletion }
+        let session = try store.save(title: job.title, startedAt: job.startedAt,
             durationSeconds: Double(frames) / sampleRate, transcript: [], recording: job.wav)
         var warning: String?
         do { try FileManager.default.removeItem(at: job.directory) }

@@ -33,6 +33,8 @@ private struct RecordingResult: Decodable {
     @Published private(set) var retainedPaths: [String] = []
     @Published private(set) var savedSessionID: UUID?
     @Published private(set) var settling = false
+    private let location: LibraryLocation
+    private var libraryActivity: LibraryActivity?
     private let storage: any RecordingStoring
     private let timeout: UInt64
     private var operation: UUID?
@@ -46,7 +48,8 @@ private struct RecordingResult: Decodable {
     private var failureToken: UUID?
     var busy: Bool { phase != .idle || settling }
     var canStart: Bool { operation != nil && !busy && !stoppingRoute }
-    init(storage: any RecordingStoring = RecordingStorage(), timeout: UInt64 = 10_000_000_000) {
+    init(storage: any RecordingStoring = RecordingStorage(), timeout: UInt64 = 10_000_000_000, location: LibraryLocation? = nil) {
+        self.location = location ?? .shared
         self.storage = storage; self.timeout = timeout
     }
     func attach(operationID: UUID, send: @escaping (Data) throws -> Void) {
@@ -62,12 +65,14 @@ private struct RecordingResult: Decodable {
     }
     func start() {
         guard canStart, let id = operation else { return }
+        guard let activity = try? location.begin("Recording") else { error = "Finish changing the library folder before recording."; return }
+        libraryActivity = activity
         failureToken = nil
         phase = .preparing; error = nil; savedSessionID = nil; message = "Preparing private recording file…"
         work = Task { [weak self] in
             guard let self else { return }
             do {
-                let prepared = try await self.storage.prepare(operationID: id)
+                let prepared = try await self.storage.prepare(operationID: id, location: activity.location)
                 self.job = prepared
                 self.retainedPaths.removeAll { $0 == prepared.directory.path }
                 guard self.operation == id, !self.stoppingRoute, !Task.isCancelled else {
@@ -151,6 +156,7 @@ private struct RecordingResult: Decodable {
                         let saved = try await self.storage.saveCompleted(job, path: result.path, frames: result.frames,
                                                                         sampleRate: result.sampleRate, channels: result.channels)
                         self.savedSessionID = saved.session.id; self.job = nil; self.phase = .idle
+                        self.releaseLibraryActivity()
                         self.message = "Recording saved to local history."; self.error = saved.cleanupWarning
                         await self.refreshRetained()
                         NotificationCenter.default.post(name: .localRecordingSaved, object: nil)
@@ -165,14 +171,19 @@ private struct RecordingResult: Decodable {
         let token = UUID(); failureToken = token
         let retained = job
         self.error = message; self.message = terminal ? "Recording was not saved." : "Recording status unknown. Stop audio."
-        if terminal { job = nil; phase = .idle } else { phase = .uncertain }
+        if terminal { job = nil; phase = .idle; releaseLibraryActivity() } else { phase = .uncertain }
         if let retained {
             if !retainedPaths.contains(retained.directory.path) { retainedPaths.append(retained.directory.path) }
             do { try await storage.retainFailure(retained, message: message) }
             catch {
                 if failureToken == token { self.error = message + " Failure note could not be written: \(error). Staging metadata remains at \(retained.directory.path)." }
             }
+            if terminal { await storage.releaseDestination(retained) }
         }
+    }
+    private func releaseLibraryActivity() {
+        if let libraryActivity { location.end(libraryActivity) }
+        libraryActivity = nil
     }
     /// Called before helper termination. A failed/missing ACK never implies a saved recording.
     func prepareForRouteStop() async {

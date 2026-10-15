@@ -1,6 +1,6 @@
 # openkrisp
 
-Private checkpoint repository: [Mr-Neutr0n/openkrisp](https://github.com/Mr-Neutr0n/openkrisp). Work is paused at user request; read [CHECKPOINT.md](CHECKPOINT.md) to resume. This is an independent local reconstruction, with no trial period, paid tiers, subscription checks, or usage quotas. All implemented local features are available without payment. Retained local features from the original paid or hidden feature set are in scope for independent implementation; unfinished features remain unavailable until implemented and verified.
+Private checkpoint repository: [Mr-Neutr0n/openkrisp](https://github.com/Mr-Neutr0n/openkrisp). Work resumed on 2026-10-15; [CHECKPOINT.md](CHECKPOINT.md) records the verified baseline and pending work. This is an independent local reconstruction, with no trial period, paid tiers, subscription checks, or usage quotas. All implemented local features are available without payment. Retained local features from the original paid or hidden feature set are in scope for independent implementation; unfinished features remain unavailable until implemented and verified.
 
 Work in progress. This project builds a desktop app and independent audio and storage components, but no complete Krisp replacement. The approved development driver installation succeeded, but HAL cannot yet resolve its expected devices. Registration diagnosis is in progress. Full parity remains unverified.
 
@@ -11,9 +11,9 @@ The reference is the installed macOS Krisp at `~/Applications/krisp.app`. It cha
 | Component | Implemented | Still missing |
 | --- | --- | --- |
 | `app/audio-transport` | Timestamped mono/stereo rings, same-user shared-memory ABI, stale-producer silence | Audio-service integration, scheduling and latency measurements |
-| `app/local-store` | Completed-session import, transcript search/export, interrupted-save visibility | Recovery actions, original-format comparison |
+| `app/local-store` | Completed-session import, transcript search/export, interrupted-save visibility and strict selected-folder reopening | Recovery actions, original-format comparison |
 | `app/audio-driver` | Virtual devices, hidden companion endpoints and bounded internal audio routing | System-host verification, app capture integration and latency measurements |
-| `app/desktop` | Native history, search, WAV import, playback, transcript export, appearance, an optional floating control panel, model validation, explicit on-device WAV transcription, audio routing, live app-route mute/volume controls explicit recording with pause/resume and history save, and a temporary Original/RNNoise microphone comparison | Full workflow verification, actual audio routing and original UI parity |
+| `app/desktop` | Native history, persisted library folder selection, search, WAV import, playback, transcript export, appearance, an optional floating control panel, model validation, explicit on-device WAV transcription, audio routing, live app-route mute/volume controls explicit recording with pause/resume and history save, and a temporary Original/RNNoise microphone comparison | Full workflow verification, actual audio routing and original UI parity |
 | `app/model-catalog` | Confined file validation, SHA256 checks and explicit license metadata | Model inference integration |
 | `app/noise-engine` | Independent RNNoise processor, arbitrary-size callback adapter and optional mic/speaker processing in the routing helper | Speech-quality comparison and end-to-end latency |
 | `app/audio-host` | Device discovery, private aggregate backend, optional noise suppression, atomic app-route mute/gain, bounded background WAV recording, temporary physical-microphone capture and paired RNNoise processing, and desktop helper integration | Real HAL and hardware verification; original device-volume curve and synchronization |
@@ -52,3 +52,10 @@ The root `./verify` passed all ten suites with exit 0 after recording integratio
 ## Temporary microphone comparison verification
 
 The combined `./verify` passed all ten component suites after temporary microphone comparison integration, with 46 desktop tests and signed-bundle checks. Synthetic tests cover the Original/RNNoise pair, cancellation, capture ownership and cleanup retry. Private log: `evidence/combined-verify-microphone-test.log`. Actual microphone capture, audible comparison and permission attribution remain untested. The driver diagnostic restart remains deferred while the user is away.
+
+
+## Library-location verification checkpoint
+
+Implemented persisted existing-folder selection and reopen without data migration or fallback. Shared admission covers active library work, transcription, capture and recording; stale dialogs/results carry revision checks. Recording preparation validates and retains the admitted destination store through final save, rejects same-path replacement and retains failed staging. Missing or invalid preferences remain recoverable through the chooser.
+
+The root `./verify` passed all ten component suites with exit 0, including 54 desktop and 12 local-store tests. Eight focused desktop location tests cover real temporary library imports, restart persistence, missing-folder recovery, stale dialog/results, cancelled authorization and replaced recording destinations. Both independent reviews accepted the changes. Private log: `evidence/combined-verify-library-location.log`. Native picker interaction, real audio routing and original parity remain unverified. No administrator or live audio action ran.

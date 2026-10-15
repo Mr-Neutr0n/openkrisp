@@ -696,7 +696,7 @@
       "id": "storage",
       "feature": "Local transcript/recording storage and location selection",
       "scope": "retained",
-      "implementation_state": "independent_partial",
+      "implementation_state": "independent_partial_fixture_verified",
       "catalog_keys": [
         "error_storage_action",
         "error_storage_full",
@@ -740,13 +740,85 @@
           "exists": true
         },
         {
+          "path": "projects/krisp/app/local-store/Tests/LocalStoreTests/LocalStoreTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift",
+          "exists": true
+        },
+        {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingStorageTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift",
           "exists": true
         }
       ],
-      "implementation": "Private staged saves, inventory and retained recording folder display exist. General library location picker and recovery/import wizard are absent.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Exercise folder selection, inaccessible/missing/full disk, corrupt/partial sessions, call-time setting lock and actual UI import/export/delete. Do not carry Business/trial restrictions."
+      "implementation": "Settings now chooses an existing local library folder. Strict LocalStore admission requires an existing plain readable/writable/searchable directory, without mkdir/chmod/probe, migration, deletion or fallback. Preference commits after successful admission; invalid/missing/inaccessible saved paths remain unavailable until explicit recovery. Shared switching/activity/capture admission blocks incompatible work across windows. History results and presentation-time import/export/delete actions use library revisions; stale work cannot redirect a delayed action to a new library. Confirmed same-revision history recovery clears unavailable errors. Cancelled Speech authorization releases only its own library lease and late authorization cannot start recognition. Recording prepare validates and retains a LocalStore destination until terminal completion, detecting disappearance/replacement at save and retaining failed staging. Other history operations reopen the selected path; persistence is a path, not a bookmark or permanent volume identity. Existing independent staged saves, history/search/playback/export/delete and retained-stage display remain; no original-file compatibility, automatic move or recovery wizard.",
+      "verified_scope": "Backend selected-root fixtures and desktop8focused location tests reported passed; desktop full ./verify exit0 with54tests plus signed release packaging/resources. Tests exercise real temporary independent libraries, nonmutation/reopen, invalid preferences/no fallback, missing/inaccessible/replaced roots, stale history/dialog actions, active imports/capture admission, recording pinning and cancelled permission leases. Bounded read-only review found no remaining material issue. Native folder-picker UI, actual calls/audio, removable-volume runtime and original parity were not exercised. Root combined ./verify completed exit0 across all10suites, including54desktoptests, retained in projects/krisp/evidence/combined-verify-library-location.log. This is fixture/build verification, not native runtime acceptance.",
+      "missing_acceptance": "Interactive native folder chooser/cancel and multiwindow rendering; actual inaccessible/unmounted-volume recovery and long I/O/disk-full behavior; real audio/recording integration and original call-time lock detection remain unverified. Independent path persistence, choose/reopen and no-migration semantics are explicit choices because original defaults, folder callbacks, move/reopen/persistence/schema are unknown. Comprehensive staging recovery/import UI and vendor-library compatibility remain absent. No Business/trial restriction or storage quota.",
+      "independent_review": {
+        "mode": "read-only stable source review",
+        "runtime_actions": false,
+        "result": "No remaining material issue in selected-root/switch integration scope",
+        "limits": "Recording identity pinned through prepare/save; general history reopen remains path/revision based. No descriptor-based persistent identity or native UI/runtime parity claim."
+      },
+      "verification_entry_points": [
+        "projects/krisp/app/local-store/verify",
+        "projects/krisp/app/desktop/verify"
+      ],
+      "verification_logs": [
+        {
+          "path": "projects/krisp/app/desktop/.build/location-tests.log",
+          "status": "reported_passed_8_tests"
+        },
+        {
+          "path": "projects/krisp/app/desktop/.build/library-location-verify.log",
+          "status": "reported_passed_54_tests_and_packaging"
+        },
+        {
+          "path": "projects/krisp/evidence/combined-verify-library-location.log",
+          "status": "reported_passed_10_suites_including_54_desktop_tests_exit0"
+        }
+      ]
     },
     {
       "id": "diagnostics",
@@ -2178,7 +2250,7 @@
       "key": "note_taker_storage.trial_ended_body",
       "text": "This feature is exclusively available on the Business plan.",
       "scope": "retained",
-      "implementation_state": "independent_partial",
+      "implementation_state": "independent_partial_fixture_verified",
       "required_action": "Investigate underlying local capability without paid, trial or admin gates. Retain proven local functionality; do not assume a cloud-backed feature must be rebuilt locally."
     },
     {
@@ -2272,8 +2344,8 @@
   "implementation_source_sha256": {
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
     "projects/krisp/app/desktop/build": "5f6de557dbc2db66355e2ddb3e933911f957a87a9c635814c9c0b342db914e43",
-    "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "ffb09a7a35ffa264256c34ea3bc22253c37c1ade4d3fcf49a991a5348a886a00",
-    "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "4201865b5a96c9c9eb2afe79a705b78352a9562286f536261f6600c6481bab97",
+    "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "74b89d527cd18dc325ae491332d133f44bb11381f8497dce4f03f54134180932",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "b1e9a95cadc305e07e69d963151877ade064656468dcd98577cd93a1a8c62bad",
     "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
     "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
     "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
@@ -2282,17 +2354,17 @@
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "4c14674f3ebe682c98c20b8071065747c9d9eed98098ddd32c5d99093d302d61",
     "projects/krisp/app/audio-host/routing.cpp": "b23260404d915ef6fe9e65570f43b7965aba66d53178651401620c6eafe5f8e7",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "7ac361b584f18e35698005a5c4dc486919ead3e9b4f0da13b8cff32aebc90e75",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "ff22f2e66e8991572feac24b527b3f172fc236bec69cad83f08a6feaec68b6e0",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
-    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "2046750265ec25fa59aed7f470d9f91e1b464106614376e7c7e88d0468c12723",
+    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "8e159a18c745d3082b63c9565ab52223d0ec65ccbe879b38662264df242a8e56",
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
     "projects/krisp/app/audio-host/route_cli.cpp": "643f8234365c51788c0f334b67e118b13fe59705c98f927c26c0a09cca297576",
-    "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "bc4570fd307a14c0287d41dffecf98279bac6ebd2017efb76fb6035555bb2684",
+    "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "2a9560ac34829770d56279d30b3d9713fae1e55ebd297eec7c104bf6f984fcc9",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fd8c301dfb965e6eb2e4dc759ebf15b436a5bf524d80dcee83eba0f358e557d4",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "6ae19499b56706ae9ba2624ce78f57a28714e7371113f892989a400f94e0c064",
-    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "9adb3724e39a0a6590e4dd9498a65f8317335c7b888e3585de4a0b8ed412e943",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "b7c6795d23d50876ee2a24c15182b924be255d3df02d453402dc25878ed16069",
+    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "f01f5c19450d902b437fa0f12bfc063de685f2041d613a4cee4b73095fba4d13",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift": "9c15b0f90017c546e5d67422904a60bd7c3aa0551193c11177dde4a88f368021",
@@ -2305,14 +2377,19 @@
     "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
     "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
     "projects/krisp/app/audio-host/host.cpp": "459f3e6b9973048ac668c8bb3c649437fcc25da84d6573fb26f2fb0800ca3db5",
-    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "abe94dbff1b939f07d4ad8b7e8824718b5995ae882171821c8749cceabe85551",
+    "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "618b884e1bddaf1dd2481fc79b5bd3a390755d018feea66f943e32f46505e214",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
     "projects/krisp/app/desktop/Sources/LabVoice/ComparisonPlayback.swift": "08321c9b89e34a7d9ed53fe494e3c8179f6574ae226eeb239c57c383d4422971",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioCaptureAdmission.swift": "d6b8f3134793ba415d4e680af85d576ff07587b91d768bd68f81f5b9b3e1dd5d",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophonePermission.swift": "4e676900a6d79625619008b8d0ee97f521da37898c68ba5f41c8dc612db14e16",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestTests.swift": "97f470c292136fc7ebc7ab4f85a130b6d337c5051c1e038ba52a77dc16d40e18",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d",
+    "projects/krisp/app/local-store/Tests/LocalStoreTests/LocalStoreTests.swift": "12deb03ab60fbcc39860eef8d63472e832077ba7971f236d37775d0e552832ab",
+    "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift": "6c265b0aa203248ec4eeeda1f6d836d5ef0712c260d5fb929a1ef7ec875a097d",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift": "1f129523cd99a5ba92bee68dab946c5b2caccd05c91c9c59a81374fecf0a321f",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingStorageTests.swift": "b61dee39c875157c8ccb4cfd0cdf817e276c2a35e2dcb8e0c4bbaef759d68f0c",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift": "f75388e49bf30c1dd2b47cbf1692d8866381917bf9b1bd43ec78847d6cf8dfa3"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

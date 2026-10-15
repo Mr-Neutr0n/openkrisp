@@ -1,4 +1,5 @@
 import XCTest
+import Darwin
 @testable import LocalStore
 
 final class LocalStoreTests: XCTestCase {
@@ -111,4 +112,102 @@ final class LocalStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.save(title: "Link", startedAt: Date(), durationSeconds: 0,
                                           transcript: [], recording: link))
     }
+
+    func testStrictExistingMissingLocationDoesNotCreateParents() throws {
+        let missing = temporary.appendingPathComponent("absent/library")
+        XCTAssertThrowsError(try LocalStore(root: missing, createIfMissing: false))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: temporary.appendingPathComponent("absent").path))
+        let created = try LocalStore(root: missing)
+        XCTAssertTrue(try created.inventory().sessions.isEmpty)
+    }
+
+    func testTwoSelectedLibrariesReopenWithoutMovingOrChangingContents() throws {
+        let first = try LocalStore(root: temporary.appendingPathComponent("first"))
+        let second = try LocalStore(root: temporary.appendingPathComponent("second"))
+        let a = try first.save(title: "First", startedAt: Date(), durationSeconds: 0, transcript: [])
+        let b = try second.save(title: "Second", startedAt: Date(), durationSeconds: 0, transcript: [])
+        let unrelated = second.root.appendingPathComponent("user-note.txt")
+        try Data("Keep this unrelated file".utf8).write(to: unrelated)
+        try FileManager.default.setAttributes([.posixPermissions: 0o750], ofItemAtPath: second.root.path)
+        let selectedSecond = try LocalStore(root: second.root, createIfMissing: false)
+        XCTAssertEqual(try selectedSecond.inventory().sessions.map(\.id), [b.id])
+        let selectedFirst = try LocalStore(root: first.root, createIfMissing: false)
+        XCTAssertEqual(try selectedFirst.inventory().sessions.map(\.id), [a.id])
+        XCTAssertEqual(try first.load(a.id), a)
+        XCTAssertEqual(try String(contentsOf: unrelated, encoding: .utf8), "Keep this unrelated file")
+        let permissions = try FileManager.default.attributesOfItem(atPath: second.root.path)[.posixPermissions] as? NSNumber
+        XCTAssertEqual(permissions?.intValue, 0o750)
+    }
+
+    func testStrictReopenKeepsHealthyCorruptAndPendingEntries() throws {
+        let created = try store()
+        let healthy = try created.save(title: "Healthy", startedAt: Date(), durationSeconds: 0, transcript: [])
+        let corrupt = UUID().uuidString
+        let corruptFolder = created.root.appendingPathComponent(corrupt)
+        try FileManager.default.createDirectory(at: corruptFolder, withIntermediateDirectories: false)
+        try Data("broken manifest".utf8).write(to: corruptFolder.appendingPathComponent("session.json"))
+        let pending = ".pending-" + UUID().uuidString
+        let pendingFolder = created.root.appendingPathComponent(pending)
+        try FileManager.default.createDirectory(at: pendingFolder, withIntermediateDirectories: false)
+        try Data("partial data".utf8).write(to: pendingFolder.appendingPathComponent("recording.wav"))
+        let reopened = try LocalStore(root: created.root, createIfMissing: false)
+        let inventory = try reopened.inventory()
+        XCTAssertEqual(inventory.sessions.map(\.id), [healthy.id])
+        XCTAssertEqual(inventory.unreadableEntries, [corrupt])
+        XCTAssertEqual(inventory.pendingEntries, [pending])
+        XCTAssertEqual(try Data(contentsOf: pendingFolder.appendingPathComponent("recording.wav")), Data("partial data".utf8))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: corruptFolder.path))
+    }
+
+    func testFileAndSymlinkLocationsAreRejectedWithoutChangingTargets() throws {
+        let file = temporary.appendingPathComponent("file")
+        try Data("not a directory".utf8).write(to: file)
+        XCTAssertThrowsError(try LocalStore(root: file, createIfMissing: false))
+        let target = try store()
+        let link = temporary.appendingPathComponent("alias")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target.root)
+        XCTAssertThrowsError(try LocalStore(root: link, createIfMissing: false))
+        XCTAssertThrowsError(try LocalStore(root: link.appendingPathComponent(""), createIfMissing: false))
+        XCTAssertTrue(try target.inventory().sessions.isEmpty)
+        XCTAssertEqual(try Data(contentsOf: file), Data("not a directory".utf8))
+    }
+
+    func testInaccessibleLocationNeverChangesPermissionsOrFallsBack() throws {
+        guard geteuid() != 0 else { throw XCTSkip("Permission assertions require an unprivileged process") }
+        let opened = try store()
+        let location = opened.root
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: location.path) }
+        for mode in [0o500, 0o300, 0o600] {
+            try FileManager.default.setAttributes([.posixPermissions: mode], ofItemAtPath: location.path)
+            XCTAssertThrowsError(try LocalStore(root: location, createIfMissing: false))
+            XCTAssertThrowsError(try opened.inventory())
+            XCTAssertThrowsError(try opened.save(title: "Unavailable", startedAt: Date(), durationSeconds: 0, transcript: []))
+            let permissions = try FileManager.default.attributesOfItem(atPath: location.path)[.posixPermissions] as? NSNumber
+            XCTAssertEqual(permissions?.intValue, mode)
+        }
+    }
+
+    func testRemovedOrReplacedRootIsNotRecreatedOrUsed() throws {
+        let opened = try store()
+        let saved = try opened.save(title: "Existing", startedAt: Date(), durationSeconds: 0, transcript: [])
+        let preserved = temporary.appendingPathComponent("preserved")
+        try FileManager.default.moveItem(at: opened.root, to: preserved)
+        XCTAssertThrowsError(try opened.inventory())
+        XCTAssertThrowsError(try opened.save(title: "No recreation", startedAt: Date(), durationSeconds: 0, transcript: []))
+        XCTAssertThrowsError(try opened.load(saved.id))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: opened.root.path))
+        try FileManager.default.createSymbolicLink(at: opened.root, withDestinationURL: preserved)
+        XCTAssertThrowsError(try opened.inventory())
+        XCTAssertThrowsError(try opened.remove(saved.id))
+        try FileManager.default.removeItem(at: opened.root)
+        let replacement = try LocalStore(root: opened.root)
+        let other = try replacement.save(title: "Replacement", startedAt: Date(), durationSeconds: 0, transcript: [])
+        XCTAssertThrowsError(try opened.inventory())
+        XCTAssertThrowsError(try opened.remove(other.id))
+        XCTAssertThrowsError(try opened.save(title: "Wrong library", startedAt: Date(), durationSeconds: 0, transcript: []))
+        XCTAssertEqual(try replacement.inventory().sessions.map(\.id), [other.id])
+        let original = try LocalStore(root: preserved, createIfMissing: false)
+        XCTAssertEqual(try original.inventory().sessions.map(\.id), [saved.id])
+    }
+
 }

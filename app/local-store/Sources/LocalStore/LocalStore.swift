@@ -47,13 +47,24 @@ public enum StoreError: Error, Equatable {
 public struct LocalStore: Sendable {
     public let root: URL
 
-    public init(root: URL) throws {
-        guard root.isFileURL else { throw StoreError.invalidEntry }
+    private let identity: LibraryIdentity
+
+    /// Selected or persisted locations must use false. Only the default location
+    /// may be created implicitly. Existing permissions and contents stay unchanged.
+    public init(root: URL, createIfMissing: Bool = true) throws {
+        guard root.isFileURL, !root.path.utf8.contains(0) else { throw StoreError.invalidEntry }
         self.root = root.standardizedFileURL
-        try FileManager.default.createDirectory(at: self.root, withIntermediateDirectories: true,
-                                               attributes: [.posixPermissions: 0o700])
-        let values = try self.root.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
-        guard values.isDirectory == true, values.isSymbolicLink != true else { throw StoreError.invalidEntry }
+        if createIfMissing {
+            try FileManager.default.createDirectory(at: self.root, withIntermediateDirectories: true,
+                                                   attributes: [.posixPermissions: 0o700])
+        }
+        identity = try inspectLibraryRoot(self.root)
+    }
+
+    private func validateRoot() throws {
+        guard try inspectLibraryRoot(root) == identity else {
+            throw StoreError.io(operation: "library location changed", code: ESTALE)
+        }
     }
 
     /// Imports an already finalized WAV file. Does not capture, resample, or transcribe audio.
@@ -67,6 +78,7 @@ public struct LocalStore: Sendable {
                   segment.startSeconds >= 0 && segment.endSeconds >= segment.startSeconds &&
                   segment.endSeconds <= durationSeconds
               }) else { throw StoreError.invalidSession }
+        try validateRoot()
         let id = UUID()
         let stage = root.appendingPathComponent(".pending-" + id.uuidString, isDirectory: true)
         let final = root.appendingPathComponent(id.uuidString, isDirectory: true)
@@ -102,11 +114,13 @@ public struct LocalStore: Sendable {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .deferredToDate
         try writePrivateFile(encoder.encode(session), to: stage.appendingPathComponent("session.json"))
+        try validateRoot()
         try FileManager.default.moveItem(at: stage, to: final)
         return session
     }
 
     public func load(_ id: UUID) throws -> Session {
+        try validateRoot()
         let folder = root.appendingPathComponent(id.uuidString, isDirectory: true)
         guard FileManager.default.fileExists(atPath: folder.path) else { throw StoreError.missingSession }
         try requirePlainDirectory(folder)
@@ -122,6 +136,7 @@ public struct LocalStore: Sendable {
                   $0.startSeconds >= 0 && $0.endSeconds >= $0.startSeconds &&
                   $0.endSeconds <= session.durationSeconds }) else { throw StoreError.malformedManifest }
         if let filename = session.recordingFilename { try requirePlainFile(folder.appendingPathComponent(filename)) }
+        try validateRoot()
         return session
     }
 
@@ -131,6 +146,7 @@ public struct LocalStore: Sendable {
     }
 
     public func inventory() throws -> StoreInventory {
+        try validateRoot()
         let entries = try FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)
         var sessions: [Session] = []
         var unreadable: [String] = []
@@ -143,6 +159,7 @@ public struct LocalStore: Sendable {
                 do { sessions.append(try load(id)) } catch { unreadable.append(name) }
             }
         }
+        try validateRoot()
         sessions.sort { $0.startedAt == $1.startedAt ? $0.id.uuidString < $1.id.uuidString : $0.startedAt > $1.startedAt }
         return StoreInventory(sessions: sessions, unreadableEntries: unreadable.sorted(), pendingEntries: pending.sorted())
     }
@@ -157,6 +174,7 @@ public struct LocalStore: Sendable {
 
     /// Explicit user action only. Never call automatic retention or cleanup against this store.
     public func remove(_ id: UUID) throws {
+        try validateRoot()
         let folder = root.appendingPathComponent(id.uuidString, isDirectory: true)
         try requirePlainDirectory(folder)
         try FileManager.default.removeItem(at: folder)
@@ -173,6 +191,29 @@ public struct LocalStore: Sendable {
         }
         try writePrivateFile(Data((lines.joined(separator: "\n") + "\n").utf8), to: destination)
     }
+}
+
+private struct LibraryIdentity: Equatable, Sendable {
+    let device: dev_t
+    let inode: ino_t
+}
+
+private func inspectLibraryRoot(_ url: URL) throws -> LibraryIdentity {
+    // Strip a trailing slash so O_NOFOLLOW applies to the selected final component.
+    var path = url.path
+    while path.count > 1, path.hasSuffix("/") { path.removeLast() }
+    let descriptor = path.withCString { Darwin.open($0, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC) }
+    guard descriptor >= 0 else { throw StoreError.io(operation: "open library location", code: errno) }
+    defer { Darwin.close(descriptor) }
+    var info = stat()
+    guard Darwin.fstat(descriptor, &info) == 0 else {
+        throw StoreError.io(operation: "inspect library location", code: errno)
+    }
+    // Check real permissions, including ACLs, without writing a probe file or chmod.
+    guard Darwin.faccessat(descriptor, ".", R_OK | W_OK | X_OK, 0) == 0 else {
+        throw StoreError.io(operation: "access library location", code: errno)
+    }
+    return LibraryIdentity(device: info.st_dev, inode: info.st_ino)
 }
 
 private func requirePlainDirectory(_ url: URL) throws {

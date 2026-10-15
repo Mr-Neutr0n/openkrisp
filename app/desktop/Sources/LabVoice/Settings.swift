@@ -67,6 +67,7 @@ actor CatalogWorker {
 struct AppSettingsView: View {
     @ObservedObject var catalog: CatalogModel
     @ObservedObject private var widget = FloatingWidgetController.shared
+    @ObservedObject private var libraryLocation = LibraryLocation.shared
     var showDone = false
     @AppStorage("appearance") private var appearance: AppAppearance = .system
     @Environment(\.dismiss) private var dismiss
@@ -127,6 +128,16 @@ struct AppSettingsView: View {
                     Toggle("Show widget", isOn: Binding(get: { widget.isVisible }, set: widget.setVisible))
                     Text("A floating panel shows this app's audio and recording state. Closing it hides the panel; audio continues until Stop.")
                         .font(.caption).foregroundColor(.secondary)
+                    Divider()
+                    Text("Storage location").font(.headline)
+                    Text(libraryLocation.displayPath).font(.caption).textSelection(.enabled)
+                    Button("Choose library folder…") {
+                        if let folder = chooseDirectory() { Task { await libraryLocation.choose(folder) } }
+                    }.disabled(!libraryLocation.canSwitch)
+                    if libraryLocation.switching { ProgressView().controlSize(.small) }
+                    Text("Choosing a folder opens its Lab Voice history and sends future saves there. Existing recordings stay in their current folders. Finish audio, recording, import or transcription before switching.")
+                        .font(.caption).foregroundColor(.secondary)
+                    if let error = libraryLocation.error { Text(error).font(.caption).foregroundColor(.red).textSelection(.enabled) }
                     Spacer()
                 }.frame(maxWidth: .infinity, alignment: .leading).padding(20).tabItem { Text("App") }
                 VStack(alignment: .leading, spacing: 12) {

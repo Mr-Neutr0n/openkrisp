@@ -58,7 +58,7 @@ private struct TestResult: Decodable {
         catch { self.error = "Cannot inspect temporary microphone tests: \(error)" }
     }
     func start(input: AudioHardwareDevice?, microphoneUnmuted: Bool, routeStopped: Bool) {
-        guard !engaged else { return }
+        guard !engaged, !LibraryLocation.shared.switching else { return }
         guard routeStopped else { error = "Stop this app's audio route before starting the independent microphone test."; return }
         guard microphoneUnmuted else { error = "Unmute the app-route microphone before starting this test."; return }
         guard let input, input.alive == 1, input.nominalRate == 48000, input.input.channels > 0 else {

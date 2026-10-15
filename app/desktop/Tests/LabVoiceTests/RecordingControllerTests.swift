@@ -7,7 +7,7 @@ private actor SuspendedFailureStorage: RecordingStoring {
     let base: RecordingStorage
     var suspension: CheckedContinuation<Void, Error>?
     init(_ base: RecordingStorage) { self.base = base }
-    func prepare(operationID: UUID) async throws -> RecordingJob { try await base.prepare(operationID: operationID) }
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot) async throws -> RecordingJob { try await base.prepare(operationID: operationID, location: location) }
     func retainedDirectories() async throws -> [String] { try await base.retainedDirectories() }
     func retainFailure(_ job: RecordingJob, message: String) async throws {
         try await withCheckedThrowingContinuation { suspension = $0 }

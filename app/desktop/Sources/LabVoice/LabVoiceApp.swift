@@ -4,41 +4,48 @@ import AVFoundation
 import UniformTypeIdentifiers
 import LocalStore
 import ModelCatalog
+import Combine
 
-actor LibraryWorker {
-    private var storage: LocalStore?
+protocol LibraryWorking: Sendable {
+    func inventory(_ location: LibraryLocationSnapshot) async throws -> StoreInventory
+    func importWAV(_ url: URL, title: String, transcript: String, location: LibraryLocationSnapshot) async throws
+    func remove(_ id: UUID, location: LibraryLocationSnapshot) async throws
+    func export(_ id: UUID, to url: URL, location: LibraryLocationSnapshot) async throws
+    func play(_ id: UUID, location: LibraryLocationSnapshot) async throws
+    func stop(revision: UUID?) async
+    func isPlaying(revision: UUID) async -> Bool
+}
+actor LibraryWorker: LibraryWorking {
     private var player: AVAudioPlayer?
-    private func store() throws -> LocalStore {
-        if let storage { return storage }
-        let base = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask,
-                                               appropriateFor: nil, create: true)
-        let value = try LocalStore(root: base.appendingPathComponent("Lab Voice/sessions", isDirectory: true))
-        storage = value
-        return value
-    }
-    func inventory() throws -> StoreInventory { try store().inventory() }
-    func importWAV(_ url: URL, title: String, transcript: String) throws {
+    private var playerRevision: UUID?
+    func inventory(_ location: LibraryLocationSnapshot) throws -> StoreInventory { try location.open().inventory() }
+    func importWAV(_ url: URL, title: String, transcript: String, location: LibraryLocationSnapshot) throws {
         let file = try AVAudioFile(forReading: url)
         let rate = file.processingFormat.sampleRate
         guard rate.isFinite, rate > 0 else { throw StoreError.invalidRecording }
         let duration = Double(file.length) / rate
         let text = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
         let segments = text.isEmpty ? [] : [TranscriptSegment(startSeconds: 0, endSeconds: duration, text: text)]
-        _ = try store().save(title: title, startedAt: Date(), durationSeconds: duration,
-                             transcript: segments, recording: url)
+        _ = try location.open().save(title: title, startedAt: Date(), durationSeconds: duration,
+                                    transcript: segments, recording: url)
     }
-    func remove(_ id: UUID) throws { player?.stop(); player = nil; try store().remove(id) }
-    func export(_ id: UUID, to url: URL) throws { try store().exportTranscript(id, to: url) }
-    func play(_ id: UUID) throws {
+    func remove(_ id: UUID, location: LibraryLocationSnapshot) throws {
+        stop(revision: location.revision); try location.open().remove(id)
+    }
+    func export(_ id: UUID, to url: URL, location: LibraryLocationSnapshot) throws { try location.open().exportTranscript(id, to: url) }
+    func play(_ id: UUID, location: LibraryLocationSnapshot) throws {
         player?.stop(); player = nil
-        guard let url = try store().recordingURL(for: id) else { throw StoreError.invalidRecording }
-        let newPlayer = try AVAudioPlayer(contentsOf: url)
-        newPlayer.prepareToPlay()
-        guard newPlayer.play() else { throw StoreError.invalidRecording }
-        player = newPlayer
+        guard let url = try location.open().recordingURL(for: id) else { throw StoreError.invalidRecording }
+        let value = try AVAudioPlayer(contentsOf: url)
+        value.prepareToPlay()
+        guard value.play() else { throw StoreError.invalidRecording }
+        player = value; playerRevision = location.revision
     }
-    func stop() { player?.stop(); player = nil }
-    func isPlaying() -> Bool { player?.isPlaying ?? false }
+    func stop(revision: UUID?) {
+        guard revision == nil || playerRevision == revision else { return }
+        player?.stop(); player = nil; playerRevision = nil
+    }
+    func isPlaying(revision: UUID) -> Bool { playerRevision == revision && (player?.isPlaying ?? false) }
 }
 
 @MainActor final class LibraryModel: ObservableObject {
@@ -49,7 +56,23 @@ actor LibraryWorker {
     @Published var error: String?
     @Published var warning = ""
     @Published var playing = false
-    private let worker = LibraryWorker()
+    private let worker: any LibraryWorking
+    let location: LibraryLocation
+    private var locationObservation: AnyCancellable?
+    private var displayedRevision: UUID
+    init(location: LibraryLocation? = nil, worker: any LibraryWorking = LibraryWorker()) {
+        self.location = location ?? .shared; self.worker = worker
+        displayedRevision = self.location.snapshot.revision
+        locationObservation = self.location.$snapshot.dropFirst().sink { [weak self] next in
+            guard let self else { return }
+            let old = self.displayedRevision
+            self.displayedRevision = next.revision
+            self.sessions = []; self.selection = nil; self.error = nil; self.warning = ""
+            self.playbackTask?.cancel(); self.playing = false
+            Task { await self.worker.stop(revision: old) }
+            self.recordingDidSave()
+        }
+    }
     private var pendingRecordingRefresh = false
     private var playbackTask: Task<Void, Never>?
     var selected: Session? { sessions.first { $0.id == selection } }
@@ -58,6 +81,12 @@ actor LibraryWorker {
         return sessions.filter { $0.title.localizedCaseInsensitiveContains(query) ||
             $0.transcript.contains { $0.text.localizedCaseInsensitiveContains(query) ||
                 ($0.speaker?.localizedCaseInsensitiveContains(query) ?? false) } }
+    }
+    private func accepts(_ revision: UUID?) -> Bool {
+        guard revision == nil || revision == location.snapshot.revision else {
+            error = "The library folder changed. Select the session or reopen Import before continuing."; return false
+        }
+        return true
     }
     func recordingDidSave() {
         if busy { pendingRecordingRefresh = true }
@@ -70,52 +99,68 @@ actor LibraryWorker {
     func load() async {
         guard !busy else { return }
         busy = true; defer { finishWork() }
-        do { try await reload() } catch { self.error = "Cannot load history: \(error)" }
+        let snapshot = location.snapshot
+        do { try await reload(snapshot) }
+        catch {
+            guard location.snapshot.revision == snapshot.revision else { return }
+            sessions = []; selection = nil; self.error = "Cannot load history: \(error)"
+            location.report(error, location: snapshot)
+        }
     }
-    private func reload() async throws {
-        let inventory = try await worker.inventory()
+    private func reload(_ snapshot: LibraryLocationSnapshot) async throws {
+        let inventory = try await worker.inventory(snapshot)
+        guard location.snapshot.revision == snapshot.revision else { return }
         sessions = inventory.sessions
+        error = nil; location.confirmed(snapshot)
         warning = ""
         if !inventory.unreadableEntries.isEmpty || !inventory.pendingEntries.isEmpty {
             warning = "\(inventory.unreadableEntries.count) unreadable entries and \(inventory.pendingEntries.count) incomplete imports remain in the local store."
         }
         if let selection, !sessions.contains(where: { $0.id == selection }) { self.selection = nil }
     }
-    func importWAV(_ url: URL, title: String, transcript: String) async -> Bool {
+    func importWAV(_ url: URL, title: String, transcript: String, expectedRevision: UUID? = nil) async -> Bool {
+        guard accepts(expectedRevision) else { return false }
         guard !busy else { return false }
-        busy = true; defer { finishWork() }
+        guard let activity = try? location.begin("Import") else { return false }
+        busy = true; defer { location.end(activity); finishWork() }
         do {
-            try await worker.importWAV(url, title: title, transcript: transcript)
-            try await reload()
+            try await worker.importWAV(url, title: title, transcript: transcript, location: activity.location)
+            try await reload(activity.location)
             return true
         } catch { self.error = "Cannot import WAV: \(error)"; return false }
     }
-    func delete(_ id: UUID) async {
+    func delete(_ id: UUID, expectedRevision: UUID? = nil) async {
+        guard accepts(expectedRevision) else { return }
         guard !busy else { return }
-        busy = true; defer { finishWork() }
+        guard let activity = try? location.begin("Delete") else { return }
+        busy = true; defer { location.end(activity); finishWork() }
         playbackTask?.cancel(); playing = false
-        do { try await worker.remove(id); try await reload() }
+        do { try await worker.remove(id, location: activity.location); try await reload(activity.location) }
         catch { self.error = "Cannot delete session: \(error)" }
     }
-    func export(_ id: UUID, to url: URL) async {
+    func export(_ id: UUID, to url: URL, expectedRevision: UUID? = nil) async {
+        guard accepts(expectedRevision) else { return }
         guard !busy else { return }
-        busy = true; defer { finishWork() }
-        do { try await worker.export(id, to: url) }
+        guard let activity = try? location.begin("Export") else { return }
+        busy = true; defer { location.end(activity); finishWork() }
+        do { try await worker.export(id, to: url, location: activity.location) }
         catch { self.error = "Cannot export transcript. Choose a new filename. \(error)" }
     }
-    func play(_ id: UUID) async {
+    func play(_ id: UUID, expectedRevision: UUID? = nil) async {
+        guard accepts(expectedRevision) else { return }
         guard !busy else { return }
-        busy = true; defer { finishWork() }
+        guard let activity = try? location.begin("Playback setup") else { return }
+        busy = true; defer { location.end(activity); finishWork() }
         playbackTask?.cancel()
         do {
-            try await worker.play(id)
+            try await worker.play(id, location: activity.location)
             playing = true
             playbackTask = Task { [weak self] in
                 while !Task.isCancelled {
                     do { try await Task.sleep(nanoseconds: 250_000_000) } catch { return }
                     guard let self else { return }
-                    let active = await self.worker.isPlaying()
-                    guard !Task.isCancelled else { return }
+                    let active = await self.worker.isPlaying(revision: activity.location.revision)
+                    guard !Task.isCancelled, self.location.snapshot.revision == activity.location.revision else { return }
                     self.playing = active
                     if !active { return }
                 }
@@ -124,7 +169,7 @@ actor LibraryWorker {
     }
     func stop() async {
         playbackTask?.cancel(); playing = false
-        await worker.stop()
+        await worker.stop(revision: location.snapshot.revision)
     }
 }
 
@@ -138,9 +183,13 @@ struct ImportView: View {
     @State private var locale = ""
     @State private var languages: [TranscriptionLanguage] = []
     @State private var replacingTranscript = false
+    @State private var libraryRevision: UUID?
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Import finalized WAV").font(.title2)
+            if libraryRevision != model.location.snapshot.revision {
+                Text("The library folder changed. Close and reopen Import before saving.").font(.caption).foregroundColor(.red)
+            }
             Button("Choose WAV…") {
                 let panel = NSOpenPanel()
                 panel.allowedContentTypes = [.wav]
@@ -184,12 +233,13 @@ struct ImportView: View {
                 if model.busy { ProgressView().controlSize(.small) }
                 Button("Import") {
                     guard let file, !transcription.busy else { return }
-                    Task { if await model.importWAV(file, title: title.trimmingCharacters(in: .whitespacesAndNewlines), transcript: transcript) { dismiss() } }
-                }.disabled(file == nil || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.busy || transcription.busy)
+                    let revision = libraryRevision
+                    Task { if await model.importWAV(file, title: title.trimmingCharacters(in: .whitespacesAndNewlines), transcript: transcript, expectedRevision: revision) { dismiss() } }
+                }.disabled(file == nil || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.busy || transcription.busy || libraryRevision != model.location.snapshot.revision)
             }
         }.padding(24).frame(width: 560)
         .interactiveDismissDisabled(model.busy)
-        .onAppear { languages = TranscriptionLanguage.supported() }
+        .onAppear { languages = TranscriptionLanguage.supported(); libraryRevision = model.location.snapshot.revision }
         .onDisappear { transcription.cancel() }
         .onChange(of: transcription.completedText) { text in
             if let text { transcript = text }
@@ -212,10 +262,12 @@ struct LibraryView: View {
     @ObservedObject var audio: AudioRouteController
     @ObservedObject var catalog: CatalogModel
     @ObservedObject private var microphoneTest = MicrophoneTestController.shared
+    @ObservedObject private var libraryLocation = LibraryLocation.shared
     @State private var showingSettings = false
     @State private var showingAudio = false
     @State private var importing = false
     @State private var deleting: Session?
+    @State private var deletingRevision: UUID?
     private func duration(_ seconds: Double) -> String {
         guard seconds < Double(Int.max) else { return "Long recording" }
         let whole = Int(seconds)
@@ -236,6 +288,8 @@ struct LibraryView: View {
                 Button("Settings…") { showingSettings = true }
                 Button("Refresh") { Task { await model.load() } }.disabled(model.busy)
             }.padding()
+            Text(libraryLocation.displayPath).font(.caption).foregroundColor(.secondary).textSelection(.enabled)
+            if let error = libraryLocation.error { Text(error).font(.caption).foregroundColor(.red).textSelection(.enabled) }
             Divider()
             HSplitView {
                 VStack {
@@ -261,17 +315,19 @@ struct LibraryView: View {
                             .foregroundColor(.secondary)
                         HStack {
                             Button(model.playing ? "Stop playback" : "Play recording") {
-                                Task { if model.playing { await model.stop() } else { await model.play(session.id) } }
+                                let revision = model.location.snapshot.revision
+                                Task { if model.playing { await model.stop() } else { await model.play(session.id, expectedRevision: revision) } }
                             }.disabled(session.recordingFilename == nil || model.busy)
                             Button("Export transcript…") {
+                                let revision = model.location.snapshot.revision
                                 let panel = NSSavePanel()
                                 panel.allowedContentTypes = [.plainText]
                                 panel.nameFieldStringValue = "transcript.txt"
                                 if panel.runModal() == .OK, let url = panel.url {
-                                    Task { await model.export(session.id, to: url) }
+                                    Task { await model.export(session.id, to: url, expectedRevision: revision) }
                                 }
                             }.disabled(session.transcript.isEmpty || model.busy)
-                            Button("Delete…") { deleting = session }.disabled(model.busy)
+                            Button("Delete…") { deletingRevision = model.location.snapshot.revision; deleting = session }.disabled(model.busy)
                         }
                         Divider()
                         Text("Transcript").font(.headline)
@@ -320,7 +376,8 @@ struct LibraryView: View {
             if let session = deleting {
                 Button("Cancel", role: .cancel) { deleting = nil }
                 Button("Delete", role: .destructive) {
-                    Task { await model.delete(session.id) }
+                    let revision = deletingRevision
+                    Task { await model.delete(session.id, expectedRevision: revision) }
                     deleting = nil
                 }
             } else {

@@ -178,3 +178,17 @@ Read-only recheck confirms the diagnostic driver tree is unchanged and CoreAudio
 ## Paused by user
 
 Hari requested stopping work, pushing a private `openkrisp` repository and preserving checkpoints. The goal is paused and workers stopped. Storage-location work produced findings and a plan only, with no source changes or new tests. `CHECKPOINT.md` records current implementation, verification, installed driver state, pending work and exact resume instructions. No new administrator or audio actions were performed.
+
+
+## Resumed 2026-10-15
+
+Hari resumed autonomous work and reconfirmed GPT 6.1 sol workers. The private checkpoint remains the last completed baseline. Local library folder selection is being implemented, with strict existing-folder admission, a persisted selection, operation-bound destinations and no implicit data migration. Review is checking cross-window dialogs, cancellation and unavailable-folder recovery.
+
+A fresh read-only discovery probe still resolves the independent plug-in but returns no devices for its four exact UIDs. CoreAudio still has PID 94316 from before diagnostic installation. No restart, administrator prompt or live audio was attempted while Hari is away.
+
+
+## Library-location verification checkpoint
+
+Implemented persisted existing-folder selection and reopen without data migration or fallback. Shared admission covers active library work, transcription, capture and recording; stale dialogs/results carry revision checks. Recording preparation validates and retains the admitted destination store through final save, rejects same-path replacement and retains failed staging. Missing or invalid preferences remain recoverable through the chooser.
+
+The root `./verify` passed all ten component suites with exit 0, including 54 desktop and 12 local-store tests. Eight focused desktop location tests cover real temporary library imports, restart persistence, missing-folder recovery, stale dialog/results, cancelled authorization and replaced recording destinations. Both independent reviews accepted the changes. Private log: `evidence/combined-verify-library-location.log`. Native picker interaction, real audio routing and original parity remain unverified. No administrator or live audio action ran.
