@@ -2318,7 +2318,10 @@
       "original_evidence_ids": [
         "ev_577f43a8dd53c48ab08a04142dbf57b9ff04ef5c188d7542aef488f8d024a8fe",
         "ev_5a9e5ce9d60f512f388eb9ddcc1625cacc86c3f286f430eb5da4062f7e7d21d3",
-        "ev_c782fa8d2f7a5c6eab1f9209ceb2bca4fc525257c6e59670acf042c90daf0032"
+        "ev_c782fa8d2f7a5c6eab1f9209ceb2bca4fc525257c6e59670acf042c90daf0032",
+        "ev_3e5e72501abfba06515d44bbbf5c5564f972c47ba920c1571ecc427b1ef7dc6c",
+        "ev_40533b8680448f249894745d350085d236f7adb2807c02890d3d0a29c2dee276",
+        "ev_1038c9b008c82aa2a695355c281073d091df676b98d03f584bd75c88bc17740f"
       ],
       "implemented_code": [
         {
@@ -2329,8 +2332,8 @@
       "catalog_keys": [],
       "representative_labels": [],
       "implementation": "Catalog only in app. Isolated sandboxed addon initialization loads an installed NC model; generator graph fails before sample processing. Prepared LabVoice graph remains unrun.",
-      "verified_scope": "Model-load logs and processor construction only, current identity-bound static/parser probes. No completed native samples.",
-      "missing_acceptance": "Approved installed synthetic source and graph start, finite finalized NC output, bypass comparison, network denial and identity checks, integrated provider selection/failure cleanup. Do not copy or publish weights."
+      "verified_scope": "Model-load logs and processor construction only. Current identity-bound static REA establishes native factory ownership, frame-copy and callback-copy paths, and stream validation. No completed native samples or callable standalone adapter.",
+      "missing_acceptance": "Either a supported source-backed graph start or a fully recovered native frame ABI; finite finalized NC output, activation and bypass comparison, network denial and identity checks, integrated provider selection/failure cleanup. Native descriptor/configuration/callback lifetimes and drain behavior remain unresolved. Do not copy or publish weights."
     },
     {
       "id": "independent-model-provider",
