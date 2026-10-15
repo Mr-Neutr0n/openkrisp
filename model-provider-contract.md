@@ -268,3 +268,13 @@ The ordinary NC bridge reaches a float SDK factory with C++ shared-pointer suppl
 Success-like results can return the original input when processing is bypassed or output size is wrong. Future acceptance must establish actual processor activation and compare output, rather than relying on an exit code, boolean return or matching byte count.
 
 A device-free native route remains plausible, but exact descriptor/configuration/callback construction, lifetime, supported framing and drain behavior still require evidence. HAL is not proven to be an intrinsic SDK requirement. The existing source-backed graph test remains prepared but unrun. No original model, binary or asset is included in Git, and no native processing invocation was attempted in this pass.
+
+
+## Synchronous native dispatch, 2026-10-15
+
+`native-frame-dispatch-findings.md` now resolves the earlier callback-timing and external sample-scaling gaps for the selected active ordinary NC path. SDK push calls the processor inline; both processor branches call the result handler before returning. The local result vector is destroyed after callback return, so a collector must copy it synchronously. External samples use normalized Float32. Both branches require a cached exact frame count.
+
+This does not resolve concurrent use, factory ABI or complete file draining. The DF branch has input/output queues and resamplers. The selected methods have no EOF parameter or short-frame flush. A finite synthetic test can use exact frames and explicit recorded padding, but must not claim that guessed trimming or closing preserves every delayed sample. See `native-stream-close-findings.md` for the distinct close contract and its exception limits.
+
+
+The descriptor follow-up establishes an eight-byte duration/rate value and sample count `floor(durationMs * rate / 1000)`. A direct adapter must keep this descriptor stable and recreate the processor when changing it; selected NC descriptor-update and finalization callbacks are no-ops. `native-nc-callback-construction-findings.md` identifies the direct typed factory as the shorter candidate than rebuilding KMS and its `std::function` context. The next bounded task is to recover the supplier's packed return type and the stats-plus-vector result type from their consumers, then review a typed C++ shim. No shim or processing attempt is included in this checkpoint.

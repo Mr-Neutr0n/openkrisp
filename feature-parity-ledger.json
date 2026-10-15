@@ -2321,7 +2321,10 @@
         "ev_c782fa8d2f7a5c6eab1f9209ceb2bca4fc525257c6e59670acf042c90daf0032",
         "ev_3e5e72501abfba06515d44bbbf5c5564f972c47ba920c1571ecc427b1ef7dc6c",
         "ev_40533b8680448f249894745d350085d236f7adb2807c02890d3d0a29c2dee276",
-        "ev_1038c9b008c82aa2a695355c281073d091df676b98d03f584bd75c88bc17740f"
+        "ev_1038c9b008c82aa2a695355c281073d091df676b98d03f584bd75c88bc17740f",
+        "ev_6a9010dfcf231d1025f02fc2bd4db5320fdf395fbb31c04cdcdfd3ae673bf3df",
+        "ev_47b50132986bf7e01ccbd338eb87744d860460c106f7123fae36ac66ecb592f2",
+        "ev_6101539f1a9b7a8a54f4f6fb90c2ae7d266c6c34d5acd46b81d9bcd594684c13"
       ],
       "implemented_code": [
         {
@@ -2332,8 +2335,8 @@
       "catalog_keys": [],
       "representative_labels": [],
       "implementation": "Catalog only in app. Isolated sandboxed addon initialization loads an installed NC model; generator graph fails before sample processing. Prepared LabVoice graph remains unrun.",
-      "verified_scope": "Model-load logs and processor construction only. Current identity-bound static REA establishes native factory ownership, frame-copy and callback-copy paths, and stream validation. No completed native samples or callable standalone adapter.",
-      "missing_acceptance": "Either a supported source-backed graph start or a fully recovered native frame ABI; finite finalized NC output, activation and bypass comparison, network denial and identity checks, integrated provider selection/failure cleanup. Native descriptor/configuration/callback lifetimes and drain behavior remain unresolved. Do not copy or publish weights."
+      "verified_scope": "Model-load logs and processor construction only. Identity-bound static REA now establishes normalized Float32, exact frame validation, synchronous selected ordinary NC callbacks, descriptor copies and selected no-op finalization. No native sample-processing run or integrated adapter.",
+      "missing_acceptance": "Supported source-backed graph or ABI-correct native factory/configuration/callback construction, then finite finalized NC output, active processor and bypass comparison, measured latency/tail behavior, network denial and identity checks, integrated provider selection/failure cleanup. Keep descriptor storage stable. Close does not flush selected ordinary NC tail. Do not copy or publish weights."
     },
     {
       "id": "independent-model-provider",
