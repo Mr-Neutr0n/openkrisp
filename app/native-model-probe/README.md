@@ -32,4 +32,16 @@ The default delay is 5760 samples, or 120 ms at 48 kHz. This is a synthetic test
 
 `worker_session.cjs` connects framing to a supplied persistent session through synchronous read/write functions. It handles partial IO and EINTR, validates each processing result and closes the session once on EOF, explicit close or failure. The parent must send close and immediately close its request pipe. The worker acknowledges after teardown and then checks for EOF without trailing bytes. The parent must validate that acknowledgement and child exit. Real OS pipe tests use a synthetic session; they do not load Krisp.
 
-The callback queues are not connected to a broker or audio routing yet. The runner has no production CLI, identity admission or self-supervision while blocked in IO. The next step is a supervised Node child and broker with runtime/model admission, wall-clock timeout and bounded teardown. Desktop selection and route acknowledgement must be updated together after that synthetic path passes.
+## Supervised worker
+
+`audio_worker.cjs` admits the fixed reviewed addon and outbound model, plus caller-supplied Node and adapter hashes. It requires loopback denial before loading, opens one model and writes an exact readiness record before processing. The checks sample files before loading; they do not atomically bind files reopened by Node or the dynamic loader. Protocol output uses fd3 so native stdout logging cannot corrupt it.
+
+`installed_worker_launch.hpp` builds the fixed deny-network sandbox command. It inherits no environment. Inside the sandbox, `/usr/bin/env -i` supplies only PATH and the reviewed library directory before launching Node. This preserves the library path across the platform executable without admitting NODE_OPTIONS, NODE_PATH or other loader variables.
+
+`WorkerBroker` starts the direct child, validates readiness and exchanges one frame at a time through nonblocking parent pipes. It applies startup, frame and shutdown deadlines. Close requires a teardown acknowledgement, response EOF and reaped exit status 0. Errors terminate only its owned child, escalating TERM to KILL with bounded reap polling. The broker must be the child's sole reaper; it does not supervise arbitrary descendants.
+
+`ProviderWorker` connects the callback queues to this broker on a dedicated thread. The callback only copies samples and reads atomic state. Control-thread stop joins the broker thread; callback removal must succeed before releasing the owner. Idle checks detect child death or unexpected output even without another audio callback. Synthetic tests cover callback output order, broker failures, repeated stop and stop during confirmed stalled processing, including TSan.
+
+`installed_worker_probe.cpp` exercises the production builder and broker with a caller-provided one-second synthetic Float32 file. It publishes output exclusively after confirmed close. Building it does not execute the installed addon. Runtime evidence is recorded separately in `../../native-direct-probe-findings.md`.
+
+This provider is not connected to the desktop or CoreAudio routing yet. The synchronous Node worker cannot supervise itself inside a permanently hung native call. Normal parent EOF closes it, but abrupt parent death during such a hang remains unresolved. Next, verify timed callback processing, add parent-death handling for that case, then extend route acknowledgement and desktop selection together. The synthetic buffering delay is not an accepted live latency budget.

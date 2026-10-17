@@ -18,7 +18,7 @@ class ProviderTransport {
     static_assert(std::atomic<std::uint64_t>::is_always_lock_free);
     static_assert(std::atomic<unsigned>::is_always_lock_free);
     enum class Fault : unsigned { none, invalid_input, overflow, deadline, sequence,
-                                  invalid_output, worker_dead, stopped };
+                                  invalid_output, worker_dead, stopped, worker_failure };
     struct Frame {
         std::uint64_t sequence = 0;
         std::array<float, frameSamples> samples{};

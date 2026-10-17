@@ -3,6 +3,7 @@
 from pathlib import Path
 import subprocess
 import tempfile
+import shutil
 
 root = Path(__file__).resolve().parent
 with tempfile.TemporaryDirectory(prefix="openkrisp-native-probe-") as build:
@@ -37,6 +38,7 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-persistent-") as build:
 subprocess.run(["node", str(root / "persistent_launcher_test.cjs")], check=True)
 subprocess.run(["node", str(root / "worker_protocol_test.cjs")], check=True)
 subprocess.run(["node", str(root / "worker_session_test.cjs")], check=True, timeout=60)
+subprocess.run(["node", str(root / "audio_worker_test.cjs")], check=True, timeout=60)
 
 with tempfile.TemporaryDirectory(prefix="openkrisp-provider-transport-") as build:
     for name, flags in [
@@ -67,3 +69,27 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-worker-wire-") as build:
         print("worker-wire " + name, flush=True)
         subprocess.run([binary], check=True, timeout=60)
         subprocess.run(["node", str(root / "worker_protocol_cross_test.cjs"), binary], check=True, timeout=60)
+
+node = str(Path(shutil.which("node")).resolve())
+with tempfile.TemporaryDirectory(prefix="openkrisp-worker-broker-") as build:
+    for source in ["worker_broker_test.cpp", "provider_worker_test.cpp", "installed_worker_launch_test.cpp"]:
+        variants = [("release", ["-O2"]),
+                    ("address-undefined", ["-O1", "-g", "-fsanitize=address,undefined"])]
+        if source == "provider_worker_test.cpp":
+            variants.append(("thread", ["-O1", "-g", "-fsanitize=thread"]))
+        for name, flags in variants:
+            binary = str(Path(build) / (source + "-" + name))
+            subprocess.run([
+                "clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra",
+                "-Werror", "-pedantic", "-pthread", *flags,
+                str(root / source), str(root / "worker_broker.cpp"), "-o", binary,
+            ], check=True)
+            print(source + " " + name, flush=True)
+            arguments = [] if source == "installed_worker_launch_test.cpp" else [node, str(root / "worker_broker_fixture.cjs")]
+            subprocess.run([binary, *arguments], check=True, timeout=60)
+
+subprocess.run([
+    "clang++", "-std=c++20", "-arch", "arm64", "-O2", "-Wall", "-Wextra",
+    "-Werror", "-pedantic", "-pthread", str(root / "worker_broker.cpp"),
+    str(root / "installed_worker_probe.cpp"), "-o", str(root / "build/installed-worker-probe"),
+], check=True)

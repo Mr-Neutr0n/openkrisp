@@ -72,3 +72,41 @@ The NC v3 launcher completed successfully, but REA returned `cleanup_incomplete`
 The bypass v3 capture reports verified owned-process-group cleanup and removed its temporary root. It lists two unrelated processes with `sysctl_failed_22`; REA left them untouched. These are process-attribution limits, not proof of a leaked owned process. Both captures retain the existing sampling, inherited-environment and absent network-trace limits. No tail, speech-quality, sustained-deadline or live-audio claim follows from these checks.
 
 An earlier NC v2 capture has Evidence `ev_7cbcd8ed6430f7fd289bbaf51362c56738f735c57f1e9a9aaa3eee38ec2bc096` and verified cleanup. Its timing may overlap a rebuild, so it is retained as supplemental evidence only. The v3 metadata and byte comparisons above establish the final build's processing result independently. Scenario JSON, result envelopes, metadata and private outputs remain under `evidence/model-probes/`.
+
+
+## Supervised worker broker runtime results
+
+On 2026-10-17, two REA process captures ran the new native `installed-worker-probe` against the installed addon and outbound model. The parent built the fixed sandbox command, started Node with only PATH and the reviewed DYLD library directory, checked exact readiness, and exchanged 100 framed requests with one persistent native processor. The worker required loopback denial EPERM and checked the fixed addon/model digests plus the supplied Node/adapter digests before loading the adapter. Each request carried one 480-sample frame. The parent sent close, half-closed requests, validated the close acknowledgement and response EOF, and reaped a successful direct-child exit before publishing output. No audio graph, microphone, playback, administrator action or CoreAudio operation was used.
+
+| Run | Processing result | Startup / 100-frame processing | REA evidence and cleanup |
+| --- | --- | --- | --- |
+| `supervised-worker-nc-20261017-v1` | Exit 0; 100 frames; 48,000 samples; teardown confirmed | 246 ms / 64 ms | No Evidence ID. REA returned cleanup_incomplete and retained a partial capture. |
+| `supervised-worker-bypass-20261017-v1` | Exit 0; 100 frames; 48,000 samples; teardown confirmed | 126 ms / 49 ms | Evidence `ev_b3a8b624dc15c550a28ec23f5d92a3f133185e8a256ad71d916c430f4c8e9cb5`; complete capture; owned-process-group cleanup verified; temporary root removed. |
+
+Both outputs contain 192,000 bytes and match the corresponding retained `direct-nc-on-v1/output.f32le` and `direct-nc-bypass-v1/output.f32le` byte for byte. Their SHA256 values are `fd389eb36788f4e2f707d63e987fd9205ff6dc1323ef94cd1ab3600960077290` and `d65f14f3868eccb927bd4da5b9a2ae2bc61755e29ae08e432cb3129f67c4f671`. The complete finite input was validated before spawning; its SHA256 is `6ef4b0e40cf74b1bbe3b97b5d36ee79a2e42b9e7eadb9240afe92a2fc2fc7b5b`. The Node runtime is `/opt/homebrew/Cellar/node/26.7.0/bin/node`, SHA256 `1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040`. Addon and model digests remain the pinned values above.
+
+The following own-code identities were recorded for these runs. Paths are relative to `app/native-model-probe`.
+
+| Artifact | SHA256 |
+| --- | --- |
+| `build/installed-worker-probe` | `fa1ba7a07f3191a7d19a8e13b0762df4b1f62e1c30a237f1b85e10579aa70c41` |
+| `installed_worker_probe.cpp` | `279c22af7002ce6b948201094eebd12e90620eb0f8a9212a25f8a9a1045e14cd` |
+| `installed_worker_launch.hpp` | `0dcae60860d0d87acd64e046e4a5db5f96dd8f45e1c6e2a72e12f77accea4832` |
+| `worker_broker.hpp` | `5fe88279133265f1f3e504a835859d0e4e3712c5fd30983214cc108d48ea2c09` |
+| `worker_broker.cpp` | `91c438fd3dd48dfa5556783d4fe9f3bcca20849089a8053c76ddb1d67f61e054` |
+| `audio_worker.cjs` | `08a475a7cead72d44a6e027eb06423c4479034e7c465a021d9a529bf764cbceb` |
+| `worker_session.cjs` | `3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888` |
+| `worker_protocol.cjs` | `2d9f55e44af128f36216f7206f4235f4020c9b0fb45eabfebd2e6a56a8c32adc` |
+| `worker_protocol.hpp` | `ae539679aef1fc12d56da20ba2affc8ecaa3222aa12a1ddeec402fdef9d94226` |
+| `native_probe.cpp` | `f484a163df812979459acd558beadca876c7b53aa491cefe346dbef87ec3992c` |
+| `abi_factory.hpp` | `dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f` |
+| `abi_supplier.hpp` | `dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb` |
+| `abi_result.hpp` | `7c31440ec799ae1bcbf08fef6df00de818fe1b22acdd922402de3a0f2a309572` |
+| `result_collector.hpp` | `d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9` |
+| `build/native-probe.node` | `4b53c9f15842680c3e6517a5df23cbcfff3c977781202da1ab7d31b2e22046c1` |
+
+The NC REA cleanup error named live candidate PID 2051 with an unreadable environment ownership token, so REA did not verify owned-process-group cleanup and retained its temporary root. A later read-only process query found no such PID, but that does not restore the missing ownership proof. The partial capture still records parent exit 0 and successful processing/publication. The broker's own close result establishes the direct worker's acknowledgement, EOF and reaped successful exit; it does not replace REA's broader cleanup proof. The bypass capture lists one unrelated process with `platform_binary_environment_withheld`, left untouched. No process was killed manually.
+
+Scenario JSON, result envelopes and output files use the run names above under `evidence/model-probes/`. The NC result envelope SHA256 is `01e4717aa17f6ce5c768990e7e2feec8a57d37047097d097ccacc652700259e5`; bypass is `bc27aa1b5e9884da39713757e3ee1fad1e702ca0f7e8f00c6d236804a130dc4b`. Full host-only verification passed before these captures with no concurrent builds. Its log is `evidence/supervised-worker-verify-20261017.log`, SHA256 `f0d275655817140d47dd3d16073b933bbc4511b012fdf2b88dfbe3df5d3e2b1a`.
+
+These measurements establish bounded synthetic processing through the native broker and isolated worker, with preserved fixture output. They do not establish real-time scheduling, speech quality, tail preservation or live routing. Startup digest checks sample files before loading; reopening paths does not provide an atomic binding between sampled bytes and loaded images. REA samples process trees and filesystem states and does not trace network syscalls. The broker supervises its direct child and assumes sole waitpid ownership. Normal EOF can close the worker, but abrupt parent death while the worker remains permanently inside a hung native call can leave that worker alive. This parent-death case remains unresolved.
