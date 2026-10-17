@@ -3,18 +3,22 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'), net = require('node:net');
 const {runSession} = require('./worker_session.cjs');
 const ADDON_SHA256 = 'adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755';
-const MODEL_SHA256 = '12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d';
+const MODEL_SHA256 = '12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d'; // Outbound compatibility export.
+const INBOUND_MODEL_SHA256 = 'd1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a';
+const MODEL_IDENTITIES = Object.freeze({outbound:MODEL_SHA256,inbound:INBOUND_MODEL_SHA256});
 // Caller must use the reviewed deny-network sandbox profile and clear NODE_OPTIONS
 // before Node starts. Broker must also clear NODE_PATH and DYLD injection variables,
 // permitting only the reviewed DYLD_LIBRARY_PATH needed for installed libraries.
 // EPERM is only a prerequisite, not proof of full isolation. Hashing precedes
 // require/native.open path reopening and does not atomically bind loaded images.
 // Caller owns fd0 requests, fd3 responses, fd1/2 redirection and kill deadlines.
-const KEYS = ['addonPath','modelPath','adapterPath','adapterSha256','nodeSha256','token','suppressionLevel','bypass','parentPID'];
+const KEYS = ['addonPath','modelPath','adapterPath','adapterSha256','nodeSha256','token','suppressionLevel','bypass','parentPID','modelRole','modelSha256'];
 function validateConfig(config) {
   if (!config || typeof config !== 'object' || Array.isArray(config) || Object.keys(config).length !== KEYS.length || KEYS.some(k=>!Object.hasOwn(config,k))) throw new Error('Invalid config keys');
   for (const key of ['addonPath','modelPath','adapterPath']) if (typeof config[key] !== 'string' || !path.isAbsolute(config[key]) || config[key].includes('\0')) throw new Error('Invalid absolute path');
-  for (const key of ['adapterSha256','nodeSha256']) if (typeof config[key] !== 'string' || !/^[0-9a-f]{64}$/.test(config[key])) throw new Error('Invalid SHA256');
+  if (typeof config.modelRole !== 'string' || !Object.hasOwn(MODEL_IDENTITIES,config.modelRole) ||
+      config.modelSha256 !== MODEL_IDENTITIES[config.modelRole]) throw new Error('Model role and SHA256 mismatch');
+  for (const key of ['adapterSha256','nodeSha256','modelSha256']) if (typeof config[key] !== 'string' || !/^[0-9a-f]{64}$/.test(config[key])) throw new Error('Invalid SHA256');
   if (typeof config.token !== 'string' || !/^[0-9a-f]{32}$/.test(config.token)) throw new Error('Invalid token');
   if (typeof config.bypass !== 'boolean' || !Number.isFinite(config.suppressionLevel) || config.suppressionLevel<0 || config.suppressionLevel>100) throw new Error('Invalid processing options');
   if (!Number.isInteger(config.parentPID) || config.parentPID <= 1 || config.parentPID > 2147483647) throw new Error('Invalid expected parent PID');
@@ -45,7 +49,7 @@ async function admit(config, dependencies={}) {
   config=validateConfig(config);
   if(await (dependencies.loopbackCheck || loopbackCheck)() !== 'EPERM') throw new Error('Required network denial was not EPERM');
   const hash=dependencies.fileHash || fileHash;
-  const identities=[['addonPath',ADDON_SHA256],['modelPath',MODEL_SHA256],['adapterPath',config.adapterSha256]];
+  const identities=[['addonPath',ADDON_SHA256],['modelPath',config.modelSha256],['adapterPath',config.adapterSha256]];
   if(hash(process.execPath)!==config.nodeSha256) throw new Error('Node identity mismatch');
   for(const [key,expected] of identities) if(hash(config[key])!==expected) throw new Error(key+' identity mismatch');
   return config;
@@ -71,7 +75,7 @@ async function runWorker(config, dependencies={}) {
     const session=native.open({addonPath:config.addonPath,modelPath:config.modelPath,sampleRate:48000,frameSize:480,suppressionLevel:config.suppressionLevel,bypass:config.bypass});
     try {
       if(!session || typeof session.process!=='function' || typeof session.close!=='function')throw new Error('Invalid session interface');
-      const ready=`OKREADY1 ${config.token} ordinary-nc-direct 48000 480 ${ADDON_SHA256} ${MODEL_SHA256} ${config.adapterSha256} ${config.nodeSha256}\n`;
+      const ready=`OKREADY2 ${config.token} ordinary-nc-direct 48000 480 ${config.modelRole} ${ADDON_SHA256} ${config.modelSha256} ${config.adapterSha256} ${config.nodeSha256}\n`;
       writeAll(write,Buffer.from(ready,'ascii'));
       return session;
     } catch(error) {
@@ -85,7 +89,7 @@ async function runWorker(config, dependencies={}) {
     if (watch.close()?.stopped !== true) throw new Error('Parent watch stop was not confirmed');
   }
 }
-module.exports={validateConfig,admit,runWorker,fileHash,ADDON_SHA256,MODEL_SHA256};
+module.exports={validateConfig,admit,runWorker,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,MODEL_IDENTITIES};
 if(require.main===module) {
   Promise.resolve().then(()=>{
     if(process.argv.length!==3)throw new Error('Expected one JSON config argument');

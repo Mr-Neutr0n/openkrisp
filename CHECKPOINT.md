@@ -208,3 +208,29 @@ Verification logs:
 - `evidence/provider-route-host-final-verify-20261018.log`, SHA256 `314a4847dc1b71489bfa2f83196fd6fb4a795ba25f0394d0543d6024de5ec269`.
 - `evidence/provider-route-desktop-verify-20261018.log`, SHA256 `2a40b0522c88e82b58c1ca4fbe7d03ca318180629913e4e49f7f51ae868963a1`.
 - `evidence/provider-cli-final-verify-20261018.log`, SHA256 `cbc6ab8f03a2c049f01a8111162492bec7b056777ae4cad7ddf8ffcb9ed7bf08`.
+
+
+## Inbound evidence and partial native UI acceptance, 2026-10-18
+
+The installed inbound model returned 100 callbacks and 48,000 finite samples in separate synthetic NC and bypass runs. Both helpers completed native teardown. The NC capture has unresolved REA ownership cleanup and no successful Evidence ID; the bypass capture completed. See `inbound-model-findings.md` for identities and exact limitations. This is processing evidence, not perceptual quality or live routing acceptance.
+
+REA opened the independent app through LaunchServices and observed the Audio sheet with audio stopped, no selected devices, driver unavailable and a visually disabled Start audio button. The provider menu showed Independent RNNoise and Installed Krisp outbound NC. Main-window Evidence is `ev_125920966322d0ac4a95f39440e59c51baf71215f22f6bf1571a6281dd4be3e9`; Audio sheet `ev_4febec546cad34f48db0062f7212a2ca5c611f4d17fdae7059da834d616ee4d1`; provider menu `ev_eea41eac38c17fc4a6e685a47dab2f24366a018b477d4051ee74834a31503e42`. No audio or provider validation was started.
+
+Menu selection remains unverified. REA's native-window admission failed while the popup was open. A scoped helper found no matching menu item and performed no AXPress. The launch capture later ended, and a fresh observation could no longer bind that PID to an application executable. No unrelated process was signaled. These observations do not verify the installed-provider chooser, validation action or a route start.
+
+The fresh read-only driver inventory still reports feed and monitor absent. Administrator changes, CoreAudio restart and physical audio remain deferred.
+
+
+## Explicit model role admission, 2026-10-18
+
+The native worker now accepts only the exact reviewed outbound or inbound role/hash pair. Configuration requires both fields. The readiness record is `OKREADY2` and includes the role and four identities. Legacy nine-field worker configurations are rejected. C++ callers retain outbound defaults. The existing microphone adapter rejects inbound settings before any child or test factory starts; the desktop and host still expose only outbound installed processing.
+
+Independent review found no blocking issue in admission, readiness matching or current desktop/host ownership. Full native and audio-host verification passed, including release, ASan/UBSan, TSan and existing lifecycle checks. Broker fixtures accept both roles and reject a wrong role with otherwise matching hashes. Desktop verification passed with 104 tests and rebuilt signed/relocated bundle resource checks. All 116 recorded source fingerprints match.
+
+Verification logs and SHA256:
+
+- `evidence/model-role-admission-verify-20261018.log`: `c6cfd3e87c4bfe21ae269925ac6c20444a56909b15bc2fb5a32c45d5f1b6e971`.
+- `evidence/host-outbound-role-verify-20261018.log`: `f133fc38810d78792217ef1c80c608f38681efd9a3b42ea8de544b9543ebe124`.
+- `evidence/model-role-desktop-verify-20261018.log`: `802bf107ee99847547c8d7ccb53fdd2a532a06892dcf1f6fe59a335cfeccebda`.
+
+The selected original stereo bridge is now established by static evidence in `native-speaker-channel-findings.md`. Next implement and test one independently owned inbound worker with stereo averaging before processing and mono duplication afterward. Then connect speaker-specific identity/configuration acknowledgement and desktop selection together. Original desktop topology, complete stereo runtime comparison, sustained deadlines, quality and live driver routing remain unverified. No full-parity release claim is made.

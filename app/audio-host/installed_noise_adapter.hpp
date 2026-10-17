@@ -39,6 +39,8 @@ class InstalledNoiseAdapter {
         WorkerFactory testFactory = {}) {
         error.clear();
         try {
+            if (settings.modelRole != krisp_probe::InstalledModelRole::outbound)
+                throw std::invalid_argument("Installed microphone provider requires outbound model role");
             if (!layout.currentCallbackFrames || !layout.maximumCallbackFrames ||
                 layout.currentCallbackFrames > layout.maximumCallbackFrames ||
                 layout.maximumCallbackFrames > callbackLimit)

@@ -289,3 +289,10 @@ The descriptor follow-up establishes an eight-byte duration/rate value and sampl
 `app/native-model-probe` now contains these ABI carriers and an independent bounded result collector. Release and AddressSanitizer/UndefinedBehaviorSanitizer fixtures verify copied ownership after the source vector is mutated/freed, exact frame size, finite values and output limits. No original library is loaded by verification. Host clang++ confirms the observed libc++ string/vector/shared-pointer sizes, but host agreement alone does not prove a foreign factory call.
 
 The next step is a separately compiled ABI fixture for the full typed factory/callback signature and shared ownership, followed by a reviewed isolated native probe. `native-direct-adapter-design.md` records actual export resolution and the evidence for representing the unused first factory argument without reconstructing SDK state. This checkpoint contains no factory invocation, processed native samples or app backend integration.
+
+
+## Inbound bridge evidence, 2026-10-18
+
+`inbound-model-findings.md` records bounded direct processing of the exact installed inbound model. `native-speaker-channel-findings.md` records the selected original KMS bridge's stereo average, single mono processor and duplicated output. The default internal channel count is one. These reports supersede earlier uncertainty about the selected bridge's channel conversion, while leaving the original desktop speaker topology and full stereo runtime comparison unresolved.
+
+The independent desktop route still uses only the installed outbound microphone model. Inbound transport admission is separate from speaker integration. Original files remain external dependencies and are not included in Git.

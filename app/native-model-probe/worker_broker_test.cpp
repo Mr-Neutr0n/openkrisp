@@ -1,4 +1,5 @@
 #include "worker_broker.hpp"
+#include "installed_worker_launch.hpp"
 #include <cassert>
 #include <cerrno>
 #include <chrono>
@@ -30,6 +31,23 @@ int main(int argc,char** argv) {
             for(unsigned i=0;i<480;++i) assert(output[i]==input[i]*.5f);
         }
         assert(b.close()); assert(b.error().empty()); reaped(b.childPID());
+    }
+    for(auto role:{InstalledModelRole::outbound,InstalledModelRole::inbound}) {
+        InstalledWorkerSettings settings;
+        settings.nodePath="/fixture/node";settings.workerPath="/fixture/worker";
+        settings.addonPath="/fixture/addon";settings.modelPath="/fixture/model";
+        settings.adapterPath="/fixture/adapter";settings.libraryPath="/fixture/lib";
+        settings.nodeSha256=std::string(64,'a');settings.adapterSha256=std::string(64,'b');
+        settings.modelRole=role;settings.modelSha256=installedModelSha256(role);
+        auto c=config(argv[1],argv[2],"normal");
+        c.expectedReadyLine=buildInstalledWorkerLaunch(settings,c.token).expectedReadyLine;
+        c.arguments[2]=c.expectedReadyLine.substr(0,c.expectedReadyLine.size()-1);
+        { WorkerBroker b(c);assert(b.start() && b.close());reaped(b.childPID()); }
+        // Matching hashes cannot compensate for the wrong declared role.
+        const auto roleName=std::string(installedModelRoleName(role));
+        const auto roleOffset=c.arguments[2].find(" "+roleName+" ");assert(roleOffset!=std::string::npos);
+        c.arguments[2].replace(roleOffset+1,roleName.size(),role==InstalledModelRole::outbound?"inbound":"outbound");
+        WorkerBroker mismatch(c);assert(!mismatch.start());assert(!mismatch.error().empty());reaped(mismatch.childPID());
     }
     for(auto mode:{"wrong-ready","oversized-ready","startup-crash","startup-stall","ignore-term"}) {
         auto c=config(argv[1],argv[2],mode); c.startupTimeout=150ms;

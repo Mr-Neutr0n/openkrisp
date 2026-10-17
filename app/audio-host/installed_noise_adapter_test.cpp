@@ -108,6 +108,11 @@ int main(int argc,char** argv) {
     {
         std::string error; unsigned calls=0;
         InstalledNoiseAdapter::WorkerFactory forbidden=[&](auto,auto&,auto) { ++calls; return std::shared_ptr<krisp_probe::ProviderWorker>{}; };
+        auto inbound=settings();
+        inbound.modelRole=krisp_probe::InstalledModelRole::inbound;
+        inbound.modelSha256=krisp_probe::installedInboundModelSHA256;
+        assert(!InstalledNoiseAdapter::create(layout(),inbound,false,error,2,forbidden));
+        assert(error=="Installed microphone provider requires outbound model role" && calls==0);
         auto invalid=layout(); invalid.maximumCallbackFrames=4097;
         assert(!InstalledNoiseAdapter::create(invalid,settings(),false,error,2,forbidden));
         assert(!InstalledNoiseAdapter::create(layout(),settings(),false,error,SIZE_MAX,forbidden));

@@ -25,4 +25,11 @@ The format ID is `lpcm` and flags are 9, the combination of float and packed fla
 
 These are property declarations at two instants, not active-stream measurements. Zero declared latency does not mean zero real latency. The current buffer sizes are not proven defaults. This does not establish the exact visibility transition rule, hidden app-I/O devices, concurrent-client behavior, stream timestamps, processing quality or hardware reconnection behavior. Names and UIDs select devices but do not authenticate the loaded driver bytes.
 
-No replacement driver is installed. The independent implementation must use distinct bundle and device identities to coexist during comparison, while matching retained routing behavior. `driver-declarations.json` preserves this baseline for later comparison.
+At the time of this original-device baseline, no replacement driver was installed. The independent implementation must use distinct bundle and device identities to coexist during comparison, while matching retained routing behavior. `driver-declarations.json` preserves this baseline for later comparison.
+
+
+## Independent driver check, 2026-10-18
+
+REA read-only capture `ev_83480bc5f63f244f4e9f3bef44b579d56e8d71bbd37824857ab1ca93d36012be` ran the independent audio host with `--list`. The helper exited 0 and returned no inventory errors. Both companion endpoints `dev.hari.labvoice.feed` and `dev.hari.labvoice.monitor` were absent. This check does not establish the state of every driver UID or the loaded plugin identity.
+
+The earlier diagnostic driver installation is recorded in CHECKPOINT.md. This check made no installation, reload, CoreAudio restart or audio-stream change. Live routing remains blocked pending driver admission work. Retained capture files are `evidence/driver-current-inventory-20261018.*`.

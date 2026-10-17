@@ -1,15 +1,15 @@
 'use strict';
 const assert=require('node:assert/strict'), fs=require('node:fs'), os=require('node:os'), path=require('node:path'), crypto=require('node:crypto');
-const {runWorker,admit,fileHash,ADDON_SHA256,MODEL_SHA256}=require('./audio_worker.cjs');
+const {runWorker,admit,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,validateConfig}=require('./audio_worker.cjs');
 const {encode,Parser}=require('./worker_protocol.cjs');
-const config={addonPath:'/fixture/addon',modelPath:'/fixture/model',adapterPath:'/fixture/adapter',adapterSha256:'a'.repeat(64),nodeSha256:'b'.repeat(64),token:'19'.repeat(16),suppressionLevel:100,bypass:false,parentPID:process.ppid};
-function fixture(options={}) {
+const config={addonPath:'/fixture/addon',modelPath:'/fixture/model',adapterPath:'/fixture/adapter',adapterSha256:'a'.repeat(64),nodeSha256:'b'.repeat(64),token:'19'.repeat(16),suppressionLevel:100,bypass:false,parentPID:process.ppid,modelRole:'outbound',modelSha256:MODEL_SHA256};
+function fixture(options={}, selected=config) {
   let loaded=0,opened=0,closed=0,offset=0;const writes=[],events=[];
   const input=options.input || Buffer.alloc(0);
   const deps={
     loopbackCheck:async()=>{events.push('network');return options.network || 'EPERM';},
-    fileHash:filename=>{events.push('hash');return options.badHash?'0'.repeat(64):filename===process.execPath?config.nodeSha256:filename===config.addonPath?ADDON_SHA256:filename===config.modelPath?MODEL_SHA256:config.adapterSha256;},
-    loadAdapter:()=>{++loaded;events.push('load');return {watchParent(pid){assert.equal(pid,config.parentPID);events.push('watch');if(options.watchError)throw new Error('parent changed');return {close(){events.push('unwatch');return {stopped:true};}};},open(value){++opened;events.push('open');assert.equal(value.frameSize,480);assert.equal(value.sampleRate,48000);return {
+    fileHash:filename=>{events.push('hash');return options.badHash?'0'.repeat(64):filename===process.execPath?selected.nodeSha256:filename===selected.addonPath?ADDON_SHA256:filename===selected.modelPath?selected.modelSha256:selected.adapterSha256;},
+    loadAdapter:()=>{++loaded;events.push('load');return {watchParent(pid){assert.equal(pid,selected.parentPID);events.push('watch');if(options.watchError)throw new Error('parent changed');return {close(){events.push('unwatch');return {stopped:true};}};},open(value){++opened;events.push('open');assert.equal(value.frameSize,480);assert.equal(value.sampleRate,48000);return {
       process(samples){if(options.processError)throw new Error('process failed');return {samples,framesProcessed:1,callbackCount:1,processorConstructed:true,directProcessInvoked:true,backend:'ordinary-nc-direct'};},
       close(){++closed;if(options.closeError)throw new Error('teardown failed');return {teardownComplete:true};},
     };}};},
@@ -22,6 +22,25 @@ function fixture(options={}) {
   for(const change of [{extra:true},{addonPath:'relative'},{modelPath:'/bad\0path'},{adapterSha256:'bad'},{nodeSha256:'C'.repeat(64)},{token:'0'},{suppressionLevel:NaN},{bypass:1},{parentPID:1},{parentPID:1.5}]){
     const f=fixture();await assert.rejects(runWorker({...config,...change},f.deps));assert.equal(f.stats().loaded,0);
   }
+  for(const change of [{modelRole:'inbound'},{modelSha256:INBOUND_MODEL_SHA256},
+      {modelRole:'unknown'},{modelRole:'__proto__'},{modelRole:null},{modelSha256:'0'.repeat(64)}]) {
+    const f=fixture();await assert.rejects(runWorker({...config,...change},f.deps));
+    assert.equal(f.stats().loaded,0);assert.deepEqual(f.events,[]);
+  }
+  for(const missing of ['modelRole','modelSha256']) {
+    const incomplete={...config};delete incomplete[missing];assert.throws(()=>validateConfig(incomplete));
+  }
+  {
+    const legacy={...config};delete legacy.modelRole;delete legacy.modelSha256;
+    assert.throws(()=>validateConfig(legacy));
+  }
+  const inbound={...config,modelRole:'inbound',modelSha256:INBOUND_MODEL_SHA256};
+  const inboundFixture=fixture({},inbound);
+  assert.deepEqual(await runWorker(inbound,inboundFixture.deps),{requests:0,teardownComplete:true});
+  assert.equal(Buffer.concat(inboundFixture.writes).toString('ascii'),`OKREADY2 ${config.token} ordinary-nc-direct 48000 480 inbound ${ADDON_SHA256} ${INBOUND_MODEL_SHA256} ${config.adapterSha256} ${config.nodeSha256}\n`);
+  const wrongInbound=fixture({},inbound), originalInboundHash=wrongInbound.deps.fileHash;
+  wrongInbound.deps.fileHash=p=>p===inbound.modelPath?MODEL_SHA256:originalInboundHash(p);
+  await assert.rejects(runWorker(inbound,wrongInbound.deps));assert.equal(wrongInbound.stats().loaded,0);
   for(const options of [{network:'ECONNREFUSED'},{network:'CONNECTED'},{network:'TIMEOUT'},{badHash:true}]){
     const f=fixture(options);await assert.rejects(runWorker(config,f.deps));assert.equal(f.stats().loaded,0);
   }
@@ -30,7 +49,7 @@ function fixture(options={}) {
     await assert.rejects(runWorker(config,f.deps));assert.equal(f.stats().loaded,0);
   }
   const f=fixture({writeSize:7});assert.deepEqual(await runWorker(config,f.deps),{requests:0,teardownComplete:true});
-  assert.equal(Buffer.concat(f.writes).toString('ascii'),`OKREADY1 ${config.token} ordinary-nc-direct 48000 480 ${ADDON_SHA256} ${MODEL_SHA256} ${config.adapterSha256} ${config.nodeSha256}\n`);
+  assert.equal(Buffer.concat(f.writes).toString('ascii'),`OKREADY2 ${config.token} ordinary-nc-direct 48000 480 outbound ${ADDON_SHA256} ${MODEL_SHA256} ${config.adapterSha256} ${config.nodeSha256}\n`);
   assert.deepEqual(f.stats(),{loaded:1,opened:1,closed:1});assert.equal(f.events[0],'network');assert.ok(f.events.indexOf('open')<f.events.indexOf('write'));
   for(const options of [{writeError:true},{readError:true},{processError:true,input:encode({kind:'request',token:Buffer.from(config.token,'hex'),sequence:0,samples:new Float32Array(480)})},{input:Buffer.from('bad')},{writeError:true,closeError:true}]){
     const failure=fixture(options);await assert.rejects(runWorker(config,failure.deps));assert.equal(failure.stats().closed,1);

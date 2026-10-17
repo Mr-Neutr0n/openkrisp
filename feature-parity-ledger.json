@@ -1362,7 +1362,10 @@
       ],
       "original_evidence_ids": [
         "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
-        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca"
+        "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
+        "ev_4388b9434974bae50da7433fa61fbba3f09b1b18513ce3a453298cbb3d027e8d",
+        "ev_4615dfd9d86356d16df51642343a4055a02d2464f133ab85160c6c6a1ef051e5",
+        "ev_ead7698e3910c1c4c8e740b8fa3a306165affd3222f2fb47ef4b32f523768679"
       ],
       "implemented_code": [
         {
@@ -1399,7 +1402,7 @@
         }
       ],
       "implementation": "Independent RNNoise microphone/stereo speaker path exists. Experimental installed outbound NC microphone provider now connects a supervised Node worker to the audio host and explicit desktop selection. Startup requires exact addon/model/adapter/Node identity and validated callback buffering; speakers remain RNNoise. AEC, BVC and Noise Shield detection/feedback are not implemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -2791,17 +2794,17 @@
     "projects/krisp/app/native-model-probe/worker_protocol_cross_test.cjs": "9e7bd0275edf39ec1b6fd25c4f6397cf58deb7410a6556b3e6156dd1600ac6de",
     "projects/krisp/app/native-model-probe/worker_session.cjs": "3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888",
     "projects/krisp/app/native-model-probe/worker_session_test.cjs": "516f7be4a20e2cf3a1ad310cd9fbb4b90c24d266b0a4b2065644fbf35fd94043",
-    "projects/krisp/app/native-model-probe/audio_worker.cjs": "65007442983c3ac03f2a6efe27f77ace71f5cd67879c3a7e90bbde70f2c6e424",
-    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "a6ee78e60876f177d44b8dfef5a452372c9e75a123eb13698fc9856cd6f8584d",
-    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "bf85ec420bed8b43b030f0989287b79ed740063cf1ef77adfe27ad70e59a27fa",
-    "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp": "d4cc264e9910bdcc4b26e0b2d16b75abfc1fa97fe881383cb0960fe3bd0ef7d4",
+    "projects/krisp/app/native-model-probe/audio_worker.cjs": "93c0fda34e544a108f19bf8fec1ee6a4d7219cce8beafbe36de5697ea7a648e8",
+    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "965821f16f3f0aa079d241b4fad4d19147365d29d8dd6585e99b9a15ddc8584b",
+    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "9595fcae3117181fb8bf05c48665c39a84f419857b45937ff758e4c16eb4e15c",
+    "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp": "fe597de9affc2e5ee1b491ae7705efc085c1dcf5d260eeebae0bd934d43ac09b",
     "projects/krisp/app/native-model-probe/installed_worker_probe.cpp": "279c22af7002ce6b948201094eebd12e90620eb0f8a9212a25f8a9a1045e14cd",
     "projects/krisp/app/native-model-probe/provider_worker.hpp": "9a26453630370cfafe17884dc8f933de753a465a37e786298ed4c93b4cfc2e88",
     "projects/krisp/app/native-model-probe/provider_worker_test.cpp": "2c5b9a17637f9a54651b8f18a2acd99408f87b168565d19f25cabe560c643d3a",
     "projects/krisp/app/native-model-probe/worker_broker.cpp": "91c438fd3dd48dfa5556783d4fe9f3bcca20849089a8053c76ddb1d67f61e054",
     "projects/krisp/app/native-model-probe/worker_broker.hpp": "5fe88279133265f1f3e504a835859d0e4e3712c5fd30983214cc108d48ea2c09",
     "projects/krisp/app/native-model-probe/worker_broker_fixture.cjs": "9c582434288b9b88b24515b2f0c3695e3fb97783fd0719286bef1d8829688d95",
-    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "168af0f73aaa0436b35d60f7cfb2aeaa12c145c25115beecc4b2b09638d204a4",
+    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "a34cf0588578157f27704b9b644fad2931ff7367283bb54d6c63c0614eaccf4b",
     "projects/krisp/app/native-model-probe/parent_watch.hpp": "e0fa1322d70384a494a944a64e351a8366938f2df1e8e1e85b3dbfacdc6d983b",
     "projects/krisp/app/native-model-probe/parent_watch_test.cpp": "74bb5165c102f863b406dd2ea0cb2680465747b960b4c488d23f1f169e65a80b",
     "projects/krisp/app/native-model-probe/parent_watch_native_test.cjs": "c436b663d58c0a03f6555a4c94c9d64abdc52614e388aa95c5d8b3b822f5c84e",
@@ -2815,9 +2818,9 @@
     "projects/krisp/app/audio-host/provider_cli_check.py": "41d60325a54c31e63e1de4bc2eb38fb2a1ef69fbc495dd0768dec9d753b650a1",
     "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift": "f1d785f3694251df8b9e9b1c98d91d773331e50d5f8d5bac99134acce97a2632",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "0a29af7a36d07270ecd81d4e28e36d658f0a2e6f66081ffdfd42777516163c07",
-    "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "2dc9c8e07fa90d6e362657b58cba28df4d3e01579047e7ee21be7fc826657ddc",
+    "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "a252acbd5b833576a298e7537d8a666e727cdb3decb76a8276e94869f43d203b",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
-    "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "7f02b51bc8ac484791b0d296335fc716f3c0fecb1431306258e2a81ee0ab9057",
+    "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "bf859f40b8e16989deaf96a92c8cebfa8286044a02b1a82ab965ba94add9b843",
     "projects/krisp/app/audio-host/verify": "f2e89e62ced7bebe3b3149b38db82f49ffe343e3f2ef78463b602483a5e3feee"
   },
   "read_only_audit_limits": [

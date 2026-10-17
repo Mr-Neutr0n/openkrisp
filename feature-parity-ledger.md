@@ -111,3 +111,10 @@ Runtime buffer configuration and a pre-IO processor factory now exist. REA NC te
 ## Installed outbound provider integration
 
 The desktop now admits an explicit installed outbound NC microphone provider and checks its helper startup identity. Speakers retain RNNoise. Synthetic bridge/lifecycle tests, 104 desktop tests and signed-resource checks pass. REA verified packaged-worker NC/bypass output against earlier probes. Actual HAL routing, quality, sustained latency and full parity remain unverified. See the latest `CHECKPOINT.md` entry.
+
+
+## Inbound evidence and worker admission, 2026-10-18
+
+The exact inbound model has bounded direct mono processing evidence. Its NC capture has unresolved REA cleanup; the bypass capture completed. Static evidence establishes stereo averaging into one mono state and duplicated output in the selected original KMS bridge. See [inbound-model-findings.md](inbound-model-findings.md) and [native-speaker-channel-findings.md](native-speaker-channel-findings.md). Original desktop topology and complete stereo runtime parity remain unresolved.
+
+Native admission now binds explicit outbound/inbound roles to exact model hashes and role-bearing readiness. The microphone adapter remains outbound-only. Native, host and desktop verification passed; 116 source fingerprints match. Speaker integration, live routing and full local parity remain incomplete.
