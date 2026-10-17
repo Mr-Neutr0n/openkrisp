@@ -34,19 +34,30 @@ struct QuitSnapshot: Sendable {
 @MainActor final class QuitCoordinator: ObservableObject {
     @Published private(set) var inProgress = false
     @Published private(set) var reason: String?
+    @Published private(set) var relaunchUncertain = false
     private let snapshot: () -> QuitSnapshot
     private let confirmSave: () async -> Bool
+    private let confirmRelaunchSave: () async -> Bool
+    private let launchForRelaunch: () async -> RelaunchOutcome
     private let stopAudio: () async -> Bool
     private let cleanupTest: () async -> Bool
     private let gate: QuitGate
     init(snapshot: @escaping () -> QuitSnapshot, confirmSave: @escaping () async -> Bool,
-         stopAudio: @escaping () async -> Bool, cleanupTest: @escaping () async -> Bool, gate: QuitGate? = nil) {
+         stopAudio: @escaping () async -> Bool, cleanupTest: @escaping () async -> Bool, gate: QuitGate? = nil,
+         confirmRelaunchSave: (() async -> Bool)? = nil,
+         launchForRelaunch: @escaping () async -> RelaunchOutcome = { .failed("No relaunch service is configured.") }) {
         self.snapshot = snapshot; self.confirmSave = confirmSave; self.stopAudio = stopAudio
+        self.confirmRelaunchSave = confirmRelaunchSave ?? confirmSave
+        self.launchForRelaunch = launchForRelaunch
         self.cleanupTest = cleanupTest; self.gate = gate ?? .shared
     }
-    func request() async -> Bool {
+    func request(intent: AppExitIntent = .quit) async -> Bool {
         guard !inProgress else { return false }
         reason = nil
+        if intent == .relaunch, relaunchUncertain {
+            reason = "A previous relaunch may have opened another instance. Relaunch is disabled for this instance. You can keep using Lab Voice or quit normally."
+            return false
+        }
         let initial = snapshot()
         guard !initial.otherWork, !gate.hasPendingWork else {
             reason = "Finish the current library, recovery or diagnostic export operation before quitting. No work was interrupted."
@@ -56,7 +67,10 @@ struct QuitSnapshot: Sendable {
         inProgress = true
         var approved = false
         defer { inProgress = false; if !approved { gate.cancelQuit(token) } }
-        if initial.recordingActive, !(await confirmSave()) { return false }
+        if initial.recordingActive {
+            let confirmed = await (intent == .relaunch ? confirmRelaunchSave() : confirmSave())
+            if !confirmed { return false }
+        }
         if initial.testEngaged, !(await cleanupTest()) {
             reason = snapshot().testFailure ?? "Microphone-test cleanup is not confirmed. Lab Voice will stay open."
             return false
@@ -76,7 +90,19 @@ struct QuitSnapshot: Sendable {
             reason = final.recordingFailure ?? "The recording was not saved to the library. Its retained files need attention before quitting."
             return false
         }
-        approved = true // Keep admission closed until the process exits.
+        if intent == .relaunch {
+            switch await launchForRelaunch() {
+            case .confirmed: break
+            case .failed(let error):
+                reason = "Relaunch failed. Lab Voice will stay open. " + error
+                return false
+            case .uncertain(let error):
+                relaunchUncertain = true
+                reason = "Relaunch could not confirm the new instance. Another instance may be open. No further relaunch will be attempted by this instance. " + error
+                return false
+            }
+        }
+        approved = true // Keep admission closed between new-instance launch and old exit.
         return true
     }
 }

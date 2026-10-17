@@ -420,6 +420,10 @@ struct LibraryView: View {
                 .onAppear { widget.restoreVisibility() }
         }
         .commands {
+            CommandGroup(before: .appTermination) {
+                Button("Relaunch Lab Voice…") { delegate.requestRelaunch() }
+                    .disabled(delegate.actionPending || delegate.relaunchBlocked)
+            }
             CommandMenu("Widget") {
                 Button("Show widget") { widget.show() }
                 Button("Hide widget") { widget.hide() }.disabled(!widget.isVisible)

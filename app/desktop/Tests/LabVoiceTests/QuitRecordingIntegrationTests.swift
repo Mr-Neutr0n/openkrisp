@@ -20,6 +20,8 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
 }
 @MainActor private final class QuitRecordingChild: AudioHelperChild {
     var running = false
+    var finalizeSyntheticWAV = false
+    private var capturePath: String?
     var arguments: [String] = []
     var line: ((String) -> Void)?
     var exit: ((HelperExit) -> Void)?
@@ -37,11 +39,17 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
         let command = try JSONSerialization.jsonObject(with: data) as! [String: Any]
         guard let type = command["type"] as? String, type.hasPrefix("recording-") else { return }
         let action = String(type.dropFirst(10))
+        if action == "start" { capturePath = command["path"] as? String }
         var ack = command; ack["type"] = "recording-ack"; ack["action"] = action; ack["accepted"] = true; ack.removeValue(forKey: "path")
         emit(ack)
         if action == "stop" {
+            if finalizeSyntheticWAV {
+                let url = URL(fileURLWithPath: capturePath!)
+                try recordingFixtureWAV().write(to: url)
+                try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+            }
             emit(["type": "recording-result", "operationID": command["operationID"]!, "recordingID": command["recordingID"]!,
-                  "status": "completed", "path": "/synthetic-quit-staging/recording.wav", "frames": 480, "sampleRate": 48000, "channels": 2])
+                  "status": "completed", "path": finalizeSyntheticWAV ? capturePath! : "/synthetic-quit-staging/recording.wav", "frames": 480, "sampleRate": 48000, "channels": 2])
         }
     }
     func terminate() { running = false; exit?(.init(status: 0, output: Data(), diagnostic: "")) }
@@ -52,14 +60,14 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
         for _ in 0..<2000 { if condition() { return }; try await Task.sleep(nanoseconds: 1_000_000) }
         XCTFail("Injected lifecycle did not settle")
     }
-    private func runningRecording(storage: QuitFailingRecordingStorage) async throws -> (AudioRouteController, RecordingController, LibraryLocation) {
+    private func runningRecording(storage: any RecordingStoring, finalizeSyntheticWAV: Bool = false) async throws -> (AudioRouteController, RecordingController, LibraryLocation) {
         let defaults = UserDefaults(suiteName: UUID().uuidString)!
         let location = LibraryLocation(defaults: defaults, defaultRoot: URL(fileURLWithPath: "/synthetic-library"), inspect: { _ in })
         let recording = RecordingController(storage: storage, location: location)
         let inventory = try JSONDecoder().decode(AudioInventory.self, from: Data("""
         {"devices":[{"uid":"mic","name":"Mic","alive":1,"nominal_rate":48000,"input":{"channels":1},"output":{"channels":0}},{"uid":"speaker","name":"Speaker","alive":1,"nominal_rate":48000,"input":{"channels":0},"output":{"channels":2}}],"companion_devices":[{"uid":"dev.hari.labvoice.feed","present":true},{"uid":"dev.hari.labvoice.monitor","present":true}],"errors":[]}
         """.utf8))
-        let child = QuitRecordingChild()
+        let child = QuitRecordingChild(); child.finalizeSyntheticWAV = finalizeSyntheticWAV
         let route = AudioRouteController(readInventory: { inventory }, authorization: { .authorized }, requestAuthorization: { XCTFail("No permission prompt expected"); return false }, factory: { child }, recording: recording)
         await route.refresh(); route.inputUID = "mic"; route.outputUID = "speaker"; route.start()
         try await wait { child.running }; child.ready(); XCTAssertEqual(route.phase, .running)
@@ -107,6 +115,43 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
         XCTAssertNotNil(recording.error) // Cleanup warning is not failed publication.
         XCTAssertNil(quit.reason); XCTAssertTrue(gate.quitting)
         XCTAssertEqual(try LocalStore(root: root).inventory().sessions.count, 1)
+    }
+
+    func testRelaunchWaitsForActualStorePublicationAndRouteShutdown() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let (route, recording, location) = try await runningRecording(storage: RecordingStorage(stagingRoot: root.appendingPathComponent("staging"), storeRoot: root.appendingPathComponent("sessions")), finalizeSyntheticWAV: true)
+        let gate = QuitGate(); var launches = 0
+        let coordinator = QuitCoordinator(snapshot: {
+            QuitSnapshot(recordingActive: recording.busy, audioEngaged: route.engaged, testEngaged: false,
+                         otherWork: location.activities.values.contains { $0 != "Recording" },
+                         recordingSaved: recording.savedSessionID != nil && !recording.busy)
+        }, confirmSave: { XCTFail("Wrong prompt intent"); return false }, stopAudio: { await route.stop() }, cleanupTest: { true }, gate: gate,
+           confirmRelaunchSave: { true }, launchForRelaunch: {
+               launches += 1; XCTAssertTrue(gate.quitting); XCTAssertFalse(route.engaged); XCTAssertFalse(recording.busy)
+               XCTAssertNotNil(recording.savedSessionID)
+               do {
+                   let store = try LocalStore(root: root.appendingPathComponent("sessions"))
+                   XCTAssertEqual(try store.inventory().sessions.map(\.id), [recording.savedSessionID!])
+                   let wav = try XCTUnwrap(store.recordingURL(for: recording.savedSessionID!))
+                   XCTAssertEqual(try Data(contentsOf: wav), recordingFixtureWAV())
+               } catch { XCTFail("Recording publication must precede launch: \(error)") }
+               return .confirmed
+           })
+        let approved = await coordinator.request(intent: .relaunch)
+        XCTAssertTrue(approved); XCTAssertEqual(launches, 1); XCTAssertTrue(gate.quitting)
+    }
+    func testRelaunchFailedActualImportNeverCallsLauncher() async throws {
+        let (route, recording, location) = try await runningRecording(storage: QuitFailingRecordingStorage())
+        let gate = QuitGate(); var launches = 0
+        let coordinator = QuitCoordinator(snapshot: {
+            QuitSnapshot(recordingActive: recording.busy, audioEngaged: route.engaged, testEngaged: false,
+                         otherWork: location.activities.values.contains { $0 != "Recording" },
+                         recordingSaved: recording.savedSessionID != nil && !recording.busy, recordingFailure: recording.error)
+        }, confirmSave: { true }, stopAudio: { await route.stop() }, cleanupTest: { true }, gate: gate,
+           launchForRelaunch: { launches += 1; return .confirmed })
+        let approved = await coordinator.request(intent: .relaunch)
+        XCTAssertFalse(approved); XCTAssertEqual(launches, 0); XCTAssertFalse(gate.quitting)
     }
 
 }

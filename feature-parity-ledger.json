@@ -336,7 +336,7 @@
         },
         {
           "key": "all_done_today",
-          "text": "All done for today \u2705"
+          "text": "All done for today ✅"
         }
       ],
       "original_evidence_ids": [
@@ -1046,7 +1046,7 @@
         },
         {
           "key": "bvc.active_tooltip_text",
-          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won\u2019t be heard."
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
         },
         {
           "key": "bvc.bvc_device_enforced_tooltip",
@@ -1366,7 +1366,23 @@
         "ev_4388b9434974bae50da7433fa61fbba3f09b1b18513ce3a453298cbb3d027e8d",
         "ev_4615dfd9d86356d16df51642343a4055a02d2464f133ab85160c6c6a1ef051e5",
         "ev_ead7698e3910c1c4c8e740b8fa3a306165affd3222f2fb47ef4b32f523768679",
-        "ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd"
+        "ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd",
+        "ev_3a54568811b26cf5484325645d4ec772d8a425f658baf6e523ffd035b522b820",
+        "ev_1d12b8556147d4186d750ee2624af3272aba5d208e5e44db8a98e8bf9f2b019d",
+        "ev_6633cc56846dc24c1803403ef109b67197a17228f64422f75143e8dd616f85b1",
+        "ev_f5ab7c72b42ff4a4d14cb47d3bf91893363610cf6acf2c89937c3802d073a6cf",
+        "ev_48289fc2d3d251a1c78a3d4bd60e7cbdd8e0a1b72b7a7052596a2b6aa93ff471",
+        "ev_e7f448f073b658a14421f39531916cc213d90e87a5fb43d0d5a969bd1cfe77d2",
+        "ev_90bc2c6dc71532c5708e4a6513ea3495429d8063dc2f9d88deab96700430922e",
+        "ev_05184fa6d2e3a58a8d09867c6d954ded8ef621a734043f9bb844613725ae53f2",
+        "ev_1d726deb5968cb257a13c64b5acc0f5d615afd4c8bbc6b9482c38fad00cbaec9",
+        "ev_3948d4fcb8f79850daade604750afc05fa74295a00b787668b6e6f7afe6ea541",
+        "ev_44c803503f174f13f195c89e2a304dedfb3da49d5974cace06a39920c5c85961",
+        "ev_1193bc162371842800b2da2f41d4dacd85b21d6497d2a7d7e13b041e77cce204",
+        "ev_ccb5f73ed927444d486c00b8bd3f4ded73c10311f17ccaeb31a49dda7d922e21",
+        "ev_0a448a8b286651622328535483067d3d3aed33f25a095db813644e4dda5661af",
+        "ev_4a1fd1ee6ecd06276ae7d39964ddb72016544cf93a283ca84ffabe37d9c6a9fc",
+        "ev_0f391dc80f1bb62a25d7262e199755ae5ae480fefc7016211d6a119335e5b5bf"
       ],
       "implemented_code": [
         {
@@ -1403,7 +1419,7 @@
         }
       ],
       "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC, BVC and Noise Shield detection/feedback remain unimplemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -1446,7 +1462,7 @@
         },
         {
           "key": "test_nc.recording_will_not_leave_device",
-          "text": "Your recording will never leave your device and won\u2019t be saved."
+          "text": "Your recording will never leave your device and won’t be saved."
         }
       ],
       "original_evidence_ids": [
@@ -2074,7 +2090,7 @@
       "representative_labels": [
         {
           "key": "about_copy_right_text",
-          "text": "\u00a9 {{date}} Krisp Technologies, Inc. All right reserved."
+          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
         },
         {
           "key": "app_menu_edit.title",
@@ -2152,17 +2168,26 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/Diagnostics.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift",
+          "exists": true
         }
       ],
-      "implementation": "Native app/Settings and orderly helper shutdown exist. Explicit launch-at-login control uses SMAppService.mainApp on macOS13+, reads actual OS status, and registers/unregisters only on user action. macOS12 is explicitly unsupported. A shared controller reports enabled, not registered, approval required, not found and unknown without a saved desired preference. Meeting-window startup, sleep/wake controls and save-before-relaunch workflow remain absent. Explicit retained-stage review and confirmed save-copy now admit only unchanged finalized independent 48kHz stereo PCM16 WAVs from fixed staging paths into the pinned current library. Source remains; repeated confirmation creates a new session. Temporary cleanup failures identify the retained temporary path. Normal application quit now offers explicit Save and quit or Cancel for a busy recording; termination requires confirmed recording library publication plus stopped helper/test. Failed save or uncertain cleanup cancels quit while retaining source data. Library/import/recovery and diagnostic export work block quit without interruption; a shared quit gate prevents new work during finalization.",
-      "verified_scope": "Five injected-service startup tests cover distinct statuses, refresh without mutation, explicit enable/disable and approval, action/read failures, stale refresh rejection, duplicate-action admission and app-activation refresh. Bounded read-only review found no material issue. Worker reports full desktop ./verify exit0 with73tests, ARM64/macOS12 release build, ad-hoc signatures and resource checks; retained local log projects/krisp/app/desktop/.build/startup-verify.log. No actual SMAppService registration/unregistration, login/reboot, Settings UI or original runtime acceptance was performed. This remains partial lifecycle implementation, not full parity. Recovery checkpoint: nine synthetic backend filesystem tests and four controller tests passed, including finalized byte-exact copy/source preservation, strict admission, changed source, replaced destination, owned temporary cleanup, stale confirmations and shared capture/library admission. Worker reports desktop ./verify exit0 with86tests plus signed release/resource checks, log projects/krisp/app/desktop/.build/recovery-verify.log. Read-only review found no remaining material issue in bounded recovery scope. No partial-WAV salvage, LocalStore .pending recovery, original crash parity, native recovery UI or live audio acceptance is claimed. Quit checkpoint: eight injected coordinator/gate tests and three actual independent route/recording-controller integration tests passed. Includes cancel/repeated quit, save failure versus helper-stop success, cleanup failure, exact recording-activity exemption, gated new work and actual DiagnosticsController suspended-export admission/release. Read-only bounded review found no remaining material issue. Worker reports desktop ./verify exit0 with97tests plus ARM64/macOS12 signed release/resource checks; log projects/krisp/app/desktop/.build/quit-verify.log. Native confirmation prompt, actual app termination, process logout, forced kill and interrupted OS shutdown remain unverified.",
-      "missing_acceptance": "Validate actual login-item registration/approval/unregistration and user-login behavior on supported macOS with explicit authorization. Original defaults and hidden/window behavior remain unknown. Validate native Save and quit/Cancel prompt and normal termination; actual process logout, forced kill, interrupted OS shutdown and crash exit remain unverified; meeting-window launch, sleep/wake and relaunch/save policy remain outstanding. Original developer-tools/reload actions remain unimplemented candidates.",
+      "implementation": "Native app/Settings and orderly helper shutdown exist. Explicit launch-at-login control uses SMAppService.mainApp on macOS13+, reads actual OS status, and registers/unregisters only on user action. macOS12 is explicitly unsupported. A shared controller reports enabled, not registered, approval required, not found and unknown without a saved desired preference. Meeting-window startup and sleep/wake controls remain absent. Explicit retained-stage review and confirmed save-copy now admit only unchanged finalized independent 48kHz stereo PCM16 WAVs from fixed staging paths into the pinned current library. Source remains; repeated confirmation creates a new session. Temporary cleanup failures identify the retained temporary path. Normal application quit now offers explicit Save and quit or Cancel for a busy recording; termination requires confirmed recording library publication plus stopped helper/test. Failed save or uncertain cleanup cancels quit while retaining source data. Library/import/recovery and diagnostic export work block quit without interruption; a shared quit gate prevents new work during finalization. Explicit Relaunch now shares the save-before-quit pipeline. It opens a new instance of the current bundle only after recording publication and stopped audio. Confirmed launch keeps work admission closed until old exit; failed launch reopens admission; uncertain launch permanently blocks further relaunch attempts in the old instance while allowing normal quit.",
+      "verified_scope": "Five injected-service startup tests cover distinct statuses, refresh without mutation, explicit enable/disable and approval, action/read failures, stale refresh rejection, duplicate-action admission and app-activation refresh. Bounded read-only review found no material issue. Worker reports full desktop ./verify exit0 with73tests, ARM64/macOS12 release build, ad-hoc signatures and resource checks; retained local log projects/krisp/app/desktop/.build/startup-verify.log. No actual SMAppService registration/unregistration, login/reboot, Settings UI or original runtime acceptance was performed. This remains partial lifecycle implementation, not full parity. Recovery checkpoint: nine synthetic backend filesystem tests and four controller tests passed, including finalized byte-exact copy/source preservation, strict admission, changed source, replaced destination, owned temporary cleanup, stale confirmations and shared capture/library admission. Worker reports desktop ./verify exit0 with86tests plus signed release/resource checks, log projects/krisp/app/desktop/.build/recovery-verify.log. Read-only review found no remaining material issue in bounded recovery scope. No partial-WAV salvage, LocalStore .pending recovery, original crash parity, native recovery UI or live audio acceptance is claimed. Quit checkpoint: eight injected coordinator/gate tests and three actual independent route/recording-controller integration tests passed. Includes cancel/repeated quit, save failure versus helper-stop success, cleanup failure, exact recording-activity exemption, gated new work and actual DiagnosticsController suspended-export admission/release. Read-only bounded review found no remaining material issue. Worker reports desktop ./verify exit0 with97tests plus ARM64/macOS12 signed release/resource checks; log projects/krisp/app/desktop/.build/quit-verify.log. Native confirmation prompt, actual app termination, process logout, forced kill and interrupted OS shutdown remain unverified. Relaunch checkpoint: independent review found no actionable issue; desktop ./verify passed 117 tests and signed/relocated packaging. Real LocalStore integration proves byte-exact synthetic WAV publication before the injected launch callback. No native launch or replacement UI acceptance ran. Launch Services completion has no deadline.",
+      "missing_acceptance": "Validate actual login-item registration/approval/unregistration and user-login behavior on supported macOS with explicit authorization. Original defaults and hidden/window behavior remain unknown. Validate native Save and quit/Cancel prompt and normal termination; actual process logout, forced kill, interrupted OS shutdown and crash exit remain unverified; meeting-window launch and sleep/wake remain outstanding. Native relaunch, replacement UI readiness and original discard/failure semantics remain unverified. Original developer-tools/reload actions remain unimplemented candidates.",
       "supporting_findings": "projects/krisp/startup-findings.md",
       "verification_log": "projects/krisp/app/desktop/.build/startup-verify.log",
       "recovery_findings": "projects/krisp/recovery-findings.md",
       "recovery_verification_log": "projects/krisp/app/desktop/.build/recovery-verify.log",
       "quit_findings": "projects/krisp/quit-findings.md",
-      "quit_verification_log": "projects/krisp/app/desktop/.build/quit-verify.log"
+      "quit_verification_log": "projects/krisp/app/desktop/.build/quit-verify.log",
+      "relaunch_verification_log": "projects/krisp/evidence/relaunch-desktop-verify-20261018.log"
     },
     {
       "id": "notifications",
@@ -2191,7 +2216,7 @@
         },
         {
           "key": "pref_notifications_on_off_indicator_body",
-          "text": "Shows key features\u2019 states at the start of each meeting and reminds to inform other participants if recording"
+          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
         }
       ],
       "original_evidence_ids": [
@@ -2225,7 +2250,7 @@
       "representative_labels": [
         {
           "key": "cant_find_page_text",
-          "text": "Can\u2019t find the page?"
+          "text": "Can’t find the page?"
         },
         {
           "key": "check_internet",
@@ -2720,7 +2745,7 @@
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "f1cb358676578116a77ee630d2deab48d3a576bf92694cff41ac1940d0f932e2",
     "projects/krisp/app/audio-host/routing.cpp": "3b2d46f0cf14fc439a7024caad8d8c33afacba32b3840d90b165e85c59918edc",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "7ec1b774284a0d9b0f706b84fe874fc002694c4955608ca7122d01cafc53824e",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "888e836225c67f5cbc470eb3a811d58875e25a48475d251ed6bdc62663ed0de8",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
@@ -2729,7 +2754,7 @@
     "projects/krisp/app/audio-host/route_cli.cpp": "6f714d68fecd9ee65ef20c3a9680c15a59a2056bd7ceb5b247c96ccca2f1c9f7",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "013d1609513ebc7e7c6537d79ad170104dbc4c1bb99fb66a0c6e44185127b27c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "fac388cece5b9f3960a18d64ba4a792cdc3954ef94f3206263ae3ef4625fbaa0",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "7dd758ce87490dbbf3319460f91ec2b2b7902d2b06c36cc50d10163a84f0c7e5",
     "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "db149846fda3b742340f544118c07a7a3928990f7eda215b12cc474d6f49bc70",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
@@ -2766,9 +2791,9 @@
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingRecoveryController.swift": "0fbf1c9bc856e6c404ff6e2ec99b435efc702d173cad109edc9337ce1f8558e9",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryTests.swift": "0699bd37de60a424bcae3cd5a988ab8ff7f0057fc5cd2d2533e161c2c99718fd",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift": "a5a23e39a0a4521d6836ae17dc202f102068dc2b778c41fae10b098a3e2275de",
-    "projects/krisp/app/desktop/Sources/LabVoice/QuitCoordinator.swift": "7e0ae5747b34e0b0aab3d6d4d6dfed88cc3362d5df5cde731041df923b7360ad",
+    "projects/krisp/app/desktop/Sources/LabVoice/QuitCoordinator.swift": "5dc1c7164073dc8965e630527077e7ebcb690f857c3febd7c2e382417378ce1b",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitCoordinatorTests.swift": "7407e235432c4f017d751ab4ec3261467bf82f9dee66a733672ac98b8488c841",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitRecordingIntegrationTests.swift": "e8819bdcc67ad6be31d34783569323b3298016f1c58eb2224c93dc48ee45234c",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitRecordingIntegrationTests.swift": "690bc18b0b52d7e7ad6231d116ff14f6815a7306e17a16983dee9ccf63571190",
     "projects/krisp/app/native-model-probe/abi_result.hpp": "7c31440ec799ae1bcbf08fef6df00de818fe1b22acdd922402de3a0f2a309572",
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
@@ -2825,7 +2850,9 @@
     "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "6d39c0d9d673a827f6a03a0c422ba3edb8c0ad5c5f106b4d02cf6fa3298fa60a",
     "projects/krisp/app/audio-host/verify": "bece48f42b7e1928f512d11c98d76a5701f55b7640c62635b3abf8c1a71785e9",
     "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "dac6160afd83a6772fbdfbb06dfddb991b8bb68dc756490f5bf19529525d607a",
-    "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76"
+    "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76",
+    "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift": "a37726a9e31660c0cad166362070872e35d295ed8d55b6b3051687822c6bed9c"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

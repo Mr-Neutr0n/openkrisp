@@ -347,7 +347,11 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
 }
 
-@MainActor final class LabVoiceApplicationDelegate: NSObject, NSApplicationDelegate {
+@MainActor final class LabVoiceApplicationDelegate: NSObject, NSApplicationDelegate, ObservableObject {
+    @Published private(set) var actionPending = false
+    @Published private(set) var relaunchBlocked = false
+    private var pendingIntent: AppExitIntent = .quit
+    private var terminationApproved = false
     private var quitTask: Task<Void, Never>?
     private lazy var quit = QuitCoordinator(snapshot: {
         let audio = AudioRouteController.shared, test = MicrophoneTestController.shared
@@ -359,23 +363,42 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                             otherWork: LibraryLocation.shared.switching || LibraryLocation.shared.activities.keys.contains { $0 != recordingActivity } || AudioCaptureAdmission.shared.owner == .recordingRecovery,
                             recordingSaved: saved, recordingFailure: saved ? nil : recording.error,
                             stopFailure: audio.error, testFailure: test.error)
-    }, confirmSave: {
+    }, confirmSave: { Self.confirmSave(intent: .quit) },
+       stopAudio: { await AudioRouteController.shared.stop() },
+       cleanupTest: { await MicrophoneTestController.shared.cancelAndCleanup() },
+       confirmRelaunchSave: { Self.confirmSave(intent: .relaunch) },
+       launchForRelaunch: {
+           guard let launcher = OwnAppRelauncher.current() else { return .failed("The current executable is unavailable.") }
+           return await launcher.launch()
+       })
+    private static func confirmSave(intent: AppExitIntent) -> Bool {
+        let relaunch = intent == .relaunch
         let alert = NSAlert()
-        alert.messageText = "Save the recording and quit?"
-        alert.informativeText = "Lab Voice will stop audio, finalize this recording and save it to your library before quitting. If saving fails, the app will stay open."
-        alert.addButton(withTitle: "Save and quit"); alert.addButton(withTitle: "Cancel")
+        alert.messageText = relaunch ? "Save the recording and relaunch?" : "Save the recording and quit?"
+        alert.informativeText = relaunch
+            ? "Lab Voice will stop audio, save this recording, and open a new instance before this one exits. If saving or launch fails, this instance stays open."
+            : "Lab Voice will stop audio, finalize this recording and save it to your library before quitting. If saving fails, the app will stay open."
+        alert.addButton(withTitle: relaunch ? "Save and relaunch" : "Save and quit")
+        alert.addButton(withTitle: "Cancel")
         return alert.runModal() == .alertFirstButtonReturn
-    }, stopAudio: { await AudioRouteController.shared.stop() },
-       cleanupTest: { await MicrophoneTestController.shared.cancelAndCleanup() })
+    }
+    func requestRelaunch() {
+        guard !actionPending, !relaunchBlocked else { return }
+        pendingIntent = .relaunch
+        NSApp.terminate(nil) // One termination delegate pipeline handles both intents.
+    }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        if terminationApproved { return .terminateNow }
         guard quitTask == nil else { return .terminateLater }
+        let intent = pendingIntent; pendingIntent = .quit; actionPending = true
         quitTask = Task {
-            let approved = await quit.request()
+            let approved = await quit.request(intent: intent)
             if !approved, let reason = quit.reason {
                 let alert = NSAlert(); alert.messageText = "Lab Voice is staying open"
                 alert.informativeText = reason; alert.addButton(withTitle: "OK"); alert.runModal()
             }
-            quitTask = nil
+            terminationApproved = approved; relaunchBlocked = quit.relaunchUncertain
+            actionPending = approved; quitTask = nil
             sender.reply(toApplicationShouldTerminate: approved)
         }
         return .terminateLater

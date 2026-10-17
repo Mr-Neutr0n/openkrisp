@@ -130,3 +130,14 @@ A paced inbound CPU helper returned the direct probe's output exactly with zero 
 ## Dual installed-model runtime, 2026-10-18
 
 The production dual adapter completed a paced CPU run using both installed models, with complete REA cleanup. Both workers processed 105 frames and shut down cleanly. Microphone output and deinterleaved speaker output match their direct-model baselines byte for byte. See [dual-installed-adapter-findings.md](dual-installed-adapter-findings.md). All 118 source fingerprints match. This does not prove live routing, complete original stereo behavior, sustained scheduling or quality. Native UI acceptance remains pending an unlocked Mac session.
+
+
+## Save and relaunch and original audio contracts, 2026-10-18
+
+The app menu now offers Relaunch Lab Voice. An active recording requires Save and relaunch or Cancel. The shared quit transaction confirms library publication and stopped audio before opening a new instance of the current bundle. Confirmed launch closes the old instance; failure keeps it usable. An uncertain returned identity blocks further relaunch attempts in that instance while allowing normal quit. No audio-resume arguments are passed. Original discard and failure semantics remain unresolved.
+
+Independent review found no actionable issue. Final desktop `./verify` passed 117 tests, signed ARM64/macOS 12 packaging and relocated resources. The save-before-launch integration uses production RecordingStorage and LocalStore with a synthetic WAV and checks byte-exact publication inside the launch callback. Private log `evidence/relaunch-desktop-verify-20261018.log`, SHA256 `fa03065451fbad605fc60471b38934c0755101597d8b577a348ceb48ce3ff963`. Native launch, replacement UI readiness and prompts remain untested. Launch Services has no callback deadline in this implementation. Other components are unchanged from their preceding verification.
+
+`original-speaker-graph-findings.md` binds the current 3.17.9 desktop speaker graph to default 48 kHz stereo Float32 and conditional inbound NC. BVC, accent, suspension and pass-through remain separate branches. The packaged microphone default is 32 kHz mono; effective overrides and the native processor-factory join remain unresolved. This does not establish full original runtime parity.
+
+`native-echo-contract-findings.md` establishes shared AEC state, separate forward/reference specifications, 10 ms Float32 calls and the direct factory ABI from nine successful static REA captures. Current full AEC-library SHA256 is `bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a`. No AEC runtime, hardware audio or administrator action ran. An independent foreign-ABI fixture is the next step. Full retained-feature parity remains incomplete.
