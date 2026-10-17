@@ -118,3 +118,10 @@ The desktop now admits an explicit installed outbound NC microphone provider and
 The exact inbound model has bounded direct mono processing evidence. Its NC capture has unresolved REA cleanup; the bypass capture completed. Static evidence establishes stereo averaging into one mono state and duplicated output in the selected original KMS bridge. See [inbound-model-findings.md](inbound-model-findings.md) and [native-speaker-channel-findings.md](native-speaker-channel-findings.md). Original desktop topology and complete stereo runtime parity remain unresolved.
 
 Native admission now binds explicit outbound/inbound roles to exact model hashes and role-bearing readiness. The microphone adapter remains outbound-only. Native, host and desktop verification passed; 116 source fingerprints match. Speaker integration, live routing and full local parity remain incomplete.
+
+
+## Installed speaker integration, 2026-10-18
+
+The desktop and host now support independently selected installed outbound microphone and inbound speaker NC. The speaker adapter uses the recovered stereo average and duplicated mono output, with a separate stateful worker. Startup and acknowledgement validate each lane. Synthetic tests cover channel arithmetic, callback partitions, invalid input, partial startup and both-worker cleanup. Desktop verification passed 109 tests and signed packaging checks. All 117 source fingerprints match.
+
+A paced inbound CPU helper returned the direct probe's output exactly with zero queue deadline faults, but REA ownership cleanup was incomplete. No original stereo comparison, dual installed-worker adapter runtime or physical route has passed. The ledger's earlier metadata-only installed-provider status is corrected to partial integration.

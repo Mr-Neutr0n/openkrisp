@@ -10,6 +10,7 @@ struct RouteControlOptions {
 };
 struct RouteProviderOptions {
     std::optional<krisp_probe::InstalledWorkerSettings> installed;
+    std::optional<krisp_probe::InstalledWorkerSettings> installedSpeaker;
 };
 int runRoute(const std::string &input, const std::string &output, bool microphoneNoise,
              bool speakerNoise, const RouteControlOptions &controls = {},

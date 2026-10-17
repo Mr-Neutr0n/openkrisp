@@ -2,7 +2,7 @@
 
 The installed inbound model accepts the reviewed ordinary NC factory with normalized mono Float32 input at 48 kHz, 480 samples per call, in this bounded synthetic experiment. Both NC and bypass runs returned 100 callbacks and 48,000 finite samples across five persistent batches, then confirmed native teardown. The NC capture has an unresolved REA cleanup failure. Stereo behavior, perceptual quality, sustained deadlines and model tail preservation remain unverified.
 
-No physical microphone, playback, CoreAudio graph, driver change or administrator action ran. Original files stayed at their installed paths. Production provider selection remains fixed to the outbound model.
+No physical microphone, playback, CoreAudio graph, driver change or administrator action ran. Original files stayed at their installed paths. At the time of the direct probes, production provider selection was fixed to the outbound model. The later integration checkpoint below adds explicit speaker selection.
 
 ## Current identity
 
@@ -55,3 +55,16 @@ The NC capture returned `cleanup_incomplete`: REA could not read ownership envir
 The experiment supports an explicit experimental inbound provider. The separate static investigation in `native-speaker-channel-findings.md` establishes averaging stereo into one mono processor and duplicating its output for the selected KMS bridge. That contract still needs synthetic adapter tests and a complete original stereo runtime comparison. Two independent mono processors would implement a different channel policy.
 
 Before production selection, extend exact model identity admission, startup acknowledgement and desktop validation together. Bind the inbound digest separately from the proven outbound digest. Keep a fresh processor per stateful channel/session and the existing normalized 48 kHz/480-sample native contract. Re-measure startup cost, sustained processing deadlines and buffering under the actual worker transport. Resolve the NC capture lifecycle limitation before treating both runs as complete REA acceptance. Model quality, original-app comparison, internal latency and finite-input tail preservation still need separate evidence.
+
+
+## Paced worker and speaker integration, 2026-10-18
+
+The timed worker probe now accepts an explicit `--model-role` option and derives the pinned model digest from that role. Unknown, repeated and missing role arguments reject before opening the synthetic input. The default remains outbound.
+
+REA capture `inbound-paced-nc-20261018-v2` ran the role-bearing production worker against the installed inbound model and the previously signed packaged adapter. The helper exited 0, processed 105 frames including five padding frames, returned 48,000 finite aligned samples and confirmed worker teardown. The callback bound was 512 samples, scheduling budget two model frames and explicit transport delay 2400 samples, or 50 ms. It reported zero queue deadline failures, maximum callback exchange 13 microseconds and maximum scheduling lateness 5328 microseconds. Output SHA256 `cf8a006932542aa1eeb9a02e2945e9c9f671804a2bcee7dc92997ab108d90a76` matches the direct inbound NC result byte for byte.
+
+The probe executable SHA256 was `bb038be1a6104fa2d9e4717b92520cddc0dd6f1346541a4e90355fcf663fe30a`. The packaged adapter SHA256 was `216d95381d62f24605103a179d2782c967621baccdf7f06493d76f06b8d26025`; addon, model and Node pins are unchanged. The worker checks identities before loading, not atomically against loaded images or again after teardown.
+
+REA returned `cleanup_incomplete` because one live candidate's ownership environment was unavailable. The retained partial capture has complete helper output and exit 0 but no successful Evidence ID; owned-process-group cleanup and temporary-root removal are unverified. No candidate was signaled manually. Files are `evidence/model-probes/inbound-paced-nc-20261018-v2.*`. This is short paced mono CPU evidence, not a stereo original-app comparison, sustained deadline guarantee, live route, quality result or model-tail proof.
+
+The independent adapter now supports a separately owned inbound speaker worker. It averages stereo before the mono worker and duplicates its output, with callback-size and finite-value checks. The host and desktop carry separate microphone and speaker configurations and identity acknowledgements. Acceptance tests and remaining gaps are recorded in CHECKPOINT.md.

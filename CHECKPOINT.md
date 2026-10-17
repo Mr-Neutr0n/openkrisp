@@ -234,3 +234,21 @@ Verification logs and SHA256:
 - `evidence/model-role-desktop-verify-20261018.log`: `802bf107ee99847547c8d7ccb53fdd2a532a06892dcf1f6fe59a335cfeccebda`.
 
 The selected original stereo bridge is now established by static evidence in `native-speaker-channel-findings.md`. Next implement and test one independently owned inbound worker with stereo averaging before processing and mono duplication afterward. Then connect speaker-specific identity/configuration acknowledgement and desktop selection together. Original desktop topology, complete stereo runtime comparison, sustained deadlines, quality and live driver routing remain unverified. No full-parity release claim is made.
+
+
+## Installed speaker integration, 2026-10-18
+
+The host and desktop now independently select installed outbound microphone NC and installed inbound speaker NC. Each installed lane owns its worker, model state and immutable identity settings. Speaker processing averages each Float32 stereo pair before its mono worker and duplicates the processed sample to both playback channels. RNNoise and disabled lanes retain their existing processing or passthrough. The UI explains the installed speaker's mono behavior.
+
+Both worker configurations validate before either child starts. Partial startup stops the first worker, and shutdown attempts both even when one fails. The callback preflights the complete input block and rejects nonfinite values or overflow in stereo summation before advancing either lane. Supported-size failures silence both outputs. The separate control-thread owner and scope guard retain safe cleanup when HAL teardown fails.
+
+The CLI keeps existing microphone flags/ACK fields and adds an independent `--speaker-provider-*` namespace with `speaker_provider_*` identity/buffering acknowledgements. Both groups require their suppression option and all runtime fields before aggregate creation. Actual parser fixtures cover five valid single/dual/mixed profiles with distinct lane paths; twenty invalid profiles reject. No fixture starts a route. Desktop selection hashes only requested roles, publishes dual admission atomically, rejects stale results and captures both configurations at start. ACK matching validates each lane and rejects unexpected identities. Startup allows 40 seconds for one installed worker or 70 seconds for two.
+
+Independent review found no actionable defect. Full audio-host verification passed, including release/ASan/UBSan/TSan adapter tests, partial startup, both-worker shutdown, irregular callback continuity, left/right/identical/opposite/distinct stereo inputs, RNNoise/passthrough and retained Context lifetime. Desktop verification passed 109 tests, signed ARM64/macOS 12 packaging and relocated worker-resource checks. The new timed-probe role option compiled with warnings as errors; three invalid-role cases rejected before input access. All 117 source fingerprints match.
+
+- Host log `evidence/installed-speaker-adapter-host-verify-20261018.log`, SHA256 `4b1df7cd9ec48c525c1d95682e19cee5777333f53790755ad62976bd692b4591`.
+- Desktop log `evidence/installed-speaker-desktop-verify-20261018.log`, SHA256 `6ad43bac857aa0f0791f674365be2b29f10b21497d6ef182018c789fc4780b5e`.
+
+The paced inbound CPU helper processed 105 frames with zero queue faults at 50 ms explicit buffering and returned output byte-identical to the direct inbound probe. REA ownership cleanup remained incomplete; this is a partial capture, not complete runtime acceptance. Exact metrics and limitations are in `inbound-model-findings.md`. This test used the preceding signed worker package, whose worker protocol and native adapter are unchanged by speaker UI/host integration. It did not exercise the dual adapter with original models.
+
+Next verify the dual adapter with synthetic input through both installed workers, inspect the actual selection/validation UI, and recover the original desktop speaker topology. Actual driver routing, sustained timing, speech quality, model tails, AEC/BVC/accent and the remaining local-feature/UI parity are still open. No physical audio, driver replacement, CoreAudio restart, administrator operation or proprietary-file publication occurred. Full parity remains incomplete.

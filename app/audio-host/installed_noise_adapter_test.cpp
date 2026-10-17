@@ -2,6 +2,7 @@
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <vector>
 using namespace labvoice;
 using namespace std::chrono_literals;
 static Layout layout() { return {{3},{3},0,1,2,0,1,2,480,512}; }
@@ -15,7 +16,8 @@ static krisp_probe::InstalledWorkerSettings settings() {
 static InstalledNoiseAdapter::WorkerFactory fixture(const char* node,const char* script,const char* mode) {
     return [=](krisp_probe::WorkerLaunchConfig built,std::string& error,krisp_probe::ProviderBufferingConfig buffering) {
         assert(built.executable=="/usr/bin/sandbox-exec");
-        assert(built.expectedReadyLine.find(krisp_probe::installed_worker_detail::modelSHA)!=std::string::npos);
+        assert(built.expectedReadyLine.find(krisp_probe::installedOutboundModelSHA256)!=std::string::npos ||
+               built.expectedReadyLine.find(krisp_probe::installedInboundModelSHA256)!=std::string::npos);
         krisp_probe::WorkerLaunchConfig c;
         c.executable=node; c.arguments={script,mode,"fixture-ready","000102030405060708090a0b0c0d0e0f"};
         c.expectedReadyLine="fixture-ready\n";
@@ -23,6 +25,10 @@ static InstalledNoiseAdapter::WorkerFactory fixture(const char* node,const char*
         c.startupTimeout=1500ms; c.frameTimeout=150ms; c.shutdownTimeout=150ms;
         return krisp_probe::ProviderWorker::create(std::move(c),error,buffering);
     };
+}
+static krisp_probe::InstalledWorkerSettings inboundSettings() {
+    auto s=settings();s.modelRole=krisp_probe::InstalledModelRole::inbound;
+    s.modelSha256=krisp_probe::installedInboundModelSHA256;return s;
 }
 int main(int argc,char** argv) {
     assert(argc==3);
@@ -75,7 +81,8 @@ int main(int argc,char** argv) {
     }
     {
         std::string error;
-        auto adapter=InstalledNoiseAdapter::create(layout(),settings(),false,error,2,fixture(argv[1],argv[2],"normal"));
+        InstalledNoiseOptions dual;dual.microphone=settings();dual.speaker=inboundSettings();
+        auto adapter=InstalledNoiseAdapter::create(layout(),dual,error,fixture(argv[1],argv[2],"normal"));
         assert(adapter);
         auto context=std::make_shared<Context>(layout(),InstalledNoiseAdapter::process,adapter.get(),adapter);
         std::atomic<bool> running{false}, finished{false};
@@ -130,6 +137,135 @@ int main(int argc,char** argv) {
         auto deadline=std::chrono::steady_clock::now()+2s;
         while(adapter->healthy() && std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(1ms);
         assert(!adapter->healthy() && !adapter->stop() && !adapter->error().empty());
+    }
+    {
+        InstalledNoiseOptions disabled;std::string error;
+        auto adapter=InstalledNoiseAdapter::create(layout(),disabled,error);assert(adapter && adapter->healthy());
+        assert(!adapter->microphoneInstalled() && !adapter->speakerInstalled());
+        assert(adapter->microphoneSettings()==nullptr && adapter->speakerSettings()==nullptr);
+        assert(adapter->microphoneDelaySamples()==0 && adapter->speakerDelaySamples()==0);
+        std::array<float,17> mic{},feed{};std::array<float,34> monitor{},playback{};
+        mic.fill(.25f);for(unsigned i=0;i<17;++i){monitor[2*i]=.125f;monitor[2*i+1]=-.25f;}
+        assert(InstalledNoiseAdapter::process(adapter.get(),mic.data(),monitor.data(),feed.data(),playback.data(),17));
+        assert(feed==mic && playback==monitor && adapter->stop());
+    }
+    for(unsigned microphoneMode=0;microphoneMode<3;++microphoneMode) {
+        InstalledNoiseOptions options;options.speaker=inboundSettings();options.schedulingBudgetFrames=0;
+        if(microphoneMode==1)options.microphoneRNNoise=true;
+        if(microphoneMode==2)options.microphone=settings();
+        std::string error;
+        auto adapter=InstalledNoiseAdapter::create(layout(),options,error,fixture(argv[1],argv[2],"normal"));
+        assert(adapter && error.empty() && adapter->speakerInstalled());
+        assert(adapter->microphoneInstalled()==(microphoneMode==2));
+        assert(adapter->speakerSettings()->modelRole==krisp_probe::InstalledModelRole::inbound);
+        assert(adapter->speakerDelaySamples()==1440);
+        assert(adapter->microphoneDelaySamples()==(microphoneMode==2?1440:microphoneMode==1?480:0));
+        NoiseAdapter fallbackReference(microphoneMode==1,false);
+        std::array<float,512> mic{},feed{},referenceFeed{};
+        std::array<float,1024> monitor{},playback{},referencePlayback{};
+        std::vector<float> micHistory,monoHistory;
+        std::size_t position=0;
+        for(unsigned block=0;block<160;++block) {
+            constexpr std::array<unsigned,5> partitions{17,463,478,512,1};
+            const auto count=partitions[block%partitions.size()];
+            for(unsigned i=0;i<count;++i) {
+                const auto p=position+i;mic[i]=float(p%19)*.015625f;
+                float left=0,right=0;
+                switch((p/2400)%5) {
+                    case 0:left=.25f;break; // Left only.
+                    case 1:right=-.5f;break; // Right only.
+                    case 2:left=right=.125f;break; // Identical.
+                    case 3:left=.25f;right=-.25f;break; // Opposite phase.
+                    default:left=float(p%13)*.03125f;right=-float(p%17)*.015625f;
+                }
+                monitor[2*i]=left;monitor[2*i+1]=right;
+                micHistory.push_back(mic[i]);monoHistory.push_back((left+right)/2.f);
+            }
+            assert(InstalledNoiseAdapter::process(adapter.get(),mic.data(),monitor.data(),feed.data(),playback.data(),count));
+            assert(NoiseAdapter::process(&fallbackReference,mic.data(),monitor.data(),referenceFeed.data(),referencePlayback.data(),count));
+            for(unsigned i=0;i<count;++i) {
+                const auto p=position+i;
+                const float expectedSpeaker=p<1440?0:monoHistory[p-1440]*.5f;
+                assert(playback[2*i]==expectedSpeaker && playback[2*i+1]==expectedSpeaker);
+                const float expectedMic=microphoneMode==2?(p<1440?0:micHistory[p-1440]*.5f):referenceFeed[i];
+                assert(feed[i]==expectedMic);
+            }
+            position+=count;
+            const auto deadline=std::chrono::steady_clock::now()+2s;
+            while((adapter->speakerProcessedFrames()<position/480 ||
+                  (microphoneMode==2 && adapter->microphoneProcessedFrames()<position/480)) &&
+                  adapter->healthy() && std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(1ms);
+            assert(adapter->healthy() && adapter->speakerProcessedFrames()==position/480);
+            if(microphoneMode==2)assert(adapter->microphoneProcessedFrames()==position/480);
+        }
+        assert(adapter->stop());
+    }
+    {
+        // Every lane configuration must be validated before the first launch.
+        InstalledNoiseOptions options;options.microphone=settings();options.speaker=inboundSettings();
+        options.speaker->nodeSha256="bad";
+        unsigned calls=0;std::string error;
+        InstalledNoiseAdapter::WorkerFactory forbidden=[&](auto,auto&,auto){++calls;return std::shared_ptr<krisp_probe::ProviderWorker>{};};
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+        options.speaker=settings();assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+        options.speaker=inboundSettings();options.speakerRNNoise=true;
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+        options.speakerRNNoise=false;options.microphoneRNNoise=true;
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+    }
+    {
+        // A second startup failure must stop the already admitted first worker,
+        // even if an injected test retains its owner beyond adapter construction.
+        InstalledNoiseOptions options;options.microphone=settings();options.speaker=inboundSettings();
+        std::shared_ptr<krisp_probe::ProviderWorker> first;unsigned calls=0;std::string error;
+        auto success=fixture(argv[1],argv[2],"normal"),failure=fixture(argv[1],argv[2],"wrong-ready");
+        auto factory=[&](auto launch,auto& err,auto buffering) {
+            if(++calls==1){first=success(std::move(launch),err,buffering);return first;}
+            return failure(std::move(launch),err,buffering);
+        };
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,factory));
+        assert(calls==2 && first && !first->healthy() && first->stop());
+    }
+    {
+        InstalledNoiseOptions options;options.microphone=settings();options.speaker=inboundSettings();
+        std::shared_ptr<krisp_probe::ProviderWorker> microphoneWorker,speakerWorker;
+        std::string error;
+        auto failure=fixture(argv[1],argv[2],"close-stall"),success=fixture(argv[1],argv[2],"normal");
+        auto factory=[&](auto launch,auto& err,auto buffering) {
+            const bool microphone=launch.expectedReadyLine.find(" outbound ")!=std::string::npos;
+            auto worker=(microphone?failure:success)(std::move(launch),err,buffering);
+            (microphone?microphoneWorker:speakerWorker)=worker;return worker;
+        };
+        auto adapter=InstalledNoiseAdapter::create(layout(),options,error,factory);assert(adapter);
+        assert(!adapter->stop() && !adapter->stop());
+        assert(!microphoneWorker->healthy() && !speakerWorker->healthy() && speakerWorker->stop());
+    }
+    {
+        InstalledNoiseOptions options;options.microphone=settings();options.speaker=inboundSettings();
+        std::string error;
+        auto adapter=InstalledNoiseAdapter::create(layout(),options,error,fixture(argv[1],argv[2],"normal"));assert(adapter);
+        std::array<float,480> mic{},feed{};std::array<float,960> monitor{},playback{};
+        monitor[958]=monitor[959]=std::numeric_limits<float>::max();feed.fill(9);playback.fill(9);
+        assert(!InstalledNoiseAdapter::process(adapter.get(),mic.data(),monitor.data(),feed.data(),playback.data(),480));
+        for(auto value:feed)assert(value==0);for(auto value:playback)assert(value==0);
+        assert(adapter->microphoneProcessedFrames()==0 && adapter->speakerProcessedFrames()==0 && !adapter->healthy());
+        (void)adapter->stop();
+    }
+    {
+        InstalledNoiseOptions options;options.microphone=settings();options.speaker=inboundSettings();
+        std::string error;auto normal=fixture(argv[1],argv[2],"normal"),broken=fixture(argv[1],argv[2],"malformed");
+        auto factory=[&](auto launch,auto& err,auto buffering) {
+            return (launch.expectedReadyLine.find(" inbound ")!=std::string::npos?broken:normal)(std::move(launch),err,buffering);
+        };
+        auto adapter=InstalledNoiseAdapter::create(layout(),options,error,factory);assert(adapter);
+        std::array<float,480> mic{},feed{};std::array<float,960> monitor{},playback{};
+        assert(InstalledNoiseAdapter::process(adapter.get(),mic.data(),monitor.data(),feed.data(),playback.data(),480));
+        auto deadline=std::chrono::steady_clock::now()+2s;
+        while(adapter->healthy() && std::chrono::steady_clock::now()<deadline)std::this_thread::sleep_for(1ms);
+        feed.fill(9);playback.fill(9);
+        assert(!InstalledNoiseAdapter::process(adapter.get(),mic.data(),monitor.data(),feed.data(),playback.data(),480));
+        for(auto value:feed)assert(value==0);for(auto value:playback)assert(value==0);
+        assert(!adapter->stop());
     }
     std::cout<<"installed noise adapter tests passed\n";
 }

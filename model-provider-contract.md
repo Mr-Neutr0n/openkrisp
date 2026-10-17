@@ -296,3 +296,8 @@ The next step is a separately compiled ABI fixture for the full typed factory/ca
 `inbound-model-findings.md` records bounded direct processing of the exact installed inbound model. `native-speaker-channel-findings.md` records the selected original KMS bridge's stereo average, single mono processor and duplicated output. The default internal channel count is one. These reports supersede earlier uncertainty about the selected bridge's channel conversion, while leaving the original desktop speaker topology and full stereo runtime comparison unresolved.
 
 The independent desktop route still uses only the installed outbound microphone model. Inbound transport admission is separate from speaker integration. Original files remain external dependencies and are not included in Git.
+
+
+## Independent dual-lane integration, 2026-10-18
+
+The host and desktop now expose separate installed microphone and speaker choices. Each lane admits its own exact role/model and worker identities. The inbound lane follows the statically recovered average/mono/duplicate channel policy; it does not claim the original desktop graph or stereo runtime parity. Single and dual admission, cancellation, acknowledgement and cleanup are covered by synthetic tests. Physical routing and quality remain unverified.

@@ -129,7 +129,7 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
     // Merely compiling this function starts no audio. --route is an explicit start command.
     labvoice::CoreAudioBackend backend;
     std::shared_ptr<labvoice::NoiseAdapter> noise;
-    if (!provider.installed && (microphoneNoise || speakerNoise))
+    if (!provider.installed && !provider.installedSpeaker && (microphoneNoise || speakerNoise))
         noise = std::make_shared<labvoice::NoiseAdapter>(microphoneNoise, speakerNoise);
     // This separate control-thread owner outlives every Session cleanup attempt.
     // Explicit worker stop prevents a queued HAL block's final Context release
@@ -153,12 +153,18 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
         std::signal(SIGTERM, oldTerm);
     };
     labvoice::ProcessorFactory prepare;
-    if (provider.installed) {
-        if (!microphoneNoise) { restore(); throw std::invalid_argument("Installed provider requires microphone suppression"); }
+    if (provider.installed || provider.installedSpeaker) {
+        if (provider.installed && !microphoneNoise) { restore(); throw std::invalid_argument("Installed provider requires microphone suppression"); }
+        if (provider.installedSpeaker && !speakerNoise) { restore(); throw std::invalid_argument("Installed provider requires speaker suppression"); }
         prepare = [&](const labvoice::Layout &layout) {
             if (interrupted || getppid() != parent) throw std::runtime_error("Route startup cancelled");
             std::string error;
-            installed = labvoice::InstalledNoiseAdapter::create(layout, *provider.installed, speakerNoise, error);
+            labvoice::InstalledNoiseOptions options;
+            options.microphone = provider.installed;
+            options.speaker = provider.installedSpeaker;
+            options.microphoneRNNoise = microphoneNoise && !provider.installed;
+            options.speakerRNNoise = speakerNoise && !provider.installedSpeaker;
+            installed = labvoice::InstalledNoiseAdapter::create(layout, options, error);
             if (!installed) throw std::runtime_error(error);
             if (interrupted || getppid() != parent) throw std::runtime_error("Route startup cancelled");
             return labvoice::ProcessorBinding{labvoice::InstalledNoiseAdapter::process, installed.get(), installed};
@@ -176,15 +182,20 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
               << ",\"microphone_noise\":" << (microphoneNoise ? "true" : "false")
               << ",\"speaker_noise\":" << (speakerNoise ? "true" : "false") << ","
               << labvoice::controlJSON(controls.initial);
-    std::cout << ",\"microphone_provider\":" << jsonString(installed ? "installed-krisp" : (microphoneNoise ? "rnnoise" : "none"))
-              << ",\"speaker_provider\":" << jsonString(speakerNoise ? "rnnoise" : "none");
+    std::cout << ",\"microphone_provider\":" << jsonString(provider.installed ? "installed-krisp" : (microphoneNoise ? "rnnoise" : "none"))
+              << ",\"speaker_provider\":" << jsonString(provider.installedSpeaker ? "installed-krisp" : (speakerNoise ? "rnnoise" : "none"));
     if (installed) {
-        std::cout << ",\"provider_model_sha256\":" << jsonString(installed->modelSha256())
-                  << ",\"provider_addon_sha256\":" << jsonString(installed->addonSha256())
-                  << ",\"provider_adapter_sha256\":" << jsonString(installed->adapterSha256())
-                  << ",\"provider_node_sha256\":" << jsonString(installed->nodeSha256())
-                  << ",\"provider_delay_samples\":" << installed->actualDelaySamples()
-                  << ",\"provider_maximum_callback_frames\":" << installed->maximumCallbackFrames();
+        const auto acknowledge = [&](const char* prefix, const krisp_probe::InstalledWorkerSettings* settings, std::size_t delay) {
+            if (!settings) return;
+            std::cout << ',' << jsonString(std::string(prefix) + "model_sha256") << ':' << jsonString(settings->modelSha256)
+                      << ',' << jsonString(std::string(prefix) + "addon_sha256") << ':' << jsonString(krisp_probe::installed_worker_detail::addonSHA)
+                      << ',' << jsonString(std::string(prefix) + "adapter_sha256") << ':' << jsonString(settings->adapterSha256)
+                      << ',' << jsonString(std::string(prefix) + "node_sha256") << ':' << jsonString(settings->nodeSha256)
+                      << ',' << jsonString(std::string(prefix) + "delay_samples") << ':' << delay
+                      << ',' << jsonString(std::string(prefix) + "maximum_callback_frames") << ':' << installed->maximumCallbackFrames();
+        };
+        acknowledge("provider_", installed->microphoneSettings(), installed->microphoneDelaySamples());
+        acknowledge("speaker_provider_", installed->speakerSettings(), installed->speakerDelaySamples());
     }
     if (controls.stdinEnabled)
         std::cout << ",\"operationID\":" << jsonString(controls.operationID);

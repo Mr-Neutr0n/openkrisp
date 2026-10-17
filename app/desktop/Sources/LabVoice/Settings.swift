@@ -210,7 +210,7 @@ struct AppSettingsView: View {
                                         Text(report.unknownLicense ? "License or redistribution rights unknown" :
                                             "Manifest license: \(report.asset.license.identifier ?? "") · Redistribution: \(report.asset.license.redistribution.rawValue)")
                                             .font(.caption).foregroundColor(.secondary)
-                                        Text("Select and validate the exact reviewed outbound NC provider in Audio. Other catalog models are unavailable for inference.").font(.caption).foregroundColor(.secondary)
+                                        Text("Select and validate reviewed microphone and speaker NC providers in Audio. Other catalog models are unavailable for inference.").font(.caption).foregroundColor(.secondary)
                                     }.frame(maxWidth: .infinity, alignment: .leading).padding(10)
                                         .background(Color.secondary.opacity(0.07)).cornerRadius(6)
                                 }

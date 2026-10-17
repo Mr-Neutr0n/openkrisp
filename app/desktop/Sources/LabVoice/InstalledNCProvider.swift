@@ -2,22 +2,35 @@ import Foundation
 import CryptoKit
 import Darwin
 
-enum MicrophoneProvider: String, CaseIterable, Identifiable {
+enum NoiseProvider: String, CaseIterable, Identifiable {
     case rnnoise, installedKrisp = "installed-krisp"
     var id: String { rawValue }
-    var title: String { self == .rnnoise ? "Independent RNNoise" : "Installed Krisp outbound NC" }
+    var title: String { title(for: .outbound) }
+    func title(for role: InstalledNCModelRole) -> String {
+        self == .rnnoise ? "Independent RNNoise" : "Installed Krisp \(role.rawValue) NC"
+    }
+}
+enum InstalledNCModelRole: String, Sendable {
+    case outbound, inbound
+    var modelFile: String { self == .outbound ? "c8.f.m.528d1f-1.0.1_1.0.kef" : "c8.w.m.d15e29_1.0.kef" }
+    var modelSHA256: String { self == .outbound ? InstalledNCConfiguration.modelSHA256 : InstalledNCConfiguration.inboundModelSHA256 }
 }
 struct InstalledNCConfiguration: Equatable, Sendable {
     let nodePath, workerPath, addonPath, modelPath, adapterPath, libraryPath: String
     let nodeSHA256, adapterSHA256: String
+    var modelRole: InstalledNCModelRole = .outbound
+    var selectedModelSHA256: String { modelRole.modelSHA256 }
     static let addonSHA256 = "adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755"
     static let modelSHA256 = "12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d"
+    static let inboundModelSHA256 = "d1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a"
     static let reviewedNodeSHA256 = "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
-    var arguments: [String] {
-        ["--microphone-provider", "installed-krisp", "--provider-node", nodePath,
-         "--provider-worker", workerPath, "--provider-addon", addonPath, "--provider-model", modelPath,
-         "--provider-adapter", adapterPath, "--provider-library", libraryPath,
-         "--provider-node-sha256", nodeSHA256, "--provider-adapter-sha256", adapterSHA256]
+    var arguments: [String] { arguments(speaker: false) }
+    func arguments(speaker: Bool) -> [String] {
+        let prefix = speaker ? "--speaker-provider-" : "--provider-"
+        return [speaker ? "--speaker-provider" : "--microphone-provider", "installed-krisp",
+         prefix + "node", nodePath, prefix + "worker", workerPath, prefix + "addon", addonPath,
+         prefix + "model", modelPath, prefix + "adapter", adapterPath, prefix + "library", libraryPath,
+         prefix + "node-sha256", nodeSHA256, prefix + "adapter-sha256", adapterSHA256]
     }
 }
 enum InstalledNCError: Error, LocalizedError {
@@ -68,13 +81,13 @@ actor InstalledNCResolver {
               current.st_dev == after.st_dev, current.st_ino == after.st_ino else { throw InstalledNCError.invalid("Selected file changed during validation.") }
         return hash.finalize().map { String(format: "%02x", $0) }.joined()
     }
-    func resolve(app: URL, node: URL, runtime: URL,
+    func resolve(app: URL, node: URL, runtime: URL, role: InstalledNCModelRole = .outbound,
                  hash: @escaping @Sendable (URL) throws -> String = { try InstalledNCResolver.hashFile($0) }) async throws -> InstalledNCConfiguration {
         try await Task.detached(priority: .utility) {
-            try Self.resolveFiles(app: app, node: node, runtime: runtime, hash: hash)
+            try Self.resolveFiles(app: app, node: node, runtime: runtime, role: role, hash: hash)
         }.value
     }
-    private static func resolveFiles(app: URL, node: URL, runtime: URL,
+    private static func resolveFiles(app: URL, node: URL, runtime: URL, role: InstalledNCModelRole,
                                      hash: (URL) throws -> String) throws -> InstalledNCConfiguration {
         guard [app, node, runtime].allSatisfy({ $0.isFileURL && $0.path.hasPrefix("/") && !$0.path.contains("\0") }) else {
             throw InstalledNCError.invalid("Choose explicit local paths.")
@@ -83,7 +96,7 @@ actor InstalledNCResolver {
         let resolvedNode = node.resolvingSymlinksInPath()
         guard access(resolvedNode.path, X_OK) == 0 else { throw InstalledNCError.invalid("Selected Node runtime is not executable.") }
         let addon = app.appendingPathComponent("Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-media-sp/build/Release/kr-media-sp.node")
-        let model = app.appendingPathComponent("Contents/Resources/resources/models/audio/c8.f.m.528d1f-1.0.1_1.0.kef")
+        let model = app.appendingPathComponent("Contents/Resources/resources/models/audio/" + role.modelFile)
         let library = app.appendingPathComponent("Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries")
         guard !library.path.contains(":"), !library.path.contains("\n"), !library.path.contains("\r") else { throw InstalledNCError.invalid("Installed library path is unsupported.") }
         var libraryStat = stat()
@@ -103,9 +116,9 @@ actor InstalledNCResolver {
         }
         guard try hash(resolvedNode) == manifest.nodeSha256 else { throw InstalledNCError.invalid("Choose the reviewed Node runtime. Its SHA256 does not match.") }
         guard try hash(addon) == InstalledNCConfiguration.addonSHA256 else { throw InstalledNCError.invalid("The installed addon is not the reviewed version.") }
-        guard try hash(model) == InstalledNCConfiguration.modelSHA256 else { throw InstalledNCError.invalid("The exact outbound NC model is missing or changed.") }
+        guard try hash(model) == role.modelSHA256 else { throw InstalledNCError.invalid("The exact \(role.rawValue) NC model is missing or changed.") }
         return InstalledNCConfiguration(nodePath: resolvedNode.path, workerPath: runtime.appendingPathComponent("audio_worker.cjs").path,
             addonPath: addon.path, modelPath: model.path, adapterPath: runtime.appendingPathComponent("native-probe.node").path,
-            libraryPath: library.path, nodeSHA256: manifest.nodeSha256, adapterSHA256: manifest.files["native-probe.node"]!)
+            libraryPath: library.path, nodeSHA256: manifest.nodeSha256, adapterSHA256: manifest.files["native-probe.node"]!, modelRole: role)
     }
 }

@@ -30,11 +30,17 @@ struct AudioRouteOptions: Equatable, Sendable {
     let microphoneNoise: Bool
     let speakerNoise: Bool
     var installedProvider: InstalledNCConfiguration? = nil
+    var installedSpeakerProvider: InstalledNCConfiguration? = nil
+    var validProviderRoles: Bool {
+        (installedProvider == nil || (microphoneNoise && installedProvider?.modelRole == .outbound)) &&
+        (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound))
+    }
     var arguments: [String] {
         var args = ["--route", "--input", inputUID, "--output", outputUID]
         if microphoneNoise { args.append("--microphone-noise-suppression") }
         if speakerNoise { args.append("--speaker-noise-suppression") }
         if microphoneNoise, let installedProvider { args += installedProvider.arguments }
+        if speakerNoise, let installedSpeakerProvider { args += installedSpeakerProvider.arguments(speaker: true) }
         return args
     }
 }
@@ -55,7 +61,16 @@ struct AudioStartup: Decodable, Sendable {
     let providerNodeSHA256: String?
     let providerDelaySamples: Int?
     let providerMaximumCallbackFrames: Int?
+    let speakerProviderModelSHA256: String?
+    let speakerProviderAddonSHA256: String?
+    let speakerProviderAdapterSHA256: String?
+    let speakerProviderNodeSHA256: String?
+    let speakerProviderDelaySamples: Int?
+    let speakerProviderMaximumCallbackFrames: Int?
     enum CodingKeys: String, CodingKey {
+        case speakerProviderModelSHA256 = "speaker_provider_model_sha256", speakerProviderAddonSHA256 = "speaker_provider_addon_sha256"
+        case speakerProviderAdapterSHA256 = "speaker_provider_adapter_sha256", speakerProviderNodeSHA256 = "speaker_provider_node_sha256"
+        case speakerProviderDelaySamples = "speaker_provider_delay_samples", speakerProviderMaximumCallbackFrames = "speaker_provider_maximum_callback_frames"
         case event, operationID, microphone, speaker
         case microphoneProvider = "microphone_provider", speakerProvider = "speaker_provider"
         case providerModelSHA256 = "provider_model_sha256", providerAddonSHA256 = "provider_addon_sha256"
@@ -69,19 +84,26 @@ struct AudioStartup: Decodable, Sendable {
         return AudioControlSnapshot(microphone: microphone, speaker: speaker)
     }
     func matches(_ expected: AudioRouteOptions) -> Bool {
-        guard inputUID == expected.inputUID, outputUID == expected.outputUID,
-              microphoneNoise == expected.microphoneNoise, speakerNoise == expected.speakerNoise,
-              speakerProvider == (expected.speakerNoise ? "rnnoise" : "none") else { return false }
-        if expected.microphoneNoise, let provider = expected.installedProvider {
-            guard microphoneProvider == "installed-krisp", providerModelSHA256 == InstalledNCConfiguration.modelSHA256,
-                  providerAddonSHA256 == InstalledNCConfiguration.addonSHA256, providerAdapterSHA256 == provider.adapterSHA256,
-                  providerNodeSHA256 == provider.nodeSHA256, let maximum = providerMaximumCallbackFrames,
-                  (1...4096).contains(maximum), providerDelaySamples == ((maximum + 958) / 480 + 2) * 480 else { return false }
-            return true
+        guard expected.validProviderRoles, inputUID == expected.inputUID, outputUID == expected.outputUID,
+              microphoneNoise == expected.microphoneNoise, speakerNoise == expected.speakerNoise else { return false }
+        func lane(noise: Bool, configuration: InstalledNCConfiguration?, role: InstalledNCModelRole,
+                  name: String?, model: String?, addon: String?, adapter: String?, node: String?, delay: Int?, maximum: Int?) -> Bool {
+            if let configuration {
+                guard noise, configuration.modelRole == role, name == "installed-krisp", model == role.modelSHA256,
+                      addon == InstalledNCConfiguration.addonSHA256, adapter == configuration.adapterSHA256,
+                      node == configuration.nodeSHA256, let maximum, (1...4096).contains(maximum),
+                      delay == ((maximum + 958) / 480 + 2) * 480 else { return false }
+                return true
+            }
+            return name == (noise ? "rnnoise" : "none") && model == nil && addon == nil && adapter == nil && node == nil && delay == nil && maximum == nil
         }
-        return microphoneProvider == (expected.microphoneNoise ? "rnnoise" : "none") &&
-            providerModelSHA256 == nil && providerAddonSHA256 == nil && providerAdapterSHA256 == nil &&
-            providerNodeSHA256 == nil && providerDelaySamples == nil && providerMaximumCallbackFrames == nil
+        return lane(noise: expected.microphoneNoise, configuration: expected.installedProvider, role: .outbound,
+                    name: microphoneProvider, model: providerModelSHA256, addon: providerAddonSHA256,
+                    adapter: providerAdapterSHA256, node: providerNodeSHA256, delay: providerDelaySamples, maximum: providerMaximumCallbackFrames) &&
+            lane(noise: expected.speakerNoise, configuration: expected.installedSpeakerProvider, role: .inbound,
+                 name: speakerProvider, model: speakerProviderModelSHA256, addon: speakerProviderAddonSHA256,
+                 adapter: speakerProviderAdapterSHA256, node: speakerProviderNodeSHA256,
+                 delay: speakerProviderDelaySamples, maximum: speakerProviderMaximumCallbackFrames)
     }
 }
 struct HelperExit: Sendable { let status: Int32; let output: Data; let diagnostic: String }

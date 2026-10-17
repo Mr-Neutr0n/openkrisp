@@ -76,11 +76,20 @@ int main(int argc, char** argv) {
     krisp_probe::ProviderBufferingConfig buffering{480,10};
     try {
         if (argc < 11)
-            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass] [--maximum-callback-frames N] [--scheduling-budget-frames N]");
-        bool bypass=false, haveMaximum=false, haveBudget=false;
+            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass] [--model-role outbound|inbound] [--maximum-callback-frames N] [--scheduling-budget-frames N]");
+        bool bypass=false, haveMaximum=false, haveBudget=false, haveRole=false;
+        auto role=krisp_probe::InstalledModelRole::outbound;
         for (int i=11;i<argc;++i) {
             const std::string option=argv[i];
             if (option=="--bypass" && !bypass) { bypass=true; continue; }
+            if (option=="--model-role") {
+                if (haveRole || ++i==argc) throw std::invalid_argument("Invalid, repeated or incomplete model role");
+                haveRole=true;
+                const std::string selected=argv[i];
+                if (selected=="inbound") role=krisp_probe::InstalledModelRole::inbound;
+                else if (selected!="outbound") throw std::invalid_argument("Unknown model role");
+                continue;
+            }
             std::size_t* destination=nullptr;
             if (option=="--maximum-callback-frames" && !haveMaximum) {
                 haveMaximum=true; destination=&buffering.maximumCallbackFrames;
@@ -115,6 +124,7 @@ int main(int argc, char** argv) {
         settings.nodePath=argv[1]; settings.workerPath=argv[2]; settings.addonPath=argv[3];
         settings.modelPath=argv[4]; settings.adapterPath=argv[5]; settings.libraryPath=argv[6];
         settings.nodeSha256=argv[7]; settings.adapterSha256=argv[8]; settings.bypass=bypass;
+        settings.modelRole=role; settings.modelSha256=krisp_probe::installedModelSha256(role);
         krisp_probe::wire::Token token{};
         arc4random_buf(token.data(),token.size());
         std::string startupError;
@@ -164,7 +174,7 @@ int main(int argc, char** argv) {
         std::cout<<"{\"status\":\"completed\",\"observation\":\"paced-cpu-simulation\",\"callbackMaxUs\":"<<callbackMaxUs
                  <<",\"schedulingMaxLatenessUs\":"<<schedulingMaxLatenessUs<<",\"processedFrames\":"<<processedFrames
                  <<",\"inputFrames\":100,\"paddedFrames\":"<<paddedFrames<<",\"bufferDelaySamples\":"<<bufferDelay<<",\"maximumCallbackFrames\":"<<maximumCallbackFrames<<",\"deadlineFailureCount\":"<<deadlineFailures
-                 <<",\"samples\":48000,\"teardownComplete\":true}\n";
+                 <<",\"modelRole\":\""<<krisp_probe::installedModelRoleName(role)<<"\",\"samples\":48000,\"teardownComplete\":true}\n";
         // Padding removes only the known transport delay. No model tail claim.
         return 0;
     } catch (const std::exception& error) {

@@ -18,15 +18,17 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
     @Published var inputUID = ""
     @Published var outputUID = ""
-    @Published var microphoneNoise = false
-    @Published var speakerNoise = false
-    @Published var microphoneProvider: MicrophoneProvider = .rnnoise
+    @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise, microphoneProvider == .installedKrisp { invalidateProvider() } } }
+    @Published var speakerNoise = false { didSet { if oldValue != speakerNoise, speakerProvider == .installedKrisp { invalidateProvider() } } }
+    @Published var microphoneProvider: NoiseProvider = .rnnoise { didSet { if oldValue != microphoneProvider, microphoneNoise { invalidateProvider() } } }
+    @Published var speakerProvider: NoiseProvider = .rnnoise { didSet { if oldValue != speakerProvider, speakerNoise { invalidateProvider() } } }
     @Published private(set) var installedApp: URL?
     @Published private(set) var installedNode: URL?
     @Published private(set) var installedConfiguration: InstalledNCConfiguration?
+    @Published private(set) var installedSpeakerConfiguration: InstalledNCConfiguration?
     @Published private(set) var providerValidating = false
     @Published private(set) var providerStatus = "Choose the installed Krisp app and reviewed Node runtime."
-    private let resolveProvider: (URL, URL) async throws -> InstalledNCConfiguration
+    private let resolveProvider: (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration
     private var providerValidationID = UUID()
     @Published private(set) var desiredControls = AudioControlSnapshot()
     @Published private(set) var confirmedControls: AudioControlSnapshot?
@@ -67,14 +69,15 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     var canStart: Bool {
         guard phase == .idle, !loading, !providerValidating, !recording.busy,
-              !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration == nil), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
+              !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != .outbound),
+              !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
         return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
             inventory.devices.contains { $0.uid == outputUID && $0.alive == 1 && $0.nominalRate == 48000 && $0.output.channels == 2 }
     }
     init() {
         recording = RecordingController()
         let resolver = InstalledNCResolver()
-        resolveProvider = { app, node in try await resolver.resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory()) }
+        resolveProvider = { app, node, role in try await resolver.resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role) }
         let services = AudioHelperServices()
         readInventory = { try await services.inventory() }
         stopInventory = { await services.stopInventory() }
@@ -90,8 +93,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          requestAuthorization: @escaping () async -> Bool,
          factory: @escaping () throws -> any AudioHelperChild,
          startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil,
-         resolveInstalledProvider: @escaping (URL, URL) async throws -> InstalledNCConfiguration = { app, node in
-             try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory())
+         resolveInstalledProvider: @escaping (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration = { app, node, role in
+             try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role)
          }) {
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider
@@ -124,18 +127,29 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         installedNode = url; invalidateProvider()
     }
     private func invalidateProvider() {
-        providerValidationID = UUID(); installedConfiguration = nil; providerValidating = false
+        providerValidationID = UUID(); installedConfiguration = nil; installedSpeakerConfiguration = nil; providerValidating = false
         providerStatus = "Validate the selected app and Node runtime before Start."
     }
+    var requestedInstalledRoles: [InstalledNCModelRole] {
+        (microphoneNoise && microphoneProvider == .installedKrisp ? [.outbound] : []) +
+        (speakerNoise && speakerProvider == .installedKrisp ? [.inbound] : [])
+    }
     func validateInstalledProvider() async {
-        guard phase == .idle, !providerValidating, let app = installedApp, let node = installedNode else { return }
-        let id = UUID(); providerValidationID = id; providerValidating = true; installedConfiguration = nil
-        providerStatus = "Checking exact installed model and packaged worker identities…"
+        let roles = requestedInstalledRoles
+        guard phase == .idle, !providerValidating, !roles.isEmpty, let app = installedApp, let node = installedNode else { return }
+        let id = UUID(); providerValidationID = id; providerValidating = true
+        installedConfiguration = nil; installedSpeakerConfiguration = nil
+        providerStatus = "Checking requested installed NC models and packaged worker identities…"
         do {
-            let configuration = try await resolveProvider(app, node)
-            guard providerValidationID == id, phase == .idle else { return }
-            installedConfiguration = configuration
-            providerStatus = "Reviewed outbound NC model ready. Speaker reduction uses RNNoise."
+            var outbound: InstalledNCConfiguration?, inbound: InstalledNCConfiguration?
+            for role in roles {
+                let configuration = try await resolveProvider(app, node, role)
+                guard providerValidationID == id, phase == .idle else { return }
+                guard configuration.modelRole == role else { throw InstalledNCError.invalid("Validated model role does not match the requested audio direction.") }
+                if role == .outbound { outbound = configuration } else { inbound = configuration }
+            }
+            installedConfiguration = outbound; installedSpeakerConfiguration = inbound
+            providerStatus = "Reviewed " + roles.map(\.rawValue).joined(separator: " and ") + " NC ready."
         } catch {
             guard providerValidationID == id else { return }
             providerStatus = error.localizedDescription
@@ -143,14 +157,17 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         if providerValidationID == id { providerValidating = false }
     }
     func startupWait(for options: AudioRouteOptions) -> UInt64 {
-        options.installedProvider == nil ? startupTimeout : 40_000_000_000
+        let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1)
+        return workers == 2 ? 70_000_000_000 : (workers == 1 ? 40_000_000_000 : startupTimeout)
     }
     // No permission request or --route launch occurs until this explicit Start action.
     func start() {
         guard canStart else { return }
         let options = AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
                                         microphoneNoise: microphoneNoise, speakerNoise: speakerNoise,
-                                        installedProvider: microphoneNoise && microphoneProvider == .installedKrisp ? installedConfiguration : nil)
+                                        installedProvider: microphoneNoise && microphoneProvider == .installedKrisp ? installedConfiguration : nil,
+                                        installedSpeakerProvider: speakerNoise && speakerProvider == .installedKrisp ? installedSpeakerConfiguration : nil)
+        guard options.validProviderRoles else { return }
         let initialControls = desiredControls
         let id = UUID()
         guard captureAdmission.acquire(id, owner: .route) else { return }

@@ -42,11 +42,11 @@ With one input channel and two output channels, path 3 is selected at `0xa2a84..
 
 A separate ToMonoConverter sums channels without averaging in its selected two-channel branch. Its existence does not override the MA path above. Reusing that sum would choose the wrong gain for this KMS channel conversion.
 
-## Smallest supported next step
+## Implementation contract
 
-Build the experimental speaker path with one independently owned inbound mono NC session. Convert each interleaved stereo pair to a Float32 average before submitting it, then duplicate the processed mono result into both playback channels. Keep microphone and speaker model state separate. Use the exact inbound model identity and mono runtime evidence in `inbound-model-findings.md`; do not generalize admission to arbitrary installed models.
+The experimental speaker path uses one independently owned inbound mono NC session. Convert each interleaved stereo pair to a Float32 average before submitting it, then duplicate the processed mono result into both playback channels. Keep microphone and speaker model state separate. Use the exact inbound model identity and mono runtime evidence in `inbound-model-findings.md`; do not generalize admission to arbitrary installed models.
 
-First test the channel adapter with synthetic left-only, right-only, identical, opposite-phase and distinct stereo inputs. Opposite-phase inputs must cancel before NC. Test callback partitioning, queue delay, silence on worker failure, and control-thread shutdown without hardware. Match the observed Float32 arithmetic order when byte-level parity matters. A later authorized isolated original comparison can test the complete stereo bridge before any live routing claim.
+The adapter tests cover synthetic left-only, right-only, identical, opposite-phase and distinct stereo inputs. Opposite-phase inputs must cancel before NC. Test callback partitioning, queue delay, silence on worker failure, and control-thread shutdown without hardware. Match the observed Float32 arithmetic order when byte-level parity matters. A later authorized isolated original comparison can test the complete stereo bridge before any live routing claim.
 
 ## Limits
 

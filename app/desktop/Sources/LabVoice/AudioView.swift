@@ -81,27 +81,30 @@ struct AudioView: View {
                     Text("Noise processing").font(.headline)
                     Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)
                     Picker("Microphone provider", selection: $audio.microphoneProvider) {
-                        ForEach(MicrophoneProvider.allCases) { provider in Text(provider.title).tag(provider) }
+                        ForEach(NoiseProvider.allCases) { provider in Text(provider.title).tag(provider) }
                     }.disabled(controlsLocked)
-                    if audio.microphoneProvider == .installedKrisp {
+                    Toggle("Reduce speaker noise", isOn: $audio.speakerNoise).disabled(controlsLocked)
+                    Picker("Speaker provider", selection: $audio.speakerProvider) {
+                        ForEach(NoiseProvider.allCases) { provider in Text(provider.title(for: .inbound)).tag(provider) }
+                    }.disabled(controlsLocked)
+                    if audio.microphoneProvider == .installedKrisp || audio.speakerProvider == .installedKrisp {
                         HStack {
                             Button("Choose Krisp app…", action: chooseProviderApp)
                             Button("Choose Node runtime…", action: chooseProviderNode)
                         }.disabled(controlsLocked || audio.providerValidating)
                         Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
                         Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
-                        Button("Validate installed microphone provider") { Task { await audio.validateInstalledProvider() } }
-                            .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil)
+                        Button("Validate selected installed providers") { Task { await audio.validateInstalledProvider() } }
+                            .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil || audio.requestedInstalledRoles.isEmpty)
                         if audio.providerValidating { ProgressView().controlSize(.small) }
                         Text(audio.providerStatus).font(.caption).textSelection(.enabled)
-                        Text("Uses only the reviewed installed outbound NC model. Startup checks exact file hashes. Other installed models remain unavailable. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
+                        Text("Uses reviewed outbound NC for microphone and inbound NC for speaker. Installed speaker processing averages stereo to mono, then duplicates the result into both channels. Startup checks exact file hashes. Other models remain unavailable. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
                             .font(.caption).foregroundColor(.secondary)
                     }
-                    Toggle("Reduce speaker noise with RNNoise", isOn: $audio.speakerNoise).disabled(controlsLocked)
-                    Text("Start captures the selected microphone and routes speaker audio. Speaker noise reduction always uses the independent RNNoise model.")
+                    Text("Start captures the selected microphone and routes speaker audio. Each enabled direction uses its selected provider.")
                         .font(.caption).foregroundColor(.secondary)
                     if let active = audio.activeOptions, audio.phase == .running {
-                        Text("Microphone: \(active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker reduction: \(active.speakerNoise ? "RNNoise" : "off").")
+                        Text("Microphone: \(active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
                             .font(.caption)
                     }
                     Divider()
