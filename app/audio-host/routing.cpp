@@ -80,6 +80,9 @@ void require(OSStatus status, const char *operation) {
 Context::Context(Layout value, Processor process, void *data, std::shared_ptr<void> owner)
     : layout(std::move(value)), processor(process), processorData(data),
       processorOwner(std::move(owner)) {
+    if (!layout.currentCallbackFrames || layout.currentCallbackFrames > layout.maximumCallbackFrames ||
+        !layout.maximumCallbackFrames || layout.maximumCallbackFrames > callbackLimit)
+        throw std::invalid_argument("Invalid callback frame bounds");
     auto count = [](const std::vector<UInt32> &buffers) {
         if (buffers.empty() || buffers.size() > bufferLimit)
             throw std::invalid_argument("Unsupported buffer count");
@@ -113,6 +116,11 @@ OSStatus Context::io(AudioObjectID, const AudioTimeStamp *, const AudioBufferLis
         return kAudioHardwareBadPropertySizeError;
     }
     silent(output, frames);
+    if (frames > c.layout.maximumCallbackFrames) {
+        c.recording->fail(Recording::Failure::route_changed);
+        c.changed.store(true, std::memory_order_release);
+        return kAudioHardwareBadPropertySizeError;
+    }
     if (!c.enabled.load(std::memory_order_acquire) || c.changed.load(std::memory_order_acquire))
         return noErr;
     if (c.rendering.test_and_set(std::memory_order_acquire)) {
@@ -179,12 +187,16 @@ Session::~Session() {
     (void)stop();
 }
 bool Session::start(const Selection &selection, Processor processor, void *processorData,
-                    std::shared_ptr<void> processorOwner, ControlSnapshot initial) {
+                    std::shared_ptr<void> processorOwner, ControlSnapshot initial, ProcessorFactory factory) {
     if (aggregate_ || context_) {
         error_ = "Session already owns a route or pending cleanup";
         return false;
     }
     error_.clear();
+    if (factory && (processor || processorData || processorOwner)) {
+        error_ = "Processor factory cannot be combined with an existing processor binding";
+        return false;
+    }
     if (!initial.valid()) {
         error_ = "Invalid initial controls";
         return false;
@@ -204,6 +216,18 @@ bool Session::start(const Selection &selection, Processor processor, void *proce
         }
         if (context_->layout != backend_.inspect(aggregate_, selection) || context_->changed.load())
             throw std::runtime_error("Aggregate changed during preparation");
+        if (factory) {
+            auto binding = factory(context_->layout);
+            if (!binding.processor)
+                throw std::runtime_error("Processor factory returned no processor");
+            context_->processor = binding.processor;
+            context_->processorData = binding.data;
+            context_->processorOwner = std::move(binding.owner);
+            // Factory startup may take seconds. Revalidate after that wait and
+            // before registering any IOProc capable of invoking the processor.
+            if (context_->layout != backend_.inspect(aggregate_, selection) || context_->changed.load())
+                throw std::runtime_error("Aggregate changed during processor preparation");
+        }
         require(backend_.registerIO(aggregate_, context_, &io_), "register IOProc");
         if (!io_)
             throw std::runtime_error("Backend returned null IOProc");
@@ -217,6 +241,11 @@ bool Session::start(const Selection &selection, Processor processor, void *proce
         const std::string cause = e.what();
         const bool cleaned = stop();
         error_ = cause + (cleaned ? "" : "; cleanup pending: " + error_);
+        return false;
+    } catch (...) {
+        const bool cleaned = stop();
+        error_ = std::string("Route preparation threw a nonstandard exception") +
+            (cleaned ? "" : "; cleanup pending: " + error_);
         return false;
     }
 }

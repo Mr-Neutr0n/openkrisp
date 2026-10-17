@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <thread>
+#include <charconv>
+#include <vector>
 #include <array>
 #include <cerrno>
 #include <chrono>
@@ -69,9 +71,33 @@ int main(int argc, char** argv) {
     std::int64_t callbackMaxUs=0,schedulingMaxLatenessUs=0;
     std::uint64_t observedProcessedFrames=0;
     unsigned deadlineFailures=0;
+    std::size_t bufferDelay=0, paddedFrames=0, maximumCallbackFrames=0;
+    // Preserve the original probe default: 480-sample callbacks and 120 ms delay.
+    krisp_probe::ProviderBufferingConfig buffering{480,10};
     try {
-        if ((argc != 11 && argc != 12) || (argc == 12 && std::string(argv[11]) != "--bypass"))
-            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass]");
+        if (argc < 11)
+            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass] [--maximum-callback-frames N] [--scheduling-budget-frames N]");
+        bool bypass=false, haveMaximum=false, haveBudget=false;
+        for (int i=11;i<argc;++i) {
+            const std::string option=argv[i];
+            if (option=="--bypass" && !bypass) { bypass=true; continue; }
+            std::size_t* destination=nullptr;
+            if (option=="--maximum-callback-frames" && !haveMaximum) {
+                haveMaximum=true; destination=&buffering.maximumCallbackFrames;
+            } else if (option=="--scheduling-budget-frames" && !haveBudget) {
+                haveBudget=true; destination=&buffering.schedulingBudgetFrames;
+            }
+            if (!destination || ++i==argc) throw std::invalid_argument("Invalid, repeated or incomplete timed probe option");
+            const std::string value=argv[i];
+            const auto parsed=std::from_chars(value.data(),value.data()+value.size(),*destination);
+            if (value.empty() || parsed.ec!=std::errc{} || parsed.ptr!=value.data()+value.size())
+                throw std::invalid_argument("Buffering options require unsigned integers");
+        }
+        // Validate configuration before any child or original artifact is loaded.
+        const krisp_probe::ProviderTransport<> validated(buffering);
+        bufferDelay=validated.actualDelaySamples();
+        maximumCallbackFrames=validated.maximumCallbackFrames();
+        paddedFrames=bufferDelay/480;
         // Validate the complete synthetic input before constructing any child.
         FD input(::open(argv[9], O_RDONLY | O_NOFOLLOW | O_CLOEXEC));
         struct stat before{}, after{};
@@ -88,30 +114,28 @@ int main(int argc, char** argv) {
         krisp_probe::InstalledWorkerSettings settings;
         settings.nodePath=argv[1]; settings.workerPath=argv[2]; settings.addonPath=argv[3];
         settings.modelPath=argv[4]; settings.adapterPath=argv[5]; settings.libraryPath=argv[6];
-        settings.nodeSha256=argv[7]; settings.adapterSha256=argv[8]; settings.bypass=argc==12;
+        settings.nodeSha256=argv[7]; settings.adapterSha256=argv[8]; settings.bypass=bypass;
         krisp_probe::wire::Token token{};
         arc4random_buf(token.data(),token.size());
         std::string startupError;
-        auto worker=krisp_probe::ProviderWorker::create(krisp_probe::buildInstalledWorkerLaunch(settings,token),startupError);
+        auto worker=krisp_probe::ProviderWorker::create(krisp_probe::buildInstalledWorkerLaunch(settings,token),startupError,buffering);
         if(!worker)throw std::runtime_error(startupError);
         using Clock=std::chrono::steady_clock;
-        constexpr unsigned inputFrames=100, paddedFrames=12, totalFrames=inputFrames+paddedFrames;
-        constexpr std::size_t bufferDelay=5760;
-        static_assert(krisp_probe::ProviderTransport<>::delaySamples==bufferDelay);
-        std::array<float,totalFrames*480> collected{};
-        std::array<float,480> frame{};
+        const std::size_t totalSamples=sampleCount+bufferDelay, totalFrames=totalSamples/480;
+        std::vector<float> collected(totalSamples);
+        std::vector<float> frame(maximumCallbackFrames);
         const auto begin=Clock::now();
-        // Paced CPU simulation only. sleep_until and all drain waits occur outside
+        // Paced CPU simulation only. All allocations and waits stay outside
         // exchange. This is not a CoreAudio callback or a realtime guarantee.
-        for(unsigned batch=0;batch<totalFrames;++batch) {
-            if(batch<inputFrames)for(unsigned i=0;i<480;++i)
-                frame[i]=std::bit_cast<float>(static_cast<std::uint32_t>(krisp_probe::wire::read(inputBytes.data()+(batch*480+i)*4,4)));
-            else frame.fill(0);
-            const auto scheduled=begin+std::chrono::milliseconds(batch*10);
+        for(std::size_t position=0;position<totalSamples;) {
+            const auto count=std::min(maximumCallbackFrames,totalSamples-position);
+            for(std::size_t i=0;i<count;++i)
+                frame[i]=position+i<sampleCount ? std::bit_cast<float>(static_cast<std::uint32_t>(krisp_probe::wire::read(inputBytes.data()+(position+i)*4,4))) : 0;
+            const auto scheduled=begin+std::chrono::nanoseconds(position*1000000000ULL/48000);
             std::this_thread::sleep_until(scheduled);
             const auto entered=Clock::now();
             schedulingMaxLatenessUs=std::max(schedulingMaxLatenessUs,static_cast<std::int64_t>(std::chrono::duration_cast<std::chrono::microseconds>(entered-scheduled).count()));
-            const bool accepted=worker->exchange(frame.data(),collected.data()+batch*480,480);
+            const bool accepted=worker->exchange(frame.data(),collected.data()+position,count);
             const auto returned=Clock::now();
             callbackMaxUs=std::max(callbackMaxUs,static_cast<std::int64_t>(std::chrono::duration_cast<std::chrono::microseconds>(returned-entered).count()));
             observedProcessedFrames=worker->processedFrames();
@@ -119,15 +143,15 @@ int main(int argc, char** argv) {
                 if(worker->fault()==krisp_probe::ProviderTransport<>::Fault::deadline)++deadlineFailures;
                 throw std::runtime_error("Paced callback exchange failed, transport fault "+std::to_string(static_cast<unsigned>(worker->fault())));
             }
+            position+=count;
         }
-        // The final twelve model requests do not feed the aligned output, but
-        // must still complete successfully before shutdown and publication.
+        // Padding requests must also finish before shutdown and publication.
         const auto drainDeadline=Clock::now()+std::chrono::seconds(2);
         while(worker->processedFrames()<totalFrames && worker->healthy() && Clock::now()<drainDeadline)
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         observedProcessedFrames=worker->processedFrames();
         if(worker->processedFrames()!=totalFrames || !worker->healthy())
-            throw std::runtime_error("Paced worker drain did not complete all 112 requests");
+            throw std::runtime_error("Paced worker drain did not complete all requests");
         for(std::size_t i=0;i<collected.size();++i) {
             if(!std::isfinite(collected[i]))throw std::runtime_error("Collected output is nonfinite");
             if(i<bufferDelay && collected[i]!=0)throw std::runtime_error("Initial transport delay was not silent");
@@ -139,14 +163,14 @@ int main(int argc, char** argv) {
         publish(argv[10],outputBytes);
         std::cout<<"{\"status\":\"completed\",\"observation\":\"paced-cpu-simulation\",\"callbackMaxUs\":"<<callbackMaxUs
                  <<",\"schedulingMaxLatenessUs\":"<<schedulingMaxLatenessUs<<",\"processedFrames\":"<<processedFrames
-                 <<",\"inputFrames\":100,\"paddedFrames\":12,\"bufferDelaySamples\":5760,\"deadlineFailureCount\":"<<deadlineFailures
+                 <<",\"inputFrames\":100,\"paddedFrames\":"<<paddedFrames<<",\"bufferDelaySamples\":"<<bufferDelay<<",\"maximumCallbackFrames\":"<<maximumCallbackFrames<<",\"deadlineFailureCount\":"<<deadlineFailures
                  <<",\"samples\":48000,\"teardownComplete\":true}\n";
         // Padding removes only the known transport delay. No model tail claim.
         return 0;
     } catch (const std::exception& error) {
         std::cout<<"{\"status\":\"failed\",\"observation\":\"paced-cpu-simulation\",\"callbackMaxUs\":"<<callbackMaxUs
                  <<",\"schedulingMaxLatenessUs\":"<<schedulingMaxLatenessUs<<",\"processedFrames\":"<<observedProcessedFrames
-                 <<",\"inputFrames\":100,\"paddedFrames\":12,\"bufferDelaySamples\":5760,\"deadlineFailureCount\":"<<deadlineFailures<<"}\n";
+                 <<",\"inputFrames\":100,\"paddedFrames\":"<<paddedFrames<<",\"bufferDelaySamples\":"<<bufferDelay<<",\"maximumCallbackFrames\":"<<maximumCallbackFrames<<",\"deadlineFailureCount\":"<<deadlineFailures<<"}\n";
         std::cerr << "Timed worker probe failed: " << error.what() << '\n';
         return 1;
     }

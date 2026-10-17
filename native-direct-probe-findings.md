@@ -149,3 +149,23 @@ The final build identities are recorded below, relative to `app/native-model-pro
 Full verification passed before these runs. `evidence/parent-watch-timed-build-verify-20261017.log` has SHA256 `86d16e88d656ef1368cc20ba936a0f0e5938c4bbc09a90a65d350f6a7e762fc5`.
 
 This is a paced CPU simulation, with no hardware audio callback or routing path. The bypass scheduling lateness exceeded one nominal callback interval, despite zero transport deadline failures in this short run. These observed maxima are not scheduling bounds. The explicit transport buffer adds 120 ms; removing that known delay for file comparison does not make it accepted product latency, remove model latency, establish speech quality, or prove complete model-tail preservation. The extra zero input is only sufficient here to extract the known transport-delay window. Startup identity checks remain pre-load file hashes rather than an atomic binding to loaded images.
+
+
+## Callback-size buffering and route preparation, 2026-10-18
+
+The callback transport accepts immutable maximum-callback and scheduling-budget settings before child launch. Its delay is `ceil((maximumCallbackFrames + 479) / 480) + schedulingBudgetFrames` in 480-sample frames. The partial-frame allowance prevents a result being required during the same callback that completes its input. The scheduling budget is explicit and is not a deadline guarantee. Invalid settings reject before spawning; callbacks above the bound require caller silence and latch a fault. Fixed queues and allocation-free callback exchange are unchanged. Default transport buffering remains 120 ms.
+
+The timed probe accepts callback and budget options, paces by sample position, and drains padding equal to its computed delay. Default probe behavior remains 480-sample callbacks with 120 ms buffering. New installed-model NC runs used the same pinned addon/model/adapter/Node identities as the preceding checkpoint, with no audio device or administrator operation.
+
+| Maximum callback / budget | Buffer | Processed model frames | Maximum exchange / scheduling lateness | Evidence |
+|---|---|---|---|---|
+| 480 / 1 | 30 ms | 103 | 14 / 2512 microseconds | `ev_1c81e694830fbbb371190e2ce4729485ac2856d7388740cfc9b6d0c6eb237cb9` |
+| 512 / 2 | 50 ms | 105 | 27 / 2665 microseconds | `ev_e6406c1a28dd2a23123fcc9dd955a3e01334f3924b80a5863102f1c67e08d611` |
+
+Both returned exit 0, zero transport deadline faults, 48,000 finite aligned samples and confirmed worker teardown. Each output SHA256 is `fd389eb36788f4e2f707d63e987fd9205ff6dc1323ef94cd1ab3600960077290`, byte-identical to the earlier direct NC output. Only the explicit queue delay is removed. This does not measure model algorithmic latency or recover a model tail. These short CPU runs do not establish sustained performance or CoreAudio latency. Bypass was not rerun for this configuration change.
+
+REA reports verified owned-process cleanup and removed temporary roots for both captures. It could not attribute one unrelated platform process in the 480 run and two in the 512 run; those were left untouched. Process sampling, prelaunch image identity, inherited probe environment and unobserved network activity retain the prior limitations. The worker still launches with its reviewed deny-network profile and cleared environment.
+
+- `timed-worker-nc-480-1-20261018-v1.result.json` SHA256 `681f2568a5f2f5864340a8d7290ab5f7611e69c57df10029d27e110806b7bd38`.
+- `timed-worker-nc-512-2-20261018-v1.result.json` SHA256 `be9d4b8cac706005c1b235a5ac1f758521e9753343b51b4ce8497d4b37a7c3dc`.
+- Timed probe executable SHA256 `e8a3499703c80063e72126019bb5ab84926c1530236c69b4696d035e60b4abe7`.

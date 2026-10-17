@@ -5,6 +5,7 @@
 #include <array>
 #include <atomic>
 #include <memory>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -18,9 +19,18 @@ struct Layout {
     std::vector<UInt32> inputBuffers, outputBuffers;
     UInt32 microphoneChannel = 0, monitorLeft = 0, monitorRight = 0;
     UInt32 feedChannel = 0, hardwareLeft = 0, hardwareRight = 0;
+    UInt32 currentCallbackFrames = 0, maximumCallbackFrames = callbackLimit;
     bool operator==(const Layout &) const = default;
 };
 using Processor = bool (*)(void *, const float *, const float *, float *, float *, UInt32) noexcept;
+struct ProcessorBinding {
+    Processor processor = nullptr;
+    void *data = nullptr;
+    std::shared_ptr<void> owner;
+};
+// Runs on the Session control thread after validated aggregate inspection and
+// listener installation. Returned ownership follows Context through HAL teardown.
+using ProcessorFactory = std::function<ProcessorBinding(const Layout &)>;
 struct Context {
     Layout layout;
     Processor processor = nullptr;
@@ -98,7 +108,7 @@ class Session {
     Session(const Session &) = delete;
     Session &operator=(const Session &) = delete;
     bool start(const Selection &, Processor = nullptr, void * = nullptr, std::shared_ptr<void> = {},
-               ControlSnapshot = {});
+               ControlSnapshot = {}, ProcessorFactory = {});
     bool publishControls(const ControlSnapshot &) noexcept;
     std::shared_ptr<Recording> recordingOwner() const { return context_ ? context_->recording : nullptr; }
     Recording *recording() noexcept { return context_ ? context_->recording.get() : nullptr; }

@@ -12,6 +12,48 @@ static void service(T& transport) {
     }
 }
 int main() {
+    assert(T{}.actualDelaySamples() == T::delaySamples);
+    assert((krisp_probe::ProviderTransport<32,11>{}.actualDelaySamples() == 5280));
+    for (auto maximum : {std::size_t(1),17ul,479ul,480ul,481ul,512ul,4096ul}) {
+        for (auto budget : {std::size_t(0),1ul,2ul}) {
+            krisp_probe::ProviderBufferingConfig config{maximum,budget};
+            T t(config);
+            const auto delay=((maximum+958)/480+budget)*480;
+            assert(t.actualDelaySamples()==delay && t.maximumCallbackFrames()==maximum);
+            config.maximumCallbackFrames=0; // Constructor copied immutable settings.
+            assert(t.bufferingConfig().maximumCallbackFrames==maximum);
+            std::array<float,4096> input{},output{};
+            std::size_t offset=0;
+            for(unsigned block=0;block<1500;++block) {
+                // 478 then512 is an adversarial boundary: frame completion can
+                // occur near callback entry. Broker only runs after the block.
+                const auto count=std::min(maximum, block%3==0?std::size_t(478):
+                                                     block%3==1?maximum:std::size_t(1));
+                for(std::size_t i=0;i<count;++i) input[i]=float((offset+i)%997);
+                assert(t.exchange(input.data(),output.data(),count));
+                for(std::size_t i=0;i<count;++i)
+                    assert(output[i]==(offset+i<delay?0:float((offset+i-delay)%997)*.5f));
+                offset+=count;
+                service(t);
+            }
+        }
+    }
+    for (auto config : {krisp_probe::ProviderBufferingConfig{0,0},
+                        krisp_probe::ProviderBufferingConfig{4097,0},
+                        krisp_probe::ProviderBufferingConfig{4096,22},
+                        krisp_probe::ProviderBufferingConfig{480,std::numeric_limits<std::size_t>::max()}}) {
+        bool rejected=false;
+        try { T t(config); } catch(const std::invalid_argument&) { rejected=true; }
+        assert(rejected);
+    }
+    assert(T(krisp_probe::ProviderBufferingConfig{4096,21}).actualDelaySamples()==31*480);
+    {
+        T t(krisp_probe::ProviderBufferingConfig{17,0});
+        std::array<float,18> input{},output{}; output.fill(9);
+        assert(!t.exchange(input.data(),output.data(),18));
+        for(auto value:output) assert(value==9); // Extent above declaration stays untouched.
+        assert(t.fault()==T::Fault::invalid_input);
+    }
     {
         T t;
         std::array<float, 4096> in{}, out{};

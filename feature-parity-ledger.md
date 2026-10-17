@@ -101,3 +101,8 @@ The next static pass establishes [synchronous dispatch](native-frame-dispatch-fi
 Experimental [native probe support](app/native-model-probe/README.md) now validates borrowed-result copying and output bounds in independent fixtures. This does not load Krisp or establish installed-model inference.
 
 [Actual native processing evidence](native-direct-probe-findings.md) now supersedes earlier load-only statements for the selected installed outbound NC model. This remains an experimental isolated provider, not desktop feature parity.
+
+
+## Callback buffering and route preparation
+
+Runtime buffer configuration and a pre-IO processor factory now exist. REA NC tests at 30/50 ms explicit queue delay passed with unchanged aligned output. Audio-host bounds and lifetime fixtures passed. The provider is still unconnected to desktop routing, and these short CPU captures do not establish live latency or full parity. See `CHECKPOINT.md` and `native-direct-probe-findings.md`.

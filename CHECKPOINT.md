@@ -173,3 +173,18 @@ C++ blocked-thread tests and actual Node/N-API blocked-JS tests pass for parent 
 REA timed probes ran 112 callbacks at 10 ms intervals, with 100 input frames plus 12 zero-padding frames for the explicit queue delay. Both processed all 112 requests with zero queue deadline failures, clean teardown and complete captures with verified owned cleanup. Removing only the 5760-sample transport delay gives output byte-identical to direct probes. NC maximum exchange/scheduling lateness was 10/2478 microseconds; bypass 281/11444 microseconds. Evidence `ev_1e069d57847168a68cb3c388899494a69908eba65b1a2f2803a96984d72c94da` and `ev_aaddd212cf3baed2368d6b1626a14238711366740a68edcc61ec0ba09220a321`. Exact identities and limits are in `native-direct-probe-findings.md`.
 
 This proves paced CPU behavior with a 120 ms synthetic buffer, not accepted live call latency, sustained performance, CoreAudio timing, model-tail recovery or speech quality. Next choose buffering from the actual callback format, then extend route identity acknowledgement and desktop provider selection together. No physical audio or administrator action occurred. Full parity remains incomplete.
+
+
+## Callback buffering and processor preparation checkpoint, 2026-10-18
+
+Implemented immutable runtime buffer settings and callback-bound checks. The delay includes incomplete model frames, a full callback and an explicit scheduling budget. Defaults remain unchanged. REA tests with 480/1 and 512/2 settings passed at 30 ms and 50 ms explicit buffering, with zero transport deadline faults, clean teardown and byte-identical aligned NC output. This is short paced CPU evidence, not accepted live latency. Exact evidence and limits are in `native-direct-probe-findings.md`.
+
+The audio host retains observed current and maximum aggregate callback sizes, watches size-range changes, and can prepare a processor after listeners are installed but before IO registration. A second inspection after factory startup catches changes during model loading. Context keeps processor ownership through failed callback/listener teardown. Invalid bounds, oversized callbacks, mixed legacy/factory bindings and factory exceptions fail with cleanup. Independent review found and fixed cleanup for nonstandard factory exceptions; no remaining blocker was found in this slice.
+
+The installed worker is still fixed to the proven outbound NC model. Desktop provider selection and matching route acknowledgement are not connected yet. Use the new processor factory and aggregate maximum for that next slice. A large advertised hardware range may still require the conservative 120 ms buffer; do not substitute the current quantum without a proven bound. Physical HAL admission, actual routing, sustained timing, other models and full local parity remain incomplete. No live audio, driver replacement, CoreAudio restart or administrator operation ran.
+
+Verification passed for the full native adapter component, including release/ASan/UBSan/TSan tests; the full audio-host suite, including synthetic routing and read-only hardware inventory; and desktop tests plus signed ARM64/macOS 12 bundle/resource checks. Other components were not repeated. Nine invalid timed-probe option cases also rejected before input access or child launch. All 106 source fingerprints match. Private logs:
+
+- `evidence/runtime-buffering-verify-20261018.log`, SHA256 `c6cfd3e87c4bfe21ae269925ac6c20444a56909b15bc2fb5a32c45d5f1b6e971`.
+- `evidence/audio-host-preparation-verify-20261018.log`, SHA256 `89a6071ad2626a1c828ed8c03351eb83e5c0c40930c382cf922f3eb98c88d004`.
+- `evidence/desktop-preparation-verify-20261018.log`, SHA256 `a4f1ca438579d512d5c82e97d22b0ab883c916e772ddb58840c9cdc8dd8ff8d9`.

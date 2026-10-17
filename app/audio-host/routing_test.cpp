@@ -1,6 +1,7 @@
 #include "noise_adapter.hpp"
 #include "routing.hpp"
 #include <cassert>
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstring>
@@ -12,13 +13,14 @@
 
 using namespace labvoice;
 namespace {
-Layout layout() { return {{2, 1}, {1, 2, 1}, 2, 0, 1, 0, 1, 2}; }
+Layout layout() { return {{2, 1}, {1, 2, 1}, 2, 0, 1, 0, 1, 2, 480, callbackLimit}; }
 struct Fake final : Backend {
     std::string fail;
     std::vector<std::string> calls;
     Context *context = nullptr;
     std::shared_ptr<Context> owner;
     bool aggregate = false, registered = false, started = false;
+    Layout observed = layout();
     UInt32 listeners = 0;
     bool error(const std::string &operation) {
         calls.push_back(operation);
@@ -34,7 +36,7 @@ struct Fake final : Backend {
     Layout inspect(AudioObjectID, const Selection &) override {
         if (error("inspect"))
             throw std::runtime_error("injected inspect failure");
-        return layout();
+        return observed;
     }
     std::vector<Watch> watches(AudioObjectID, const Selection &) override {
         return {{100, {kAudioDevicePropertyDeviceIsAlive, kAudioObjectPropertyScopeGlobal, 0}},
@@ -151,7 +153,7 @@ void samples() {
             assert(cycle.out[2][i] == 0);
         }
     }
-    Layout planes = {{1, 1, 1}, {1, 1, 1, 1}, 2, 0, 1, 0, 1, 2};
+    Layout planes = {{1, 1, 1}, {1, 1, 1, 1}, 2, 0, 1, 0, 1, 2, 480, callbackLimit};
     Context planar(planes);
     planar.enabled = true;
     Cycle p(planes, 15);
@@ -191,6 +193,66 @@ void samples() {
     c.enabled = false;
     Cycle stopped(c.layout, 15);
     assert(stopped.run(&c) == noErr && stopped.zero());
+}
+void preparationFactory() {
+    const Processor process=+[](void *, const float *mic, const float *monitor, float *feed,
+                               float *playback, UInt32 count) noexcept {
+        std::copy_n(mic,count,feed);std::copy_n(monitor,count*2,playback);return true;
+    };
+    {
+        Fake fake;Session session(fake);unsigned calls=0;std::weak_ptr<int> weak;
+        assert(session.start({"microphone","speaker"},nullptr,nullptr,{}, {},[&](const Layout &observed){
+            ++calls;assert(observed.currentCallbackFrames==480 && observed.maximumCallbackFrames==callbackLimit);
+            assert(fake.aggregate && fake.listeners==2 && !fake.registered && !fake.started && !fake.context->enabled.load());
+            assert(std::count(fake.calls.begin(),fake.calls.end(),"inspect")==2);
+            auto owner=std::make_shared<int>(7);weak=owner;return ProcessorBinding{process,owner.get(),owner};
+        }));
+        assert(calls==1 && std::count(fake.calls.begin(),fake.calls.end(),"inspect")==3);
+        assert(fake.context->processorData==weak.lock().get());
+        fake.fail="stop";assert(!session.stop() && !weak.expired());
+        fake.fail.clear();assert(session.stop() && weak.expired());
+    }
+    for(const std::string mode:{"throw","nonstandard","empty","current","maximum","notification","register","pending"}) {
+        Fake fake;Session session(fake);std::weak_ptr<int> weak;
+        assert(!session.start({"microphone","speaker"},nullptr,nullptr,{}, {},[&](const Layout &) -> ProcessorBinding {
+            assert(!fake.registered && !fake.started);
+            if(mode=="throw")throw std::runtime_error("factory failed");
+            if(mode=="nonstandard")throw 7;
+            auto owner=std::make_shared<int>(1);weak=owner;
+            if(mode=="empty")return {};
+            if(mode=="current" || mode=="pending")fake.observed.currentCallbackFrames=256;
+            if(mode=="maximum")fake.observed.maximumCallbackFrames=1024;
+            if(mode=="notification")Context::change(100,0,nullptr,fake.context);
+            if(mode=="register")fake.fail="register";
+            if(mode=="pending")fake.fail="unwatch";
+            return {process,owner.get(),owner};
+        }));
+        if(mode=="pending") {
+            assert(!weak.expired() && !fake.registered && !fake.context->enabled.load());
+            fake.fail.clear();assert(session.stop());
+        }
+        assert(!fake.aggregate && !fake.registered && !fake.started && !fake.listeners && weak.expired());
+        if(mode!="register")assert(std::find(fake.calls.begin(),fake.calls.end(),"register")==fake.calls.end());
+    }
+    for(unsigned mode=0;mode<3;++mode) {
+        Fake fake;Session session(fake);bool called=false;auto owner=std::make_shared<int>(1);
+        assert(!session.start({"microphone","speaker"},mode==0?process:nullptr,
+            mode==1?owner.get():nullptr,mode==2?owner:std::shared_ptr<void>{}, {},
+            [&](const Layout &){called=true;return ProcessorBinding{};}));
+        assert(!called && fake.calls.empty());
+    }
+    for(unsigned mode=0;mode<4;++mode) {
+        auto invalid=layout();
+        if(mode==0)invalid.currentCallbackFrames=0;
+        if(mode==1)invalid.maximumCallbackFrames=0;
+        if(mode==2)invalid.maximumCallbackFrames=479;
+        if(mode==3)invalid.maximumCallbackFrames=callbackLimit+1;
+        bool rejected=false;try{Context context(invalid);}catch(const std::invalid_argument &){rejected=true;}
+        assert(rejected);
+    }
+    auto bounded=layout();bounded.maximumCallbackFrames=480;
+    Context context(bounded,process);context.enabled=true;
+    Cycle oversized(bounded,481);assert(oversized.run(&context)!=noErr && oversized.zero() && context.changed.load());
 }
 void failures() {
     for (const auto &fail : {"create", "create-after-id", "inspect", "watch1", "watch2", "register",
@@ -548,6 +610,7 @@ int main() {
     callbackRecording();
     recordingPausedCallback();
     failures();
+    preparationFactory();
     queuedLifetime();
     drain();
     noise();

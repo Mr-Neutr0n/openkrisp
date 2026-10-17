@@ -19,7 +19,8 @@ class ProviderWorker {
     std::atomic<std::uint64_t> processed_{0};
     bool cleanShutdown_ = false; // Published by finished_ or thread join.
     std::string error_; // Read only after join or finished_ acquire.
-    explicit ProviderWorker(WorkerLaunchConfig config) : broker_(std::move(config)) {}
+    explicit ProviderWorker(WorkerLaunchConfig config, ProviderBufferingConfig buffering)
+        : transport_(buffering), broker_(std::move(config)) {}
     void run() noexcept {
         try {
             ProviderTransport<>::Frame frame;
@@ -58,8 +59,11 @@ class ProviderWorker {
         finished_.store(true, std::memory_order_release);
     }
   public:
-    static std::shared_ptr<ProviderWorker> create(WorkerLaunchConfig config, std::string& error) {
-        auto owner = std::shared_ptr<ProviderWorker>(new ProviderWorker(std::move(config)));
+    static std::shared_ptr<ProviderWorker> create(WorkerLaunchConfig config, std::string& error,
+                                                 ProviderBufferingConfig buffering = {}) {
+        std::shared_ptr<ProviderWorker> owner;
+        try { owner.reset(new ProviderWorker(std::move(config), buffering)); }
+        catch (const std::invalid_argument& failure) { error = failure.what(); return {}; }
         if (!owner->broker_.start()) { error = owner->broker_.error(); return {}; }
         try { owner->thread_ = std::thread([p = owner.get()] { p->run(); }); }
         catch (...) { error = "Could not start provider broker thread"; return {}; }
@@ -71,6 +75,9 @@ class ProviderWorker {
     bool exchange(const float* input, float* output, std::size_t count) noexcept {
         return transport_.exchange(input, output, count);
     }
+    std::size_t actualDelaySamples() const noexcept { return transport_.actualDelaySamples(); }
+    std::size_t maximumCallbackFrames() const noexcept { return transport_.maximumCallbackFrames(); }
+    const ProviderBufferingConfig& bufferingConfig() const noexcept { return transport_.bufferingConfig(); }
     bool healthy() const noexcept {
         return !finished_.load(std::memory_order_acquire) &&
                transport_.fault() == ProviderTransport<>::Fault::none;

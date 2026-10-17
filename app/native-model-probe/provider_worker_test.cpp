@@ -41,6 +41,35 @@ int main(int argc, char** argv) {
         assert(!worker->exchange(input.data(), output.data(), 480));
         for (auto value : output) assert(value == 0);
     }
+    for (auto buffering : {ProviderBufferingConfig{480,1},ProviderBufferingConfig{512,0}}) {
+        std::string error;
+        auto worker=ProviderWorker::create(config(argv[1],argv[2],"normal"),error,buffering);
+        assert(worker && error.empty());
+        const auto delay=((buffering.maximumCallbackFrames+958)/480+buffering.schedulingBudgetFrames)*480;
+        assert(worker->actualDelaySamples()==delay);
+        assert(worker->maximumCallbackFrames()==buffering.maximumCallbackFrames);
+        std::array<float,512> input{},output{};
+        std::size_t offset=0;
+        for(unsigned block=0;block<150;++block) {
+            const auto count=block%3==0?std::size_t(478):block%3==1?buffering.maximumCallbackFrames:std::size_t(1);
+            for(std::size_t i=0;i<count;++i) input[i]=float((offset+i)%997);
+            assert(worker->exchange(input.data(),output.data(),count));
+            for(std::size_t i=0;i<count;++i)
+                assert(output[i]==(offset+i<delay?0:float((offset+i-delay)%997)*.5f));
+            offset+=count;
+            const auto deadline=std::chrono::steady_clock::now()+2s;
+            while(worker->processedFrames()<offset/480 && worker->healthy() &&
+                  std::chrono::steady_clock::now()<deadline) std::this_thread::sleep_for(1ms);
+            assert(worker->healthy() && worker->processedFrames()==offset/480);
+        }
+        assert(worker->stop());
+    }
+    {
+        std::string error;
+        // Buffering rejects before the wrong-ready child can be launched.
+        assert(!ProviderWorker::create(config(argv[1],argv[2],"wrong-ready"),error,{0,0}));
+        assert(error.find("Maximum callback")!=std::string::npos);
+    }
     for (const auto* mode : {"processing-stall", "crash", "malformed"}) {
         std::string error;
         auto worker = ProviderWorker::create(config(argv[1], argv[2], mode), error);

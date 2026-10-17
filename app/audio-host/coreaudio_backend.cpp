@@ -266,12 +266,17 @@ Layout CoreAudioBackend::inspect(AudioObjectID aggregate, const Selection &selec
         if (!drift.count(uid) || bool(drift[uid]) != (uid != feed && uid != monitor))
             throw std::runtime_error("Aggregate drift setting readback mismatch");
     const auto range = scalar<AudioValueRange>(aggregate, kAudioDevicePropertyBufferFrameSizeRange);
-    if (!std::isfinite(range.mMaximum) || range.mMaximum > callbackLimit || range.mMinimum < 1 ||
-        scalar<UInt32>(aggregate, kAudioDevicePropertyBufferFrameSize) > callbackLimit)
-        throw std::runtime_error("Aggregate callback bound exceeds preallocation");
+    const auto current = scalar<UInt32>(aggregate, kAudioDevicePropertyBufferFrameSize);
+    if (!std::isfinite(range.mMinimum) || !std::isfinite(range.mMaximum) ||
+        range.mMinimum < 1 || range.mMinimum > range.mMaximum || range.mMaximum > callbackLimit ||
+        std::floor(range.mMinimum) != range.mMinimum || std::floor(range.mMaximum) != range.mMaximum ||
+        !current || current < range.mMinimum || current > range.mMaximum)
+        throw std::runtime_error("Aggregate callback bounds are invalid or exceed preallocation");
     formats(aggregate, kAudioObjectPropertyScopeInput);
     formats(aggregate, kAudioObjectPropertyScopeOutput);
     Layout layout;
+    layout.currentCallbackFrames = current;
+    layout.maximumCallbackFrames = static_cast<UInt32>(range.mMaximum);
     layout.inputBuffers = buffers(aggregate, kAudioObjectPropertyScopeInput);
     layout.outputBuffers = buffers(aggregate, kAudioObjectPropertyScopeOutput);
     UInt32 in = 0, out = 0;
@@ -313,9 +318,10 @@ std::vector<Watch> CoreAudioBackend::watches(AudioObjectID aggregate, const Sele
         ids.push_back(lookup(uid));
     std::vector<Watch> result;
     for (auto id : ids) {
-        for (UInt32 selector : std::array<UInt32, 3>{kAudioDevicePropertyDeviceIsAlive,
+        for (UInt32 selector : std::array<UInt32, 4>{kAudioDevicePropertyDeviceIsAlive,
                                                      kAudioDevicePropertyNominalSampleRate,
-                                                     kAudioDevicePropertyBufferFrameSize})
+                                                     kAudioDevicePropertyBufferFrameSize,
+                                                     kAudioDevicePropertyBufferFrameSizeRange})
             result.push_back({id, property(selector)});
         for (auto scope : {kAudioObjectPropertyScopeInput, kAudioObjectPropertyScopeOutput}) {
             result.push_back({id, property(kAudioDevicePropertyStreams, scope)});

@@ -5,8 +5,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <stdexcept>
 
 namespace krisp_probe {
+struct ProviderBufferingConfig {
+    std::size_t maximumCallbackFrames = 4096;
+    std::size_t schedulingBudgetFrames = 2; // Units of 480 samples, not callback blocks.
+};
 // One serialized callback producer/consumer and one broker consumer/producer.
 // Construct before either thread starts. Never reset a live transport.
 template<std::size_t Capacity = 32, std::size_t DelayFrames = 12>
@@ -24,6 +29,25 @@ class ProviderTransport {
         std::array<float, frameSamples> samples{};
     };
   private:
+    static std::size_t checkedDelay(ProviderBufferingConfig config) {
+        if (config.maximumCallbackFrames < 1 || config.maximumCallbackFrames > 4096)
+            throw std::invalid_argument("Maximum callback frames must be 1 through 4096");
+        // A full model frame can finish just after callback entry. Account for
+        // its 479 preceding samples plus an entire maximum callback before
+        // requiring that result, so inference never has to run inside exchange.
+        const auto baseFrames = (config.maximumCallbackFrames + 958) / frameSamples;
+        if (baseFrames >= Capacity || config.schedulingBudgetFrames >= Capacity - baseFrames)
+            throw std::invalid_argument("Buffering delay exceeds fixed queue capacity");
+        return (baseFrames + config.schedulingBudgetFrames) * frameSamples;
+    }
+    static ProviderBufferingConfig legacyConfig() {
+        constexpr std::size_t baseFrames = (4096 + 958) / frameSamples;
+        if constexpr (DelayFrames < baseFrames)
+            throw std::invalid_argument("Legacy delay cannot cover 4096-sample callbacks");
+        return {4096, DelayFrames - baseFrames};
+    }
+    const ProviderBufferingConfig buffering_;
+    const std::size_t actualDelay_;
     struct Queue {
         std::array<Frame, Capacity> slots{};
         std::atomic<std::uint64_t> write{0}, read{0};
@@ -51,6 +75,14 @@ class ProviderTransport {
     std::uint64_t brokerNext_ = 0;
     bool brokerOutstanding_ = false;
   public:
+    ProviderTransport() : ProviderTransport(legacyConfig()) {}
+    explicit ProviderTransport(ProviderBufferingConfig config)
+        : buffering_(config), actualDelay_(checkedDelay(config)) {}
+    // Immutable after construction. Default is 5760 samples. For example,
+    // maximum480/budget1 gives1440 samples (30ms at48kHz); 512/budget2 gives2400.
+    std::size_t actualDelaySamples() const noexcept { return actualDelay_; }
+    std::size_t maximumCallbackFrames() const noexcept { return buffering_.maximumCallbackFrames; }
+    const ProviderBufferingConfig& bufferingConfig() const noexcept { return buffering_; }
     Fault fault() const noexcept {
         return static_cast<Fault>(fault_.load(std::memory_order_acquire));
     }
@@ -62,10 +94,10 @@ class ProviderTransport {
     }
     // For a valid destination/count, clears the complete destination first.
     // Failure silences the entire block. Input and output must not overlap.
-    // Counts above 4096 fail without touching the untrusted destination extent.
+    // Counts above the declared maximum fail without touching the destination extent.
     // The caller must mute unsupported-size output buffers.
     bool exchange(const float* input, float* output, std::size_t count) noexcept {
-        if (!output || count > 4096) { fail(Fault::invalid_input); return false; }
+        if (!output || count > buffering_.maximumCallbackFrames) { fail(Fault::invalid_input); return false; }
         for (std::size_t i = 0; i < count; ++i) output[i] = 0;
         if (fault() != Fault::none) return false;
         if (!input || position_ > std::numeric_limits<std::uint64_t>::max() - count) {
@@ -79,7 +111,7 @@ class ProviderTransport {
                 if (!requests_.push(input_)) { fail(Fault::overflow); break; }
                 inputOffset_ = 0;
             }
-            if (position_ >= delaySamples) {
+            if (position_ >= actualDelay_) {
                 if (outputOffset_ == frameSamples) {
                     if (!results_.pop(output_)) { fail(Fault::deadline); break; }
                     if (output_.sequence != nextOutput_++) { fail(Fault::sequence); break; }
