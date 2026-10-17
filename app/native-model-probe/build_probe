@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Build the experimental adapter. Does not load it or any vendor image."""
+from pathlib import Path
+import subprocess
+
+root = Path(__file__).resolve().parent
+headers = Path('/opt/homebrew/include/node')
+if not (headers / 'node_api.h').is_file():
+    raise SystemExit('Node C API headers missing: /opt/homebrew/include/node/node_api.h')
+out = root / 'build'
+out.mkdir(exist_ok=True)
+subprocess.run([
+    'clang++', '-std=c++20', '-arch', 'arm64', '-O2', '-Wall', '-Wextra',
+    '-Werror', '-pedantic', '-bundle', '-undefined', 'dynamic_lookup',
+    '-I' + str(headers), str(root / 'native_probe.cpp'),
+    '-o', str(out / 'native-probe.node'),
+], check=True)
+print(out / 'native-probe.node')

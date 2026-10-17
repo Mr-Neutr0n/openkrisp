@@ -2327,7 +2327,9 @@
         "ev_6101539f1a9b7a8a54f4f6fb90c2ae7d266c6c34d5acd46b81d9bcd594684c13",
         "ev_09d0d4c600e38a28147808f7043ecaf02c0a516eb13c62e2c657967364b86e24",
         "ev_f662e1365be4b192dfacaef94e4a1fe90aa8fee30ceee69b9908980fdb324cd3",
-        "ev_cb31e375f551e009bf5174cdc1a90b0d49c5fa42a53d8b1ea6ea5fe876a3b6c5"
+        "ev_cb31e375f551e009bf5174cdc1a90b0d49c5fa42a53d8b1ea6ea5fe876a3b6c5",
+        "ev_7034d8272ba48730207d483805f9ad9da71049b1a7b812222aecd0a9c637fc45",
+        "ev_abb78582f1221125c4d65f66935d0711799541a1b7e308fe5d8dcf209abcc5e7"
       ],
       "implemented_code": [
         {
@@ -2345,13 +2347,25 @@
         {
           "path": "projects/krisp/app/native-model-probe/result_collector.hpp",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/abi_factory.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/native_probe.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/run_probe.cjs",
+          "exists": true
         }
       ],
       "catalog_keys": [],
       "representative_labels": [],
-      "implementation": "Catalog only in app. Isolated addon initialization loads an installed NC model; generator graph fails before processing and prepared LabVoice graph remains unrun. Experimental native-model-probe now has ABI carriers and a bounded copy collector, tested without loading original code; no factory shim or app backend yet.",
-      "verified_scope": "Model-load logs and processor construction only. Identity-bound static REA now establishes normalized Float32, exact frame validation, synchronous selected ordinary NC callbacks, descriptor copies and selected no-op finalization. No native sample-processing run or integrated adapter. Supplier return and result payload layouts recovered; independent collector ownership/bounds tests pass release and ASan/UBSan. These fixtures do not establish native inference.",
-      "missing_acceptance": "Supported source-backed graph or ABI-correct native factory/configuration/callback construction, then finite finalized NC output, active processor and bypass comparison, measured latency/tail behavior, network denial and identity checks, integrated provider selection/failure cleanup. Keep descriptor storage stable. Close does not flush selected ordinary NC tail. Do not copy or publish weights."
+      "implementation": "Catalog only in app. Experimental native-model-probe now implements typed direct-factory processing in an isolated network-denied Node host using installed files. Not integrated into the desktop or audio routing helper.",
+      "verified_scope": "Two identity-bound REA runs completed: NC and bypass each produced 100 synchronous callbacks, 48000 finite samples and clean teardown. Outputs differ in 47500 samples. Release/ASan/UBSan cross-library and collector fixtures, launcher tests and 20 host-only adapter checks pass. One synthetic fixture and one installed outbound model only; no speech quality or full parity claim.",
+      "missing_acceptance": "Persistent isolated provider and app/routing integration; model/version selection and cleanup; real speech comparison, sustained latency, tail handling, additional retained models and physical audio tests. Do not redistribute original models without established rights."
     },
     {
       "id": "independent-model-provider",
@@ -2612,7 +2626,15 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "5c249b51ab56adb576f3f05785829d3e42f5644c99a1cf0be38c8f675e19c00d"
+    "projects/krisp/app/native-model-probe/verify": "96e85b1f3b2ef91205320ae274907f45be3c62786721f8b04017597977cf3192",
+    "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
+    "projects/krisp/app/native-model-probe/build_probe": "2acf1b3047c68a16980429bd01e8b6dc2413466cb79cc1ac7da25ce2c613943a",
+    "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
+    "projects/krisp/app/native-model-probe/fixture_library.cpp": "67a1ac825bc633d8dfd3a51a524e15f478f2460b8b3e84077f5f1e60c8d82dd2",
+    "projects/krisp/app/native-model-probe/launcher_test.cjs": "6a9f1d34c03dc046c4bc086a79aee0605a39d4ee06448457b6cbe5ed4d30a0c2",
+    "projects/krisp/app/native-model-probe/native_probe.cpp": "fb5c0bd7b06d4dbd541d9d809d6cae9b33e6da1df99d45fc2c3cc45d7650012c",
+    "projects/krisp/app/native-model-probe/native_probe_test.cjs": "e57e4d606f85d159c1bc4ada47216dab7f2f9c38a8657137585d16b494f7f95e",
+    "projects/krisp/app/native-model-probe/run_probe.cjs": "8881d05779597a13c8153615bdf5b8966bfb8093db3c159ddd827b365475cdc9"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

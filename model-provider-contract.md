@@ -1,5 +1,7 @@
 # Installed model provider contract
 
+Current runtime update, 2026-10-15: [native-direct-probe-findings.md](native-direct-probe-findings.md) records successful installed-model sample processing. NC and bypass each returned 100 callbacks and 48,000 finite samples under the declared network-denial profile. Earlier load-only and no-callable-adapter statements below describe historical investigation stages. Desktop integration and parity remain incomplete.
+
 The installed NC model can load locally through the native addon. Current probes recover the initialization, model-object and graph argument schemas. They do not yet establish an audio-processing route. The first network-denied synthetic-file graph stopped at source creation, before processing or output.
 
 Current unresolved prerequisites are approval and installed HAL verification for the prepared LabVoice synthetic source, exact running sample semantics, frame duration units, completed sample processing, validated output and an NC-off comparison. The initialization and model-object fields are recovered.
