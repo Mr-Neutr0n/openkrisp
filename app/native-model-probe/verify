@@ -36,6 +36,7 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-persistent-") as build:
     subprocess.run(["node", "--expose-gc", str(root / "persistent_session_test.cjs"), str(root / "build/native-probe.node"), fixture], check=True)
 subprocess.run(["node", str(root / "persistent_launcher_test.cjs")], check=True)
 subprocess.run(["node", str(root / "worker_protocol_test.cjs")], check=True)
+subprocess.run(["node", str(root / "worker_session_test.cjs")], check=True, timeout=60)
 
 with tempfile.TemporaryDirectory(prefix="openkrisp-provider-transport-") as build:
     for name, flags in [
@@ -51,3 +52,18 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-provider-transport-") as buil
         ], check=True)
         print("provider-transport " + name, flush=True)
         subprocess.run([binary], check=True)
+
+with tempfile.TemporaryDirectory(prefix="openkrisp-worker-wire-") as build:
+    for name, flags in [
+        ("release", ["-O2"]),
+        ("address-undefined", ["-O1", "-g", "-fsanitize=address,undefined"]),
+    ]:
+        binary = str(Path(build) / name)
+        subprocess.run([
+            "clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra",
+            "-Werror", "-pedantic", *flags,
+            str(root / "worker_protocol_native_test.cpp"), "-o", binary,
+        ], check=True)
+        print("worker-wire " + name, flush=True)
+        subprocess.run([binary], check=True, timeout=60)
+        subprocess.run(["node", str(root / "worker_protocol_cross_test.cjs"), binary], check=True, timeout=60)

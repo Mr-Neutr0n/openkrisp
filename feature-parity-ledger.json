@@ -2394,11 +2394,31 @@
         {
           "path": "projects/krisp/app/native-model-probe/worker_protocol_test.cjs",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_protocol.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_protocol_native_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_protocol_cross_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_session.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_session_test.cjs",
+          "exists": true
         }
       ],
       "catalog_keys": [],
       "representative_labels": [],
-      "implementation": "Catalog only in app. Experimental native-model-probe supports persistent typed direct-factory sessions in an isolated network-denied Node host. Bounded callback queues and worker framing have synthetic verification but are not connected to a broker, child process or routing.",
+      "implementation": "Catalog only in app. Experimental native-model-probe supports persistent direct-factory sessions in an isolated network-denied Node host. Bounded callback queues, compatible C++/Node framing and a synchronous worker-session runner are implemented. Synthetic OS pipe tests pass; no production child admission, broker or routing connection yet.",
       "verified_scope": "Persistent NC and bypass each processed five batches, 100 callbacks and 48000 finite samples with byte-identical output to prior single-call probes. Final close-contract fix has host fixture coverage and matching runtime output; final NC capture has incomplete REA cleanup attribution, documented in native-direct-probe-findings.md. Queue release/ASan/UBSan/TSan tests include 20000 concurrent frames; bounded protocol tests cover fragmentation, reentry and malformed input. One synthetic signal and one installed outbound model, no speech quality or realtime claim.",
       "missing_acceptance": "Supervised Node child and broker, readiness/version/model binding, wall-clock deadline and parent-loss handling, app/routing selection; real speech comparison, sustained latency, tail handling, other models and physical audio tests. Original model redistribution rights remain unresolved."
     },
@@ -2661,7 +2681,7 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "45f6d848d629484a090896e9988802dc7b89565343fd27d81dfbbbde5305afb4",
+    "projects/krisp/app/native-model-probe/verify": "c72ddbe580dd147c61c21c7a9279b3ac46e079b8b3a60662c42dd0e0e0c821c9",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "2acf1b3047c68a16980429bd01e8b6dc2413466cb79cc1ac7da25ce2c613943a",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
@@ -2678,7 +2698,12 @@
     "projects/krisp/app/native-model-probe/provider_transport_test.cpp": "3c8654b41ce47483ae54659721f0bd0924d3d4aa028619b71a8c7f3cb459220b",
     "projects/krisp/app/native-model-probe/worker_protocol.cjs": "2d9f55e44af128f36216f7206f4235f4020c9b0fb45eabfebd2e6a56a8c32adc",
     "projects/krisp/app/native-model-probe/worker_protocol_test.cjs": "ab17a7ac3c982478865a97e11b6540e7cfeef333a14edd24114cf435fca93c2d",
-    "projects/krisp/verify": "bf469bdbf5e4348c72d24eee23b9d5dc0969d5dbafc215508fad5b6551136435"
+    "projects/krisp/verify": "bf469bdbf5e4348c72d24eee23b9d5dc0969d5dbafc215508fad5b6551136435",
+    "projects/krisp/app/native-model-probe/worker_protocol.hpp": "ae539679aef1fc12d56da20ba2affc8ecaa3222aa12a1ddeec402fdef9d94226",
+    "projects/krisp/app/native-model-probe/worker_protocol_native_test.cpp": "54e40b043e77d6153a1cddf82f74143ceadad458d9db8a015b496903e7e139d3",
+    "projects/krisp/app/native-model-probe/worker_protocol_cross_test.cjs": "9e7bd0275edf39ec1b6fd25c4f6397cf58deb7410a6556b3e6156dd1600ac6de",
+    "projects/krisp/app/native-model-probe/worker_session.cjs": "3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888",
+    "projects/krisp/app/native-model-probe/worker_session_test.cjs": "516f7be4a20e2cf3a1ad310cd9fbb4b90c24d266b0a4b2065644fbf35fd94043"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
