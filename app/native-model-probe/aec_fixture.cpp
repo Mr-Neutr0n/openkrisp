@@ -1,5 +1,7 @@
 // Own synthetic producer. Deliberately does not include the consumer ABI view.
 #include <cstddef>
+#include <cstdlib>
+#include <cstring>
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
@@ -55,4 +57,14 @@ extern "C" Engine* synthetic_aec_create() {
     if (failFactory) throw FactoryError();
     ++counts[0];
     return new Engine;
+}
+
+// Own-only alias lets the standalone probe test its exact Darwin lookup name.
+extern "C" Engine* synthetic_direct_aec_create() __asm__("__ZN9krips_aec3AEC6createEv");
+extern "C" Engine* synthetic_direct_aec_create() {
+    const char* mode = std::getenv("OPENKRISP_AEC_FIXTURE_FAILURE");
+    failFactory = mode && std::strcmp(mode, "factory") == 0;
+    throwStage = mode && std::strcmp(mode, "reverse") == 0 ? 1 :
+                 mode && std::strcmp(mode, "forward") == 0 ? 2 : 0;
+    return synthetic_aec_create();
 }

@@ -69,3 +69,44 @@ virtual declarations only preserve slot positions and must never be called.
 This fixture does not prove echo quality, rate conversion, original scheduling
 or compatibility with a loaded vendor library. It is separate from production
 NC admission and does not provide a runtime AEC launcher.
+
+### Standalone direct AEC experiment
+
+Build the own CPU-only executable with:
+
+```sh
+clang++ -std=c++20 -arch arm64 -O2 -Wall -Wextra -Werror -pedantic \
+  aec_direct_probe.cpp -o build/aec-direct-probe
+```
+
+Its positional arguments are `libraryPath forward-input.f32le
+reference-input.f32le reference-on.f32le reference-zero.f32le`. The fixed run
+uses two fresh engines, each with 300 reference-first 10 ms calls followed by
+300 forward calls. Forward is 32 kHz mono, reference is 48 kHz stereo. A shared
+continuous-time 233/617/1229 Hz multitone generates the reference and a 50 ms
+delayed, 0.6-scaled forward echo with no near-end signal. The zero-reference
+control receives the same forward samples. No delay setter is called.
+
+The four exclusive 0600 files contain 96000 forward floats, 288000 reference
+floats and 96000 floats per output. All are Float32 little-endian. Publication
+requires both engine destructions and library unload, every status zero,
+finite outputs, completed writes and unchanged output inode identities.
+Failures remove only matching owned files. The caller must use a private
+output directory without concurrent writers; these path checks are not an
+atomic transaction across files. JSON reports all-sample and last-second RMS,
+call counts and elapsed time. Three seconds is an exploratory adaptation
+window and gives no quality acceptance or desktop timing claim.
+
+`./verify` runs this executable only against the own synthetic fixture in
+release and ASan/UBSan modes, including output collisions, symlinks, partial
+publication rollback and foreign factory/processing exceptions. The fixture
+exports the exact factory lookup name, so the probe has no test-only symbol
+or vendor-admission bypass option.
+
+Vendor execution is a separate REA-reviewed experiment. Before `dlopen`, its
+runner must pin the executable and full library SHA256
+`bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a`,
+apply a deny-network sandbox and clean environment, then repeat hashes after
+exit. This executable does not hash or sandbox itself. The runner must bound
+wall time because a synchronous foreign call can stall. No vendor execution
+is part of the fixture verification.

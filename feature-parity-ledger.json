@@ -1382,7 +1382,8 @@
         "ev_ccb5f73ed927444d486c00b8bd3f4ded73c10311f17ccaeb31a49dda7d922e21",
         "ev_0a448a8b286651622328535483067d3d3aed33f25a095db813644e4dda5661af",
         "ev_4a1fd1ee6ecd06276ae7d39964ddb72016544cf93a283ca84ffabe37d9c6a9fc",
-        "ev_0f391dc80f1bb62a25d7262e199755ae5ae480fefc7016211d6a119335e5b5bf"
+        "ev_0f391dc80f1bb62a25d7262e199755ae5ae480fefc7016211d6a119335e5b5bf",
+        "ev_dc0785e71d0f2a842f97891ee8393ea074fd739ebe64ce0857c2aa60d4051547"
       ],
       "implemented_code": [
         {
@@ -1428,10 +1429,18 @@
         {
           "path": "projects/krisp/app/native-model-probe/aec_fixture_test.cpp",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_direct_probe.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_direct_probe_test.py",
+          "exists": true
         }
       ],
       "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC, BVC and Noise Shield detection/feedback remain unimplemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md. Independent AEC foreign-ABI fixture checks separate forward/reference stream specifications, selected virtual slots, 100 synthetic duplex frames, finite-size admission and destruction before library unload, including thrown frame-call exceptions. It does not load vendor code or implement production AEC. Complete native-model-probe ./verify passed including AEC release/ASan/UBSan and existing TSan suites; log evidence/aec-fixture-verify-20261018.log SHA256 e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md. Independent AEC foreign-ABI fixture checks separate forward/reference stream specifications, selected virtual slots, 100 synthetic duplex frames, finite-size admission and destruction before library unload, including thrown frame-call exceptions. It does not load vendor code or implement production AEC. Complete native-model-probe ./verify passed including AEC release/ASan/UBSan and existing TSan suites; log evidence/aec-fixture-verify-20261018.log SHA256 e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26. Direct installed AEC CPU capture completed with exact library/executable pre/post hashes, 600 successful calls for each of two fresh engines and verified REA cleanup. It accepted the tested 32 kHz mono forward and 48 kHz stereo reference frames. Last-second reference-on output RMS was nearly unchanged from zero-reference control, so useful echo suppression is not established. See aec-direct-runtime-findings.md; no production AEC integration or physical route.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -2810,7 +2819,7 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "eb2f3c92febeec817fe796759c9935055b6fb3744922b46e077259de62c1e16c",
+    "projects/krisp/app/native-model-probe/verify": "cd4dad3332c554dfd7a659e81ba485a2082647e40da33572fde33978ae4d2716",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "c441582cee43a7e95c2b12f23046e6f5d2b354a8958fef41f491dbae46d694df",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
@@ -2866,8 +2875,10 @@
     "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift": "a37726a9e31660c0cad166362070872e35d295ed8d55b6b3051687822c6bed9c",
     "projects/krisp/app/native-model-probe/aec_abi.hpp": "7290320f0d4a362df8033dc1d2673964c88dac8e7dcbe650617a75642be096d4",
-    "projects/krisp/app/native-model-probe/aec_fixture.cpp": "16a7ee408e28f3542745de08f7f021ae0994a08279ac42d4fa0942bc5a516e62",
-    "projects/krisp/app/native-model-probe/aec_fixture_test.cpp": "ce8de52f80b1df679bf3495afcf9dcee22a2e900b9cdbf4d56055eac42705239"
+    "projects/krisp/app/native-model-probe/aec_fixture.cpp": "0139bb7ee5a55a45a2a3d162805fe3199a11581a9b0b52190efb9bdb59dd3585",
+    "projects/krisp/app/native-model-probe/aec_fixture_test.cpp": "ce8de52f80b1df679bf3495afcf9dcee22a2e900b9cdbf4d56055eac42705239",
+    "projects/krisp/app/native-model-probe/aec_direct_probe.cpp": "400bb110cb0a95e84d6801089832709e84047629c1f2ba4d38243b9b26b39cc2",
+    "projects/krisp/app/native-model-probe/aec_direct_probe_test.py": "a3afda32268062b9102dcaca5896f688eaf34f200582e15f35ef026b93746c47"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -2896,7 +2907,8 @@
     "current_mediasp": {
       "evidence_id": "ev_9d50689e7c21e8ee795702e6530ac10449eb05a44b7abd684e9ab88ecfff3dd9",
       "artifact_sha256": "adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755",
-      "limit": "Static/parser/model-load probes only; no successful sample processing."
+      "limit": "Original registry evidence was static/model-load only. Later direct and dual-adapter CPU captures verify bounded NC sample processing with selected models. No physical route or original full-pipeline parity.",
+      "processing_evidence_id": "ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd"
     },
     "current_audio_dm": {
       "evidence_ids": [
@@ -2922,6 +2934,19 @@
       ],
       "artifact_sha256": "50751bd7a50f4f8f2e2f116769cad75aab9b811344b7711174f41ce2ca695c30",
       "limit": "Static virtual-device curve/IO branches, no original audio execution."
+    },
+    "current_js": {
+      "evidence_id": "ev_6633cc56846dc24c1803403ef109b67197a17228f64422f75143e8dd616f85b1",
+      "artifact_sha256": "40269da405babcd79c18780715c63625d0bb7035f03a480b1732fe067ba911b4",
+      "version": "3.17.9",
+      "limit": "Selected static speaker graph bodies and literal decoding only; no original desktop runtime execution."
+    },
+    "current_aec": {
+      "evidence_id": "ev_90bc2c6dc71532c5708e4a6513ea3495429d8063dc2f9d88deab96700430922e",
+      "artifact_sha256": "bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a",
+      "arm64_slice_sha256": "55bc1f7cc2e32dbe00cae2cf2deb06765a8d007b77c819a7b16aa6116763d349",
+      "limit": "Exact container and slice identity, static ABI and bounded successful direct CPU processing. Tested formats only; no useful suppression, near-end preservation, sustained timing or production integration acceptance.",
+      "runtime_evidence_id": "ev_dc0785e71d0f2a842f97891ee8393ea074fd739ebe64ce0857c2aa60d4051547"
     }
   },
   "scope_counts": {

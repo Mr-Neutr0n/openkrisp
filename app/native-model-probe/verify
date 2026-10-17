@@ -37,6 +37,10 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-aec-abi-") as build:
         subprocess.run([*common, str(root / "aec_fixture_test.cpp"), "-o", client], check=True)
         print("aec-foreign-abi " + name, flush=True)
         subprocess.run([client, library], check=True, timeout=30)
+        probe = str(Path(build) / (name + "-aec-direct-probe"))
+        subprocess.run([*common, str(root / "aec_direct_probe.cpp"), "-o", probe], check=True)
+        subprocess.run(["python3", str(root / "aec_direct_probe_test.py"), probe, library], check=True, timeout=60)
+
 
 subprocess.run(["node", str(root / "launcher_test.cjs")], check=True)
 subprocess.run([str(root / "build_probe")], check=True)
