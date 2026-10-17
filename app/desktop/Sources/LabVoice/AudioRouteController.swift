@@ -20,6 +20,14 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published var outputUID = ""
     @Published var microphoneNoise = false
     @Published var speakerNoise = false
+    @Published var microphoneProvider: MicrophoneProvider = .rnnoise
+    @Published private(set) var installedApp: URL?
+    @Published private(set) var installedNode: URL?
+    @Published private(set) var installedConfiguration: InstalledNCConfiguration?
+    @Published private(set) var providerValidating = false
+    @Published private(set) var providerStatus = "Choose the installed Krisp app and reviewed Node runtime."
+    private let resolveProvider: (URL, URL) async throws -> InstalledNCConfiguration
+    private var providerValidationID = UUID()
     @Published private(set) var desiredControls = AudioControlSnapshot()
     @Published private(set) var confirmedControls: AudioControlSnapshot?
     @Published private(set) var controlPending = false
@@ -58,12 +66,15 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         }
     }
     var canStart: Bool {
-        guard phase == .idle, !loading, !recording.busy, captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
+        guard phase == .idle, !loading, !providerValidating, !recording.busy,
+              !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration == nil), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
         return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
             inventory.devices.contains { $0.uid == outputUID && $0.alive == 1 && $0.nominalRate == 48000 && $0.output.channels == 2 }
     }
     init() {
         recording = RecordingController()
+        let resolver = InstalledNCResolver()
+        resolveProvider = { app, node in try await resolver.resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory()) }
         let services = AudioHelperServices()
         readInventory = { try await services.inventory() }
         stopInventory = { await services.stopInventory() }
@@ -78,8 +89,12 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          authorization: @escaping () -> AVAuthorizationStatus,
          requestAuthorization: @escaping () async -> Bool,
          factory: @escaping () throws -> any AudioHelperChild,
-         startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil) {
+         startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil,
+         resolveInstalledProvider: @escaping (URL, URL) async throws -> InstalledNCConfiguration = { app, node in
+             try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory())
+         }) {
         self.recording = recording ?? RecordingController()
+        self.resolveProvider = resolveInstalledProvider
         self.readInventory = readInventory; self.stopInventory = stopInventory
         self.authorization = authorization; self.requestAuthorization = requestAuthorization
         self.factory = factory; self.startupTimeout = startupTimeout; self.stopTimeout = stopTimeout; self.controlTimeout = controlTimeout
@@ -100,11 +115,42 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             if !result.devices.contains(where: { $0.uid == outputUID && $0.output.channels > 0 }) { outputUID = "" }
         } catch { inventory = nil; self.error = error.localizedDescription }
     }
+    func selectInstalledApp(_ url: URL) {
+        guard phase == .idle else { return }
+        installedApp = url; invalidateProvider()
+    }
+    func selectInstalledNode(_ url: URL) {
+        guard phase == .idle else { return }
+        installedNode = url; invalidateProvider()
+    }
+    private func invalidateProvider() {
+        providerValidationID = UUID(); installedConfiguration = nil; providerValidating = false
+        providerStatus = "Validate the selected app and Node runtime before Start."
+    }
+    func validateInstalledProvider() async {
+        guard phase == .idle, !providerValidating, let app = installedApp, let node = installedNode else { return }
+        let id = UUID(); providerValidationID = id; providerValidating = true; installedConfiguration = nil
+        providerStatus = "Checking exact installed model and packaged worker identities…"
+        do {
+            let configuration = try await resolveProvider(app, node)
+            guard providerValidationID == id, phase == .idle else { return }
+            installedConfiguration = configuration
+            providerStatus = "Reviewed outbound NC model ready. Speaker reduction uses RNNoise."
+        } catch {
+            guard providerValidationID == id else { return }
+            providerStatus = error.localizedDescription
+        }
+        if providerValidationID == id { providerValidating = false }
+    }
+    func startupWait(for options: AudioRouteOptions) -> UInt64 {
+        options.installedProvider == nil ? startupTimeout : 40_000_000_000
+    }
     // No permission request or --route launch occurs until this explicit Start action.
     func start() {
         guard canStart else { return }
         let options = AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
-                                        microphoneNoise: microphoneNoise, speakerNoise: speakerNoise)
+                                        microphoneNoise: microphoneNoise, speakerNoise: speakerNoise,
+                                        installedProvider: microphoneNoise && microphoneProvider == .installedKrisp ? installedConfiguration : nil)
         let initialControls = desiredControls
         let id = UUID()
         guard captureAdmission.acquire(id, owner: .route) else { return }
@@ -129,7 +175,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                 }, exit: { [weak self] event in self?.exited(event, id: id) })
                 if self.operationID == id, self.phase == .starting {
                     self.deadline = Task { [weak self] in
-                        do { try await Task.sleep(nanoseconds: self?.startupTimeout ?? 0) } catch { return }
+                        do { try await Task.sleep(nanoseconds: self?.startupWait(for: options) ?? 0) } catch { return }
                         guard let self, self.operationID == id, self.phase == .starting else { return }
                         self.error = "The audio helper did not confirm startup. Stopping it."
                         self.deadline = nil // Stop must not cancel its own timeout task before awaiting exit.
@@ -153,7 +199,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         guard phase == .starting,
               let data = line.data(using: .utf8), let ready = try? JSONDecoder().decode(AudioStartup.self, from: data),
               ready.event == "route_started" else { return }
-        guard ready.options == expected, ready.operationID == id.uuidString, ready.controls == initialControls, initialControls.valid else {
+        guard ready.matches(expected), ready.operationID == id.uuidString, ready.controls == initialControls, initialControls.valid else {
             error = "The audio helper confirmed a different device or processing configuration. Stopping it."
             Task { [weak self] in
                 guard let self, self.operationID == id else { return }
@@ -161,7 +207,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             }; return
         }
         deadline?.cancel(); deadline = nil
-        activeOptions = ready.options; confirmedControls = ready.controls; phase = .running
+        activeOptions = expected; confirmedControls = ready.controls; phase = .running
         recording.attach(operationID: id) { [weak self] bytes in
             guard let self, self.operationID == id, self.phase == .running || self.phase == .stopping,
                   let process = self.child else { throw AudioHelperError.controlChannelClosed }

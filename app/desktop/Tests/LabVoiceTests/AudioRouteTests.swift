@@ -41,7 +41,8 @@ import AVFoundation
                                     "microphone": ["muted": arguments.contains("--microphone-muted"), "gain": Double(argument("--microphone-gain") ?? "1")!],
                                     "speaker": ["muted": arguments.contains("--speaker-muted"), "gain": Double(argument("--speaker-gain") ?? "1")!],
                                     "event": "route_started", "input_uid": input, "output_uid": output,
-                                    "microphone_noise": microphone, "speaker_noise": speaker]
+                                    "microphone_noise": microphone, "speaker_noise": speaker,
+                                    "microphone_provider": microphone ? "rnnoise" : "none", "speaker_provider": speaker ? "rnnoise" : "none"]
         let data = try! JSONSerialization.data(withJSONObject: value)
         line(String(decoding: data, as: UTF8.self))
     }

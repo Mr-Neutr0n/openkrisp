@@ -188,3 +188,23 @@ Verification passed for the full native adapter component, including release/ASa
 - `evidence/runtime-buffering-verify-20261018.log`, SHA256 `c6cfd3e87c4bfe21ae269925ac6c20444a56909b15bc2fb5a32c45d5f1b6e971`.
 - `evidence/audio-host-preparation-verify-20261018.log`, SHA256 `89a6071ad2626a1c828ed8c03351eb83e5c0c40930c382cf922f3eb98c88d004`.
 - `evidence/desktop-preparation-verify-20261018.log`, SHA256 `a4f1ca438579d512d5c82e97d22b0ab883c916e772ddb58840c9cdc8dd8ff8d9`.
+
+
+## Installed microphone provider integration, 2026-10-18
+
+Connected the proven installed outbound NC worker to the audio host and explicit desktop selection. Audio retains independent RNNoise as its default. Installed selection requires the user-selected Krisp app and exact reviewed external Node, plus the signed packaged adapter and worker scripts. Validation reads identities off the main thread and admits only the exact outbound model. It does not launch a worker or request microphone access. Selections are session-only. Start captures an immutable configuration and requires a matching helper acknowledgement for provider names, all four identities, maximum callback size and derived delay. Speaker processing remains RNNoise; there is no automatic fallback on provider failure.
+
+The helper prepares the worker from validated aggregate bounds before registering IO. It keeps a separate control-owned adapter, stops the worker on failure and shutdown even when HAL cleanup fails, and retains callback memory in Context. A scope guard covers exception unwinding. Synthetic tests exercise both speaker modes, continuous microphone queues, failure silence, concurrent stop/exchange and late Context release. Provider CLI validation rejects incomplete, duplicate and malformed settings before aggregate creation. Desktop startup allows 40 seconds for installed-model admission, with existing cancellation and late-reply guards.
+
+The bundle includes only our adapter, three scripts and a manifest. The adapter now targets macOS 12; signing precedes hashing. Native and relocated-bundle checks verify hashes, signatures and resources. REA ran the actual signed packaged worker for NC and bypass at 50 ms explicit buffering. Both returned clean teardown, zero deadline faults and output identical to earlier direct probes. Exact evidence and limits are in `native-direct-probe-findings.md`.
+
+Full native component verification, final audio-host verification and desktop verification passed. The desktop has 104 passing tests and signed ARM64/macOS 12 packaging checks. Audio-host checks include release/ASan/UBSan/TSan synthetic installed-adapter coverage and read-only inventory. An earlier audio-host verification invocation ended with status 2 and no diagnostic after partial output while its script was being edited; the final unchanged-script rerun completed successfully. No success claim relies on the partial log. Other components were not repeated. All 116 source fingerprints match.
+
+This is an integrated experimental source checkpoint, not a full-parity release. Native chooser/validation UI, actual installed-model HAL routing, latency/quality, model-tail behavior, other models, AEC, live transcription and remaining lifecycle/UI parity still need work. The physical driver admission/restart remains deferred. No live microphone, CoreAudio restart, administrator operation or vendor-file publication occurred.
+
+Verification logs:
+
+- `evidence/provider-route-native-verify-20261018.log`, SHA256 `c6cfd3e87c4bfe21ae269925ac6c20444a56909b15bc2fb5a32c45d5f1b6e971`.
+- `evidence/provider-route-host-final-verify-20261018.log`, SHA256 `314a4847dc1b71489bfa2f83196fd6fb4a795ba25f0394d0543d6024de5ec269`.
+- `evidence/provider-route-desktop-verify-20261018.log`, SHA256 `2a40b0522c88e82b58c1ca4fbe7d03ca318180629913e4e49f7f51ae868963a1`.
+- `evidence/provider-cli-final-verify-20261018.log`, SHA256 `cbc6ab8f03a2c049f01a8111162492bec7b056777ae4cad7ddf8ffcb9ed7bf08`.

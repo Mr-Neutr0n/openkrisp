@@ -8,8 +8,9 @@ if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
   echo 'Build ../noise-engine with its ./verify before audio-host verification.' >&2
   exit 1
 fi
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
 python3 check.py
+python3 provider_cli_check.py
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test
 ./build/routing-test
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$sanitized_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test-sanitized
@@ -35,3 +36,21 @@ clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,
 ./build/microphone-test-test-sanitized
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_wire_fixture.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-wire-fixture
 python3 microphone_test_wire_check.py
+# Synthetic installed-provider bridge. The child is our half-gain fixture only.
+python3 - <<'PY'
+from pathlib import Path
+import shutil, subprocess
+root = Path.cwd()
+node = str(Path(shutil.which('node')).resolve())
+for name, flags, library in [
+    ('release', ['-O2'], '../noise-engine/build/release/librnnoise.a'),
+    ('sanitized', ['-O1', '-g', '-fsanitize=address,undefined'], '../noise-engine/build/sanitized/librnnoise.a'),
+    ('thread', ['-O1', '-g', '-fsanitize=thread'], '../noise-engine/build/release/librnnoise.a'),
+]:
+    binary = root / 'build' / ('installed-noise-adapter-' + name)
+    subprocess.run(['clang++', '-mmacosx-version-min=12.0', '-fblocks', '-std=c++20', '-pthread', '-Wall', '-Wextra', '-Werror',
+                    *flags, '-I../noise-engine/vendor/rnnoise/include', 'installed_noise_adapter_test.cpp',
+                    'routing.cpp', 'recording.cpp', '../native-model-probe/worker_broker.cpp', library,
+                    '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(binary)], check=True)
+    subprocess.run([str(binary), node, str(root.parent / 'native-model-probe/worker_broker_fixture.cjs')], check=True, timeout=60)
+PY

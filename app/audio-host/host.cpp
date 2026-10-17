@@ -1,3 +1,4 @@
+#include <set>
 #include "control_protocol.hpp"
 #include "route_cli.hpp"
 #include "microphone_test.hpp"
@@ -554,9 +555,29 @@ int main(int argc, char **argv) {
             std::string(argv[4]) == "--output") {
             bool microphone = false, speaker = false;
             RouteControlOptions controls;
+            RouteProviderOptions provider;
+            krisp_probe::InstalledWorkerSettings settings;
+            bool installedProvider = false;
+            std::set<std::string> providerFlags;
             for (int i = 6; i < argc; ++i) {
                 const std::string flag = argv[i];
-                if (flag == "--noise-suppression" || flag == "--microphone-noise-suppression")
+                if (flag == "--microphone-provider" || flag.rfind("--provider-", 0) == 0) {
+                    if (!providerFlags.insert(flag).second || ++i == argc)
+                        throw std::invalid_argument("Repeated or incomplete provider option");
+                    const std::string value = argv[i];
+                    if (flag == "--microphone-provider") {
+                        if (value != "installed-krisp") throw std::invalid_argument("Unsupported microphone provider");
+                        installedProvider = true;
+                    } else if (flag == "--provider-node") settings.nodePath = value;
+                    else if (flag == "--provider-worker") settings.workerPath = value;
+                    else if (flag == "--provider-addon") settings.addonPath = value;
+                    else if (flag == "--provider-model") settings.modelPath = value;
+                    else if (flag == "--provider-adapter") settings.adapterPath = value;
+                    else if (flag == "--provider-library") settings.libraryPath = value;
+                    else if (flag == "--provider-node-sha256") settings.nodeSha256 = value;
+                    else if (flag == "--provider-adapter-sha256") settings.adapterSha256 = value;
+                    else throw std::invalid_argument("Unknown provider option");
+                } else if (flag == "--noise-suppression" || flag == "--microphone-noise-suppression")
                     microphone = true;
                 else if (flag == "--speaker-noise-suppression")
                     speaker = true;
@@ -590,7 +611,15 @@ int main(int argc, char **argv) {
                 std::cerr << "--control-stdin and --operation-id must be supplied together\n";
                 return 64;
             }
-            return runRoute(argv[3], argv[5], microphone, speaker, controls);
+            if (!providerFlags.empty()) {
+                if (!installedProvider || !microphone || providerFlags.size() != 9)
+                    throw std::invalid_argument("Installed provider requires microphone suppression and all runtime options");
+                // Syntax validation before aggregate creation. Worker admission
+                // checks actual artifacts before any callback can run.
+                (void)krisp_probe::buildInstalledWorkerLaunch(settings, {});
+                provider.installed = std::move(settings);
+            }
+            return runRoute(argv[3], argv[5], microphone, speaker, controls, provider);
         }
         std::cerr << "Usage: audio-host --list | --plan/--aggregate-plan --input DEVICE_UID "
                      "--output DEVICE_UID\n";

@@ -106,3 +106,8 @@ Experimental [native probe support](app/native-model-probe/README.md) now valida
 ## Callback buffering and route preparation
 
 Runtime buffer configuration and a pre-IO processor factory now exist. REA NC tests at 30/50 ms explicit queue delay passed with unchanged aligned output. Audio-host bounds and lifetime fixtures passed. The provider is still unconnected to desktop routing, and these short CPU captures do not establish live latency or full parity. See `CHECKPOINT.md` and `native-direct-probe-findings.md`.
+
+
+## Installed outbound provider integration
+
+The desktop now admits an explicit installed outbound NC microphone provider and checks its helper startup identity. Speakers retain RNNoise. Synthetic bridge/lifecycle tests, 104 desktop tests and signed-resource checks pass. REA verified packaged-worker NC/bypass output against earlier probes. Actual HAL routing, quality, sustained latency and full parity remain unverified. See the latest `CHECKPOINT.md` entry.

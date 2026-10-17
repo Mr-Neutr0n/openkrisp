@@ -29,10 +29,12 @@ struct AudioRouteOptions: Equatable, Sendable {
     let outputUID: String
     let microphoneNoise: Bool
     let speakerNoise: Bool
+    var installedProvider: InstalledNCConfiguration? = nil
     var arguments: [String] {
         var args = ["--route", "--input", inputUID, "--output", outputUID]
         if microphoneNoise { args.append("--microphone-noise-suppression") }
         if speakerNoise { args.append("--speaker-noise-suppression") }
+        if microphoneNoise, let installedProvider { args += installedProvider.arguments }
         return args
     }
 }
@@ -45,8 +47,20 @@ struct AudioStartup: Decodable, Sendable {
     let outputUID: String
     let microphoneNoise: Bool
     let speakerNoise: Bool
+    let microphoneProvider: String?
+    let speakerProvider: String?
+    let providerModelSHA256: String?
+    let providerAddonSHA256: String?
+    let providerAdapterSHA256: String?
+    let providerNodeSHA256: String?
+    let providerDelaySamples: Int?
+    let providerMaximumCallbackFrames: Int?
     enum CodingKeys: String, CodingKey {
         case event, operationID, microphone, speaker
+        case microphoneProvider = "microphone_provider", speakerProvider = "speaker_provider"
+        case providerModelSHA256 = "provider_model_sha256", providerAddonSHA256 = "provider_addon_sha256"
+        case providerAdapterSHA256 = "provider_adapter_sha256", providerNodeSHA256 = "provider_node_sha256"
+        case providerDelaySamples = "provider_delay_samples", providerMaximumCallbackFrames = "provider_maximum_callback_frames"
         case inputUID = "input_uid", outputUID = "output_uid"
         case microphoneNoise = "microphone_noise", speakerNoise = "speaker_noise"
     }
@@ -54,9 +68,20 @@ struct AudioStartup: Decodable, Sendable {
         guard let microphone, let speaker else { return nil }
         return AudioControlSnapshot(microphone: microphone, speaker: speaker)
     }
-    var options: AudioRouteOptions {
-        AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
-                          microphoneNoise: microphoneNoise, speakerNoise: speakerNoise)
+    func matches(_ expected: AudioRouteOptions) -> Bool {
+        guard inputUID == expected.inputUID, outputUID == expected.outputUID,
+              microphoneNoise == expected.microphoneNoise, speakerNoise == expected.speakerNoise,
+              speakerProvider == (expected.speakerNoise ? "rnnoise" : "none") else { return false }
+        if expected.microphoneNoise, let provider = expected.installedProvider {
+            guard microphoneProvider == "installed-krisp", providerModelSHA256 == InstalledNCConfiguration.modelSHA256,
+                  providerAddonSHA256 == InstalledNCConfiguration.addonSHA256, providerAdapterSHA256 == provider.adapterSHA256,
+                  providerNodeSHA256 == provider.nodeSHA256, let maximum = providerMaximumCallbackFrames,
+                  (1...4096).contains(maximum), providerDelaySamples == ((maximum + 958) / 480 + 2) * 480 else { return false }
+            return true
+        }
+        return microphoneProvider == (expected.microphoneNoise ? "rnnoise" : "none") &&
+            providerModelSHA256 == nil && providerAddonSHA256 == nil && providerAdapterSHA256 == nil &&
+            providerNodeSHA256 == nil && providerDelaySamples == nil && providerMaximumCallbackFrames == nil
     }
 }
 struct HelperExit: Sendable { let status: Int32; let output: Data; let diagnostic: String }

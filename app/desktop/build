@@ -3,6 +3,8 @@ import pathlib
 import plistlib
 import shutil
 import subprocess
+import hashlib
+import json
 
 root = pathlib.Path(__file__).resolve().parent
 subprocess.run(["swift", "build", "-c", "release", "--package-path", str(root)], check=True)
@@ -23,10 +25,13 @@ if not helper_source.is_file():
     raise RuntimeError("Build app/audio-host with ./verify before packaging desktop.")
 helper_inputs = [helper_root / name for name in (
     "host.cpp", "route_cli.cpp", "route_cli.hpp", "routing.cpp", "routing.hpp",
-    "coreaudio_backend.cpp", "noise_adapter.hpp", "controls.hpp",
+    "coreaudio_backend.cpp", "noise_adapter.hpp", "installed_noise_adapter.hpp", "controls.hpp",
     "control_protocol.cpp", "control_protocol.hpp", "recording.cpp", "recording.hpp", "microphone_test.cpp", "microphone_test.hpp",
     "microphone_test_cli.cpp", "microphone_test_coreaudio.cpp")]
 helper_inputs.append(root.parent / "noise-engine" / "build" / "release" / "librnnoise.a")
+worker_root = root.parent / "native-model-probe"
+helper_inputs.extend(worker_root.glob("*.hpp"))
+helper_inputs.append(worker_root / "worker_broker.cpp")
 if any(path.stat().st_mtime_ns > helper_source.stat().st_mtime_ns for path in helper_inputs):
     raise RuntimeError("Audio helper is stale. Rebuild app/audio-host with ./verify before packaging desktop.")
 helper_dir = app / "Contents" / "Resources" / "helper"
@@ -38,6 +43,36 @@ notices.mkdir()
 shutil.copy2(root.parent / "noise-engine" / "vendor" / "rnnoise" / "COPYING", notices / "RNNoise-COPYING")
 subprocess.run(["codesign", "--force", "--sign", "-", "--identifier", "dev.labvoice.audio-host", str(helper)], check=True)
 subprocess.run(["codesign", "--verify", "--strict", str(helper)], check=True)
+# Bundle only our adapter and worker code. Node, the vendor addon, models and
+# dependency libraries remain at explicitly selected external installed paths.
+worker_files = ("native-probe.node", "audio_worker.cjs", "worker_session.cjs", "worker_protocol.cjs")
+adapter_source = worker_root / "build" / "native-probe.node"
+adapter_inputs = [worker_root / "native_probe.cpp", worker_root / "build_probe", *worker_root.glob("*.hpp")]
+if not adapter_source.is_file() or adapter_source.is_symlink():
+    raise RuntimeError("Build app/native-model-probe with ./build_probe before packaging desktop.")
+if any(path.stat().st_mtime_ns > adapter_source.stat().st_mtime_ns for path in adapter_inputs):
+    raise RuntimeError("Native adapter is stale. Rebuild app/native-model-probe before packaging desktop.")
+worker_dir = helper_dir / "installed-worker"
+worker_dir.mkdir()
+for name in worker_files:
+    source = adapter_source if name == "native-probe.node" else worker_root / name
+    if source.is_symlink() or not source.is_file():
+        raise RuntimeError("Expected plain worker resource: " + name)
+    shutil.copy2(source, worker_dir / name)
+adapter = worker_dir / "native-probe.node"
+if subprocess.check_output(["lipo", "-archs", str(adapter)], text=True).strip() != "arm64":
+    raise RuntimeError("Native adapter must be ARM64.")
+if "minos 12.0" not in subprocess.check_output(["otool", "-l", str(adapter)], text=True):
+    raise RuntimeError("Native adapter must target macOS 12.0.")
+subprocess.run(["codesign", "--force", "--sign", "-", "--identifier", "dev.labvoice.native-probe", str(adapter)], check=True)
+subprocess.run(["codesign", "--verify", "--strict", str(adapter)], check=True)
+# Signing changes Mach-O bytes. Record only the final signed adapter identity.
+manifest = {
+    "schemaVersion": 1,
+    "nodeSha256": "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040",
+    "files": {name: hashlib.sha256((worker_dir / name).read_bytes()).hexdigest() for name in worker_files},
+}
+(worker_dir / "runtime-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 info = {
     "CFBundleName": "Lab Voice", "CFBundleDisplayName": "Lab Voice",
     "CFBundleIdentifier": "dev.labvoice.desktop", "CFBundleExecutable": "LabVoice",

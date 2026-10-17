@@ -1,6 +1,7 @@
 #include "route_cli.hpp"
 #include "control_protocol.hpp"
 #include "noise_adapter.hpp"
+#include "installed_noise_adapter.hpp"
 #include "routing.hpp"
 #include <cerrno>
 #include <chrono>
@@ -124,13 +125,21 @@ void serviceControls(labvoice::ControlFramer &input, labvoice::ControlProtocol &
 
 } // namespace
 int runRoute(const std::string &input, const std::string &output, bool microphoneNoise,
-             bool speakerNoise, const RouteControlOptions &controls) {
+             bool speakerNoise, const RouteControlOptions &controls, const RouteProviderOptions &provider) {
     // Merely compiling this function starts no audio. --route is an explicit start command.
     labvoice::CoreAudioBackend backend;
     std::shared_ptr<labvoice::NoiseAdapter> noise;
-    if (microphoneNoise || speakerNoise)
+    if (!provider.installed && (microphoneNoise || speakerNoise))
         noise = std::make_shared<labvoice::NoiseAdapter>(microphoneNoise, speakerNoise);
+    // This separate control-thread owner outlives every Session cleanup attempt.
+    // Explicit worker stop prevents a queued HAL block's final Context release
+    // from performing a blocking worker join on its dispatch thread.
+    std::shared_ptr<labvoice::InstalledNoiseAdapter> installed;
     labvoice::Session session(backend);
+    struct WorkerStopGuard {
+        std::shared_ptr<labvoice::InstalledNoiseAdapter>& owner;
+        ~WorkerStopGuard() { if (owner) { try { (void)owner->stop(); } catch (...) {} } }
+    } workerStopGuard{installed};
     std::unique_ptr<labvoice::ControlProtocol> protocol;
     labvoice::ControlFramer controlInput;
     RouteRecording recording(controls.operationID);
@@ -143,8 +152,21 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
         std::signal(SIGINT, oldInt);
         std::signal(SIGTERM, oldTerm);
     };
+    labvoice::ProcessorFactory prepare;
+    if (provider.installed) {
+        if (!microphoneNoise) { restore(); throw std::invalid_argument("Installed provider requires microphone suppression"); }
+        prepare = [&](const labvoice::Layout &layout) {
+            if (interrupted || getppid() != parent) throw std::runtime_error("Route startup cancelled");
+            std::string error;
+            installed = labvoice::InstalledNoiseAdapter::create(layout, *provider.installed, speakerNoise, error);
+            if (!installed) throw std::runtime_error(error);
+            if (interrupted || getppid() != parent) throw std::runtime_error("Route startup cancelled");
+            return labvoice::ProcessorBinding{labvoice::InstalledNoiseAdapter::process, installed.get(), installed};
+        };
+    }
     if (!session.start({input, output}, noise ? labvoice::NoiseAdapter::process : nullptr,
-                       noise.get(), noise, controls.initial)) {
+                       noise.get(), noise, controls.initial, prepare)) {
+        if (installed) (void)installed->stop();
         std::cerr << "Route start failed: " << session.error() << '\n';
         restore();
         return 1;
@@ -154,6 +176,16 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
               << ",\"microphone_noise\":" << (microphoneNoise ? "true" : "false")
               << ",\"speaker_noise\":" << (speakerNoise ? "true" : "false") << ","
               << labvoice::controlJSON(controls.initial);
+    std::cout << ",\"microphone_provider\":" << jsonString(installed ? "installed-krisp" : (microphoneNoise ? "rnnoise" : "none"))
+              << ",\"speaker_provider\":" << jsonString(speakerNoise ? "rnnoise" : "none");
+    if (installed) {
+        std::cout << ",\"provider_model_sha256\":" << jsonString(installed->modelSha256())
+                  << ",\"provider_addon_sha256\":" << jsonString(installed->addonSha256())
+                  << ",\"provider_adapter_sha256\":" << jsonString(installed->adapterSha256())
+                  << ",\"provider_node_sha256\":" << jsonString(installed->nodeSha256())
+                  << ",\"provider_delay_samples\":" << installed->actualDelaySamples()
+                  << ",\"provider_maximum_callback_frames\":" << installed->maximumCallbackFrames();
+    }
     if (controls.stdinEnabled)
         std::cout << ",\"operationID\":" << jsonString(controls.operationID);
     std::cout << "}" << std::endl;
@@ -166,13 +198,18 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
         if (protocol)
             serviceControls(controlInput, *protocol, session, recording, parent);
         recording.service(session, !session.running());
-        if (!session.service())
+        if ((installed && !installed->healthy()) || !session.service())
             break;
     }
     const bool changed = !interrupted;
     recording.service(session, true);
     const bool stopped = session.stop();
+    const bool workerStopped = !installed || installed->stop();
     restore();
+    if (!workerStopped) {
+        std::cerr << "Installed provider failed: " << installed->error() << '\n';
+        return 1;
+    }
     if (!stopped) {
         std::cerr << "Route cleanup pending: " << session.error() << '\n';
         return 1;

@@ -2,6 +2,8 @@
 import pathlib
 import plistlib
 import subprocess
+import hashlib
+import json
 
 root = pathlib.Path(__file__).resolve().parent
 subprocess.run(["swift", "test", "--package-path", str(root)], check=True)
@@ -29,6 +31,26 @@ notice = helper.parent / "notices" / "RNNoise-COPYING"
 assert notice.read_bytes() == (root.parent / "noise-engine" / "vendor" / "rnnoise" / "COPYING").read_bytes()
 resource = app / "Contents" / "Resources" / "ModelCatalog_ModelCatalog.bundle"
 assert resource.is_dir()
+def verify_worker(resources):
+    worker = resources / "helper" / "installed-worker"
+    names = {"native-probe.node", "audio_worker.cjs", "worker_session.cjs", "worker_protocol.cjs"}
+    assert {file.name for file in worker.iterdir()} == names | {"runtime-manifest.json"}
+    assert all(file.is_file() and not file.is_symlink() for file in worker.iterdir())
+    manifest = json.loads((worker / "runtime-manifest.json").read_text())
+    assert set(manifest) == {"schemaVersion", "nodeSha256", "files"}
+    assert manifest["schemaVersion"] == 1
+    assert manifest["nodeSha256"] == "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+    assert set(manifest["files"]) == names
+    for name, digest in manifest["files"].items():
+        assert digest == hashlib.sha256((worker / name).read_bytes()).hexdigest()
+        if name != "native-probe.node":
+            assert (worker / name).read_bytes() == (root.parent / "native-model-probe" / name).read_bytes()
+    adapter = worker / "native-probe.node"
+    subprocess.run(["codesign", "--verify", "--strict", str(adapter)], check=True)
+    assert subprocess.check_output(["lipo", "-archs", str(adapter)], text=True).strip() == "arm64"
+    assert "minos 12.0" in subprocess.check_output(["otool", "-l", str(adapter)], text=True)
+
+verify_worker(app / "Contents" / "Resources")
 # Copy out of the package build tree so no SwiftPM absolute build-path fallback
 # can satisfy the signed app resource check.
 import tempfile
@@ -40,11 +62,12 @@ with tempfile.TemporaryDirectory(prefix="labvoice-bundle-check-") as temporary:
     subprocess.run([str(relocated / "Contents" / "MacOS" / "LabVoice"), "--verify-model-catalog"], check=True)
     relocated_helper = relocated / "Contents" / "Resources" / "helper" / "audio-host"
     subprocess.run(["codesign", "--verify", "--strict", str(relocated_helper)], check=True)
+    verify_worker(relocated / "Contents" / "Resources")
     # Only metadata listing is allowed here. Never run --route or request mic access.
-    import json
     devices = json.loads(subprocess.check_output([str(relocated_helper), "--list"], text=True))
     assert devices["operation"] == "read_only_inventory"
     assert len(devices["companion_devices"]) == 2
 print("Verified ARM64 bundle, macOS 12 deployment target, metadata, and ad-hoc signature.")
 print("Headless resource check passed. No UI launch, visual QA, or interactive workflow tests performed.")
+print("Own installed-worker resources, signed adapter digest and fixed external Node identity verified after relocation. No installed vendor assets loaded.")
 print("Controller tests use injected permission, recognition and route processes. No OS prompt, recognition or live route ran.")

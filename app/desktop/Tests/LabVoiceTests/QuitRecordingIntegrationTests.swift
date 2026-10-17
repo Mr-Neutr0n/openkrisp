@@ -30,7 +30,7 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
     func ready() {
         let index = arguments.firstIndex(of: "--operation-id")!
         emit(["event": "route_started", "operationID": arguments[index + 1], "input_uid": "mic", "output_uid": "speaker",
-              "microphone_noise": false, "speaker_noise": false,
+              "microphone_noise": false, "speaker_noise": false, "microphone_provider": "none", "speaker_provider": "none",
               "microphone": ["muted": false, "gain": 1], "speaker": ["muted": false, "gain": 1]])
     }
     func send(_ data: Data) throws {

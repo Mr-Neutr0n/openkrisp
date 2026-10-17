@@ -169,3 +169,15 @@ REA reports verified owned-process cleanup and removed temporary roots for both 
 - `timed-worker-nc-480-1-20261018-v1.result.json` SHA256 `681f2568a5f2f5864340a8d7290ab5f7611e69c57df10029d27e110806b7bd38`.
 - `timed-worker-nc-512-2-20261018-v1.result.json` SHA256 `be9d4b8cac706005c1b235a5ac1f758521e9753343b51b4ce8497d4b37a7c3dc`.
 - Timed probe executable SHA256 `e8a3499703c80063e72126019bb5ab84926c1530236c69b4696d035e60b4abe7`.
+
+
+## Signed desktop worker resources, 2026-10-18
+
+The desktop now packages only our adapter and three worker scripts. The adapter build explicitly targets macOS 12 with Node-API 8, correcting its earlier host-OS deployment target. Packaging signs the adapter before calculating its manifest digest. Signed packaged adapter SHA256 is `216d95381d62f24605103a179d2782c967621baccdf7f06493d76f06b8d26025`. Exact external Node/addon/model hashes remain unchanged. No vendor asset is bundled.
+
+REA exercised the actual packaged worker scripts and signed adapter with synthetic input, 512-sample callback blocks and a two-frame scheduling budget. Both runs used 2400 samples of explicit buffering, processed 105 frames including five padding frames, returned 48,000 finite aligned samples, recorded zero transport deadline faults and confirmed worker teardown. Outputs match their earlier direct counterparts byte for byte.
+
+- nc: Evidence `ev_7f2c43c2ee54014826bcc5a847ed6524ee3146840050945337641eab5087fc34`; maximum exchange/scheduling lateness 21/2703 microseconds. Result envelope SHA256 `27e3c2f4581b5bfaa211e8651869bd747a47d9174acd351358beb490df13ea2a`; output SHA256 `fd389eb36788f4e2f707d63e987fd9205ff6dc1323ef94cd1ab3600960077290`.
+- bypass: Evidence `ev_c115357e4627c1977be6329dc17fa6cc5ab75da3c37ae30b3ffcd12d559cae02`; maximum exchange/scheduling lateness 44/5180 microseconds. Result envelope SHA256 `38be813429ed5ac29df14609304b69708b0273b0d9e7262d3c022d24f03e46f8`; output SHA256 `d65f14f3868eccb927bd4da5b9a2ae2bc61755e29ae08e432cb3129f67c4f671`.
+
+Both captures report verified owned-process cleanup and removed temporary roots. NC retains two unrelated platform-process attribution limits; bypass reports no unverified processes. Earlier process-sampling, file/image binding and network-observation limits still apply. The worker's reviewed deny-network launcher remains in use. This proves short packaged-worker CPU execution on this Mac, not CoreAudio routing, macOS 12 runtime compatibility of external Node/vendor libraries, sustained deadlines, end-to-end latency, speech quality or UI interaction.

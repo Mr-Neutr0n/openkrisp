@@ -1376,10 +1376,30 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/installed_noise_adapter.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/route_cli.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+          "exists": true
         }
       ],
-      "implementation": "Independent RNNoise microphone/stereo speaker path exists. No integrated AEC or installed original-model inference backend. Noise Shield heavy/medium/background voice detection and feedback labels are also not implemented.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
+      "implementation": "Independent RNNoise microphone/stereo speaker path exists. Experimental installed outbound NC microphone provider now connects a supervised Node worker to the audio host and explicit desktop selection. Startup requires exact addon/model/adapter/Node identity and validated callback buffering; speakers remain RNNoise. AEC, BVC and Noise Shield detection/feedback are not implemented.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -2684,28 +2704,28 @@
   ],
   "implementation_source_sha256": {
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
-    "projects/krisp/app/desktop/build": "5f6de557dbc2db66355e2ddb3e933911f957a87a9c635814c9c0b342db914e43",
+    "projects/krisp/app/desktop/build": "f39baa6bdf6003d47e003aa16ecee9009ad000e1bbf831b08111e08ca8943133",
     "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "74b89d527cd18dc325ae491332d133f44bb11381f8497dce4f03f54134180932",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "b1e9a95cadc305e07e69d963151877ade064656468dcd98577cd93a1a8c62bad",
     "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
     "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
     "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift": "ba2a1b8342403879dd5b217805a65b2c14a6bbd9c7f4bbad5c4f0548340b3244",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "ef6ea3500c5d31811ea79145f1c0004c6d151ef0e744213ed86ca8bfa4681f82",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "488d5c72262ac3c9452ed9ec44286d468a1205653b954f14b3748a5009382a60",
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "f1cb358676578116a77ee630d2deab48d3a576bf92694cff41ac1940d0f932e2",
     "projects/krisp/app/audio-host/routing.cpp": "3b2d46f0cf14fc439a7024caad8d8c33afacba32b3840d90b165e85c59918edc",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "81d624ce63a4830e2721db517099302ce3f1a7466bfa4fe03e491a01e7228d72",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "ccbba84e8403d08a6a771772aded5bbb989c6abe56ac4dab1e4d4b71af73a6c0",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
     "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "27e8f2bf044d21f73d28e3077b018da9121bafcc36054720bd6d9b02605f2299",
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
-    "projects/krisp/app/audio-host/route_cli.cpp": "643f8234365c51788c0f334b67e118b13fe59705c98f927c26c0a09cca297576",
+    "projects/krisp/app/audio-host/route_cli.cpp": "246d0630c2ace184c632f8c36d29724fb82b5fbc4c025e63e3d8e0d67d676c49",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "013d1609513ebc7e7c6537d79ad170104dbc4c1bb99fb66a0c6e44185127b27c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
     "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "fac388cece5b9f3960a18d64ba4a792cdc3954ef94f3206263ae3ef4625fbaa0",
-    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "652932d96a1c929967d81751c5e6d1eff24c96a63dddda45f5948aaf50551741",
+    "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "1ece3002c6da7ba99d58f1f9e46934cbaedcabef33958b4b3208234080c91615",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/FloatingWidgetTests.swift": "9c15b0f90017c546e5d67422904a60bd7c3aa0551193c11177dde4a88f368021",
@@ -2717,7 +2737,7 @@
     "projects/krisp/app/audio-host/microphone_test_wire_fixture.cpp": "104b0317817109fe838b05935d82b77b0450eb9b097278dcf275e7f609a3c751",
     "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
     "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
-    "projects/krisp/app/audio-host/host.cpp": "459f3e6b9973048ac668c8bb3c649437fcc25da84d6573fb26f2fb0800ca3db5",
+    "projects/krisp/app/audio-host/host.cpp": "732fe6d662d3e48c9ad5b35832c3f60891d5dea7b47c473ecea1cc6db09b46e1",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "7ca02e333ed2f1a78f84ebba3f41df490273a5f4564e0cf3cd6e0a08aee3c1c0",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
@@ -2743,14 +2763,14 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingRecoveryControllerTests.swift": "a5a23e39a0a4521d6836ae17dc202f102068dc2b778c41fae10b098a3e2275de",
     "projects/krisp/app/desktop/Sources/LabVoice/QuitCoordinator.swift": "7e0ae5747b34e0b0aab3d6d4d6dfed88cc3362d5df5cde731041df923b7360ad",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitCoordinatorTests.swift": "7407e235432c4f017d751ab4ec3261467bf82f9dee66a733672ac98b8488c841",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitRecordingIntegrationTests.swift": "a76cb018f39cdcf7534bb8028d2d2c11b611b827508391a1e3a3ab62f3300510",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/QuitRecordingIntegrationTests.swift": "e8819bdcc67ad6be31d34783569323b3298016f1c58eb2224c93dc48ee45234c",
     "projects/krisp/app/native-model-probe/abi_result.hpp": "7c31440ec799ae1bcbf08fef6df00de818fe1b22acdd922402de3a0f2a309572",
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
     "projects/krisp/app/native-model-probe/verify": "585c56ccd66b1f7371b5691d64956b30560082150e01f5fc2319dd575d868b78",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
-    "projects/krisp/app/native-model-probe/build_probe": "2acf1b3047c68a16980429bd01e8b6dc2413466cb79cc1ac7da25ce2c613943a",
+    "projects/krisp/app/native-model-probe/build_probe": "c441582cee43a7e95c2b12f23046e6f5d2b354a8958fef41f491dbae46d694df",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
     "projects/krisp/app/native-model-probe/fixture_library.cpp": "67a1ac825bc633d8dfd3a51a524e15f478f2460b8b3e84077f5f1e60c8d82dd2",
     "projects/krisp/app/native-model-probe/launcher_test.cjs": "6a9f1d34c03dc046c4bc086a79aee0605a39d4ee06448457b6cbe5ed4d30a0c2",
@@ -2788,7 +2808,17 @@
     "projects/krisp/app/native-model-probe/parent_watch_integration_test.cjs": "fbe2f35e76e416a8d35b250bda7825b0db88460f2a8abcb75944e1f8861c5fce",
     "projects/krisp/app/native-model-probe/timed_worker_probe.cpp": "d7b599626f7efe7cba6c87013b2a3e0ff2019c10387d6997ee542c3c37b47cd2",
     "projects/krisp/app/audio-host/routing.hpp": "cac63b865fe931b69f202db8a3cd91fbfb12a070d83682303a293052f2dee7f0",
-    "projects/krisp/app/audio-host/routing_test.cpp": "805275805d416b7629076394cce97ad04d98dfda7ac5e7affa82d8b2963191a6"
+    "projects/krisp/app/audio-host/routing_test.cpp": "805275805d416b7629076394cce97ad04d98dfda7ac5e7affa82d8b2963191a6",
+    "projects/krisp/app/desktop/verify": "62c8181690ebbc5c3282ceb5b72f54ead26752f466d45b8c0bf719b15fb7d81b",
+    "projects/krisp/app/audio-host/route_cli.hpp": "409a9521a11a80bfc34f42a48eaf1f2fc5bebb32a9ee0d9e13770ec7784dc8fb",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "fd2248fd7e1e0535c452860202ddad4ee4187f174ed610b9ff5991dbcdf3be4c",
+    "projects/krisp/app/audio-host/provider_cli_check.py": "41d60325a54c31e63e1de4bc2eb38fb2a1ef69fbc495dd0768dec9d753b650a1",
+    "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift": "f1d785f3694251df8b9e9b1c98d91d773331e50d5f8d5bac99134acce97a2632",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "0a29af7a36d07270ecd81d4e28e36d658f0a2e6f66081ffdfd42777516163c07",
+    "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "2dc9c8e07fa90d6e362657b58cba28df4d3e01579047e7ee21be7fc826657ddc",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
+    "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "7f02b51bc8ac484791b0d296335fc716f3c0fecb1431306258e2a81ee0ab9057",
+    "projects/krisp/app/audio-host/verify": "f2e89e62ced7bebe3b3149b38db82f49ffe343e3f2ef78463b602483a5e3feee"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

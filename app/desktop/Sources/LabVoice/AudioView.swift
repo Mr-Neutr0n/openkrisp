@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 
 struct AudioView: View {
     @ObservedObject var audio: AudioRouteController
@@ -26,6 +28,16 @@ struct AudioView: View {
                 .accessibilityLabel("\(name) app-route volume")
             Text("\(Int((gain * 100).rounded()))%").frame(width: 42, alignment: .trailing)
         }.disabled(!audio.controlsEditable)
+    }
+    private func chooseProviderApp() {
+        let panel = NSOpenPanel(); panel.allowedContentTypes = [.applicationBundle]
+        panel.allowsMultipleSelection = false
+        if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledApp(url) }
+    }
+    private func chooseProviderNode() {
+        let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.canChooseFiles = true
+        panel.allowsMultipleSelection = false; panel.message = "Choose the reviewed Node executable."
+        if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledNode(url) }
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -66,13 +78,30 @@ struct AudioView: View {
                     Text("Choose devices currently running at 48 kHz. Device sample rates are not changed.")
                         .font(.caption).foregroundColor(.secondary)
                     Divider()
-                    Text("Independent RNNoise processing").font(.headline)
+                    Text("Noise processing").font(.headline)
                     Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)
-                    Toggle("Reduce speaker noise", isOn: $audio.speakerNoise).disabled(controlsLocked)
-                    Text("Start captures the selected microphone and routes speaker audio. These options use the independent model, not the original Krisp models.")
+                    Picker("Microphone provider", selection: $audio.microphoneProvider) {
+                        ForEach(MicrophoneProvider.allCases) { provider in Text(provider.title).tag(provider) }
+                    }.disabled(controlsLocked)
+                    if audio.microphoneProvider == .installedKrisp {
+                        HStack {
+                            Button("Choose Krisp app…", action: chooseProviderApp)
+                            Button("Choose Node runtime…", action: chooseProviderNode)
+                        }.disabled(controlsLocked || audio.providerValidating)
+                        Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
+                        Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
+                        Button("Validate installed microphone provider") { Task { await audio.validateInstalledProvider() } }
+                            .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil)
+                        if audio.providerValidating { ProgressView().controlSize(.small) }
+                        Text(audio.providerStatus).font(.caption).textSelection(.enabled)
+                        Text("Uses only the reviewed installed outbound NC model. Startup checks exact file hashes. Other installed models remain unavailable. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                    Toggle("Reduce speaker noise with RNNoise", isOn: $audio.speakerNoise).disabled(controlsLocked)
+                    Text("Start captures the selected microphone and routes speaker audio. Speaker noise reduction always uses the independent RNNoise model.")
                         .font(.caption).foregroundColor(.secondary)
                     if let active = audio.activeOptions, audio.phase == .running {
-                        Text("Microphone reduction: \(active.microphoneNoise ? "on" : "off"). Speaker reduction: \(active.speakerNoise ? "on" : "off").")
+                        Text("Microphone: \(active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker reduction: \(active.speakerNoise ? "RNNoise" : "off").")
                             .font(.caption)
                     }
                     Divider()

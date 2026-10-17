@@ -197,7 +197,7 @@ struct AppSettingsView: View {
                             if !catalog.resultSource.isEmpty {
                                 Divider()
                                 Text(catalog.resultSource).font(.headline)
-                                Text("\(catalog.assessments.filter { $0.detected }.count) detected across \(catalog.assessments.count) expected-location checks. Inference unavailable.")
+                                Text("\(catalog.assessments.filter { $0.detected }.count) detected across \(catalog.assessments.count) expected-location checks. These checks do not activate audio processing.")
                                 ForEach(Array(catalog.assessments.enumerated()), id: \.offset) { _, report in
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(report.asset.id).font(.headline)
@@ -210,7 +210,7 @@ struct AppSettingsView: View {
                                         Text(report.unknownLicense ? "License or redistribution rights unknown" :
                                             "Manifest license: \(report.asset.license.identifier ?? "") · Redistribution: \(report.asset.license.redistribution.rawValue)")
                                             .font(.caption).foregroundColor(.secondary)
-                                        Text("Backend unavailable").font(.caption).foregroundColor(.secondary)
+                                        Text("Select and validate the exact reviewed outbound NC provider in Audio. Other catalog models are unavailable for inference.").font(.caption).foregroundColor(.secondary)
                                     }.frame(maxWidth: .infinity, alignment: .leading).padding(10)
                                         .background(Color.secondary.opacity(0.07)).cornerRadius(6)
                                 }
