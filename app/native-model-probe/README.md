@@ -51,3 +51,21 @@ The launcher supplies its own PID to the worker. Before opening the installed mo
 The desktop and routing helper can now select this worker through the processor preparation hook and validate its startup identity. The helper uses the aggregate's maximum callback bound and a two-frame scheduling budget. The desktop packages only our adapter and worker scripts, with hashes taken after signing. It requires the exact reviewed external Node and addon, with the outbound microphone or inbound speaker model pinned separately. Actual HAL routing and sustained timing remain unverified; 120 ms buffering for a 4096-frame bound is not an accepted live latency budget.
 
 `timed_worker_probe` accepts `--model-role outbound|inbound`, defaulting to outbound. The role selects its fixed model digest; it does not permit arbitrary models. The inbound paced capture returned output identical to the direct mono probe, but REA ownership cleanup remained incomplete. See `../../inbound-model-findings.md` for exact scope and metrics.
+
+### Synthetic AEC foreign ABI fixture
+
+`./verify` also builds `aec_fixture.cpp` as an own dylib and runs
+`aec_fixture_test.cpp` against it in release and ASan/UBSan modes. No installed
+library is loaded. The producer declares its layout independently from
+`aec_abi.hpp`. Checks cover the 24-byte ARM64 stream specification, selected
+virtual slots, 100 separate 32 kHz mono forward / 48 kHz stereo reference
+10 ms frames, in-place Float32 output, virtual deletion and foreign exceptions
+from factory and both frame calls. The library remains loaded until engines
+and caught exceptions have been destroyed, including unexpected error paths.
+
+The fixture admits only 16/32/48 kHz and one or two channels with exact finite
+10 ms frames. These are test bounds, not established vendor support. Unused
+virtual declarations only preserve slot positions and must never be called.
+This fixture does not prove echo quality, rate conversion, original scheduling
+or compatibility with a loaded vendor library. It is separate from production
+NC admission and does not provide a runtime AEC launcher.

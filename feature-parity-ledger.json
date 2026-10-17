@@ -1416,10 +1416,22 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_abi.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_fixture.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_fixture_test.cpp",
+          "exists": true
         }
       ],
       "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC, BVC and Noise Shield detection/feedback remain unimplemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md. Independent AEC foreign-ABI fixture checks separate forward/reference stream specifications, selected virtual slots, 100 synthetic duplex frames, finite-size admission and destruction before library unload, including thrown frame-call exceptions. It does not load vendor code or implement production AEC. Complete native-model-probe ./verify passed including AEC release/ASan/UBSan and existing TSan suites; log evidence/aec-fixture-verify-20261018.log SHA256 e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -2798,7 +2810,7 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "585c56ccd66b1f7371b5691d64956b30560082150e01f5fc2319dd575d868b78",
+    "projects/krisp/app/native-model-probe/verify": "eb2f3c92febeec817fe796759c9935055b6fb3744922b46e077259de62c1e16c",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "c441582cee43a7e95c2b12f23046e6f5d2b354a8958fef41f491dbae46d694df",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
@@ -2852,7 +2864,10 @@
     "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "dac6160afd83a6772fbdfbb06dfddb991b8bb68dc756490f5bf19529525d607a",
     "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76",
     "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift": "a37726a9e31660c0cad166362070872e35d295ed8d55b6b3051687822c6bed9c"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift": "a37726a9e31660c0cad166362070872e35d295ed8d55b6b3051687822c6bed9c",
+    "projects/krisp/app/native-model-probe/aec_abi.hpp": "7290320f0d4a362df8033dc1d2673964c88dac8e7dcbe650617a75642be096d4",
+    "projects/krisp/app/native-model-probe/aec_fixture.cpp": "16a7ee408e28f3542745de08f7f021ae0994a08279ac42d4fa0942bc5a516e62",
+    "projects/krisp/app/native-model-probe/aec_fixture_test.cpp": "ce8de52f80b1df679bf3495afcf9dcee22a2e900b9cdbf4d56055eac42705239"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

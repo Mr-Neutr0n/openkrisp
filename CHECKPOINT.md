@@ -287,3 +287,12 @@ Independent review found no actionable issue. Final desktop `./verify` passed 11
 `original-speaker-graph-findings.md` binds the current 3.17.9 desktop speaker graph to default 48 kHz stereo Float32 and conditional inbound NC. BVC, accent, suspension and pass-through remain separate branches. The packaged microphone default is 32 kHz mono; effective overrides and the native processor-factory join remain unresolved. This does not establish full original runtime parity.
 
 `native-echo-contract-findings.md` establishes shared AEC state, separate forward/reference specifications, 10 ms Float32 calls and the direct factory ABI from nine successful static REA captures. Current full AEC-library SHA256 is `bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a`. No AEC runtime, hardware audio or administrator action ran. An independent foreign-ABI fixture is the next step. Full retained-feature parity remains incomplete.
+
+
+## Independent AEC interface fixture, 2026-10-18
+
+The native probe suite now includes a separate synthetic AEC library and consumer. It checks the 24-byte ARM64 stream specification, selected virtual slots, 100 paired frames with separate 32 kHz mono forward and 48 kHz stereo reference inputs, in-place output and malformed-input rejection. These rates are fixture bounds, not verified vendor support. The library remains loaded until engines and caught foreign exceptions are destroyed. Review identified and fixed the error-path unload order; forward and reverse exception tests cover it.
+
+Independent review found no remaining actionable issue. Focused release and ASan/UBSan checks passed. No original library, audio device, network or administrator action was used. This is experimental probe support, not a production echo canceller. The next runtime investigation must pin the current AEC library and establish actual supported frame combinations, reference timing and output behavior through REA before integration.
+
+Complete native-model-probe `./verify` passed, including existing release, sanitizer and thread-sanitizer suites. Private log `evidence/aec-fixture-verify-20261018.log`, SHA256 `e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26`. All 123 tracked implementation fingerprints match this checkpoint.
