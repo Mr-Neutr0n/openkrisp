@@ -10,13 +10,14 @@ const MODEL_SHA256 = '12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a700
 // EPERM is only a prerequisite, not proof of full isolation. Hashing precedes
 // require/native.open path reopening and does not atomically bind loaded images.
 // Caller owns fd0 requests, fd3 responses, fd1/2 redirection and kill deadlines.
-const KEYS = ['addonPath','modelPath','adapterPath','adapterSha256','nodeSha256','token','suppressionLevel','bypass'];
+const KEYS = ['addonPath','modelPath','adapterPath','adapterSha256','nodeSha256','token','suppressionLevel','bypass','parentPID'];
 function validateConfig(config) {
   if (!config || typeof config !== 'object' || Array.isArray(config) || Object.keys(config).length !== KEYS.length || KEYS.some(k=>!Object.hasOwn(config,k))) throw new Error('Invalid config keys');
   for (const key of ['addonPath','modelPath','adapterPath']) if (typeof config[key] !== 'string' || !path.isAbsolute(config[key]) || config[key].includes('\0')) throw new Error('Invalid absolute path');
   for (const key of ['adapterSha256','nodeSha256']) if (typeof config[key] !== 'string' || !/^[0-9a-f]{64}$/.test(config[key])) throw new Error('Invalid SHA256');
   if (typeof config.token !== 'string' || !/^[0-9a-f]{32}$/.test(config.token)) throw new Error('Invalid token');
   if (typeof config.bypass !== 'boolean' || !Number.isFinite(config.suppressionLevel) || config.suppressionLevel<0 || config.suppressionLevel>100) throw new Error('Invalid processing options');
+  if (!Number.isInteger(config.parentPID) || config.parentPID <= 1 || config.parentPID > 2147483647) throw new Error('Invalid expected parent PID');
   return Object.freeze({...config});
 }
 function fileHash(filename) {
@@ -61,10 +62,12 @@ function writeAll(write,bytes) {
 async function runWorker(config, dependencies={}) {
   config=await admit(config,dependencies);
   const native=(dependencies.loadAdapter || require)(config.adapterPath);
-  if(!native || typeof native.open!=='function')throw new Error('Adapter must export open');
+  if(!native || typeof native.open!=='function' || typeof native.watchParent!=='function')throw new Error('Adapter must export open and watchParent');
   const write=dependencies.write || (bytes=>fs.writeSync(3,bytes,0,bytes.length,null));
   const read=dependencies.read || (bytes=>fs.readSync(0,bytes,0,bytes.length,null));
-  return runSession({token:Buffer.from(config.token,'hex'),read,write,openSession(){
+  const watch = native.watchParent(config.parentPID);
+  if (!watch || typeof watch.close !== 'function') throw new Error('Invalid parent watch');
+  try { return runSession({token:Buffer.from(config.token,'hex'),read,write,openSession(){
     const session=native.open({addonPath:config.addonPath,modelPath:config.modelPath,sampleRate:48000,frameSize:480,suppressionLevel:config.suppressionLevel,bypass:config.bypass});
     try {
       if(!session || typeof session.process!=='function' || typeof session.close!=='function')throw new Error('Invalid session interface');
@@ -78,7 +81,9 @@ async function runWorker(config, dependencies={}) {
       }
       throw error;
     }
-  }});
+  }}); } finally {
+    if (watch.close()?.stopped !== true) throw new Error('Parent watch stop was not confirmed');
+  }
 }
 module.exports={validateConfig,admit,runWorker,fileHash,ADDON_SHA256,MODEL_SHA256};
 if(require.main===module) {

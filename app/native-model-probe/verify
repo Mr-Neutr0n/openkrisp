@@ -30,6 +30,8 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-native-probe-") as build:
 subprocess.run(["node", str(root / "launcher_test.cjs")], check=True)
 subprocess.run([str(root / "build_probe")], check=True)
 subprocess.run(["node", str(root / "native_probe_test.cjs")], check=True)
+subprocess.run(["node", str(root / "parent_watch_native_test.cjs")], check=True, timeout=60)
+subprocess.run(["node", str(root / "parent_watch_integration_test.cjs"), str(root / "build/native-probe.node")], check=True, timeout=60)
 
 with tempfile.TemporaryDirectory(prefix="openkrisp-persistent-") as build:
     fixture = str(Path(build) / "persistent-fixture.dylib")
@@ -92,4 +94,21 @@ subprocess.run([
     "clang++", "-std=c++20", "-arch", "arm64", "-O2", "-Wall", "-Wextra",
     "-Werror", "-pedantic", "-pthread", str(root / "worker_broker.cpp"),
     str(root / "installed_worker_probe.cpp"), "-o", str(root / "build/installed-worker-probe"),
+], check=True)
+
+with tempfile.TemporaryDirectory(prefix="openkrisp-parent-watch-") as build:
+    for name, flags in [("release", ["-O2"]),
+                        ("address-undefined", ["-O1", "-g", "-fsanitize=address,undefined"])]:
+        binary = str(Path(build) / name)
+        subprocess.run([
+            "clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra",
+            "-Werror", "-pedantic", "-pthread", *flags,
+            str(root / "parent_watch_test.cpp"), "-o", binary,
+        ], check=True)
+        print("parent-watch " + name, flush=True)
+        subprocess.run([binary], check=True, timeout=60)
+subprocess.run([
+    "clang++", "-std=c++20", "-arch", "arm64", "-O2", "-Wall", "-Wextra",
+    "-Werror", "-pedantic", "-pthread", str(root / "worker_broker.cpp"),
+    str(root / "timed_worker_probe.cpp"), "-o", str(root / "build/timed-worker-probe"),
 ], check=True)

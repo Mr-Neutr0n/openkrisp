@@ -4,6 +4,7 @@
 #include <locale>
 #include <sstream>
 #include <stdexcept>
+#include <unistd.h>
 
 namespace krisp_probe {
 struct InstalledWorkerSettings {
@@ -64,7 +65,7 @@ inline WorkerLaunchConfig buildInstalledWorkerLaunch(const InstalledWorkerSettin
     if(!std::isfinite(settings.suppressionLevel) || settings.suppressionLevel<0 || settings.suppressionLevel>100)throw std::invalid_argument("Invalid suppression level");
     const auto tokenText=tokenHex(token);
     std::ostringstream level;level.imbue(std::locale::classic());level<<std::setprecision(std::numeric_limits<double>::max_digits10)<<settings.suppressionLevel;
-    const std::string config="{\"addonPath\":"+json(settings.addonPath)+",\"modelPath\":"+json(settings.modelPath)+",\"adapterPath\":"+json(settings.adapterPath)+",\"adapterSha256\":"+json(settings.adapterSha256)+",\"nodeSha256\":"+json(settings.nodeSha256)+",\"token\":"+json(tokenText)+",\"suppressionLevel\":"+level.str()+",\"bypass\":"+(settings.bypass?"true":"false")+"}";
+    const std::string config="{\"parentPID\":"+std::to_string(getpid())+",\"addonPath\":"+json(settings.addonPath)+",\"modelPath\":"+json(settings.modelPath)+",\"adapterPath\":"+json(settings.adapterPath)+",\"adapterSha256\":"+json(settings.adapterSha256)+",\"nodeSha256\":"+json(settings.nodeSha256)+",\"token\":"+json(tokenText)+",\"suppressionLevel\":"+level.str()+",\"bypass\":"+(settings.bypass?"true":"false")+"}";
     WorkerLaunchConfig result;
     result.executable="/usr/bin/sandbox-exec";
     result.arguments={"-p","(version 1) (allow default) (deny network*)","/usr/bin/env","-i","PATH=/usr/bin:/bin","DYLD_LIBRARY_PATH="+settings.libraryPath,settings.nodePath,settings.workerPath,config};

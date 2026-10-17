@@ -1,6 +1,8 @@
 #include <node_api.h>
 #include "abi_factory.hpp"
 #include "result_collector.hpp"
+#include "parent_watch.hpp"
+#include <limits>
 #include <atomic>
 #include <cmath>
 #include <cstring>
@@ -415,6 +417,39 @@ napi_value openImpl(napi_env env, napi_callback_info info) {
     fail(env, failure); return nullptr;
 }
 napi_value open(napi_env env, napi_callback_info info) { return contain<openImpl>(env, info); }
+const napi_type_tag parentWatchTag{0xc45adbd45989f018ULL, 0x5ca7b976b12bf03eULL};
+void finalizeParentWatch(napi_env, void* value, void*) { delete static_cast<krisp_probe::ParentWatch*>(value); }
+napi_value closeParentWatchImpl(napi_env env, napi_callback_info info) {
+    std::size_t count = 0; napi_value self;
+    check(napi_get_cb_info(env, info, &count, nullptr, &self, nullptr));
+    if (count != 0) throw std::invalid_argument("Parent watch close takes no arguments");
+    bool tagged = false;
+    check(napi_check_object_type_tag(env, self, &parentWatchTag, &tagged));
+    if (!tagged) throw std::invalid_argument("Invalid parent watch receiver");
+    void* data = nullptr; check(napi_unwrap(env, self, &data));
+    if (!data) throw std::invalid_argument("Invalid parent watch receiver");
+    static_cast<krisp_probe::ParentWatch*>(data)->stop();
+    napi_value result; check(napi_create_object(env, &result));
+    set(env, result, "stopped", boolean(env, true)); return result;
+}
+napi_value closeParentWatch(napi_env env, napi_callback_info info) { return contain<closeParentWatchImpl>(env, info); }
+napi_value watchParentImpl(napi_env env, napi_callback_info info) {
+    std::size_t count = 0; napi_value argument;
+    check(napi_get_cb_info(env, info, &count, nullptr, nullptr, nullptr));
+    if (count != 1) throw std::invalid_argument("watchParent requires one parent PID");
+    check(napi_get_cb_info(env, info, &count, &argument, nullptr, nullptr));
+    const double pid = number(env, argument);
+    if (pid <= 1 || pid > std::numeric_limits<pid_t>::max() || std::floor(pid) != pid)
+        throw std::invalid_argument("Invalid expected parent PID");
+    auto watch = std::make_unique<krisp_probe::ParentWatch>(static_cast<pid_t>(pid));
+    napi_value object; check(napi_create_object(env, &object));
+    const napi_property_descriptor method = {"close", nullptr, closeParentWatch, nullptr, nullptr, nullptr, napi_default, nullptr};
+    check(napi_define_properties(env, object, 1, &method));
+    check(napi_type_tag_object(env, object, &parentWatchTag));
+    check(napi_wrap(env, object, watch.get(), finalizeParentWatch, nullptr, nullptr));
+    watch.release(); return object;
+}
+napi_value watchParent(napi_env env, napi_callback_info info) { return contain<watchParentImpl>(env, info); }
 napi_value initialize(napi_env env, napi_value exports) {
     napi_value function;
     if (napi_create_function(env, "run", NAPI_AUTO_LENGTH, run, nullptr, &function) != napi_ok ||
@@ -424,6 +459,10 @@ napi_value initialize(napi_env env, napi_value exports) {
     if (napi_create_function(env, "open", NAPI_AUTO_LENGTH, open, nullptr, &function) != napi_ok ||
         napi_set_named_property(env, exports, "open", function) != napi_ok) {
         napi_throw_error(env, nullptr, "Cannot initialize native session export"); return nullptr;
+    }
+    if (napi_create_function(env, "watchParent", NAPI_AUTO_LENGTH, watchParent, nullptr, &function) != napi_ok ||
+        napi_set_named_property(env, exports, "watchParent", function) != napi_ok) {
+        napi_throw_error(env, nullptr, "Cannot initialize parent watch export"); return nullptr;
     }
     return exports;
 }

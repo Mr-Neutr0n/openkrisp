@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-17",
+  "snapshot_date": "2026-10-18",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -2333,7 +2333,9 @@
         "ev_99071294c29921e2053b1c07202b132deaf318a776f2882c32ed96ab98bab06b",
         "ev_649e0bc972f011ec9611767d806b4acf591787e62b0eb3fbf7138cb7af3a0d94",
         "ev_0351c467f523d0bfeaadcb82ad979cc17ca7a23d2edc89f7cb5dc393fc351d9b",
-        "ev_b3a8b624dc15c550a28ec23f5d92a3f133185e8a256ad71d916c430f4c8e9cb5"
+        "ev_b3a8b624dc15c550a28ec23f5d92a3f133185e8a256ad71d916c430f4c8e9cb5",
+        "ev_1e069d57847168a68cb3c388899494a69908eba65b1a2f2803a96984d72c94da",
+        "ev_aaddd212cf3baed2368d6b1626a14238711366740a68edcc61ec0ba09220a321"
       ],
       "implemented_code": [
         {
@@ -2459,13 +2461,33 @@
         {
           "path": "projects/krisp/app/native-model-probe/worker_broker_test.cpp",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/parent_watch.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/parent_watch_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/parent_watch_native_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/parent_watch_integration_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/timed_worker_probe.cpp",
+          "exists": true
         }
       ],
       "catalog_keys": [],
       "representative_labels": [],
-      "implementation": "App still exposes catalog metadata only. Experimental installed-model provider now has gated Node startup, a fixed network-denied launch builder, supervised native broker and callback queues connected through a broker thread. CPU-only installed-model broker probes succeed; the provider is not yet connected to desktop/CoreAudio routing.",
-      "verified_scope": "Persistent and supervised broker NC/bypass probes each produce 100 frames and 48000 finite samples matching retained single-call outputs byte-for-byte. Supervised NC capture has incomplete REA ownership cleanup attribution, separately from broker-confirmed teardown. Final bypass has complete REA evidence. Component release/ASan/UBSan/TSan tests cover queue concurrency, real pipes, broker startup/frame/shutdown failures, idle child death and stop during stalled processing. No live callback deadline or speech-quality claim.",
-      "missing_acceptance": "Timed callback processing and latency; abrupt parent death during permanently hung native processing; app/routing acknowledgement and provider selection; physical audio and speech comparisons, tail handling and other models. Pre-load hash gates do not atomically bind reopened images. Original model redistribution rights remain unresolved."
+      "implementation": "App still exposes catalog metadata only. Experimental provider has gated Node startup, fixed network-denied launch, supervised broker, callback queues and a native parent-death guard. Timed CPU-only callback probes succeed against the installed outbound model. Not yet connected to desktop/CoreAudio routing.",
+      "verified_scope": "Timed NC and bypass each complete 112 paced 480-sample callbacks with zero queue deadline failures; aligned 48000 samples match direct probes byte for byte after removing 5760 samples of explicit transport delay. Both final REA captures are complete with verified owned cleanup. Maximum exchange time was 10/281 microseconds and scheduling lateness 2478/11444 microseconds in the NC/bypass runs. These are single CPU runs, not sustained or hardware latency measurements. Native parent guard passes C++ blocked-thread and actual Node blocked-JS parent-death tests. Existing release/ASan/UBSan/TSan worker and broker checks pass.",
+      "missing_acceptance": "Buffering chosen from actual callback format, sustained timing, helper/desktop identity acknowledgement and provider selection, physical audio and speech comparisons, tail handling and other models. Parent-loss detection depends on scheduling and uses process exit without C++ teardown. Startup hashes do not atomically bind reopened images. Original model redistribution rights remain unresolved."
     },
     {
       "id": "independent-model-provider",
@@ -2726,13 +2748,13 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "7f187a3bd753650b69b01eb991a0c2d71a4dfe726f2f6aacd21e6393b756a4ce",
+    "projects/krisp/app/native-model-probe/verify": "585c56ccd66b1f7371b5691d64956b30560082150e01f5fc2319dd575d868b78",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "2acf1b3047c68a16980429bd01e8b6dc2413466cb79cc1ac7da25ce2c613943a",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
     "projects/krisp/app/native-model-probe/fixture_library.cpp": "67a1ac825bc633d8dfd3a51a524e15f478f2460b8b3e84077f5f1e60c8d82dd2",
     "projects/krisp/app/native-model-probe/launcher_test.cjs": "6a9f1d34c03dc046c4bc086a79aee0605a39d4ee06448457b6cbe5ed4d30a0c2",
-    "projects/krisp/app/native-model-probe/native_probe.cpp": "f484a163df812979459acd558beadca876c7b53aa491cefe346dbef87ec3992c",
+    "projects/krisp/app/native-model-probe/native_probe.cpp": "57569a2751b8e7e9bdf84c689acefe12d13fc28282828e8a09ab622771fa23cb",
     "projects/krisp/app/native-model-probe/native_probe_test.cjs": "e57e4d606f85d159c1bc4ada47216dab7f2f9c38a8657137585d16b494f7f95e",
     "projects/krisp/app/native-model-probe/run_probe.cjs": "5b4e3d349ad5febb4e17e14df1387a34b460cc3485b9d12d87b0be92a267b9d2",
     "projects/krisp/app/native-model-probe/persistent_fixture.cpp": "02e6505c77a531e3f33ab5e1dae66678200f8c72bbf20792d582fbdc50479237",
@@ -2749,9 +2771,9 @@
     "projects/krisp/app/native-model-probe/worker_protocol_cross_test.cjs": "9e7bd0275edf39ec1b6fd25c4f6397cf58deb7410a6556b3e6156dd1600ac6de",
     "projects/krisp/app/native-model-probe/worker_session.cjs": "3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888",
     "projects/krisp/app/native-model-probe/worker_session_test.cjs": "516f7be4a20e2cf3a1ad310cd9fbb4b90c24d266b0a4b2065644fbf35fd94043",
-    "projects/krisp/app/native-model-probe/audio_worker.cjs": "08a475a7cead72d44a6e027eb06423c4479034e7c465a021d9a529bf764cbceb",
-    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "36d6fb531365633e163489e60f651b759c8d44b086e8046187f2baae78d3c55a",
-    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "0dcae60860d0d87acd64e046e4a5db5f96dd8f45e1c6e2a72e12f77accea4832",
+    "projects/krisp/app/native-model-probe/audio_worker.cjs": "65007442983c3ac03f2a6efe27f77ace71f5cd67879c3a7e90bbde70f2c6e424",
+    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "a6ee78e60876f177d44b8dfef5a452372c9e75a123eb13698fc9856cd6f8584d",
+    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "bf85ec420bed8b43b030f0989287b79ed740063cf1ef77adfe27ad70e59a27fa",
     "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp": "d4cc264e9910bdcc4b26e0b2d16b75abfc1fa97fe881383cb0960fe3bd0ef7d4",
     "projects/krisp/app/native-model-probe/installed_worker_probe.cpp": "279c22af7002ce6b948201094eebd12e90620eb0f8a9212a25f8a9a1045e14cd",
     "projects/krisp/app/native-model-probe/provider_worker.hpp": "51fd5a2fdbaafbf0b01f1bcf50194072ae980b547aed51733e9d103be2fe0836",
@@ -2759,7 +2781,12 @@
     "projects/krisp/app/native-model-probe/worker_broker.cpp": "91c438fd3dd48dfa5556783d4fe9f3bcca20849089a8053c76ddb1d67f61e054",
     "projects/krisp/app/native-model-probe/worker_broker.hpp": "5fe88279133265f1f3e504a835859d0e4e3712c5fd30983214cc108d48ea2c09",
     "projects/krisp/app/native-model-probe/worker_broker_fixture.cjs": "9c582434288b9b88b24515b2f0c3695e3fb97783fd0719286bef1d8829688d95",
-    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "168af0f73aaa0436b35d60f7cfb2aeaa12c145c25115beecc4b2b09638d204a4"
+    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "168af0f73aaa0436b35d60f7cfb2aeaa12c145c25115beecc4b2b09638d204a4",
+    "projects/krisp/app/native-model-probe/parent_watch.hpp": "e0fa1322d70384a494a944a64e351a8366938f2df1e8e1e85b3dbfacdc6d983b",
+    "projects/krisp/app/native-model-probe/parent_watch_test.cpp": "74bb5165c102f863b406dd2ea0cb2680465747b960b4c488d23f1f169e65a80b",
+    "projects/krisp/app/native-model-probe/parent_watch_native_test.cjs": "c436b663d58c0a03f6555a4c94c9d64abdc52614e388aa95c5d8b3b822f5c84e",
+    "projects/krisp/app/native-model-probe/parent_watch_integration_test.cjs": "fbe2f35e76e416a8d35b250bda7825b0db88460f2a8abcb75944e1f8861c5fce",
+    "projects/krisp/app/native-model-probe/timed_worker_probe.cpp": "6952ed9ca6e8bb60bbaa5aad7a9995377f1de390cd2c65df5f4dd8a64c402b8b"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

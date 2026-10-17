@@ -110,3 +110,42 @@ The NC REA cleanup error named live candidate PID 2051 with an unreadable enviro
 Scenario JSON, result envelopes and output files use the run names above under `evidence/model-probes/`. The NC result envelope SHA256 is `01e4717aa17f6ce5c768990e7e2feec8a57d37047097d097ccacc652700259e5`; bypass is `bc27aa1b5e9884da39713757e3ee1fad1e702ca0f7e8f00c6d236804a130dc4b`. Full host-only verification passed before these captures with no concurrent builds. Its log is `evidence/supervised-worker-verify-20261017.log`, SHA256 `f0d275655817140d47dd3d16073b933bbc4511b012fdf2b88dfbe3df5d3e2b1a`.
 
 These measurements establish bounded synthetic processing through the native broker and isolated worker, with preserved fixture output. They do not establish real-time scheduling, speech quality, tail preservation or live routing. Startup digest checks sample files before loading; reopening paths does not provide an atomic binding between sampled bytes and loaded images. REA samples process trees and filesystem states and does not trace network syscalls. The broker supervises its direct child and assumes sole waitpid ownership. Normal EOF can close the worker, but abrupt parent death while the worker remains permanently inside a hung native call can leave that worker alive. This parent-death case remains unresolved.
+
+
+## Paced provider and native parent-watch results
+
+A later build on 2026-10-17 adds a native parent-loss guard before vendor loading. The builder passes the broker's PID through the exec chain. Native code checks that it is still the current parent, then a separate thread checks getppid every 25 ms. Parent loss calls _exit(72) in the worker itself, even when its main thread is blocked in native processing. It never signals another PID. Normal stop wakes and joins the guard after session cleanup. Release and ASan/UBSan host fixtures cover graceful parent exit, SIGKILL parent loss with a blocked child main thread, invalid parent values, and repeated stop. This addresses the prior build's parent-death gap for a worker whose guard thread can still run. The polling interval is not a hard exit deadline; scheduling or a whole-process suspension can delay it. Abrupt exit reclaims OS resources and does not perform C++ or vendor teardown. These installed-model captures do not deliberately kill a parent.
+
+Two new REA captures ran `timed-worker-probe` through ProviderWorker and its broker thread with the final guarded adapter. Each paced 112 CPU callbacks at nominal 10 ms intervals: 100 deterministic input frames followed by 12 zero frames. Each exchange uses the fixed transport queue; pipe IO and inference stay on the broker thread. The probe checked the initial 5,760 transport-delay samples were silent, then removed exactly those samples and retained the next 48,000. It drained all 112 model requests and required confirmed worker shutdown before exclusive publication.
+
+| Run | Evidence ID | Maximum exchange duration | Maximum scheduling lateness | Result |
+| --- | --- | ---: | ---: | --- |
+| `timed-worker-nc-20261017-v1` | `ev_1e069d57847168a68cb3c388899494a69908eba65b1a2f2803a96984d72c94da` | 10 us | 2,478 us | Exit 0, 112 processed frames, zero transport deadline failures, teardown confirmed |
+| `timed-worker-bypass-20261017-v1` | `ev_aaddd212cf3baed2368d6b1626a14238711366740a68edcc61ec0ba09220a321` | 281 us | 11,444 us | Exit 0, 112 processed frames, zero transport deadline failures, teardown confirmed |
+
+Both aligned outputs contain 192,000 bytes and match the corresponding retained direct-v1 output byte for byte. NC output SHA256 is `fd389eb36788f4e2f707d63e987fd9205ff6dc1323ef94cd1ab3600960077290`; bypass is `d65f14f3868eccb927bd4da5b9a2ae2bc61755e29ae08e432cb3129f67c4f671`. The input remains `6ef4b0e40cf74b1bbe3b97b5d36ee79a2e42b9e7eadb9240afe92a2fc2fc7b5b`. The selected Node remains `1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040`; addon/model identities remain pinned as above. There were no concurrent builds during these sequential captures.
+
+Both REA captures are complete, with verified owned-process-group cleanup and removed temporary roots. NC lists three unrelated processes with `platform_binary_environment_withheld`; bypass lists one. REA left them untouched. Sampled process attribution, inherited capture environment and absent syscall/network tracing limits still apply. Result envelope SHA256 is `59dc45ce68e0a3b9c95f309f11e59b2fd649a81e2fea2a6e23da211862e7ff71` for NC and `8d5c53b5b1501d0c841b9636d7718e6507b411a1120931de5ae05f42e92b47c2` for bypass. Scenarios, envelopes and private output files are retained under `evidence/model-probes/` with the run names above.
+
+The final build identities are recorded below, relative to `app/native-model-probe`.
+
+| Artifact | SHA256 |
+| --- | --- |
+| `build/timed-worker-probe` | `5e8ababc20b29d64f9ddf8a7989d9b1a654ae1393dabc649e2018d2433b0b127` |
+| `timed_worker_probe.cpp` | `6952ed9ca6e8bb60bbaa5aad7a9995377f1de390cd2c65df5f4dd8a64c402b8b` |
+| `build/native-probe.node` | `adfc9cf06066bafc58bfdc9a6fb08eb99ea08f42ce215912865c80de40a80552` |
+| `native_probe.cpp` | `57569a2751b8e7e9bdf84c689acefe12d13fc28282828e8a09ab622771fa23cb` |
+| `parent_watch.hpp` | `e0fa1322d70384a494a944a64e351a8366938f2df1e8e1e85b3dbfacdc6d983b` |
+| `audio_worker.cjs` | `65007442983c3ac03f2a6efe27f77ace71f5cd67879c3a7e90bbde70f2c6e424` |
+| `installed_worker_launch.hpp` | `bf85ec420bed8b43b030f0989287b79ed740063cf1ef77adfe27ad70e59a27fa` |
+| `provider_worker.hpp` | `51fd5a2fdbaafbf0b01f1bcf50194072ae980b547aed51733e9d103be2fe0836` |
+| `provider_transport.hpp` | `cfae8bcacee8d7f144522231398b50bbdad199fbdc10a208a6b81e22bfc87bfa` |
+| `worker_broker.hpp` | `5fe88279133265f1f3e504a835859d0e4e3712c5fd30983214cc108d48ea2c09` |
+| `worker_broker.cpp` | `91c438fd3dd48dfa5556783d4fe9f3bcca20849089a8053c76ddb1d67f61e054` |
+| `worker_protocol.hpp` | `ae539679aef1fc12d56da20ba2affc8ecaa3222aa12a1ddeec402fdef9d94226` |
+| `worker_protocol.cjs` | `2d9f55e44af128f36216f7206f4235f4020c9b0fb45eabfebd2e6a56a8c32adc` |
+| `worker_session.cjs` | `3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888` |
+
+Full verification passed before these runs. `evidence/parent-watch-timed-build-verify-20261017.log` has SHA256 `86d16e88d656ef1368cc20ba936a0f0e5938c4bbc09a90a65d350f6a7e762fc5`.
+
+This is a paced CPU simulation, with no hardware audio callback or routing path. The bypass scheduling lateness exceeded one nominal callback interval, despite zero transport deadline failures in this short run. These observed maxima are not scheduling bounds. The explicit transport buffer adds 120 ms; removing that known delay for file comparison does not make it accepted product latency, remove model latency, establish speech quality, or prove complete model-tail preservation. The extra zero input is only sufficient here to extract the known transport-delay window. Startup identity checks remain pre-load file hashes rather than an atomic binding to loaded images.
