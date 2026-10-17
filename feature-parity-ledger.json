@@ -1365,7 +1365,8 @@
         "ev_a171e77e361a92e3a14ece5a0d849dd226d5669aaa7a8dbc9bafd807200e54ca",
         "ev_4388b9434974bae50da7433fa61fbba3f09b1b18513ce3a453298cbb3d027e8d",
         "ev_4615dfd9d86356d16df51642343a4055a02d2464f133ab85160c6c6a1ef051e5",
-        "ev_ead7698e3910c1c4c8e740b8fa3a306165affd3222f2fb47ef4b32f523768679"
+        "ev_ead7698e3910c1c4c8e740b8fa3a306165affd3222f2fb47ef4b32f523768679",
+        "ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd"
       ],
       "implemented_code": [
         {
@@ -1402,7 +1403,7 @@
         }
       ],
       "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC, BVC and Noise Shield detection/feedback remain unimplemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -2358,7 +2359,8 @@
         "ev_0351c467f523d0bfeaadcb82ad979cc17ca7a23d2edc89f7cb5dc393fc351d9b",
         "ev_b3a8b624dc15c550a28ec23f5d92a3f133185e8a256ad71d916c430f4c8e9cb5",
         "ev_1e069d57847168a68cb3c388899494a69908eba65b1a2f2803a96984d72c94da",
-        "ev_aaddd212cf3baed2368d6b1626a14238711366740a68edcc61ec0ba09220a321"
+        "ev_aaddd212cf3baed2368d6b1626a14238711366740a68edcc61ec0ba09220a321",
+        "ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd"
       ],
       "implemented_code": [
         {
@@ -2509,7 +2511,7 @@
       "catalog_keys": [],
       "representative_labels": [],
       "implementation": "Experimental installed outbound microphone and inbound speaker NC are connected to desktop selection and the audio host. Exact role/model pairs use separate supervised workers with parent guards, callback queues and network-denied startup. Selection validates requested files without loading them. Models remain external dependencies.",
-      "verified_scope": "Timed NC and bypass each complete 112 paced 480-sample callbacks with zero queue deadline failures; aligned 48000 samples match direct probes byte for byte after removing 5760 samples of explicit transport delay. Both final REA captures are complete with verified owned cleanup. Maximum exchange time was 10/281 microseconds and scheduling lateness 2478/11444 microseconds in the NC/bypass runs. These are single CPU runs, not sustained or hardware latency measurements. Native parent guard passes C++ blocked-thread and actual Node blocked-JS parent-death tests. Existing release/ASan/UBSan/TSan worker and broker checks pass. Later 50 ms outbound packaged-worker probes and inbound mono probes are recorded in native-direct-probe-findings.md and inbound-model-findings.md. The inbound paced helper returned byte-identical direct output and zero queue faults, but REA ownership cleanup was incomplete. Dual adapter and desktop tests cover lane identity, channel conversion, partial startup and cleanup; no physical audio route has passed.",
+      "verified_scope": "Timed NC and bypass each complete 112 paced 480-sample callbacks with zero queue deadline failures; aligned 48000 samples match direct probes byte for byte after removing 5760 samples of explicit transport delay. Both final REA captures are complete with verified owned cleanup. Maximum exchange time was 10/281 microseconds and scheduling lateness 2478/11444 microseconds in the NC/bypass runs. These are single CPU runs, not sustained or hardware latency measurements. Native parent guard passes C++ blocked-thread and actual Node blocked-JS parent-death tests. Existing release/ASan/UBSan/TSan worker and broker checks pass. Later 50 ms outbound packaged-worker probes and inbound mono probes are recorded in native-direct-probe-findings.md and inbound-model-findings.md. The inbound paced helper returned byte-identical direct output and zero queue faults, but REA ownership cleanup was incomplete. Dual adapter and desktop tests cover lane identity, channel conversion, partial startup and cleanup; no physical audio route has passed. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md.",
       "missing_acceptance": "Actual installed-model HAL routing, native selection/validation UI acceptance, sustained dual-worker timing, complete original stereo runtime comparison, speech quality, model latency and tail handling, AEC/BVC/accent/other local models. Parent-loss detection depends on scheduling and exits without C++ teardown. Startup hashes do not atomically bind reopened images. Original model redistribution rights remain unresolved."
     },
     {
@@ -2822,7 +2824,8 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
     "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "6d39c0d9d673a827f6a03a0c422ba3edb8c0ad5c5f106b4d02cf6fa3298fa60a",
     "projects/krisp/app/audio-host/verify": "bece48f42b7e1928f512d11c98d76a5701f55b7640c62635b3abf8c1a71785e9",
-    "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "dac6160afd83a6772fbdfbb06dfddb991b8bb68dc756490f5bf19529525d607a"
+    "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "dac6160afd83a6772fbdfbb06dfddb991b8bb68dc756490f5bf19529525d607a",
+    "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

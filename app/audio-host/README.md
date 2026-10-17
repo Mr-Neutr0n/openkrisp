@@ -141,3 +141,18 @@ The desktop can independently select the exact reviewed installed outbound micro
 The internal helper interface adds `--microphone-provider installed-krisp` plus `--provider-node`, `--provider-worker`, `--provider-addon`, `--provider-model`, `--provider-adapter`, `--provider-library`, `--provider-node-sha256` and `--provider-adapter-sha256`. Microphone suppression must be enabled. The speaker lane uses `--speaker-provider installed-krisp` and the same eight runtime option suffixes under `--speaker-provider-`; speaker suppression must be enabled. Each group derives its own pinned role and model digest. Missing, repeated, unsupported or malformed provider options reject before aggregate creation. The worker verifies the fixed addon/model and supplied Node/adapter hashes before callbacks start. There is no automatic RNNoise fallback on failure.
 
 Startup ACKs identify both providers. Installed microphone metadata retains `provider_*` fields; installed speaker metadata uses `speaker_provider_*`. Each includes its four hashes, maximum callback size and queue delay. Idle worker failure stops the route. Both worker configurations validate before either child starts. Partial startup stops the first worker. A separate control-owned adapter attempts to stop both workers even when one worker or HAL teardown fails; retained Context memory keeps late callbacks safe. A control-scope guard also stops both workers during exception unwinding. Tests use synthetic children and no hardware audio. Actual installed-model routing, complete latency and speech quality remain unverified.
+
+## Offline dual installed-provider probe
+
+`installed_dual_probe.cpp` exercises the production adapter and two installed workers with generated microphone/stereo samples. It never creates a CoreAudio route or opens an audio device. Build from the experiment root after building RNNoise:
+
+```sh
+clang++ -mmacosx-version-min=12.0 -std=c++20 -ffp-contract=off -pthread \
+  -O2 -Wall -Wextra -Werror -Iapp/noise-engine/vendor/rnnoise/include \
+  app/audio-host/installed_dual_probe.cpp app/native-model-probe/worker_broker.cpp \
+  app/noise-engine/build/release/librnnoise.a -o app/audio-host/build/installed-dual-probe
+```
+
+Compilation does not load vendor code. The positional arguments are `node runtimeDir addon outboundModel inboundModel library adapterSHA workerSHA sessionSHA protocolSHA newOutputDir`. Node and both model roles have fixed reviewed pins. The four supplied hashes bind the already reviewed packaged adapter and scripts. Runtime execution belongs in an explicit REA process capture. The production builder applies network denial to each child and requires its EPERM gate before loading.
+
+The probe generates the known one-second mono fixture and alternates its doubled value between left and right monitor channels. Their Float32 average is exactly the mono fixture. It uses a 512-sample callback bound and two-frame scheduling budget, pads by the derived 2400-sample delay, then requires both 105-frame counts and clean worker stops before publishing exclusive mode-0600 files in a new mode-0700 directory. Output contains the aligned first 48,000 samples per lane. It validates finite output, silent initial buffering and identical speaker channels. Before/after hashes do not atomically bind loaded images. Results and timing limits are in `../../dual-installed-adapter-findings.md`.

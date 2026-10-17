@@ -68,3 +68,6 @@ The probe executable SHA256 was `bb038be1a6104fa2d9e4717b92520cddc0dd6f1346541a4
 REA returned `cleanup_incomplete` because one live candidate's ownership environment was unavailable. The retained partial capture has complete helper output and exit 0 but no successful Evidence ID; owned-process-group cleanup and temporary-root removal are unverified. No candidate was signaled manually. Files are `evidence/model-probes/inbound-paced-nc-20261018-v2.*`. This is short paced mono CPU evidence, not a stereo original-app comparison, sustained deadline guarantee, live route, quality result or model-tail proof.
 
 The independent adapter now supports a separately owned inbound speaker worker. It averages stereo before the mono worker and duplicates its output, with callback-size and finite-value checks. The host and desktop carry separate microphone and speaker configurations and identity acknowledgements. Acceptance tests and remaining gaps are recorded in CHECKPOINT.md.
+
+
+A later complete capture exercises both installed models through the production dual adapter with verified REA cleanup. Each speaker channel matches the direct inbound bytes. See `dual-installed-adapter-findings.md`. This supplies complete bounded NC capture evidence without changing the earlier partial captures' status or establishing live routing, speech quality or original desktop parity.

@@ -252,3 +252,27 @@ Independent review found no actionable defect. Full audio-host verification pass
 The paced inbound CPU helper processed 105 frames with zero queue faults at 50 ms explicit buffering and returned output byte-identical to the direct inbound probe. REA ownership cleanup remained incomplete; this is a partial capture, not complete runtime acceptance. Exact metrics and limitations are in `inbound-model-findings.md`. This test used the preceding signed worker package, whose worker protocol and native adapter are unchanged by speaker UI/host integration. It did not exercise the dual adapter with original models.
 
 Next verify the dual adapter with synthetic input through both installed workers, inspect the actual selection/validation UI, and recover the original desktop speaker topology. Actual driver routing, sustained timing, speech quality, model tails, AEC/BVC/accent and the remaining local-feature/UI parity are still open. No physical audio, driver replacement, CoreAudio restart, administrator operation or proprietary-file publication occurred. Full parity remains incomplete.
+
+
+## Locked-session UI attempt, 2026-10-18
+
+REA confirmed no running independent app before launching the signed bundle for a no-audio UI check. Inventory evidence `ev_3c5b0d96720a99045744cc5377d5f560d281baa216150bbfd12e90a0d9ccd458` preceded the launch; `ev_618c2d6de7ad8a25220dcf8784239d04e92cf4dc6e8baa169233fb5396a73f99` bound its process and windows. The executable SHA256 was `a14945ec24ecf5a73980e1e2893339fe64b5116dd7be34f20486bd6baf3f68d8`.
+
+Native observation could not match the main window geometry. A bounded read-only AX helper returned an application element where a window was expected and no usable Audio controls. A second deduplicated traversal confirmed that condition. These did not exercise provider selection or validation.
+
+Cleanup evidence `ev_438b5f8a35b5037cfec2524632e419d4988d9e8ec39199bf6be7451e5b6cfc79` reported `screenLocked:1` and accepted termination of only the exact test PID after checking executable path, launch timestamp and hash. The LaunchServices `open -W` child exited 0. Its separate REA cleanup attribution was incomplete, so the launch capture has no successful Evidence ID. No unrelated candidate was signaled. UI acceptance remains pending an unlocked session; no route, microphone test, model validation or permission prompt was started.
+
+
+## Dual installed-model adapter runtime, 2026-10-18
+
+A bounded independent probe now exercises the actual dual adapter with both installed models through its production workers. It creates no CoreAudio route. The deterministic microphone fixture matches prior direct probes; the speaker input alternates the doubled fixture between left and right, so Float32 averaging recovers the exact same mono input. Both lanes use a 512-sample callback bound and two-frame scheduling budget, giving 2400 samples of explicit delay.
+
+REA Evidence `ev_0b8f21763dd187e4803927e806f568fa7fc49656251867462dbba4547a86a1dd` completed with exit 0, no truncation, verified owned-process cleanup and removed temporary root. Both distinct workers processed 105 frames, including five padding frames, and confirmed teardown. Published output has 48,000 finite samples per lane; speaker left/right are identical. Microphone bytes match the direct outbound result, and deinterleaved speaker bytes match the direct inbound result. Independent review checked the input averaging, output bytes and REA lifecycle.
+
+Startup took 197 ms; callback exchange peaked at 18 microseconds and scheduling lateness at 5220 microseconds in this single run. Before/after hashes matched for the reviewed Node, addon, both models and four packaged runtime files. These are sampled file identities, not atomic loaded-image binding. REA does not trace network syscalls or every short-lived process. The production worker's deny-network launch and EPERM prerequisite remain in use.
+
+See `dual-installed-adapter-findings.md` for exact hashes, commands and scope. The probe compiled with warnings as errors and its actual REA execution passed; unchanged production suites were not rerun. All 118 source fingerprints match. No proprietary files were copied into the repository.
+
+This verifies the independent adapter's short CPU execution and channel conversion with the installed models. Original desktop topology, complete original stereo comparison, sustained deadlines, physical routing, quality, algorithmic latency and tail behavior remain unverified. UI acceptance is deferred because the current Mac session is locked. The next independent work is recovering the original desktop speaker topology and other retained local processing contracts; live driver work remains deferred.
+
+The standalone probe's separate build-only check also passed with empty compiler output. Log `evidence/installed-dual-probe-build-20261018.log`, SHA256 `d974dfbf00826a967eabc06068e7c47a36ed3633bdad0a8d90c0a2273b7f615a`. The captured executable was preserved.

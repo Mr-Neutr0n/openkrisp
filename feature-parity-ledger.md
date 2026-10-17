@@ -125,3 +125,8 @@ Native admission now binds explicit outbound/inbound roles to exact model hashes
 The desktop and host now support independently selected installed outbound microphone and inbound speaker NC. The speaker adapter uses the recovered stereo average and duplicated mono output, with a separate stateful worker. Startup and acknowledgement validate each lane. Synthetic tests cover channel arithmetic, callback partitions, invalid input, partial startup and both-worker cleanup. Desktop verification passed 109 tests and signed packaging checks. All 117 source fingerprints match.
 
 A paced inbound CPU helper returned the direct probe's output exactly with zero queue deadline faults, but REA ownership cleanup was incomplete. No original stereo comparison, dual installed-worker adapter runtime or physical route has passed. The ledger's earlier metadata-only installed-provider status is corrected to partial integration.
+
+
+## Dual installed-model runtime, 2026-10-18
+
+The production dual adapter completed a paced CPU run using both installed models, with complete REA cleanup. Both workers processed 105 frames and shut down cleanly. Microphone output and deinterleaved speaker output match their direct-model baselines byte for byte. See [dual-installed-adapter-findings.md](dual-installed-adapter-findings.md). All 118 source fingerprints match. This does not prove live routing, complete original stereo behavior, sustained scheduling or quality. Native UI acceptance remains pending an unlocked Mac session.
