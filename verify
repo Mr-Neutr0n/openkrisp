@@ -9,5 +9,6 @@ cd "$(dirname "$0")"
 ./app/local-transcription/verify
 ./app/model-catalog/verify
 ./app/noise-engine/verify
+./app/native-model-probe/verify
 ./app/audio-host/verify
 ./app/desktop/verify

@@ -29,3 +29,25 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-native-probe-") as build:
 subprocess.run(["node", str(root / "launcher_test.cjs")], check=True)
 subprocess.run([str(root / "build_probe")], check=True)
 subprocess.run(["node", str(root / "native_probe_test.cjs")], check=True)
+
+with tempfile.TemporaryDirectory(prefix="openkrisp-persistent-") as build:
+    fixture = str(Path(build) / "persistent-fixture.dylib")
+    subprocess.run(["clang++", "-std=c++20", "-arch", "arm64", "-O2", "-Wall", "-Wextra", "-Werror", "-pedantic", "-dynamiclib", str(root / "persistent_fixture.cpp"), "-o", fixture], check=True)
+    subprocess.run(["node", "--expose-gc", str(root / "persistent_session_test.cjs"), str(root / "build/native-probe.node"), fixture], check=True)
+subprocess.run(["node", str(root / "persistent_launcher_test.cjs")], check=True)
+subprocess.run(["node", str(root / "worker_protocol_test.cjs")], check=True)
+
+with tempfile.TemporaryDirectory(prefix="openkrisp-provider-transport-") as build:
+    for name, flags in [
+        ("release", ["-O2"]),
+        ("address-undefined", ["-O1", "-g", "-fsanitize=address,undefined"]),
+        ("thread", ["-O1", "-g", "-fsanitize=thread"]),
+    ]:
+        binary = str(Path(build) / name)
+        subprocess.run([
+            "clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra",
+            "-Werror", "-pedantic", "-pthread", *flags,
+            str(root / "provider_transport_test.cpp"), "-o", binary,
+        ], check=True)
+        print("provider-transport " + name, flush=True)
+        subprocess.run([binary], check=True)

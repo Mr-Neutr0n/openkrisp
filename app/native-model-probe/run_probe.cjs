@@ -84,6 +84,7 @@ function encoded(samples) {
   return bytes;
 }
 function validateResult(result, expectedSamples) {
+  if (result?.sessionBatches !== undefined && (!Number.isInteger(result.sessionBatches) || result.sessionBatches < 1 || result.sessionBatches > BLOCKS)) fail("Invalid persistent batch count");
   if (!result || !(result.samples instanceof Float32Array) || result.samples.length !== expectedSamples ||
       result.framesProcessed !== BLOCKS || result.callbackCount !== BLOCKS || result.processorConstructed !== true ||
       result.directProcessInvoked !== true || result.teardownComplete !== true || result.backend !== 'ordinary-nc-direct') fail('Adapter did not confirm the complete ordinary-NC processing and teardown contract');
@@ -153,6 +154,7 @@ async function runProbe(options, dependencies = {}) {
   if (processingError) throw processingError;
   const metadata = { schemaVersion: 1, status: 'completed', backend: result.backend,
     sampleRate: RATE, frameSize: FRAME_SIZE, framesProcessed: result.framesProcessed, callbackCount: result.callbackCount,
+    execution: { mode: result.sessionBatches === undefined ? 'single-call' : 'persistent-session', batches: result.sessionBatches ?? 1 },
     samples: FRAME_SIZE * BLOCKS, processorConstructed: true, directProcessInvoked: true, teardownComplete: true,
     suppressionLevel: options.suppressionLevel, bypass: options.bypass,
     fixture: { kind: 'seeded-noise-and-triangle-tones', seed: '0x4c564e43', sha256: crypto.createHash('sha256').update(inputBytes).digest('hex') },

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-15",
+  "snapshot_date": "2026-10-17",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -336,7 +336,7 @@
         },
         {
           "key": "all_done_today",
-          "text": "All done for today ✅"
+          "text": "All done for today \u2705"
         }
       ],
       "original_evidence_ids": [
@@ -1046,7 +1046,7 @@
         },
         {
           "key": "bvc.active_tooltip_text",
-          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won\u2019t be heard."
         },
         {
           "key": "bvc.bvc_device_enforced_tooltip",
@@ -1422,7 +1422,7 @@
         },
         {
           "key": "test_nc.recording_will_not_leave_device",
-          "text": "Your recording will never leave your device and won’t be saved."
+          "text": "Your recording will never leave your device and won\u2019t be saved."
         }
       ],
       "original_evidence_ids": [
@@ -2050,7 +2050,7 @@
       "representative_labels": [
         {
           "key": "about_copy_right_text",
-          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
+          "text": "\u00a9 {{date}} Krisp Technologies, Inc. All right reserved."
         },
         {
           "key": "app_menu_edit.title",
@@ -2167,7 +2167,7 @@
         },
         {
           "key": "pref_notifications_on_off_indicator_body",
-          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
+          "text": "Shows key features\u2019 states at the start of each meeting and reminds to inform other participants if recording"
         }
       ],
       "original_evidence_ids": [
@@ -2201,7 +2201,7 @@
       "representative_labels": [
         {
           "key": "cant_find_page_text",
-          "text": "Can’t find the page?"
+          "text": "Can\u2019t find the page?"
         },
         {
           "key": "check_internet",
@@ -2329,7 +2329,10 @@
         "ev_f662e1365be4b192dfacaef94e4a1fe90aa8fee30ceee69b9908980fdb324cd3",
         "ev_cb31e375f551e009bf5174cdc1a90b0d49c5fa42a53d8b1ea6ea5fe876a3b6c5",
         "ev_7034d8272ba48730207d483805f9ad9da71049b1a7b812222aecd0a9c637fc45",
-        "ev_abb78582f1221125c4d65f66935d0711799541a1b7e308fe5d8dcf209abcc5e7"
+        "ev_abb78582f1221125c4d65f66935d0711799541a1b7e308fe5d8dcf209abcc5e7",
+        "ev_99071294c29921e2053b1c07202b132deaf318a776f2882c32ed96ab98bab06b",
+        "ev_649e0bc972f011ec9611767d806b4acf591787e62b0eb3fbf7138cb7af3a0d94",
+        "ev_0351c467f523d0bfeaadcb82ad979cc17ca7a23d2edc89f7cb5dc393fc351d9b"
       ],
       "implemented_code": [
         {
@@ -2359,13 +2362,45 @@
         {
           "path": "projects/krisp/app/native-model-probe/run_probe.cjs",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/persistent_fixture.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/persistent_launcher_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/persistent_session_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/run_persistent_probe.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/provider_transport.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/provider_transport_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_protocol.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_protocol_test.cjs",
+          "exists": true
         }
       ],
       "catalog_keys": [],
       "representative_labels": [],
-      "implementation": "Catalog only in app. Experimental native-model-probe now implements typed direct-factory processing in an isolated network-denied Node host using installed files. Not integrated into the desktop or audio routing helper.",
-      "verified_scope": "Two identity-bound REA runs completed: NC and bypass each produced 100 synchronous callbacks, 48000 finite samples and clean teardown. Outputs differ in 47500 samples. Release/ASan/UBSan cross-library and collector fixtures, launcher tests and 20 host-only adapter checks pass. One synthetic fixture and one installed outbound model only; no speech quality or full parity claim.",
-      "missing_acceptance": "Persistent isolated provider and app/routing integration; model/version selection and cleanup; real speech comparison, sustained latency, tail handling, additional retained models and physical audio tests. Do not redistribute original models without established rights."
+      "implementation": "Catalog only in app. Experimental native-model-probe supports persistent typed direct-factory sessions in an isolated network-denied Node host. Bounded callback queues and worker framing have synthetic verification but are not connected to a broker, child process or routing.",
+      "verified_scope": "Persistent NC and bypass each processed five batches, 100 callbacks and 48000 finite samples with byte-identical output to prior single-call probes. Final close-contract fix has host fixture coverage and matching runtime output; final NC capture has incomplete REA cleanup attribution, documented in native-direct-probe-findings.md. Queue release/ASan/UBSan/TSan tests include 20000 concurrent frames; bounded protocol tests cover fragmentation, reentry and malformed input. One synthetic signal and one installed outbound model, no speech quality or realtime claim.",
+      "missing_acceptance": "Supervised Node child and broker, readiness/version/model binding, wall-clock deadline and parent-loss handling, app/routing selection; real speech comparison, sustained latency, tail handling, other models and physical audio tests. Original model redistribution rights remain unresolved."
     },
     {
       "id": "independent-model-provider",
@@ -2626,15 +2661,24 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "96e85b1f3b2ef91205320ae274907f45be3c62786721f8b04017597977cf3192",
+    "projects/krisp/app/native-model-probe/verify": "45f6d848d629484a090896e9988802dc7b89565343fd27d81dfbbbde5305afb4",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "2acf1b3047c68a16980429bd01e8b6dc2413466cb79cc1ac7da25ce2c613943a",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
     "projects/krisp/app/native-model-probe/fixture_library.cpp": "67a1ac825bc633d8dfd3a51a524e15f478f2460b8b3e84077f5f1e60c8d82dd2",
     "projects/krisp/app/native-model-probe/launcher_test.cjs": "6a9f1d34c03dc046c4bc086a79aee0605a39d4ee06448457b6cbe5ed4d30a0c2",
-    "projects/krisp/app/native-model-probe/native_probe.cpp": "fb5c0bd7b06d4dbd541d9d809d6cae9b33e6da1df99d45fc2c3cc45d7650012c",
+    "projects/krisp/app/native-model-probe/native_probe.cpp": "f484a163df812979459acd558beadca876c7b53aa491cefe346dbef87ec3992c",
     "projects/krisp/app/native-model-probe/native_probe_test.cjs": "e57e4d606f85d159c1bc4ada47216dab7f2f9c38a8657137585d16b494f7f95e",
-    "projects/krisp/app/native-model-probe/run_probe.cjs": "8881d05779597a13c8153615bdf5b8966bfb8093db3c159ddd827b365475cdc9"
+    "projects/krisp/app/native-model-probe/run_probe.cjs": "5b4e3d349ad5febb4e17e14df1387a34b460cc3485b9d12d87b0be92a267b9d2",
+    "projects/krisp/app/native-model-probe/persistent_fixture.cpp": "02e6505c77a531e3f33ab5e1dae66678200f8c72bbf20792d582fbdc50479237",
+    "projects/krisp/app/native-model-probe/persistent_launcher_test.cjs": "7b5f6f6e93b946e95f7dbac3bac647af841a6773dd4398cd0adf0b12a593abd1",
+    "projects/krisp/app/native-model-probe/persistent_session_test.cjs": "d932114cd544717fbef7a30116213e212296fd29c286819b19b99a48cf57520a",
+    "projects/krisp/app/native-model-probe/run_persistent_probe.cjs": "90a906439a12ec8d29ad9324981132c930d117b0468fb7fa1d74031e321670b2",
+    "projects/krisp/app/native-model-probe/provider_transport.hpp": "b0ac279de22ef37a42950634f6a9b728ca8908542e62b35bbb604c9510942e9d",
+    "projects/krisp/app/native-model-probe/provider_transport_test.cpp": "3c8654b41ce47483ae54659721f0bd0924d3d4aa028619b71a8c7f3cb459220b",
+    "projects/krisp/app/native-model-probe/worker_protocol.cjs": "2d9f55e44af128f36216f7206f4235f4020c9b0fb45eabfebd2e6a56a8c32adc",
+    "projects/krisp/app/native-model-probe/worker_protocol_test.cjs": "ab17a7ac3c982478865a97e11b6540e7cfeef333a14edd24114cf435fca93c2d",
+    "projects/krisp/verify": "bf469bdbf5e4348c72d24eee23b9d5dc0969d5dbafc215508fad5b6551136435"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
