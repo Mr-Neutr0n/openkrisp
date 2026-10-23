@@ -8,7 +8,7 @@ import Combine
 
 protocol LibraryWorking: Sendable {
     func inventory(_ location: LibraryLocationSnapshot) async throws -> StoreInventory
-    func importWAV(_ url: URL, title: String, transcript: String, location: LibraryLocationSnapshot) async throws
+    func importWAV(_ url: URL, title: String, transcript: ImportTranscriptDraft, location: LibraryLocationSnapshot) async throws
     func remove(_ id: UUID, location: LibraryLocationSnapshot) async throws
     func export(_ id: UUID, to url: URL, location: LibraryLocationSnapshot) async throws
     func play(_ id: UUID, location: LibraryLocationSnapshot) async throws
@@ -19,13 +19,12 @@ actor LibraryWorker: LibraryWorking {
     private var player: AVAudioPlayer?
     private var playerRevision: UUID?
     func inventory(_ location: LibraryLocationSnapshot) throws -> StoreInventory { try location.open().inventory() }
-    func importWAV(_ url: URL, title: String, transcript: String, location: LibraryLocationSnapshot) throws {
+    func importWAV(_ url: URL, title: String, transcript: ImportTranscriptDraft, location: LibraryLocationSnapshot) throws {
         let file = try AVAudioFile(forReading: url)
         let rate = file.processingFormat.sampleRate
         guard rate.isFinite, rate > 0 else { throw StoreError.invalidRecording }
         let duration = Double(file.length) / rate
-        let text = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
-        let segments = text.isEmpty ? [] : [TranscriptSegment(startSeconds: 0, endSeconds: duration, text: text)]
+        let segments = try transcript.segments(duration: duration)
         _ = try location.open().save(title: title, startedAt: Date(), durationSeconds: duration,
                                     transcript: segments, recording: url)
     }
@@ -79,8 +78,8 @@ actor LibraryWorker: LibraryWorking {
     var filtered: [Session] {
         guard !query.isEmpty else { return sessions }
         return sessions.filter { $0.title.localizedCaseInsensitiveContains(query) ||
-            $0.transcript.contains { $0.text.localizedCaseInsensitiveContains(query) ||
-                ($0.speaker?.localizedCaseInsensitiveContains(query) ?? false) } }
+            $0.transcript.map(\.text).joined(separator: " ").localizedCaseInsensitiveContains(query) ||
+            $0.transcript.contains { $0.speaker?.localizedCaseInsensitiveContains(query) ?? false } }
     }
     private func accepts(_ revision: UUID?) -> Bool {
         guard revision == nil || revision == location.snapshot.revision else {
@@ -119,6 +118,9 @@ actor LibraryWorker: LibraryWorking {
         if let selection, !sessions.contains(where: { $0.id == selection }) { self.selection = nil }
     }
     func importWAV(_ url: URL, title: String, transcript: String, expectedRevision: UUID? = nil) async -> Bool {
+        await importWAV(url, title: title, transcript: .plainText(transcript), expectedRevision: expectedRevision)
+    }
+    func importWAV(_ url: URL, title: String, transcript: ImportTranscriptDraft, expectedRevision: UUID? = nil) async -> Bool {
         guard accepts(expectedRevision) else { return false }
         guard !busy else { return false }
         guard let activity = try? location.begin("Import") else { return false }
@@ -195,7 +197,7 @@ struct ImportView: View {
                 panel.allowedContentTypes = [.wav]
                 panel.allowsMultipleSelection = false
                 if panel.runModal() == .OK, let url = panel.url {
-                    transcription.cancel()
+                    transcription.fileDidChange()
                     replacingTranscript = false
                     file = url; title = url.deletingPathExtension().lastPathComponent
                 }
@@ -225,6 +227,10 @@ struct ImportView: View {
             }
             TextEditor(text: $transcript).frame(height: 150).border(Color.secondary.opacity(0.3))
                 .disabled(transcription.busy || model.busy)
+            Text(transcription.hasTimings(file: file, text: transcript)
+                 ? "Word timestamps will be saved. Export lists each word on its own line."
+                 : "Edited or manually entered text will be saved without word timestamps.")
+                .font(.caption).foregroundColor(.secondary)
             if let error = transcription.error { Text(error).foregroundColor(.red).font(.caption) }
             if let error = model.error { Text(error).foregroundColor(.red).font(.caption) }
             HStack {
@@ -234,13 +240,15 @@ struct ImportView: View {
                 Button("Import") {
                     guard let file, !transcription.busy else { return }
                     let revision = libraryRevision
-                    Task { if await model.importWAV(file, title: title.trimmingCharacters(in: .whitespacesAndNewlines), transcript: transcript, expectedRevision: revision) { dismiss() } }
+                    let draft = transcription.draft(file: file, text: transcript)
+                    Task { if await model.importWAV(file, title: title.trimmingCharacters(in: .whitespacesAndNewlines), transcript: draft, expectedRevision: revision) { dismiss() } }
                 }.disabled(file == nil || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.busy || transcription.busy || libraryRevision != model.location.snapshot.revision)
             }
         }.padding(24).frame(width: 560)
         .interactiveDismissDisabled(model.busy)
         .onAppear { languages = TranscriptionLanguage.supported(); libraryRevision = model.location.snapshot.revision }
         .onDisappear { transcription.cancel() }
+        .onChange(of: transcript) { transcription.reviewTextChanged($0) }
         .onChange(of: transcription.completedText) { text in
             if let text { transcript = text }
         }

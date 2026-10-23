@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import LocalTranscription
+import LocalStore
 @preconcurrency import Speech
 
 struct TranscriptionLanguage: Identifiable {
@@ -14,11 +15,61 @@ struct TranscriptionLanguage: Identifiable {
     }
 }
 
+// Formatted recognition text selects timing provenance, but it is not rebuilt
+// from individual word texts. Stored/exported timed entries use original word
+// texts, so paragraph punctuation/layout can differ from the review editor.
+enum ImportTranscriptDraft: Sendable {
+    case plainText(String)
+    case recognized(OfflineTranscript)
+
+    static func validate(_ result: OfflineTranscript, duration: Double? = nil) throws {
+        guard result.segments.allSatisfy({ segment in
+            let end = segment.startSeconds + segment.durationSeconds
+            return segment.startSeconds.isFinite && segment.startSeconds >= 0 &&
+                segment.durationSeconds.isFinite && segment.durationSeconds >= 0 && end.isFinite &&
+                segment.confidence.isFinite && segment.confidence >= 0 && segment.confidence <= 1 &&
+                (duration.map { end <= $0 } ?? true)
+        }) else { throw TranscriptionFailure.invalidResult }
+    }
+    func segments(duration: Double) throws -> [TranscriptSegment] {
+        switch self {
+        case .plainText(let value):
+            let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            return text.isEmpty ? [] : [TranscriptSegment(startSeconds: 0, endSeconds: duration, text: text)]
+        case .recognized(let result):
+            try Self.validate(result, duration: duration)
+            if result.segments.isEmpty { return try Self.plainText(result.text).segments(duration: duration) }
+            return result.segments.map {
+                TranscriptSegment(startSeconds: $0.startSeconds, endSeconds: $0.startSeconds + $0.durationSeconds, text: $0.text)
+            }
+        }
+    }
+}
+
 @MainActor final class ImportTranscription: ObservableObject {
     @Published private(set) var busy = false { didSet { if busy != oldValue { DiagnosticEventLog.shared.append(component: .transcription, code: busy ? .started : .stopped, severity: .info) } } }
     @Published private(set) var status = ""
     @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .transcription, code: .operationFailed, severity: .error) } } }
     @Published private(set) var completedText: String?
+    private struct Candidate {
+        let file: URL
+        let result: OfflineTranscript
+    }
+    // A failed or cancelled replacement keeps the prior reviewed candidate.
+    // New file selection and text edits explicitly invalidate its provenance.
+    private var candidate: Candidate?
+    func fileDidChange() { cancel(); candidate = nil }
+    func reviewTextChanged(_ text: String) {
+        if let candidate, text != candidate.result.text { self.candidate = nil }
+    }
+    func hasTimings(file: URL?, text: String) -> Bool {
+        guard let candidate, let file else { return false }
+        return candidate.file == file.standardizedFileURL && text == candidate.result.text && !candidate.result.segments.isEmpty
+    }
+    func draft(file: URL, text: String) -> ImportTranscriptDraft {
+        guard hasTimings(file: file, text: text), let candidate else { return .plainText(text) }
+        return .recognized(candidate.result)
+    }
     private let authorization: () -> SpeechAuthorization
     private let requestAuthorization: () async throws -> SpeechAuthorization
     private let recognize: (UserSelectedWAV, String) async throws -> OfflineTranscript
@@ -55,6 +106,7 @@ struct TranscriptionLanguage: Identifiable {
         let selected: UserSelectedWAV
         do { selected = try UserSelectedWAV(userSelectedURL: file) }
         catch { self.error = "Choose a readable, finalized WAV file."; return }
+        if let candidate, candidate.file != selected.url { self.candidate = nil }
         guard let activity = try? location.begin("Transcription") else { error = "Finish changing the library folder before transcribing."; return }
         let id = UUID()
         libraryActivity = activity
@@ -87,6 +139,8 @@ struct TranscriptionLanguage: Identifiable {
                     self.error = "No speech text was returned. Your current transcript is unchanged."
                     self.status = ""; return
                 }
+                try ImportTranscriptDraft.validate(result)
+                self.candidate = Candidate(file: selected.url, result: result)
                 self.completedText = result.text
                 self.status = "Transcript ready. Review and edit it before importing."
             } catch {

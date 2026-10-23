@@ -27,7 +27,7 @@ private actor SuspendedLibraryWorker: LibraryWorking {
         else { pending?.resume(returning: old!) }
         pending = nil
     }
-    func importWAV(_ url: URL, title: String, transcript: String, location: LibraryLocationSnapshot) async throws {
+    func importWAV(_ url: URL, title: String, transcript: ImportTranscriptDraft, location: LibraryLocationSnapshot) async throws {
         if suspendImports { await withCheckedContinuation { pendingImport = $0 } }
         try await base.importWAV(url, title: title, transcript: transcript, location: location)
     }

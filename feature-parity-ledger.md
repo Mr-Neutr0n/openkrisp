@@ -331,3 +331,12 @@ Output pairs have SHA256 `4201d16161d76d5b442be7cabd7b779046fc5d8adc119de6a79a5d
 Full own-fixture host verification exited zero: `evidence/aec-chain-probe-host-verify-20261023.log`, SHA256 `1f1470954ca3ceb799a407987bbb8b448a42fa98af23a3430f4f7cd8d48a0eb0`. All before/after pins match. See `aec-nc-chain-runtime-findings.md` for exact artifacts, result/metrics hashes and capture limits. The new four-file probe and 164 source fingerprints are recorded in the parity ledger. Desktop fingerprints use committed `fada15b` sources so subsequent offline-transcription work is excluded.
 
 This unpaced functional handshake test does not establish real-time behavior, original processing order, acoustic quality, full model tails, physical routing or full parity. These remain acceptance gates; AEC remains off by default. No hardware audio or administrator action ran.
+
+
+## Offline transcript timing checkpoint, 2026-10-23
+
+Desktop import now preserves recognized segment text, order and timing through storage and timed export. Exact unchanged drafts retain timing; edits irreversibly invalidate it, selected-file changes clear it, and failed or cancelled replacements preserve the prior candidate. Manual text and missing segments keep the recording-wide fallback. Desktop phrase search spans stored word boundaries; `LocalStore.search` remains per-segment. Full desktop verification passed 138 tests, with 22 focused tests including seven new timing tests; unchanged transcription/store suites passed 14/12. Tests use own fixtures and injected recognition. Export uses segment text and millisecond start markers, not a separately stored formatted paragraph. Original timestamp parity, live ASR, diarization and real recognition accuracy remain unverified. See `offline-transcript-timing-findings.md`.
+
+- `evidence/transcript-timing-local-transcription-verify-20261023.log` SHA256 `57eacd32abab9ca067872fe5948531c4d5f33a5f233d23f249d703baa9af1ff8`.
+- `evidence/transcript-timing-local-store-verify-20261023.log` SHA256 `7a31ad53ae070d24ec5825955416931dee73c48c26d7e617819f9f3a19a52d61`.
+- `evidence/transcript-timing-desktop-verify-20261023.log` SHA256 `3dae16820385bfedd235c3746941dd01eec430e44639d2c9609ca41ed395d580`.

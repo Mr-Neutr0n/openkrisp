@@ -1915,11 +1915,23 @@
         {
           "path": "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift",
+          "exists": true
         }
       ],
-      "implementation": "Explicit selected-WAV Apple offline recognition exists. No live meeting ASR, diarization, speaker labels, transcript-only capture, live pause/resume, original ASR model inference or automatic recording transcription.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Run authorized real offline recognition; implement live source/timestamp contracts and diarization; resolve conflicting short-call labels before enforcing limits; preserve/edit/export timing."
+      "implementation": "Selected-WAV Apple offline recognition now preserves unchanged recognized segment text, order and timing through desktop review, import, storage and timed export. Manual edits irreversibly invalidate the timing candidate, selected-file changes clear it, and failed/cancelled replacement recognition preserves the previous candidate. Manual text and missing segments retain a recording-wide fallback. Desktop phrase search spans stored word boundaries; LocalStore.search remains per-segment. No live meeting ASR, diarization, speaker labels, transcript-only capture, original ASR model inference or automatic recording transcription.",
+      "verified_scope": "Full desktop verification passed 138 tests and signed packaging/relocation checks. Focused tests passed 22 cases, including seven new timing tests covering real local-store import/export, timing rejection, edits/reverts, missing segments, replacement cancellation/failure, late results, selected-file changes, phrase search and stale library revisions. Unchanged local-transcription and local-store suites passed 14 and 12 tests. Tests use own WAVs and injected recognition; no Speech prompt, real recognition, hardware audio or original runtime timestamp comparison ran. Formatted recognition paragraphs are not separately stored; timed export retains segment text with millisecond-formatted start markers. See offline-transcript-timing-findings.md. Verification log SHA256: {\"evidence/transcript-timing-local-transcription-verify-20261023.log\": \"57eacd32abab9ca067872fe5948531c4d5f33a5f233d23f249d703baa9af1ff8\", \"evidence/transcript-timing-local-store-verify-20261023.log\": \"7a31ad53ae070d24ec5825955416931dee73c48c26d7e617819f9f3a19a52d61\", \"evidence/transcript-timing-desktop-verify-20261023.log\": \"3dae16820385bfedd235c3746941dd01eec430e44639d2c9609ca41ed395d580\"}.",
+      "missing_acceptance": "Run authorized real offline recognition and assess recognition/timestamp accuracy. Implement and validate live source/timestamp contracts, diarization and transcript-only lifecycle. Original runtime timestamp parity and full feature parity remain unverified; resolve conflicting short-call labels before enforcing limits."
     },
     {
       "id": "recording",
@@ -2904,12 +2916,12 @@
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
-    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "27e8f2bf044d21f73d28e3077b018da9121bafcc36054720bd6d9b02605f2299",
+    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "f577d1d79c7c91ee2229018a69e4951c7d4f4ac49d68bb75a9a4e6142e82b6cc",
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
     "projects/krisp/app/audio-host/route_cli.cpp": "2f403de3adb4c9026886a61be29818d2810ced083584c7f49051b35cfac3b399",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "013d1609513ebc7e7c6537d79ad170104dbc4c1bb99fb66a0c6e44185127b27c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "7dd758ce87490dbbf3319460f91ec2b2b7902d2b06c36cc50d10163a84f0c7e5",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "409a88c5a15f5d917bb4925a86fa0fe01ddddd1483a74c22036e82df5a982cd3",
     "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "db149846fda3b742340f544118c07a7a3928990f7eda215b12cc474d6f49bc70",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
@@ -2933,7 +2945,7 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/MicrophoneTestFilesTests.swift": "0b69929ed0553382a91ebef42cac944fdf630a2a0361b5a636dad65c11f5150d",
     "projects/krisp/app/local-store/Tests/LocalStoreTests/LocalStoreTests.swift": "12deb03ab60fbcc39860eef8d63472e832077ba7971f236d37775d0e552832ab",
     "projects/krisp/app/desktop/Sources/LabVoice/LibraryLocation.swift": "189de23c044faf91bb18c93ebe176306dc43bc7d1ff5cd5269ea419da9278c6f",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift": "1f129523cd99a5ba92bee68dab946c5b2caccd05c91c9c59a81374fecf0a321f",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/LibraryLocationTests.swift": "6d0eac2150863d4238ee34b09a309099d8784b5194d222cb348c906ee02f4276",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingStorageTests.swift": "b61dee39c875157c8ccb4cfd0cdf817e276c2a35e2dcb8e0c4bbaef759d68f0c",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/ImportTranscriptionTests.swift": "f75388e49bf30c1dd2b47cbf1692d8866381917bf9b1bd43ec78847d6cf8dfa3",
     "projects/krisp/app/desktop/Sources/LabVoice/DiagnosticReport.swift": "c16f328f061fb30d6e82fe312583e621f0c2ecf4e5a57cd70df66009f89ec572",
@@ -3051,7 +3063,8 @@
     "projects/krisp/app/audio-host/aec_microphone_chain_probe.cpp": "6fb2dbbe22fb7eaeae5a0ff36b421aca872825430c1f0ef6e45d9eb64df3336a",
     "projects/krisp/app/audio-host/aec_microphone_chain_probe.hpp": "f235a84a4f70452827f4b9e6fd3433172025c7612ad78cd66e69ff7b2a9f384e",
     "projects/krisp/app/audio-host/aec_microphone_chain_probe_fixture.cjs": "6efc7c99aa5b9c799d809ce41cb13e8fd925fcff67243bab7ee892a989975d98",
-    "projects/krisp/app/audio-host/aec_microphone_chain_probe_test.cpp": "8142f6fc5668df1469e39ed338cc6a3dc519651f96d88904cf6ad573cb34f56a"
+    "projects/krisp/app/audio-host/aec_microphone_chain_probe_test.cpp": "8142f6fc5668df1469e39ed338cc6a3dc519651f96d88904cf6ad573cb34f56a",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift": "d151b3f651a886e512b1fde70cb5ea8208dc7eb07b27c5a322e77f42f01f002e"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3062,7 +3075,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "AEC/NC runtime checkpoint source fingerprints cover 164 referenced independent files. Desktop entries use committed fada15b sources, excluding concurrent uncommitted offline-transcription work. These are source snapshots, not loaded-image identity or full-parity certificates.",
+  "source_snapshot_note": "Code fingerprints identify 165 referenced independent files at the verified offline transcript timing checkpoint. They are source snapshots, not runtime identity, original timestamp parity or completion certificates.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
