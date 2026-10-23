@@ -130,3 +130,37 @@ apply a deny-network sandbox and clean environment, then repeat hashes after
 exit. This executable does not hash or sandbox itself. The runner must bound
 wall time because a synchronous foreign call can stall. No vendor execution
 is part of the fixture verification.
+
+### Synthetic double-talk diagnostic
+
+`aec_doubletalk_probe.cpp` is a separate bounded CPU experiment. Build it with
+the standalone command above, substituting `aec_doubletalk_probe.cpp` and
+`build/aec-doubletalk-probe`. Its arguments are `libraryPath newOutputDirectory`.
+The probe creates that directory exclusively with mode 0700 after all engines
+are destroyed and the library is unloaded. The caller must provide a new path
+inside a private directory without concurrent writers.
+
+The ten-second far reference uses the broadband source above. The echo has
+a 50 ms delay and gain 0.6. An independent xorshift32 source uses seed
+`0x6a09e667`, the same base rate and interpolation, and gain 0.6. This near-end
+source starts at forward sample 96000, exactly three seconds into the run.
+The forward mixture is the Float32 sum of echo and near-end samples.
+
+Four fresh engines process mixture with the actual reference, mixture with
+zero reference, near-end alone with zero reference, and echo alone with zero
+reference. Each engine makes 1000 checked reference-first reverse calls and
+1000 checked forward calls. The probe does not set delay or configuration.
+It publishes eight exclusive 0600 Float32 little-endian files:
+
+- `reference-input.f32le` contains 960000 interleaved stereo values.
+- `echo-input.f32le`, `near-input.f32le` and `mixture-input.f32le` each contain 320000 mono values.
+- `mixture-reference-on.f32le`, `mixture-reference-zero.f32le`, `near-reference-zero.f32le` and `echo-reference-zero.f32le` each contain 320000 mono values.
+
+JSON reports fixture identity, seeds, gains, delay, onset, dimensions, call
+counts and teardown. The own-fixture tests check every generated sample,
+mixture arithmetic, fresh zero-reference controls, repeatability, publication
+refusal and foreign exceptions in release and ASan/UBSan modes. Broadband
+noise is not speech. These tests establish no speech preservation or vendor
+quality result. Processed mixtures may differ from the sum of processed
+isolated controls, so residuals cannot uniquely identify echo or near-end
+components without checking this interaction.
