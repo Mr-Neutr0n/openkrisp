@@ -41,14 +41,58 @@ float interpolate(const std::vector<float>& base, std::size_t index, unsigned ra
     const float phase = static_cast<float>(index % ratio) / ratio;
     return base[lower] + (base[lower + 1] - base[lower]) * phase;
 }
+struct NearInput {
+    int fd = -1;
+    const char* path;
+    struct stat identity{};
+    std::vector<float> samples;
+    explicit NearInput(const char* source) : path(source), samples(320000) {
+        require(path[0] == '/', "near input must be an absolute path");
+        fd = ::open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK);
+        require(fd >= 0, "near input open failed");
+        try {
+            require(::fstat(fd, &identity) == 0 && S_ISREG(identity.st_mode) &&
+                    identity.st_size == static_cast<off_t>(samples.size() * sizeof(float)),
+                    "near input must be exactly 320000 Float32 values");
+            char* bytes = reinterpret_cast<char*>(samples.data());
+            std::size_t remaining = samples.size() * sizeof(float);
+            while (remaining) {
+                const auto count = ::read(fd, bytes, remaining);
+                if (count < 0 && errno == EINTR) continue;
+                require(count > 0, "near input read failed");
+                remaining -= static_cast<std::size_t>(count); bytes += count;
+            }
+            for (std::size_t i = 0; i < samples.size(); ++i)
+                require(std::isfinite(samples[i]) && (i >= 96000 || samples[i] == 0.0f),
+                        "near input must be finite with first 96000 values zero");
+            require(unchanged(), "near input changed during read");
+        } catch (...) { ::close(fd); fd = -1; throw; }
+    }
+    bool unchanged() const noexcept {
+        struct stat current{}, named{};
+        if (::fstat(fd, &current) != 0 || ::lstat(path, &named) != 0) return false;
+        const auto same = [&](const struct stat& value) {
+            return S_ISREG(value.st_mode) && value.st_dev == identity.st_dev &&
+                value.st_ino == identity.st_ino && value.st_size == identity.st_size &&
+                value.st_mtimespec.tv_sec == identity.st_mtimespec.tv_sec &&
+                value.st_mtimespec.tv_nsec == identity.st_mtimespec.tv_nsec &&
+                value.st_ctimespec.tv_sec == identity.st_ctimespec.tv_sec &&
+                value.st_ctimespec.tv_nsec == identity.st_ctimespec.tv_nsec;
+        };
+        return same(current) && same(named);
+    }
+    ~NearInput() { if (fd >= 0) ::close(fd); }
+};
 struct Signals {
     const unsigned frames = 1000;
     std::vector<float> forward, reference, echo, near;
-    Signals() : forward(320000), reference(960000), echo(320000), near(320000) {
+    explicit Signals(const NearInput* input) : forward(320000), reference(960000), echo(320000), near(320000) {
         const auto farBase = noise(broadbandSeed), nearBase = noise(0x6a09e667u);
         for (std::size_t i = 0; i < forward.size(); ++i) {
             echo[i] = i >= 1600 ? 0.6f * interpolate(farBase, i - 1600, 2) : 0.0f;
-            near[i] = i >= 96000 ? 0.6f * interpolate(nearBase, i - 96000, 2) : 0.0f;
+            near[i] = input ? input->samples[i] :
+                i >= 96000 ? 0.6f * interpolate(nearBase, i - 96000, 2) : 0.0f;
+            require(std::isfinite(echo[i] + near[i]), "nonfinite input mixture");
             forward[i] = echo[i] + near[i];
         }
         for (std::size_t i = 0; i < reference.size() / 2; ++i)
@@ -136,9 +180,11 @@ struct Directory {
 };
 int main(int argc, char** argv) {
     try {
-        require(argc == 3, "usage: aec-doubletalk-probe library new-private-output-directory");
+        require(argc == 3 || (argc == 5 && std::strcmp(argv[3], "--near-input") == 0),
+                "usage: aec-doubletalk-probe library new-private-output-directory [--near-input absolute-f32le-file]");
         static_assert(sizeof(float) == 4 && std::endian::native == std::endian::little);
-        const Signals signals;
+        const auto nearInput = argc == 5 ? std::make_unique<NearInput>(argv[4]) : nullptr;
+        const Signals signals(nearInput.get());
         std::vector<float> on, zero, near, echo;
         {
             Library library(argv[1]);
@@ -156,6 +202,7 @@ int main(int argc, char** argv) {
             require(failure.empty(), failure.c_str());
             require(closed == 0, "AEC library close failed");
         }
+        require(!nearInput || nearInput->unchanged(), "near input changed during processing");
         Directory directory(argv[2]);
         const std::array<const char*, 8> names{"reference-input.f32le", "echo-input.f32le",
             "near-input.f32le", "mixture-input.f32le", "mixture-reference-on.f32le",
@@ -171,14 +218,16 @@ int main(int argc, char** argv) {
         }
         for (const auto& file : files) require(file->matches(), "output path identity changed");
         require(directory.matches(), "output directory identity changed");
+        require(!nearInput || nearInput->unchanged(), "near input changed during publication");
         for (const auto& file : files) file->published = true;
         directory.published = true;
-        std::cout << "{\"fixture\":\"doubletalk-xorshift32-linear16k-v1\","
+        std::cout << "{\"fixture\":\"" << (nearInput ? "doubletalk-external-near-v1" : "doubletalk-xorshift32-linear16k-v1") << "\","
+                  << "\"nearSource\":\"" << (nearInput ? "external-f32le" : "generated-noise") << "\","
                   << "\"framesPerEngine\":1000,\"engines\":4,\"successfulCallsPerEngine\":2000,"
                   << "\"samplesPerOutput\":320000,\"referenceSamples\":960000,"
                   << "\"forwardRate\":32000,\"forwardChannels\":1,\"referenceRate\":48000,\"referenceChannels\":2,"
-                  << "\"farSeed\":2447445413,\"nearSeed\":1779033703,"
-                  << "\"echoGain\":0.6,\"nearGain\":0.6,\"echoDelaySamples\":1600,"
+                  << "\"farSeed\":2447445413,\"nearSeed\":" << (nearInput ? "null" : "1779033703") << ","
+                  << "\"echoGain\":0.6,\"nearGain\":" << (nearInput ? "1.0" : "0.6") << ",\"echoDelaySamples\":1600,"
                   << "\"nearStartSample\":96000,\"delaySetterCalled\":false,\"teardownComplete\":true}\n";
         return 0;
     } catch (const std::exception& error) {

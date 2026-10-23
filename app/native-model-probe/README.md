@@ -164,3 +164,18 @@ noise is not speech. These tests establish no speech preservation or vendor
 quality result. Processed mixtures may differ from the sum of processed
 isolated controls, so residuals cannot uniquely identify echo or near-end
 components without checking this interaction.
+
+An optional `--near-input /absolute/path/to/near.f32le` replaces the generated
+near-end source. The caller supplies exactly 320000 finite Float32
+little-endian samples at 32 kHz mono, with the first 96000 values zero.
+The probe uses these samples without scaling and retains their bytes in
+`near-input.f32le`. Metadata reports `nearSource: external-f32le`, a null near
+seed and near gain 1. The default generated-noise mode is unchanged.
+
+The reader requires a regular file and refuses a final-component symlink,
+wrong length, nonfinite values, early near-end activity or nonfinite mixture.
+It compares file identity, size, modification time and change time after the
+read and after processing. This detects observed changes, not an atomic lock
+against a concurrent writer. Inputs must remain private and stable through
+publication. Own-fixture tests cover exact retention, malformed inputs and a
+deterministic file mutation from the synthetic factory.

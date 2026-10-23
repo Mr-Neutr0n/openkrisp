@@ -1,5 +1,6 @@
 // Own synthetic producer. Deliberately does not include the consumer ABI view.
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
@@ -66,5 +67,13 @@ extern "C" Engine* synthetic_direct_aec_create() {
     failFactory = mode && std::strcmp(mode, "factory") == 0;
     throwStage = mode && std::strcmp(mode, "reverse") == 0 ? 1 :
                  mode && std::strcmp(mode, "forward") == 0 ? 2 : 0;
+    // Deterministic own-fixture mutation after the consumer snapshots its input.
+    if (const char* path = std::getenv("OPENKRISP_AEC_FIXTURE_MUTATE_INPUT")) {
+        auto* file = std::fopen(path, "ab");
+        if (!file) throw std::runtime_error("fixture input mutation open failed");
+        const bool written = std::fputc(0, file) != EOF;
+        const int closed = std::fclose(file);
+        if (!written || closed != 0) throw std::runtime_error("fixture input mutation failed");
+    }
     return synthetic_aec_create();
 }

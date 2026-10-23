@@ -77,5 +77,35 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-doubletalk-') as temporary:
     link.symlink_to(root / 'absent')
     assert subprocess.run([binary, library, str(link)], capture_output=True, timeout=30).returncode != 0
     assert link.is_symlink() and not (root / 'absent').exists()
+    external = root / 'caller-near.f32le'
+    supplied = array.array('f', [0.0] * 320000)
+    for index in range(96000, 320000):
+        supplied[index] = ((index % 97) - 48) / 1024
+    external.write_bytes(supplied.tobytes())
+    external_output = root / 'external'
+    external_command = [binary, library, str(external_output), '--near-input', str(external)]
+    result = subprocess.run(external_command, capture_output=True, text=True, check=True, timeout=30)
+    status = json.loads(result.stdout)
+    assert status['nearSource'] == 'external-f32le' and status['nearSeed'] is None
+    assert status['fixture'] == 'doubletalk-external-near-v1' and status['nearGain'] == 1
+    assert (external_output / 'near-input.f32le').read_bytes() == supplied.tobytes()
+    assert (external_output / 'near-reference-zero.f32le').read_bytes() == supplied.tobytes()
+    mixed = array.array('f', (external_output / 'mixture-input.f32le').read_bytes())
+    assert all(value == f32(echo[index] + supplied[index]) for index, value in enumerate(mixed))
+    for label, payload in [('short', b'\0' * 4), ('long', supplied.tobytes() + b'\0'),
+                           ('nan', b'\0' * (96000 * 4) + struct.pack('<f', float('nan')) + b'\0' * (223999 * 4)),
+                           ('early', struct.pack('<f', 0.25) + b'\0' * (319999 * 4))]:
+        invalid = root / label
+        invalid.write_bytes(payload)
+        target = root / (label + '-output')
+        failed = subprocess.run([binary, library, str(target), '--near-input', str(invalid)],
+                                capture_output=True, timeout=30)
+        assert failed.returncode != 0 and not target.exists()
+    mutated_output = root / 'mutated-output'
+    failed = subprocess.run([binary, library, str(mutated_output), '--near-input', str(external)],
+                            env={**os.environ, 'OPENKRISP_AEC_FIXTURE_MUTATE_INPUT': str(external)},
+                            capture_output=True, timeout=30)
+    assert failed.returncode != 0 and b'near input changed during processing' in failed.stderr
+    assert not mutated_output.exists()
     assert subprocess.run([binary], capture_output=True, timeout=30).returncode != 0
 print('AEC doubletalk own-fixture signal, fresh control, publication and failure tests passed')
