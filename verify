@@ -11,4 +11,5 @@ cd "$(dirname "$0")"
 ./app/noise-engine/verify
 ./app/native-model-probe/verify
 ./app/audio-host/verify
+./app/native-model-probe/build_aec_worker
 ./app/desktop/verify

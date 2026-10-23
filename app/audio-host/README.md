@@ -186,7 +186,7 @@ The helper accepts `--aec-provider installed-krisp`, `--aec-worker ABSOLUTE_PATH
 `--aec-worker-sha256 SHA256` and `--aec-library ABSOLUTE_PATH` together. It hashes
 the worker before route creation and again at adapter startup. The library hash
 is fixed to the reviewed installed version; no CLI override exists. Original
-libraries stay external. No AEC worker is bundled in the desktop app yet.
+libraries stay external. The desktop app bundles our AEC worker and can validate the selected installed app before an explicit Start.
 
 AEC rejects microphone suppression and installed microphone-provider options.
 Speaker RNNoise or the installed speaker provider can run once before AEC takes

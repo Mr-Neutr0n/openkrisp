@@ -2,7 +2,7 @@
 
 This original provisional SwiftUI and AppKit app uses the sibling LocalStore, ModelCatalog, and LocalTranscription packages, plus the audio-host helper. It builds for macOS 12 or later on ARM64. It ships the independent RNNoise helper and its license notice. It ships no proprietary vendor binaries or model assets, and no cloud services. Its optional installed-provider bridge uses exact caller-selected local files. Model validation reads only caller-selected assets for hashing. Session history does not read Krisp user data.
 
-Build the noise-engine and audio-host components first. Run `./verify` to compile the release executable, create `.build/app/Lab Voice.app`, apply an ad-hoc signature, and verify bundle metadata, architecture, minimum OS, signature, and metadata resource lookup from a relocated signed copy. `./build` only builds and packages the app. Neither script installs or opens its UI. Verification runs the executable with `--verify-model-catalog`, which exits before scenes or session storage open, and runs the packaged helper with read-only `--list`. It also runs injected controller tests without OS permission requests or live audio. Build outputs stay under ignored `.build/`. Swift and the macOS SDK must be available. The app is not notarized or sandboxed.
+Build the noise-engine and audio-host components first. Build the own native adapter with `../native-model-probe/build_probe` and the own AEC worker with `../native-model-probe/build_aec_worker` before packaging. Run `./verify` to compile the release executable, create `.build/app/Lab Voice.app`, apply an ad-hoc signature, and verify bundle metadata, architecture, minimum OS, signature, and metadata resource lookup from a relocated signed copy. `./build` only builds and packages the app. Neither script installs or opens its UI. Verification runs the executable with `--verify-model-catalog`, which exits before scenes or session storage open, and runs the packaged helper with read-only `--list`. It also runs injected controller tests without OS permission requests or live audio. Build outputs stay under ignored `.build/`. Swift and the macOS SDK must be available. The app is not notarized or sandboxed.
 
 The window has local history, title and transcript search, finalized WAV import, recording playback, transcript text export, and a confirmation before selected-session deletion. Imports derive duration from AVAudioFile frame count and sample rate. Transcript text can be entered manually or generated through the explicit Transcribe on this Mac action for a user-selected WAV. The result stays editable and spans the imported recording when saved. Playback uses AVAudioPlayer. The Audio button opens physical device selection and independent microphone/speaker noise reduction options. Status reflects the helper lifecycle and reports running only after a matching startup handshake.
 
@@ -16,7 +16,7 @@ Verification has passed release builds and bundle checks on this Mac. Earlier RE
 
 The main window has a Settings button. The app also provides the standard macOS Settings or Preferences menu entry. App settings expose System, Light, and Dark. `@AppStorage` persists only the Lab Voice `appearance` preference, and `preferredColorScheme` applies the choice to the library window and settings UI. System follows this Mac's appearance. These are the observed original labels from `ui-runtime-map`, not a claim about the original factory default. The independent app starts with System when it has no saved choice. Show widget, library location and Launch at login are described below. Other original settings remain incomplete.
 
-The Models tab lets the user choose an installed app bundle and a dedicated downloaded-model directory, or an independent model root and a manifest inside that root. Nothing scans automatically. Validation runs on a worker actor. Results list model ID, feature, source location, missing or unreadable status, hash match or mismatch, observed SHA256, and license metadata. Assets with no authenticated reference digest remain unverified. Catalogue checks do not activate inference. Only the reviewed microphone and speaker NC providers can be separately selected and validated in Audio. Other catalog models remain unavailable. No vendor model is decoded or copied by catalogue validation. Selected paths and reports remain in memory for the current app session.
+The Models tab lets the user choose an installed app bundle and a dedicated downloaded-model directory, or an independent model root and a manifest inside that root. Nothing scans automatically. Validation runs on a worker actor. Results list model ID, feature, source location, missing or unreadable status, hash match or mismatch, observed SHA256, and license metadata. Assets with no authenticated reference digest remain unverified. Catalogue checks do not activate inference. The reviewed microphone/speaker NC providers and installed echo canceller can be separately selected and validated in Audio. Other catalog models remain unavailable. No vendor model is decoded or copied by catalogue validation. Selected paths and reports remain in memory for the current app session.
 
 `build` packages metadata resources, the audio helper, and its RNNoise license notice under `Contents/Resources`. The helper is individually ad-hoc signed before the outer bundle is signed. The catalog resolves that signed app location and falls back to SwiftPM resources outside packaged apps. `verify` copies the app to a temporary location and runs its headless resource check there. This checks packaging independently of the absolute SwiftPM build path. ModelCatalog's five fixture tests and release build pass after this resource lookup change. The earlier appearance/render evidence above remains valid for that build. New Audio/ASR UI and selected-directory flows still require runtime checks.
 
@@ -170,3 +170,32 @@ A reported launch error keeps the old instance usable and permits an explicit re
 The retained original catalog names `context_menu_relaunch`, `save_and_relaunch` and `wait_for_relaunch_text` in Evidence `ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4`; `../../quit-findings.md` records the exact labels and limits. These establish the named workflow. The publication checks, new-instance identity and uncertain-launch handling are independent safety decisions, not recovered original failure semantics. Injected launcher tests and real LocalStore publication integration verify ordering without opening another app. Native launch, prompt presentation and old-process exit still require an unlocked interactive acceptance check.
 
 Final relaunch verification passes 117 desktop tests plus signed ARM64/macOS 12 packaging and relocated-resource checks. The save-before-launch integration uses production RecordingStorage and LocalStore, verifies the finalized synthetic WAV byte-for-byte in the published session, then permits the injected launcher. No native launch, UI, permission prompt or physical audio occurs in verification. Local log: `../../evidence/relaunch-desktop-verify-20261018.log`.
+
+
+## Installed echo cancellation
+
+Audio has an explicit Cancel speaker echo option, initially off. Choose an
+installed Krisp app and validate it before Start. AEC uses the packaged own
+worker and the fixed reviewed external `libaec-sdk.dylib`; it does not require
+Node. The desktop package contains only our worker and its identity manifest.
+Original libraries and models remain external.
+
+Validation runs off the main actor, checks bounded ordinary files and exact
+hashes, and rejects observed file changes. It starts no worker or microphone.
+Changing the selected app, AEC toggle or microphone-noise option invalidates
+AEC admission. A stale validation result cannot restore it. Start still checks
+permissions and requires the helper's exact configuration acknowledgement.
+Unexpected AEC fields when disabled, missing or wrong identities, invalid
+formats or delays, and microphone NC fields in an AEC route are rejected.
+
+Microphone noise reduction and echo cancellation cannot run together yet.
+Speaker processing remains available before the final playback reference.
+The app allows the worker startup budget for one or two selected workers.
+Stop and permission cancellation use the existing supervised route lifecycle.
+The choice and file selection remain in memory and do not auto-start audio.
+
+The signed own worker targets ARM64/macOS12. Packaging checks source freshness
+and records its hash after signing; verification checks it again after app
+relocation. The build writes `build/aec-worker-packaged` and preserves the
+frozen probe worker. Physical echo alignment, speech quality, live route
+recovery and the new controls' visual acceptance remain unverified.

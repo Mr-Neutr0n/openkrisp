@@ -18,10 +18,16 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
     @Published var inputUID = ""
     @Published var outputUID = ""
-    @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise, microphoneProvider == .installedKrisp { invalidateProvider() } } }
+    @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise { invalidateAEC(); if microphoneProvider == .installedKrisp { invalidateProvider() } } } }
     @Published var speakerNoise = false { didSet { if oldValue != speakerNoise, speakerProvider == .installedKrisp { invalidateProvider() } } }
     @Published var microphoneProvider: NoiseProvider = .rnnoise { didSet { if oldValue != microphoneProvider, microphoneNoise { invalidateProvider() } } }
     @Published var speakerProvider: NoiseProvider = .rnnoise { didSet { if oldValue != speakerProvider, speakerNoise { invalidateProvider() } } }
+    @Published var echoCancellation = false { didSet { if oldValue != echoCancellation { invalidateAEC() } } }
+    @Published private(set) var installedAECConfiguration: InstalledAECConfiguration?
+    @Published private(set) var aecValidating = false
+    @Published private(set) var aecStatus = "Choose the installed Krisp app to validate echo cancellation."
+    private let resolveAEC: (URL) async throws -> InstalledAECConfiguration
+    private var aecValidationID = UUID()
     @Published private(set) var installedApp: URL?
     @Published private(set) var installedNode: URL?
     @Published private(set) var installedConfiguration: InstalledNCConfiguration?
@@ -68,7 +74,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         }
     }
     var canStart: Bool {
-        guard phase == .idle, !loading, !providerValidating, !recording.busy,
+        guard phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
+              !(echoCancellation && (microphoneNoise || installedAECConfiguration == nil)),
               !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != .outbound),
               !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
         return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
@@ -76,6 +83,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     init() {
         recording = RecordingController()
+        let aecResolver = InstalledAECResolver()
+        resolveAEC = { app in try await aecResolver.resolve(app: app, runtime: InstalledAECResolver.packagedDirectory()) }
         let resolver = InstalledNCResolver()
         resolveProvider = { app, node, role in try await resolver.resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role) }
         let services = AudioHelperServices()
@@ -95,7 +104,11 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil,
          resolveInstalledProvider: @escaping (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration = { app, node, role in
              try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role)
+         },
+         resolveInstalledAEC: @escaping (URL) async throws -> InstalledAECConfiguration = { app in
+             try await InstalledAECResolver().resolve(app: app, runtime: InstalledAECResolver.packagedDirectory())
          }) {
+        self.resolveAEC = resolveInstalledAEC
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider
         self.readInventory = readInventory; self.stopInventory = stopInventory
@@ -120,7 +133,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func selectInstalledApp(_ url: URL) {
         guard phase == .idle else { return }
-        installedApp = url; invalidateProvider()
+        installedApp = url; invalidateProvider(); invalidateAEC()
     }
     func selectInstalledNode(_ url: URL) {
         guard phase == .idle else { return }
@@ -129,6 +142,25 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private func invalidateProvider() {
         providerValidationID = UUID(); installedConfiguration = nil; installedSpeakerConfiguration = nil; providerValidating = false
         providerStatus = "Validate the selected app and Node runtime before Start."
+    }
+    private func invalidateAEC() {
+        aecValidationID = UUID(); installedAECConfiguration = nil; aecValidating = false
+        aecStatus = "Validate echo cancellation for the selected app before Start."
+    }
+    func validateInstalledAEC() async {
+        guard phase == .idle, echoCancellation, !aecValidating, let app = installedApp else { return }
+        let id = UUID(); aecValidationID = id; aecValidating = true; installedAECConfiguration = nil
+        aecStatus = "Checking the installed echo canceller and packaged worker…"
+        do {
+            let configuration = try await resolveAEC(app)
+            guard aecValidationID == id, phase == .idle, echoCancellation else { return }
+            installedAECConfiguration = configuration
+            aecStatus = "Echo cancellation is ready for Start."
+        } catch {
+            guard aecValidationID == id else { return }
+            aecStatus = error.localizedDescription
+        }
+        if aecValidationID == id { aecValidating = false }
     }
     var requestedInstalledRoles: [InstalledNCModelRole] {
         (microphoneNoise && microphoneProvider == .installedKrisp ? [.outbound] : []) +
@@ -157,7 +189,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         if providerValidationID == id { providerValidating = false }
     }
     func startupWait(for options: AudioRouteOptions) -> UInt64 {
-        let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1)
+        let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1) + (options.installedAEC == nil ? 0 : 1)
         return workers == 2 ? 70_000_000_000 : (workers == 1 ? 40_000_000_000 : startupTimeout)
     }
     // No permission request or --route launch occurs until this explicit Start action.
@@ -166,7 +198,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         let options = AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
                                         microphoneNoise: microphoneNoise, speakerNoise: speakerNoise,
                                         installedProvider: microphoneNoise && microphoneProvider == .installedKrisp ? installedConfiguration : nil,
-                                        installedSpeakerProvider: speakerNoise && speakerProvider == .installedKrisp ? installedSpeakerConfiguration : nil)
+                                        installedSpeakerProvider: speakerNoise && speakerProvider == .installedKrisp ? installedSpeakerConfiguration : nil,
+                                        installedAEC: echoCancellation ? installedAECConfiguration : nil)
         guard options.validProviderRoles else { return }
         let initialControls = desiredControls
         let id = UUID()

@@ -50,6 +50,27 @@ def verify_worker(resources):
     assert subprocess.check_output(["lipo", "-archs", str(adapter)], text=True).strip() == "arm64"
     assert "minos 12.0" in subprocess.check_output(["otool", "-l", str(adapter)], text=True)
 
+def verify_aec_worker(resources):
+    helper_dir = resources / "helper"
+    assert helper_dir.is_dir() and not helper_dir.is_symlink()
+    assert {file.name for file in helper_dir.iterdir()} == {"audio-host", "notices", "installed-worker", "aec-worker"}
+    worker_dir = helper_dir / "aec-worker"
+    assert worker_dir.is_dir() and not worker_dir.is_symlink()
+    assert {file.name for file in worker_dir.iterdir()} == {"aec-worker", "runtime-manifest.json"}
+    assert all(file.is_file() and not file.is_symlink() for file in worker_dir.iterdir())
+    manifest = json.loads((worker_dir / "runtime-manifest.json").read_text())
+    assert set(manifest) == {"schemaVersion", "files", "librarySha256"}
+    assert manifest["schemaVersion"] == 1
+    assert manifest["librarySha256"] == "bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a"
+    assert set(manifest["files"]) == {"aec-worker"}
+    worker = worker_dir / "aec-worker"
+    assert worker.stat().st_mode & 0o111
+    assert manifest["files"]["aec-worker"] == hashlib.sha256(worker.read_bytes()).hexdigest()
+    subprocess.run(["codesign", "--verify", "--strict", str(worker)], check=True)
+    assert subprocess.check_output(["lipo", "-archs", str(worker)], text=True).strip() == "arm64"
+    assert any(line.strip() == "minos 12.0" for line in subprocess.check_output(["otool", "-l", str(worker)], text=True).splitlines())
+
+verify_aec_worker(app / "Contents" / "Resources")
 verify_worker(app / "Contents" / "Resources")
 # Copy out of the package build tree so no SwiftPM absolute build-path fallback
 # can satisfy the signed app resource check.
@@ -63,11 +84,12 @@ with tempfile.TemporaryDirectory(prefix="labvoice-bundle-check-") as temporary:
     relocated_helper = relocated / "Contents" / "Resources" / "helper" / "audio-host"
     subprocess.run(["codesign", "--verify", "--strict", str(relocated_helper)], check=True)
     verify_worker(relocated / "Contents" / "Resources")
+    verify_aec_worker(relocated / "Contents" / "Resources")
     # Only metadata listing is allowed here. Never run --route or request mic access.
     devices = json.loads(subprocess.check_output([str(relocated_helper), "--list"], text=True))
     assert devices["operation"] == "read_only_inventory"
     assert len(devices["companion_devices"]) == 2
 print("Verified ARM64 bundle, macOS 12 deployment target, metadata, and ad-hoc signature.")
 print("Headless resource check passed. No UI launch, visual QA, or interactive workflow tests performed.")
-print("Own installed-worker resources, signed adapter digest and fixed external Node identity verified after relocation. No installed vendor assets loaded.")
+print("Own installed-worker and AEC worker resources, signed executable digests and fixed external library identities verified after relocation. No installed vendor assets loaded.")
 print("Controller tests use injected permission, recognition and route processes. No OS prompt, recognition or live route ran.")

@@ -294,3 +294,16 @@ Full audio-host verification passed, including release, ASan/UBSan and TSan adap
 Verification logs: `evidence/aec-route-adapter-verify-20261023.log` SHA256 `53da3c19ee6933ac493fdff9c0c0d813f26fdf5c114d81034bcbe0e0f9accab3`; `evidence/aec-route-desktop-verify-20261023.log` SHA256 `4335c4afed34835dd4b7ce5c885a435163bbc9d9ebf9cf0ec34f70fbab70cb78`.
 
 Next package the own AEC worker and add explicit desktop selection with matching startup acknowledgement and restore/error tests. Keep microphone NC disabled until a separate AEC-to-NC chain is validated. Physical audio, acoustic alignment, speech quality, desktop visual acceptance and full retained local parity remain incomplete. No original code, physical audio or administrator action ran in this checkpoint. Vendor assets remain external and excluded from Git.
+
+
+## Desktop AEC checkpoint, 2026-10-23
+
+The desktop app now bundles its own signed ARM64/macOS12 AEC worker and offers explicit echo-cancellation selection, initially off. The installed app supplies the fixed reviewed external library. AEC-only validation does not require Node. It checks bounded ordinary files, executable mode, the exact manifest and hashes, and observed identity changes without loading vendor code or starting audio. The packaged worker build preserves the frozen runtime-probe executable.
+
+Changing the selected app, AEC toggle or microphone-noise option invalidates admission. Validation IDs reject stale completions. The UI and controller reject simultaneous microphone NC and AEC; speaker processing remains available. Start still requires microphone authorization and exact helper acknowledgement. AEC acknowledgement checks reject missing, incorrect, null or unknown AEC fields, microphone NC metadata, and inconsistent callback bounds between AEC and installed speaker processing. Disabled AEC rejects all AEC fields. Startup budgets count both workers when selected.
+
+Full desktop verification passed128tests, release build, signed package and relocated-resource checks. New controller tests cover default-off/noNode validation, configuration invalidation, failed and stale validation, mismatched acknowledgement, late readiness, permission cancellation, and AEC plus installed speaker processing. Resolver tests use own files with injected vendor hashes; actual hashing, symlink/mode/bounds and observed mutation rejection are tested independently. The packaged executable also passed the existing release adapter integration against a freshly compiled own synthetic library. Independent GPT6.1sol review found no remaining issues.
+
+Verification logs: `evidence/aec-desktop-verify-20261023.log` SHA256 `80afb14134221ce5af362018982a4298093c0ba6867003f922d1816034b78108`; `evidence/aec-packaged-worker-verify-20261023.log` SHA256 `1d83287bbbec6e07aec962a005e86f716023f25792e7656148edb5dee373a034`.
+
+No physical route, microphone, OS prompt, original artifact execution or administrator operation ran. Original libraries/models remain external and excluded from Git. UI rendering, acoustic alignment, speech quality, device lifecycle and full retained local parity are still unverified or incomplete. Next implement and verify the separate AEC-to-microphone-NC chain, including combined startup delay and failure propagation, before allowing both toggles. Physical acceptance remains a separate gate.

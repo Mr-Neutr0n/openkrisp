@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import hashlib
 import json
+import stat
 
 root = pathlib.Path(__file__).resolve().parent
 subprocess.run(["swift", "build", "-c", "release", "--package-path", str(root)], check=True)
@@ -21,7 +22,7 @@ for resource in pathlib.Path(binpath).glob("*.bundle"):
 # The audio-host component builds this helper before desktop packaging.
 helper_root = root.parent / "audio-host"
 helper_source = helper_root / "build" / "audio-host"
-if not helper_source.is_file():
+if not helper_source.is_file() or helper_source.is_symlink():
     raise RuntimeError("Build app/audio-host with ./verify before packaging desktop.")
 helper_inputs = [helper_root / name for name in (
     "host.cpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
@@ -43,6 +44,33 @@ notices.mkdir()
 shutil.copy2(root.parent / "noise-engine" / "vendor" / "rnnoise" / "COPYING", notices / "RNNoise-COPYING")
 subprocess.run(["codesign", "--force", "--sign", "-", "--identifier", "dev.labvoice.audio-host", str(helper)], check=True)
 subprocess.run(["codesign", "--verify", "--strict", str(helper)], check=True)
+# This separate output must not replace the frozen CPU-probe executable.
+aec_source = worker_root / "build" / "aec-worker-packaged"
+aec_inputs = [worker_root / name for name in (
+    "build_aec_worker", "aec_worker.cpp", "aec_abi.hpp", "aec_worker_protocol.hpp", "parent_watch.hpp")]
+if aec_source.parent.is_symlink() or not aec_source.is_file() or aec_source.is_symlink() or not aec_source.stat().st_mode & 0o111:
+    raise RuntimeError("Build app/native-model-probe with ./build_aec_worker before packaging desktop.")
+if any(not stat.S_ISREG(path.lstat().st_mode) for path in aec_inputs):
+    raise RuntimeError("Expected ordinary AEC worker build inputs.")
+if any(path.stat().st_mtime_ns > aec_source.stat().st_mtime_ns for path in aec_inputs):
+    raise RuntimeError("AEC worker is stale. Run app/native-model-probe/build_aec_worker before packaging desktop.")
+aec_dir = helper_dir / "aec-worker"
+aec_dir.mkdir()
+aec_worker = aec_dir / "aec-worker"
+shutil.copy2(aec_source, aec_worker)
+if subprocess.check_output(["lipo", "-archs", str(aec_worker)], text=True).strip() != "arm64":
+    raise RuntimeError("AEC worker must be ARM64.")
+if not any(line.strip() == "minos 12.0" for line in subprocess.check_output(["otool", "-l", str(aec_worker)], text=True).splitlines()):
+    raise RuntimeError("AEC worker must target macOS 12.0.")
+subprocess.run(["codesign", "--verify", "--strict", str(aec_source)], check=True)
+subprocess.run(["codesign", "--force", "--sign", "-", "--identifier", "dev.labvoice.aec-worker", str(aec_worker)], check=True)
+subprocess.run(["codesign", "--verify", "--strict", str(aec_worker)], check=True)
+aec_manifest = {
+    "schemaVersion": 1,
+    "files": {"aec-worker": hashlib.sha256(aec_worker.read_bytes()).hexdigest()},
+    "librarySha256": "bd75d4f1188c778647afab3899c731ecd31ecf4e05751a3e3fc632a616414a3a",
+}
+(aec_dir / "runtime-manifest.json").write_text(json.dumps(aec_manifest, indent=2) + "\n")
 # Bundle only our adapter and worker code. Node, the vendor addon, models and
 # dependency libraries remain at explicitly selected external installed paths.
 worker_files = ("native-probe.node", "audio_worker.cjs", "worker_session.cjs", "worker_protocol.cjs")

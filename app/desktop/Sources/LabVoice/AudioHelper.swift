@@ -31,7 +31,9 @@ struct AudioRouteOptions: Equatable, Sendable {
     let speakerNoise: Bool
     var installedProvider: InstalledNCConfiguration? = nil
     var installedSpeakerProvider: InstalledNCConfiguration? = nil
+    var installedAEC: InstalledAECConfiguration? = nil
     var validProviderRoles: Bool {
+        (installedAEC == nil || (!microphoneNoise && installedProvider == nil)) &&
         (installedProvider == nil || (microphoneNoise && installedProvider?.modelRole == .outbound)) &&
         (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound))
     }
@@ -41,6 +43,7 @@ struct AudioRouteOptions: Equatable, Sendable {
         if speakerNoise { args.append("--speaker-noise-suppression") }
         if microphoneNoise, let installedProvider { args += installedProvider.arguments }
         if speakerNoise, let installedSpeakerProvider { args += installedSpeakerProvider.arguments(speaker: true) }
+        if let installedAEC { args += installedAEC.arguments }
         return args
     }
 }
@@ -67,7 +70,29 @@ struct AudioStartup: Decodable, Sendable {
     let speakerProviderNodeSHA256: String?
     let speakerProviderDelaySamples: Int?
     let speakerProviderMaximumCallbackFrames: Int?
+    let aecProvider: String?
+    let aecWorkerSHA256: String?
+    let aecLibrarySHA256: String?
+    let aecDelaySamples: Int?
+    let aecMaximumCallbackFrames: Int?
+    let aecSchedulingBudgetFrames: Int?
+    let aecForwardRate: Int?
+    let aecForwardChannels: Int?
+    let aecReferenceRate: Int?
+    let aecReferenceChannels: Int?
+    private let aecFieldNames: Set<String>
+    private let hasMicrophoneNCFields: Bool
     enum CodingKeys: String, CodingKey {
+        case aecProvider = "aec_provider"
+        case aecWorkerSHA256 = "aec_worker_sha256"
+        case aecLibrarySHA256 = "aec_library_sha256"
+        case aecDelaySamples = "aec_delay_samples"
+        case aecMaximumCallbackFrames = "aec_maximum_callback_frames"
+        case aecSchedulingBudgetFrames = "aec_scheduling_budget_frames"
+        case aecForwardRate = "aec_forward_rate"
+        case aecForwardChannels = "aec_forward_channels"
+        case aecReferenceRate = "aec_reference_rate"
+        case aecReferenceChannels = "aec_reference_channels"
         case speakerProviderModelSHA256 = "speaker_provider_model_sha256", speakerProviderAddonSHA256 = "speaker_provider_addon_sha256"
         case speakerProviderAdapterSHA256 = "speaker_provider_adapter_sha256", speakerProviderNodeSHA256 = "speaker_provider_node_sha256"
         case speakerProviderDelaySamples = "speaker_provider_delay_samples", speakerProviderMaximumCallbackFrames = "speaker_provider_maximum_callback_frames"
@@ -78,6 +103,50 @@ struct AudioStartup: Decodable, Sendable {
         case providerDelaySamples = "provider_delay_samples", providerMaximumCallbackFrames = "provider_maximum_callback_frames"
         case inputUID = "input_uid", outputUID = "output_uid"
         case microphoneNoise = "microphone_noise", speakerNoise = "speaker_noise"
+    }
+    private struct AnyKey: CodingKey {
+        let stringValue: String
+        var intValue: Int? { nil }
+        init?(stringValue: String) { self.stringValue = stringValue }
+        init?(intValue: Int) { return nil }
+    }
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        event = try values.decode(String.self, forKey: .event)
+        operationID = try values.decodeIfPresent(String.self, forKey: .operationID)
+        microphone = try values.decodeIfPresent(AudioChannelControl.self, forKey: .microphone)
+        speaker = try values.decodeIfPresent(AudioChannelControl.self, forKey: .speaker)
+        inputUID = try values.decode(String.self, forKey: .inputUID)
+        outputUID = try values.decode(String.self, forKey: .outputUID)
+        microphoneNoise = try values.decode(Bool.self, forKey: .microphoneNoise)
+        speakerNoise = try values.decode(Bool.self, forKey: .speakerNoise)
+        microphoneProvider = try values.decodeIfPresent(String.self, forKey: .microphoneProvider)
+        speakerProvider = try values.decodeIfPresent(String.self, forKey: .speakerProvider)
+        providerModelSHA256 = try values.decodeIfPresent(String.self, forKey: .providerModelSHA256)
+        providerAddonSHA256 = try values.decodeIfPresent(String.self, forKey: .providerAddonSHA256)
+        providerAdapterSHA256 = try values.decodeIfPresent(String.self, forKey: .providerAdapterSHA256)
+        providerNodeSHA256 = try values.decodeIfPresent(String.self, forKey: .providerNodeSHA256)
+        providerDelaySamples = try values.decodeIfPresent(Int.self, forKey: .providerDelaySamples)
+        providerMaximumCallbackFrames = try values.decodeIfPresent(Int.self, forKey: .providerMaximumCallbackFrames)
+        speakerProviderModelSHA256 = try values.decodeIfPresent(String.self, forKey: .speakerProviderModelSHA256)
+        speakerProviderAddonSHA256 = try values.decodeIfPresent(String.self, forKey: .speakerProviderAddonSHA256)
+        speakerProviderAdapterSHA256 = try values.decodeIfPresent(String.self, forKey: .speakerProviderAdapterSHA256)
+        speakerProviderNodeSHA256 = try values.decodeIfPresent(String.self, forKey: .speakerProviderNodeSHA256)
+        speakerProviderDelaySamples = try values.decodeIfPresent(Int.self, forKey: .speakerProviderDelaySamples)
+        speakerProviderMaximumCallbackFrames = try values.decodeIfPresent(Int.self, forKey: .speakerProviderMaximumCallbackFrames)
+        aecProvider = try values.decodeIfPresent(String.self, forKey: .aecProvider)
+        aecWorkerSHA256 = try values.decodeIfPresent(String.self, forKey: .aecWorkerSHA256)
+        aecLibrarySHA256 = try values.decodeIfPresent(String.self, forKey: .aecLibrarySHA256)
+        aecDelaySamples = try values.decodeIfPresent(Int.self, forKey: .aecDelaySamples)
+        aecMaximumCallbackFrames = try values.decodeIfPresent(Int.self, forKey: .aecMaximumCallbackFrames)
+        aecSchedulingBudgetFrames = try values.decodeIfPresent(Int.self, forKey: .aecSchedulingBudgetFrames)
+        aecForwardRate = try values.decodeIfPresent(Int.self, forKey: .aecForwardRate)
+        aecForwardChannels = try values.decodeIfPresent(Int.self, forKey: .aecForwardChannels)
+        aecReferenceRate = try values.decodeIfPresent(Int.self, forKey: .aecReferenceRate)
+        aecReferenceChannels = try values.decodeIfPresent(Int.self, forKey: .aecReferenceChannels)
+        let all = try decoder.container(keyedBy: AnyKey.self).allKeys.map(\.stringValue)
+        aecFieldNames = Set(all.filter { $0.hasPrefix("aec_") })
+        hasMicrophoneNCFields = all.contains { $0.hasPrefix("provider_") }
     }
     var controls: AudioControlSnapshot? {
         guard let microphone, let speaker else { return nil }
@@ -97,9 +166,26 @@ struct AudioStartup: Decodable, Sendable {
             }
             return name == (noise ? "rnnoise" : "none") && model == nil && addon == nil && adapter == nil && node == nil && delay == nil && maximum == nil
         }
-        return lane(noise: expected.microphoneNoise, configuration: expected.installedProvider, role: .outbound,
-                    name: microphoneProvider, model: providerModelSHA256, addon: providerAddonSHA256,
-                    adapter: providerAdapterSHA256, node: providerNodeSHA256, delay: providerDelaySamples, maximum: providerMaximumCallbackFrames) &&
+        let microphoneMatches: Bool
+        if let aec = expected.installedAEC {
+            let required: Set<String> = ["aec_provider", "aec_worker_sha256", "aec_library_sha256", "aec_delay_samples",
+                "aec_maximum_callback_frames", "aec_scheduling_budget_frames", "aec_forward_rate", "aec_forward_channels",
+                "aec_reference_rate", "aec_reference_channels"]
+            guard aecFieldNames == required, !hasMicrophoneNCFields,
+                  microphoneProvider == "installed-krisp-aec", aecProvider == "installed-krisp",
+                  aecWorkerSHA256 == aec.workerSHA256, aecLibrarySHA256 == InstalledAECConfiguration.librarySHA256,
+                  aecForwardRate == 48000, aecForwardChannels == 1, aecReferenceRate == 48000, aecReferenceChannels == 2,
+                  aecSchedulingBudgetFrames == 2, let maximum = aecMaximumCallbackFrames, (1...4096).contains(maximum),
+                  aecDelaySamples == ((maximum + 958) / 480 + 2) * 480 else { return false }
+            if expected.installedSpeakerProvider != nil && speakerProviderMaximumCallbackFrames != maximum { return false }
+            microphoneMatches = true
+        } else {
+            guard aecFieldNames.isEmpty else { return false }
+            microphoneMatches = lane(noise: expected.microphoneNoise, configuration: expected.installedProvider, role: .outbound,
+                name: microphoneProvider, model: providerModelSHA256, addon: providerAddonSHA256,
+                adapter: providerAdapterSHA256, node: providerNodeSHA256, delay: providerDelaySamples, maximum: providerMaximumCallbackFrames)
+        }
+        return microphoneMatches &&
             lane(noise: expected.speakerNoise, configuration: expected.installedSpeakerProvider, role: .inbound,
                  name: speakerProvider, model: speakerProviderModelSHA256, addon: speakerProviderAddonSHA256,
                  adapter: speakerProviderAdapterSHA256, node: speakerProviderNodeSHA256,
