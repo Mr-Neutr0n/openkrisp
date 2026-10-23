@@ -8,10 +8,11 @@ if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
   echo 'Build ../noise-engine with its ./verify before audio-host verification.' >&2
   exit 1
 fi
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
 python3 check.py
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror host.cpp provider_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework CoreFoundation -o build/provider-cli-fixture
 python3 provider_cli_check.py
+python3 aec_cli_check.py
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test
 ./build/routing-test
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$sanitized_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test-sanitized
@@ -54,4 +55,22 @@ for name, flags, library in [
                     'routing.cpp', 'recording.cpp', '../native-model-probe/worker_broker.cpp', library,
                     '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(binary)], check=True)
     subprocess.run([str(binary), node, str(root.parent / 'native-model-probe/worker_broker_fixture.cjs')], check=True, timeout=60)
+PY
+# AEC route integration uses only our worker and synthetic AEC library.
+python3 - <<'PY'
+from pathlib import Path
+import hashlib, subprocess, tempfile
+root = Path.cwd()
+probe = root.parent / 'native-model-probe'
+with tempfile.TemporaryDirectory(prefix='openkrisp-aec-route-') as temporary:
+    build = Path(temporary)
+    worker, fixture = build / 'worker', build / 'fixture.dylib'
+    common = ['clang++', '-mmacosx-version-min=12.0', '-std=c++20', '-pthread', '-Wall', '-Wextra', '-Werror']
+    subprocess.run([*common, '-O2', str(probe / 'aec_worker.cpp'), '-o', str(worker)], check=True)
+    subprocess.run([*common, '-O2', '-dynamiclib', str(probe / 'aec_fixture.cpp'), '-o', str(fixture)], check=True)
+    digest = hashlib.sha256(fixture.read_bytes()).hexdigest()
+    for name, flags in [('release', ['-O2']), ('sanitized', ['-O1', '-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer']), ('thread', ['-O1', '-g', '-fsanitize=thread'])]:
+        binary = root / 'build' / ('installed-aec-adapter-' + name)
+        subprocess.run([*common, '-fblocks', *flags, 'installed_aec_adapter_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(binary)], check=True)
+        subprocess.run([str(binary), str(worker), str(fixture), digest], check=True, timeout=90)
 PY

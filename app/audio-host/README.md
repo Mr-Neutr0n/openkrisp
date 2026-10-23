@@ -162,8 +162,8 @@ The probe generates the known one-second mono fixture and alternates its doubled
 
 `ProcessorBinding` can carry a `DuplexBinding` after the existing speaker stage.
 The factory must explicitly declare `microphoneStageDisabled`; the initial hook
-uses raw microphone input and does not chain microphone NC. The hook is not yet
-connected to the CLI or desktop. Existing bindings follow the original path.
+uses raw microphone input and does not chain microphone NC. The CLI can explicitly bind the installed AEC adapter. Desktop selection remains
+pending. Existing bindings follow the original path.
 
 The route computes final playback after speaker processing and gain/mute into
 preallocated storage. One final enabled/changed check commits the callback before
@@ -177,4 +177,28 @@ reference input origin is not historical capture time before speaker buffering.
 Host-time validity remains explicit. The hook owner stays with Context through
 failed HAL cleanup and queued callbacks. Synthetic tests verify byte equality,
 clock fields, gain/mute, speaker delay, failure/stop races and retained ownership.
-Actual AEC binding, physical timing and live playback remain pending.
+Physical timing and live playback remain pending.
+
+
+### Explicit installed AEC route
+
+The helper accepts `--aec-provider installed-krisp`, `--aec-worker ABSOLUTE_PATH`,
+`--aec-worker-sha256 SHA256` and `--aec-library ABSOLUTE_PATH` together. It hashes
+the worker before route creation and again at adapter startup. The library hash
+is fixed to the reviewed installed version; no CLI override exists. Original
+libraries stay external. No AEC worker is bundled in the desktop app yet.
+
+AEC rejects microphone suppression and installed microphone-provider options.
+Speaker RNNoise or the installed speaker provider can run once before AEC takes
+its final playback reference. The adapter uses 48 kHz mono microphone and stereo
+reference frames, with two scheduling-budget frames and a delay derived from
+the validated maximum callback bound. Startup JSON reports the identities,
+format, callback bound and delay. `microphone_provider` is `installed-krisp-aec`,
+so older desktop clients reject an unexpected AEC route. AEC-off fields stay
+unchanged.
+
+The control thread retains and stops the worker even when route startup or HAL
+cleanup fails. Late callbacks retain stopped storage. Synthetic fixture tests
+cover this ownership, final-reference samples, timing provenance, delayed
+microphone output and CLI admission. They do not establish physical routing,
+acoustic alignment, speech quality or the AEC-to-NC chain.

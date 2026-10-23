@@ -559,11 +559,24 @@ int main(int argc, char **argv) {
             krisp_probe::InstalledWorkerSettings settings, speakerSettings;
             speakerSettings.modelRole = krisp_probe::InstalledModelRole::inbound;
             speakerSettings.modelSha256 = krisp_probe::installedInboundModelSHA256;
-            bool installedProvider = false, installedSpeaker = false;
+            bool installedProvider = false, installedSpeaker = false, installedAEC = false;
+            krisp_probe::InstalledAECWorkerSettings aecSettings;
+            std::set<std::string> aecFlags;
             std::set<std::string> providerFlags, speakerProviderFlags;
             for (int i = 6; i < argc; ++i) {
                 const std::string flag = argv[i];
-                if (flag == "--microphone-provider" || flag.rfind("--provider-", 0) == 0 ||
+                if (flag.rfind("--aec-",0)==0) {
+                    if(!aecFlags.insert(flag).second || ++i==argc)
+                        throw std::invalid_argument("Repeated or incomplete AEC option");
+                    const std::string value=argv[i];
+                    if(flag=="--aec-provider") {
+                        if(value!="installed-krisp")throw std::invalid_argument("Unsupported AEC provider");
+                        installedAEC=true;
+                    } else if(flag=="--aec-worker")aecSettings.workerPath=value;
+                    else if(flag=="--aec-worker-sha256")aecSettings.workerSha256=value;
+                    else if(flag=="--aec-library")aecSettings.libraryPath=value;
+                    else throw std::invalid_argument("Unknown AEC option");
+                } else if (flag == "--microphone-provider" || flag.rfind("--provider-", 0) == 0 ||
                     flag == "--speaker-provider" || flag.rfind("--speaker-provider-", 0) == 0) {
                     const bool speakerOption = flag.rfind("--speaker-provider", 0) == 0;
                     auto &seen = speakerOption ? speakerProviderFlags : providerFlags;
@@ -618,6 +631,14 @@ int main(int argc, char **argv) {
             if (controls.stdinEnabled != !controls.operationID.empty()) {
                 std::cerr << "--control-stdin and --operation-id must be supplied together\n";
                 return 64;
+            }
+            if(!aecFlags.empty()) {
+                if(!installedAEC || aecFlags.size()!=4)
+                    throw std::invalid_argument("AEC provider requires all runtime options");
+                if(microphone || installedProvider || !providerFlags.empty())
+                    throw std::invalid_argument("AEC cannot be combined with microphone suppression or provider");
+                (void)krisp_probe::buildInstalledAECWorkerLaunch(aecSettings,{});
+                provider.installedAEC=std::move(aecSettings);
             }
             if (!providerFlags.empty()) {
                 if (!installedProvider || !microphone || providerFlags.size() != 9)

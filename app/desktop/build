@@ -24,14 +24,14 @@ helper_source = helper_root / "build" / "audio-host"
 if not helper_source.is_file():
     raise RuntimeError("Build app/audio-host with ./verify before packaging desktop.")
 helper_inputs = [helper_root / name for name in (
-    "host.cpp", "route_cli.cpp", "route_cli.hpp", "routing.cpp", "routing.hpp",
-    "coreaudio_backend.cpp", "noise_adapter.hpp", "installed_noise_adapter.hpp", "controls.hpp",
+    "host.cpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
+    "coreaudio_backend.cpp", "noise_adapter.hpp", "installed_noise_adapter.hpp", "installed_aec_adapter.hpp", "controls.hpp",
     "control_protocol.cpp", "control_protocol.hpp", "recording.cpp", "recording.hpp", "microphone_test.cpp", "microphone_test.hpp",
     "microphone_test_cli.cpp", "microphone_test_coreaudio.cpp")]
 helper_inputs.append(root.parent / "noise-engine" / "build" / "release" / "librnnoise.a")
 worker_root = root.parent / "native-model-probe"
 helper_inputs.extend(worker_root.glob("*.hpp"))
-helper_inputs.append(worker_root / "worker_broker.cpp")
+helper_inputs.extend(worker_root / name for name in ("worker_broker.cpp", "aec_worker_broker.cpp"))
 if any(path.stat().st_mtime_ns > helper_source.stat().st_mtime_ns for path in helper_inputs):
     raise RuntimeError("Audio helper is stale. Rebuild app/audio-host with ./verify before packaging desktop.")
 helper_dir = app / "Contents" / "Resources" / "helper"
