@@ -80,9 +80,8 @@ clang++ -std=c++20 -arch arm64 -O2 -Wall -Wextra -Werror -pedantic \
 ```
 
 Its positional arguments are `libraryPath forward-input.f32le
-reference-input.f32le reference-on.f32le reference-zero.f32le`. The fixed run
-uses two fresh engines, each with 300 reference-first 10 ms calls followed by
-300 forward calls. Forward is 32 kHz mono, reference is 48 kHz stereo. A shared
+reference-input.f32le reference-on.f32le reference-zero.f32le`. The default multitone run uses two fresh engines. Each engine processes 300
+10 ms blocks, with reverse analysis before forward processing for each block. Forward is 32 kHz mono, reference is 48 kHz stereo. A shared
 continuous-time 233/617/1229 Hz multitone generates the reference and a 50 ms
 delayed, 0.6-scaled forward echo with no near-end signal. The zero-reference
 control receives the same forward samples. No delay setter is called.
@@ -96,6 +95,27 @@ output directory without concurrent writers; these path checks are not an
 atomic transaction across files. JSON reports all-sample and last-second RMS,
 call counts and elapsed time. Three seconds is an exploratory adaptation
 window and gives no quality acceptance or desktop timing claim.
+
+Append `--broadband` to select a ten-second baseline. It generates 160001 base
+samples at 16 kHz, including one interpolation lookahead sample. A xorshift32
+sequence starts at seed `0x91e10da5`, advances with shifts 13, 17 and 5, then
+maps the low 16 bits to `(value - 32768) / 262144`. Linear interpolation at
+integer sample positions produces the 32 kHz forward and 48 kHz reference
+streams from this shared base. The forward stream starts with 1600 zero
+samples, then uses the same 50 ms delay and 0.6 gain. Both reference channels
+are identical. There is no near-end source.
+
+Broadband mode makes 1000 reverse and 1000 forward calls per engine. It writes
+320000 forward floats, 960000 interleaved reference floats and 320000 floats
+per output. JSON identifies the selected mode, fixture, seed, rates, channels
+and reference sample count. The default multitone stimulus is unchanged.
+The ten-second stimulus supports a later alignment and adaptation experiment;
+fixture tests do not establish vendor cancellation or delay estimation.
+
+The own-fixture checks cover both modes, all interpolation phases, the exact
+forward delay and gain, repeatable broadband bytes, duplicate-output refusal,
+rollback, symlink refusal and foreign exceptions. Release and ASan/UBSan runs
+use only our dylib.
 
 `./verify` runs this executable only against the own synthetic fixture in
 release and ASan/UBSan modes, including output collisions, symlinks, partial

@@ -16,8 +16,7 @@
 #include <vector>
 
 namespace {
-constexpr unsigned frames = 300;
-constexpr std::size_t samples = frames * 320;
+constexpr std::uint32_t broadbandSeed = 0x91e10da5u;
 void require(bool condition, const char* message) {
     if (!condition) throw std::runtime_error(message);
 }
@@ -35,9 +34,32 @@ float referenceSample(double seconds) {
                               0.04 * std::sin(2 * std::numbers::pi * 1229 * seconds));
 }
 struct Signals {
-    std::vector<float> forward = std::vector<float>(samples);
-    std::vector<float> reference = std::vector<float>(frames * 480 * 2);
-    Signals() {
+    const unsigned frames;
+    std::vector<float> forward;
+    std::vector<float> reference;
+    explicit Signals(bool broadband) : frames(broadband ? 1000 : 300),
+        forward(frames * 320), reference(frames * 480 * 2) {
+        if (broadband) {
+            // Fixed 16 kHz source plus one interpolation lookahead sample.
+            std::vector<float> base(160001);
+            std::uint32_t state = broadbandSeed;
+            for (float& sample : base) {
+                state ^= state << 13; state ^= state >> 17; state ^= state << 5;
+                sample = static_cast<float>(static_cast<int>(state & 65535u) - 32768) / 262144.0f;
+            }
+            const auto interpolate = [&](std::size_t index, std::size_t ratio) {
+                const auto lower = index / ratio;
+                const float fraction = static_cast<float>(index % ratio) / static_cast<float>(ratio);
+                return base[lower] + (base[lower + 1] - base[lower]) * fraction;
+            };
+            for (std::size_t i = 0; i < forward.size(); ++i)
+                forward[i] = i >= 1600 ? 0.6f * interpolate(i - 1600, 2) : 0.0f;
+            for (std::size_t i = 0; i < reference.size() / 2; ++i) {
+                const float value = interpolate(i, 3);
+                reference[2 * i] = value; reference[2 * i + 1] = value;
+            }
+            return;
+        }
         for (std::size_t i = 0; i < forward.size(); ++i) {
             const double time = static_cast<double>(i) / 32000;
             forward[i] = time >= 0.05 ? 0.6f * referenceSample(time - 0.05) : 0;
@@ -49,13 +71,13 @@ struct Signals {
     }
 };
 std::vector<float> run(aec_probe::Factory factory, const Signals& signals, bool referenceOn) {
-    std::vector<float> result(samples);
+    std::vector<float> result(signals.forward.size());
     std::unique_ptr<aec_probe::View> engine(factory());
     require(engine != nullptr, "null AEC factory result");
     // Factory already initializes the object. No initialize or delay setter call.
     const aec_probe::StreamConfig forward{32000, 0, 1, 320}, reverse{48000, 0, 2, 480};
     const std::array<float, 960> silence{};
-    for (unsigned frame = 0; frame < frames; ++frame) {
+    for (unsigned frame = 0; frame < signals.frames; ++frame) {
         const auto mic = std::span(signals.forward).subspan(frame * 320, 320);
         const auto speaker = referenceOn ? std::span(signals.reference).subspan(frame * 960, 960)
                                         : std::span<const float>(silence);
@@ -111,13 +133,15 @@ struct Output {
 }
 int main(int argc, char** argv) {
     try {
-        require(argc == 6, "usage: aec-direct-probe library forward-input.f32le reference-input.f32le reference-on.f32le reference-zero.f32le");
-        for (int i = 2; i < argc; ++i)
-            for (int j = i + 1; j < argc; ++j)
+        require(argc == 6 || (argc == 7 && std::strcmp(argv[6], "--broadband") == 0),
+                "usage: aec-direct-probe library forward-input.f32le reference-input.f32le reference-on.f32le reference-zero.f32le [--broadband]");
+        const bool broadband = argc == 7;
+        for (int i = 2; i < 6; ++i)
+            for (int j = i + 1; j < 6; ++j)
                 require(std::strcmp(argv[i], argv[j]) != 0, "output destinations must differ");
         static_assert(sizeof(float) == 4 && std::endian::native == std::endian::little);
         const auto started = std::chrono::steady_clock::now();
-        const Signals signals;
+        const Signals signals(broadband);
         std::vector<float> on, zero;
         {
             Library library(argv[1]);
@@ -143,7 +167,11 @@ int main(int argc, char** argv) {
         onFile.published = true; zeroFile.published = true;
         const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - started).count();
-        std::cout << "{\"framesPerEngine\":" << frames << ",\"samplesPerOutput\":" << samples
+        std::cout << "{\"framesPerEngine\":" << signals.frames << ",\"samplesPerOutput\":" << signals.forward.size()
+                  << ",\"mode\":\"" << (broadband ? "broadband" : "multitone") << "\""
+                  << ",\"fixture\":\"" << (broadband ? "xorshift32-linear16k-v1" : "multitone-v1") << "\""
+                  << ",\"baseNoiseSeed\":" << (broadband ? broadbandSeed : 0)
+                  << ",\"referenceSamples\":" << signals.reference.size()
                   << ",\"forwardRate\":32000,\"forwardChannels\":1,\"referenceRate\":48000,\"referenceChannels\":2"
                   << ",\"referenceOnRms\":" << rms(on) << ",\"referenceZeroRms\":" << rms(zero)
                   << ",\"inputRms\":" << rms(signals.forward)
@@ -151,7 +179,7 @@ int main(int argc, char** argv) {
                   << ",\"lateInputRms\":" << rms(std::span(signals.forward).last(32000))
                   << ",\"lateReferenceOnRms\":" << rms(std::span(on).last(32000))
                   << ",\"lateReferenceZeroRms\":" << rms(std::span(zero).last(32000))
-                  << ",\"successfulCallsPerEngine\":600,\"delaySetterCalled\":false"
+                  << ",\"successfulCallsPerEngine\":" << signals.frames * 2 << ",\"delaySetterCalled\":false"
                   << ",\"elapsedMs\":" << elapsed << ",\"teardownComplete\":true}\n";
         return 0;
     } catch (const std::exception& error) {
