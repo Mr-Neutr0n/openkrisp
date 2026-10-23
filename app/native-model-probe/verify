@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import shutil
+import hashlib
 
 root = Path(__file__).resolve().parent
 with tempfile.TemporaryDirectory(prefix="openkrisp-native-probe-") as build:
@@ -131,3 +132,26 @@ subprocess.run([
     "-Werror", "-pedantic", "-pthread", str(root / "worker_broker.cpp"),
     str(root / "timed_worker_probe.cpp"), "-o", str(root / "build/timed-worker-probe"),
 ], check=True)
+
+with tempfile.TemporaryDirectory(prefix="openkrisp-aec-worker-") as build:
+    for name, flags in [("release", ["-O2"]),
+                        ("address-undefined", ["-O1", "-g", "-fsanitize=address,undefined", "-fno-omit-frame-pointer"])]:
+        common = ["clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra", "-Werror", "-pedantic", "-pthread", *flags]
+        wire = str(Path(build) / (name + "-wire"))
+        broker = str(Path(build) / (name + "-broker"))
+        fixture = str(Path(build) / (name + "-broker-fixture"))
+        library = str(Path(build) / (name + "-aec-fixture.dylib"))
+        worker = str(Path(build) / (name + "-worker"))
+        subprocess.run([*common, str(root / "aec_worker_protocol_test.cpp"), "-o", wire], check=True)
+        subprocess.run([*common, str(root / "aec_worker_broker_fixture.cpp"), "-o", fixture], check=True)
+        subprocess.run([*common, str(root / "aec_worker_broker_test.cpp"), str(root / "aec_worker_broker.cpp"), "-o", broker], check=True)
+        subprocess.run([*common, "-dynamiclib", str(root / "aec_fixture.cpp"), "-o", library], check=True)
+        subprocess.run([*common, str(root / "aec_worker.cpp"), "-o", worker], check=True)
+        print("aec-persistent-worker " + name, flush=True)
+        subprocess.run([wire], check=True, timeout=60)
+        subprocess.run([broker, fixture], check=True, timeout=60)
+        subprocess.run(["python3", str(root / "aec_worker_test.py"), worker, library], check=True, timeout=60)
+        integration = str(Path(build) / (name + "-integration"))
+        subprocess.run([*common, str(root / "aec_worker_end_to_end_test.cpp"), str(root / "aec_worker_broker.cpp"), "-o", integration], check=True)
+        digest = hashlib.sha256(Path(library).read_bytes()).hexdigest()
+        subprocess.run([integration, worker, library, digest], check=True, timeout=60)

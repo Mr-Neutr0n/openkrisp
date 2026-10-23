@@ -191,3 +191,47 @@ first three seconds zero. Metadata reports the selected rate and derived
 counts, delay and onset. Each engine still makes 1000 reverse-first duplex
 blocks. This option permits a later vendor rate-acceptance experiment. Its
 own-fixture verification does not establish vendor acceptance or live timing.
+
+### Persistent AEC worker
+
+`aec_worker.cpp` is a separate native worker for fixed 48 kHz mono forward
+and 48 kHz stereo reference streams. Build it with:
+
+```sh
+clang++ -std=c++20 -arch arm64 -O2 -Wall -Wextra -Werror -pedantic -pthread \
+  aec_worker.cpp -o build/aec-worker
+```
+
+Arguments are `absoluteLibrary expectedLibrarySHA256 tokenHex parentPID`.
+Before loading, it requires a matching regular-file SHA256 and loopback
+connection denial with `EPERM`. The caller must apply a deny-network sandbox,
+a clean environment and executable admission. The expected library hash is
+caller supplied. This generic executable is not fixed vendor admission; a
+production launcher must supply the reviewed fixed library hash and pin the
+worker executable. Sampled file hashes do not atomically bind loader reads.
+
+The worker reads `aec_worker_protocol.hpp` requests on fd0 and writes readiness,
+results and close acknowledgement on fd3. Vendor stdout is outside the wire.
+Readiness is `OKAEC1 SHA256 48000 1 48000 2` followed by a newline. Each request
+has 480 microphone and 960 stereo reference values. One engine persists across
+requests and always receives reverse analysis before forward processing.
+Every native status and output sample is checked. Results echo sequence, epoch
+and both timestamp records. Each valid lane advances its input and output
+sample origins by exactly 480; host times must increase when present. Flags
+must stay fixed. Epoch changes require a fresh worker.
+
+Explicit close destroys the engine and unloads the library before its ACK.
+The parent must close its request pipe, validate the ACK, response EOF and
+exit status zero. Missing close, truncated EOF, trailing data, malformed frames
+and foreign failures exit unsuccessfully. Foreign exception objects die before
+unload. `ParentWatch` checks the expected parent every 25 ms, including while
+foreign processing blocks. Parent loss uses `_exit(72)` and skips foreign
+teardown. This is an orphan containment mechanism, not a hard deadline.
+
+`aec_worker_test.py worker ownFixtureLibrary` runs only our independent dylib
+inside the deny-network sandbox. Tests cover a persistent 17-frame session,
+partial writes, exact output and timestamp echo, lifecycle trace, malformed
+requests, discontinuity, EOF/close errors, foreign exceptions, hash mismatch,
+unsandboxed rejection and parent loss during blocked foreign processing.
+Release and ASan/UBSan variants are supported. These tests use no hardware and
+execute no installed library.

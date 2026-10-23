@@ -336,7 +336,7 @@
         },
         {
           "key": "all_done_today",
-          "text": "All done for today ✅"
+          "text": "All done for today \u2705"
         }
       ],
       "original_evidence_ids": [
@@ -1046,7 +1046,7 @@
         },
         {
           "key": "bvc.active_tooltip_text",
-          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won\u2019t be heard."
         },
         {
           "key": "bvc.bvc_device_enforced_tooltip",
@@ -1448,10 +1448,46 @@
         {
           "path": "projects/krisp/app/native-model-probe/aec_doubletalk_probe_test.py",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_protocol.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_protocol_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_broker.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_broker.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_broker_fixture.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_broker_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_test.py",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/aec_worker_end_to_end_test.cpp",
+          "exists": true
         }
       ],
-      "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC, BVC and Noise Shield detection/feedback remain unimplemented.",
-      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md. Independent AEC foreign-ABI fixture checks separate forward/reference stream specifications, selected virtual slots, 100 synthetic duplex frames, finite-size admission and destruction before library unload, including thrown frame-call exceptions. It does not load vendor code or implement production AEC. Complete native-model-probe ./verify passed including AEC release/ASan/UBSan and existing TSan suites; log evidence/aec-fixture-verify-20261018.log SHA256 e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26. Direct installed AEC CPU capture completed with exact library/executable pre/post hashes, 600 successful calls for each of two fresh engines and verified REA cleanup. It accepted the tested 32 kHz mono forward and 48 kHz stereo reference frames. Last-second reference-on output RMS was nearly unchanged from zero-reference control, so useful echo suppression is not established. See aec-direct-runtime-findings.md; no production AEC integration or physical route. Ten-second broadband AEC CPU capture completed with 2000 successful calls per engine, exact before/after library and executable hashes and verified owned cleanup. Matching-reference output had 17.228 dB lower final-second RMS than zero-reference control for this synthetic echo-only signal. This supersedes the multitone result only for this stimulus; simultaneous near-end preservation, speech quality, real routing and production AEC remain unverified. See aec-broadband-runtime-findings.md. Four-engine synthetic double-talk experiment returned finite output with 2000 successful calls per engine and matching pre/post hashes, but REA cleanup ownership was unverified for an unrelated Chrome renderer, so this is a partial observation without a successful Evidence ID. Zero-reference isolated controls nearly sum to the zero-reference mixture. Matching-reference output does not establish independent noise preservation; projected near coefficient is about0.074 in finalsecond with high unexplained residual. This is synthetic noise, not speech. Do not integrate as proven speech-preserving AEC. See aec-doubletalk-runtime-findings.md. Locally synthesized speech with simultaneous synthetic echo completed a four-engine REA capture with verified owned cleanup and matching library/executable/input hashes. Active full-second projections onto processed near/echo controls give near coefficients0.760..0.875, echo0.0126..0.0183 and normalized residual0.350..0.452. This improves on noise-only preservation but does not prove transparent speech or real call quality. Explicit external near-input admission preserves exactfinite320000samples with initial3secondssilent and rejects observed file changes. See aec-speech-runtime-findings.md. The direct AEC48k mono forward/48k stereo reference gate passed with the same synthesized utterance convertedto48k andfourfreshcontrols. All2000calls/engine succeeded with finiteoutput andverifiedREAownedcleanup. Activewindownearprojection.788.. .866,echoprojection.0036.. .0170,normalizedresidual.363.. .433. This establishes testedratecompatibility forduplexworkerimplementation withoutresampling, notphysicalrouting ortransparentquality. See aec-48k-runtime-findings.md.",
+      "implementation": "Independent RNNoise microphone/stereo speaker processing and explicit installed outbound microphone/inbound speaker selection are connected to the desktop and host. Installed lanes use separate supervised workers. The installed speaker path averages stereo into one mono processor and duplicates output. Startup requires per-lane exact identities and callback buffering; errors stop the route without fallback. AEC now has an independent persistent worker and duplex broker, but no production route integration. BVC and Noise Shield detection/feedback remain unimplemented.",
+      "verified_scope": "Synthetic adapter tests verify microphone queue output, unchanged stereo processing, failure silence, concurrent stop and retained callback ownership. Desktop tests cover selected configuration, strict identity ACKs, stale validation and cancellation. Separate REA CPU probes verify installed NC processing. No actual installed-model CoreAudio route, end-to-end latency, quality or original parity pass has run. Exact inbound model direct processing has bounded mono evidence; the NC capture has unresolved REA cleanup. Static evidence binds the selected KMS stereo bridge to averaging into one mono state and duplicating its output. This does not establish the original desktop speaker topology. See inbound-model-findings.md and native-speaker-channel-findings.md. Dual-lane synthetic adapter tests cover stereo conversion, partition continuity, overflow silence, partial startup and both-worker stop. Parser fixtures cover speaker-only and dual configurations. Desktop tests cover per-role validation and acknowledgements. Installed speaker HAL routing and complete original stereo runtime comparison remain unverified. Complete REA dual-adapter CPU capture now verifies both installed workers concurrently: each processed 105 frames with clean teardown, mic matches direct outbound bytes and duplicated speaker matches direct inbound bytes after removing 2400 samples transport delay. This is one short synthetic run, not original stereo runtime, live routing or quality acceptance. See dual-installed-adapter-findings.md. Current 3.17.9 static desktop evidence binds the speaker inbound graph to default 48 kHz stereo Float32 and conditional inbound NC, with BVC/accent/pass-through branches separate. Native processor-factory join and effective overrides remain unresolved. AEC static evidence establishes paired forward/reverse state, separate frame specs, 10 ms blocks and direct library ABI; no AEC runtime result exists. See original-speaker-graph-findings.md and native-echo-contract-findings.md. Independent AEC foreign-ABI fixture checks separate forward/reference stream specifications, selected virtual slots, 100 synthetic duplex frames, finite-size admission and destruction before library unload, including thrown frame-call exceptions. It does not load vendor code or implement production AEC. Complete native-model-probe ./verify passed including AEC release/ASan/UBSan and existing TSan suites; log evidence/aec-fixture-verify-20261018.log SHA256 e938d9faae83810f9ad4261d4aa5edf184dc59f3627c62a8d082c2e6835ada26. Direct installed AEC CPU capture completed with exact library/executable pre/post hashes, 600 successful calls for each of two fresh engines and verified REA cleanup. It accepted the tested 32 kHz mono forward and 48 kHz stereo reference frames. Last-second reference-on output RMS was nearly unchanged from zero-reference control, so useful echo suppression is not established. See aec-direct-runtime-findings.md; no production AEC integration or physical route. Ten-second broadband AEC CPU capture completed with 2000 successful calls per engine, exact before/after library and executable hashes and verified owned cleanup. Matching-reference output had 17.228 dB lower final-second RMS than zero-reference control for this synthetic echo-only signal. This supersedes the multitone result only for this stimulus; simultaneous near-end preservation, speech quality, real routing and production AEC remain unverified. See aec-broadband-runtime-findings.md. Four-engine synthetic double-talk experiment returned finite output with 2000 successful calls per engine and matching pre/post hashes, but REA cleanup ownership was unverified for an unrelated Chrome renderer, so this is a partial observation without a successful Evidence ID. Zero-reference isolated controls nearly sum to the zero-reference mixture. Matching-reference output does not establish independent noise preservation; projected near coefficient is about0.074 in finalsecond with high unexplained residual. This is synthetic noise, not speech. Do not integrate as proven speech-preserving AEC. See aec-doubletalk-runtime-findings.md. Locally synthesized speech with simultaneous synthetic echo completed a four-engine REA capture with verified owned cleanup and matching library/executable/input hashes. Active full-second projections onto processed near/echo controls give near coefficients0.760..0.875, echo0.0126..0.0183 and normalized residual0.350..0.452. This improves on noise-only preservation but does not prove transparent speech or real call quality. Explicit external near-input admission preserves exactfinite320000samples with initial3secondssilent and rejects observed file changes. See aec-speech-runtime-findings.md. The direct AEC48k mono forward/48k stereo reference gate passed with the same synthesized utterance convertedto48k andfourfreshcontrols. All2000calls/engine succeeded with finiteoutput andverifiedREAownedcleanup. Activewindownearprojection.788.. .866,echoprojection.0036.. .0170,normalizedresidual.363.. .433. This establishes testedratecompatibility forduplexworkerimplementation withoutresampling, notphysicalrouting ortransparentquality. See aec-48k-runtime-findings.md. Independent persistent AEC worker and duplex protocol/broker pass focused release and ASan/UBSan own-fixture checks, including 37 end-to-end broker/worker/library frame pairs, timing continuity, fixed epochs, malformed streams, teardown acknowledgement and blocked parent-loss containment. This executes no installed library. Generic caller-supplied hashes are not fixed vendor/executable production admission; admitted launcher, worker vendor runtime, callback integration and live timing remain outstanding. Full native-model-probe ./verify passed; log evidence/aec-persistent-verify-20261023.log SHA256 92c2ae594ab71baf0a8941b5d884559b418acb7c3a16bffd8bc98e365da63dd1.",
       "missing_acceptance": "Validate real synthetic routed output and speech quality/latency; implement echo reference/delay path and compare independently. Do not confuse RNNoise with AEC or BVC. Define and validate local Noise Shield detection categories; no fabricated measured clarity or intensity."
     },
     {
@@ -1494,7 +1530,7 @@
         },
         {
           "key": "test_nc.recording_will_not_leave_device",
-          "text": "Your recording will never leave your device and won’t be saved."
+          "text": "Your recording will never leave your device and won\u2019t be saved."
         }
       ],
       "original_evidence_ids": [
@@ -2122,7 +2158,7 @@
       "representative_labels": [
         {
           "key": "about_copy_right_text",
-          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
+          "text": "\u00a9 {{date}} Krisp Technologies, Inc. All right reserved."
         },
         {
           "key": "app_menu_edit.title",
@@ -2248,7 +2284,7 @@
         },
         {
           "key": "pref_notifications_on_off_indicator_body",
-          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
+          "text": "Shows key features\u2019 states at the start of each meeting and reminds to inform other participants if recording"
         }
       ],
       "original_evidence_ids": [
@@ -2282,7 +2318,7 @@
       "representative_labels": [
         {
           "key": "cant_find_page_text",
-          "text": "Can’t find the page?"
+          "text": "Can\u2019t find the page?"
         },
         {
           "key": "check_internet",
@@ -2830,7 +2866,7 @@
     "projects/krisp/app/native-model-probe/abi_supplier.hpp": "dbbd7c0f8b26e854b66b1ea78cb75d8d54a4977b0c05a5a208001286fff3a3bb",
     "projects/krisp/app/native-model-probe/result_collector.hpp": "d2f12eacdbfd05d4a6e33dd67c82bdfc34be756b68cf7136fe3eb879ad44bcc9",
     "projects/krisp/app/native-model-probe/result_collector_test.cpp": "84c33fcceececca2d812133ebf83884ddc66c57112089120d79b750da0b10058",
-    "projects/krisp/app/native-model-probe/verify": "a3ac797868b6bbda29df8cacb784626e0e1756410603edbda29764dd1c8ad47f",
+    "projects/krisp/app/native-model-probe/verify": "6f0b427710285f1cec0a4445a604534dc771979e522a8b1b02ad95c6afbbb8f2",
     "projects/krisp/app/native-model-probe/abi_factory.hpp": "dd8154707024d253312f6542fe874a170fa7562691b30a3e7c34ec8e1a06964f",
     "projects/krisp/app/native-model-probe/build_probe": "c441582cee43a7e95c2b12f23046e6f5d2b354a8958fef41f491dbae46d694df",
     "projects/krisp/app/native-model-probe/fixture_client.cpp": "237e4b50acb757ba8d655e48d400f78d37fc2d67c6b2cfcd73a9b6db018989ea",
@@ -2886,12 +2922,21 @@
     "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RelaunchTests.swift": "a37726a9e31660c0cad166362070872e35d295ed8d55b6b3051687822c6bed9c",
     "projects/krisp/app/native-model-probe/aec_abi.hpp": "7290320f0d4a362df8033dc1d2673964c88dac8e7dcbe650617a75642be096d4",
-    "projects/krisp/app/native-model-probe/aec_fixture.cpp": "7e6419db1e376eaf27d3adaadee837ae6303a61fb7455bda5d6cec2cd3522a8d",
+    "projects/krisp/app/native-model-probe/aec_fixture.cpp": "3b4ed5bf615ac34e428f47b841b68d9a11ae47c75fc3efec1501b5ecf1f5c3a9",
     "projects/krisp/app/native-model-probe/aec_fixture_test.cpp": "ce8de52f80b1df679bf3495afcf9dcee22a2e900b9cdbf4d56055eac42705239",
     "projects/krisp/app/native-model-probe/aec_direct_probe.cpp": "2d03599693cc07a758a8e4ddd8bcdcdf42fcbbbcfc1ddd1d749c3d2acda7993c",
     "projects/krisp/app/native-model-probe/aec_direct_probe_test.py": "3b80e03f6dac4d6ccc8728bfb3a451f9b1582054d14e7013150c239f1b8ca150",
     "projects/krisp/app/native-model-probe/aec_doubletalk_probe.cpp": "dd12f812d0885032d92eedbd15392ee587d7925a4c75eda3b39b6815b0456e2f",
-    "projects/krisp/app/native-model-probe/aec_doubletalk_probe_test.py": "1f162fdd7fdbbad17c0b7329e739cf6880e05e0c1603d39035bb235dccd7360b"
+    "projects/krisp/app/native-model-probe/aec_doubletalk_probe_test.py": "1f162fdd7fdbbad17c0b7329e739cf6880e05e0c1603d39035bb235dccd7360b",
+    "projects/krisp/app/native-model-probe/aec_worker.cpp": "e8856290b5f44a955e843919e0cf4b566ae10d5571d60997321d18f2db403305",
+    "projects/krisp/app/native-model-probe/aec_worker_protocol.hpp": "5b7ddf1f023f104f70f7485a77783cfe68587e7da180414949f00a027e5104b4",
+    "projects/krisp/app/native-model-probe/aec_worker_protocol_test.cpp": "30e36ba2613d1b87a904505fe4a8c637ea31971dc7acd20ea59f6c933b79fd1c",
+    "projects/krisp/app/native-model-probe/aec_worker_broker.hpp": "be70c6100bfbf7c446d8868b72db8e1a3b5d4a0f1aae21220ff8fe43d1b4db55",
+    "projects/krisp/app/native-model-probe/aec_worker_broker.cpp": "fb807f7a4c304ae51e9c7b1c9d661977823ab8076d2a2db2285eb419379ef7d1",
+    "projects/krisp/app/native-model-probe/aec_worker_broker_fixture.cpp": "2811ba22271b327c088df0dd73385b552ad559fce6cbb0bf326652df94113726",
+    "projects/krisp/app/native-model-probe/aec_worker_broker_test.cpp": "489fcfd21b6a49aafbfe468738a1042c9d58b4d11c594a11ed7991c333dbe054",
+    "projects/krisp/app/native-model-probe/aec_worker_test.py": "998777d518e6da57a6e27c2142bce20a972d5fe2092706a250b165de6f100056",
+    "projects/krisp/app/native-model-probe/aec_worker_end_to_end_test.cpp": "3b9a62a80364790c95bc07ab37fc1355f8c8bcd7c620c6929549721992ddaf58"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

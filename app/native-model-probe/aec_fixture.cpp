@@ -6,7 +6,16 @@
 #include <cstdint>
 #include <exception>
 #include <stdexcept>
+#include <unistd.h>
 namespace {
+void trace(const char* event) {
+    if (const char* path = std::getenv("OPENKRISP_AEC_FIXTURE_TRACE")) {
+        auto* file = std::fopen(path, "ab");
+        if (!file) throw std::runtime_error("fixture trace failed");
+        std::fputs(event, file); std::fputc('\n', file); std::fclose(file);
+    }
+}
+struct Unload { ~Unload() { trace("unload"); } } unload;
 struct Spec { int rate; unsigned padding; std::size_t channels; std::size_t frames; };
 unsigned counts[5]{}; // created, destroyed, reference calls, forward calls, exceptions destroyed
 bool failFactory = false;
@@ -18,7 +27,7 @@ public:
 };
 class Engine {
 public:
-    virtual ~Engine() { ++counts[1]; }
+    virtual ~Engine() { ++counts[1]; trace("destroy"); }
     virtual int initialize() { return 0; }
     virtual void config() { throw std::logic_error("wrong slot"); }
     virtual void mute() { throw std::logic_error("wrong slot"); }
@@ -30,7 +39,8 @@ public:
         if ((in.rate != 32000 && in.rate != 48000) || in.channels != 1 || in.frames != static_cast<std::size_t>(in.rate / 100) || in.padding ||
             out.rate != in.rate || out.channels != in.channels || out.frames != in.frames ||
             out.padding || !referenceSeen_) throw std::runtime_error("forward ABI/config/order");
-        ++counts[3];
+        if (std::getenv("OPENKRISP_AEC_FIXTURE_BLOCK_FORWARD")) for (;;) ::pause();
+        ++counts[3]; trace("forward"); referenceSeen_ = false;
         for (std::size_t i = 0; i < in.frames; ++i) output[i] = input[i] - reference_;
         return 0;
     }
@@ -40,7 +50,7 @@ public:
         if (throwStage == 1) throw FactoryError();
         if (spec.rate != 48000 || spec.channels != 2 || spec.frames != 480 || spec.padding)
             throw std::runtime_error("reference ABI/config");
-        ++counts[2];
+        ++counts[2]; trace("reverse");
         reference_ = (input[0] + input[1]) / 2;
         referenceSeen_ = true;
         return 0;
@@ -56,7 +66,7 @@ extern "C" void synthetic_aec_fail(bool value) { failFactory = value; }
 extern "C" unsigned synthetic_aec_count(unsigned index) { return index < 5 ? counts[index] : 999; }
 extern "C" Engine* synthetic_aec_create() {
     if (failFactory) throw FactoryError();
-    ++counts[0];
+    ++counts[0]; trace("create");
     return new Engine;
 }
 
