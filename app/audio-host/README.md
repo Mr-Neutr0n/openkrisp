@@ -226,3 +226,32 @@ does not prove Krisp's microphone processing order. Synthetic tests compare the
 chain against explicit sequential AEC and NC, including the leading zeros that
 advance NC state. Installed-model quality and physical timing need separate
 acceptance.
+
+
+### Offline installed-chain comparison
+
+`aec-microphone-chain-probe` compares the actual installed AEC-to-NC chain with
+an independent NC worker fed a retained direct-AEC output. Its positional
+arguments are `aecWorker aecWorkerSHA aecLibrary node nodeSHA ncWorker addon
+model adapter adapterSHA libraryDir microphoneF32 referenceStereoF32
+directAECF32 newOutputDirectory maximumCallbackFrames`. Run installed-component
+experiments only through a declared REA process capture.
+
+The probe requires 480000 finite mono microphone samples, 960000 stereo
+reference values and 480000 direct-AEC oracle samples at 48 kHz. Callback bounds
+are 480 or 4096, with two scheduling-budget frames per stage. The real chain
+receives microphone/reference input, padded by the combined delay. A fresh
+standalone NC broker receives only the AEC startup zeros and the oracle. The
+comparison removes both transport delays from the chain and only the AEC prefix
+from the synchronous NC baseline.
+
+Processed-frame handshakes occur outside callbacks. This checks functional
+sequence, not real-time scheduling. Publication requires clean worker stops and
+unchanged input identities. Exact output differences produce retained outputs,
+`comparisonEqual: false` and exit code 2. Invalid inputs, processing failures or
+unclean teardown do not publish sample output. The directory is created through
+exclusive staging publication and never overwrites an existing destination.
+
+The stateful own NC fixture and an independent scalar calculation test startup
+warmup. Changing only the oracle must leave chain output unchanged while
+reporting a mismatch. These tests execute no installed component.

@@ -78,4 +78,9 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-route-') as temporary:
         subprocess.run([*common, '-fblocks', *flags, '-I../noise-engine/vendor/rnnoise/include', 'aec_microphone_chain_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), str(probe / 'worker_broker.cpp'), rnnoise, '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(chain)], check=True)
         node = str(Path(shutil.which('node')).resolve())
         subprocess.run([str(chain), str(worker), str(fixture), digest, node, str(probe / 'worker_broker_fixture.cjs')], check=True, timeout=120)
+        if name == 'release':
+            subprocess.run([*common, '-fblocks', *flags, '-I../noise-engine/vendor/rnnoise/include', 'aec_microphone_chain_probe.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), str(probe / 'worker_broker.cpp'), rnnoise, '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(root / 'build/aec-microphone-chain-probe')], check=True)
+        comparison = root / 'build' / ('aec-chain-probe-test-' + name)
+        subprocess.run([*common, '-fblocks', *flags, '-I../noise-engine/vendor/rnnoise/include', 'aec_microphone_chain_probe_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), str(probe / 'worker_broker.cpp'), rnnoise, '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(comparison)], check=True)
+        subprocess.run([str(comparison), str(worker), str(fixture), digest, node, str(root / 'aec_microphone_chain_probe_fixture.cjs')], check=True, timeout=120)
 PY
