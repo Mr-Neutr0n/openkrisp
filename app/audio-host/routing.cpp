@@ -77,9 +77,14 @@ void require(OSStatus status, const char *operation) {
         throw std::runtime_error(std::string(operation) + " OSStatus=" + std::to_string(status));
 }
 } // namespace
-Context::Context(Layout value, Processor process, void *data, std::shared_ptr<void> owner)
+Context::Context(Layout value, Processor process, void *data, std::shared_ptr<void> owner,
+                 DuplexBinding duplexBinding, bool microphoneStageDisabled)
     : layout(std::move(value)), processor(process), processorData(data),
-      processorOwner(std::move(owner)) {
+      processorOwner(std::move(owner)), duplex(std::move(duplexBinding)) {
+    if (duplex.processor && !microphoneStageDisabled)
+        throw std::invalid_argument("Duplex AEC requires the microphone processing stage disabled");
+    if (!duplex.processor && (duplex.data || duplex.owner))
+        throw std::invalid_argument("Duplex binding has no processor");
     if (!layout.currentCallbackFrames || layout.currentCallbackFrames > layout.maximumCallbackFrames ||
         !layout.maximumCallbackFrames || layout.maximumCallbackFrames > callbackLimit)
         throw std::invalid_argument("Invalid callback frame bounds");
@@ -157,6 +162,42 @@ OSStatus Context::io(AudioObjectID, const AudioTimeStamp *, const AudioBufferLis
         return noErr;
     }
     const auto controls = c.controls.load();
+    if (c.duplex.processor) {
+        for (UInt32 f = 0; f < frames * 2; ++f)
+            c.finalPlayback[f] = controlledSample(c.processedMonitor[f], controls.speaker);
+        // This is the playback commit point. A stop/change observed here keeps
+        // both playback and reference silent by avoiding the hook entirely.
+        // A later stop/change affects the next callback. Never revise playback
+        // after the hook may have published its paired reference samples.
+        if (!c.enabled.load(std::memory_order_acquire) || c.changed.load(std::memory_order_acquire))
+            return noErr;
+        DuplexBlock block;
+        block.rawMicrophone = c.microphone.data(); block.finalPlayback = c.finalPlayback.data();
+        block.count = frames; block.epoch = c.duplex.epoch;
+        block.microphoneTiming = {inputTime->mSampleTime, outputTime->mSampleTime,
+            inputTime->mHostTime, true, bool(inputTime->mFlags & kAudioTimeStampHostTimeValid)};
+        block.referenceTiming = {inputTime->mSampleTime, outputTime->mSampleTime,
+            outputTime->mHostTime, true, bool(outputTime->mFlags & kAudioTimeStampHostTimeValid)};
+        bool success = c.duplex.processor(c.duplex.data, block, c.processedMicrophone.data());
+        if (success)
+            for (UInt32 f = 0; f < frames; ++f)
+                if (!std::isfinite(c.processedMicrophone[f])) { success = false; break; }
+        if (!success) {
+            std::fill_n(c.processedMicrophone.data(), frames, 0.0f);
+            c.recording->fail(Recording::Failure::route_changed);
+            c.changed.store(true, std::memory_order_release);
+        }
+        for (UInt32 f = 0; f < frames; ++f) {
+            put(output, c.layout.feedChannel, f,
+                controlledSample(c.processedMicrophone[f], controls.microphone));
+            put(output, c.layout.hardwareLeft, f, c.finalPlayback[2 * f]);
+            put(output, c.layout.hardwareRight, f, c.finalPlayback[2 * f + 1]);
+        }
+        if (success && c.enabled.load(std::memory_order_acquire) && !c.changed.load(std::memory_order_acquire))
+            c.recording->capture(c.processedMicrophone.data(), c.processedMonitor.data(), frames,
+                outputTime->mSampleTime, controls, recordingGeneration, inputTime->mSampleTime);
+        return noErr;
+    }
     for (UInt32 f = 0; f < frames; ++f) {
         put(output, c.layout.feedChannel, f,
             controlledSample(c.processedMicrophone[f], controls.microphone));
@@ -218,11 +259,16 @@ bool Session::start(const Selection &selection, Processor processor, void *proce
             throw std::runtime_error("Aggregate changed during preparation");
         if (factory) {
             auto binding = factory(context_->layout);
-            if (!binding.processor)
+            if (!binding.processor && !binding.duplex.processor)
                 throw std::runtime_error("Processor factory returned no processor");
+            if (binding.duplex.processor && !binding.microphoneStageDisabled)
+                throw std::runtime_error("Duplex AEC requires the microphone processing stage disabled");
+            if (!binding.duplex.processor && (binding.duplex.data || binding.duplex.owner))
+                throw std::runtime_error("Duplex binding has no processor");
             context_->processor = binding.processor;
             context_->processorData = binding.data;
             context_->processorOwner = std::move(binding.owner);
+            context_->duplex = std::move(binding.duplex);
             // Factory startup may take seconds. Revalidate after that wait and
             // before registering any IOProc capable of invoking the processor.
             if (context_->layout != backend_.inspect(aggregate_, selection) || context_->changed.load())

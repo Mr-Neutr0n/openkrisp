@@ -23,10 +23,38 @@ struct Layout {
     bool operator==(const Layout &) const = default;
 };
 using Processor = bool (*)(void *, const float *, const float *, float *, float *, UInt32) noexcept;
+// Both input origins identify this aggregate input callback. For reference,
+// this is not the historical speaker source position before DSP/queue delay.
+// Output origins identify scheduled final playback/feed. Microphone hostTime
+// observes inputTime; reference hostTime observes outputTime. No acoustic clock
+// alignment or conversion is inferred by pairing these callbacks.
+struct DuplexLaneTiming {
+    double inputSampleOrigin = 0, outputSampleOrigin = 0;
+    std::uint64_t hostTime = 0;
+    bool sampleOriginsValid = false, hostTimeValid = false;
+};
+struct DuplexBlock {
+    const float *rawMicrophone = nullptr, *finalPlayback = nullptr;
+    UInt32 count = 0;
+    std::uint64_t epoch = 0;
+    DuplexLaneTiming microphoneTiming{}, referenceTiming{};
+};
+// Callback only. No allocation, IPC, waits or native calls. Reference is already
+// committed for this callback. false may follow input publication: the route
+// silences microphone only and ends the route after this callback's playback.
+using DuplexProcessor = bool (*)(void *, const DuplexBlock &, float *) noexcept;
+struct DuplexBinding {
+    DuplexProcessor processor = nullptr;
+    void *data = nullptr;
+    std::shared_ptr<void> owner;
+    std::uint64_t epoch = 0; // Fresh owner/epoch for each route; never reuse a live epoch after discontinuity.
+};
 struct ProcessorBinding {
     Processor processor = nullptr;
     void *data = nullptr;
     std::shared_ptr<void> owner;
+    bool microphoneStageDisabled = false; // Required declaration for initial duplex AEC.
+    DuplexBinding duplex{};
 };
 // Runs on the Session control thread after validated aggregate inspection and
 // listener installation. Returned ownership follows Context through HAL teardown.
@@ -36,16 +64,18 @@ struct Context {
     Processor processor = nullptr;
     void *processorData = nullptr;
     std::shared_ptr<void> processorOwner;
+    DuplexBinding duplex;
     AtomicControls controls;
     const std::shared_ptr<Recording> recording = std::make_shared<Recording>();
     std::atomic<bool> enabled{false}, changed{false};
     std::atomic<UInt32> callbacks{0};
     std::array<float, callbackLimit> microphone{}, processedMicrophone{};
-    std::array<float, callbackLimit * 2> monitor{}, processedMonitor{};
+    std::array<float, callbackLimit * 2> monitor{}, processedMonitor{}, finalPlayback{};
     // One aggregate IOProc is serialized by its backend. Try-once rejects unexpected reentry.
     std::atomic_flag rendering = ATOMIC_FLAG_INIT;
     explicit Context(Layout value, Processor process = nullptr, void *data = nullptr,
-                     std::shared_ptr<void> owner = {});
+                     std::shared_ptr<void> owner = {}, DuplexBinding duplexBinding = {},
+                     bool microphoneStageDisabled = false);
     static OSStatus io(AudioObjectID, const AudioTimeStamp *, const AudioBufferList *,
                        const AudioTimeStamp *, AudioBufferList *, const AudioTimeStamp *,
                        void *) noexcept;

@@ -341,3 +341,26 @@ partitions, output metadata, stalled/burst workers, tampered responses and 5000
 concurrent queue wraps. Tiny callbacks run beyond startup delay and produce
 actual results. These checks exercise the independent implementation, not
 installed-library scheduling or final hardware playback-reference equality.
+
+
+### Paced duplex probe
+
+`aec_duplex_paced_probe.cpp` accepts worker path/hash, installed library path,
+480000-sample microphone input, 960000-value stereo reference input, a new output
+directory, callback bound and scheduling budget. Bounds are 480, 512 or 4096.
+The production entry uses the fixed-library launch builder. The separate fixture
+entry supplies only the independently built library for tests.
+
+Callbacks use steady-clock deadlines derived from sample position at 48 kHz.
+They do not wait for processed-frame counters. Zero input/reference extends the
+stream by the transport's fixed delay so all original 480000 output samples can
+be collected. `paced-output.f32le` retains initial silence; compare its suffix
+after `delaySamples` with the direct baseline. This flushes transport buffering,
+not an independently established AEC acoustic tail.
+
+Metadata reports callback lateness, exchange-only duration, counts, delay and
+clean shutdown. `totalPacedMs` ends after the last callback returns; it is not
+physical playback duration. Failure diagnostics identify callback, sample
+position and transport fault. Successful files publish only after clean stop and
+input identity checks, using the existing exclusive publication helper. No
+CoreAudio device runs, and host scheduling remains uncontrolled.

@@ -177,3 +177,10 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-aec-worker-") as build:
             subprocess.run([thread_transport], check=True, timeout=60)
             subprocess.run([*thread_common, str(root / "aec_duplex_worker_test.cpp"), str(root / "aec_worker_broker.cpp"), "-o", thread_owner], check=True)
             subprocess.run([thread_owner, worker, library, digest, fixture], check=True, timeout=60)
+        paced = str(Path(build) / (name + "-aec-paced-fixture"))
+        paced_production = str(Path(build) / (name + "-aec-paced-probe"))
+        subprocess.run([*common, str(root / "aec_duplex_paced_fixture.cpp"), str(root / "aec_worker_broker.cpp"), "-o", paced], check=True)
+        subprocess.run([*common, str(root / "aec_duplex_paced_probe.cpp"), str(root / "aec_worker_broker.cpp"), "-o", paced_production], check=True)
+        paced_cases = [("480", "2"), ("4096", "2")] if name == "release" else [("512", "4")]
+        for maximum, budget in paced_cases:
+            subprocess.run(["python3", str(root / "aec_duplex_paced_test.py"), paced, worker, library, maximum, budget], check=True, timeout=60)

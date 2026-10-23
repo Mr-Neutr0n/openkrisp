@@ -604,9 +604,129 @@ void noise() {
                 assert(std::isfinite(value));
     }
 }
+
+struct DuplexTrace {
+    Context *context = nullptr;
+    std::array<float, callbackLimit * 2> reference{};
+    std::array<float, callbackLimit> microphone{};
+    DuplexLaneTiming microphoneTiming{}, referenceTiming{};
+    std::uint64_t epoch = 0;
+    UInt32 frames = 0, calls = 0;
+    unsigned mode = 0;
+    float previousLeft = 0, previousRight = 0;
+    bool changeBeforeCommit = false, blockHook = false;
+    std::atomic<bool> entered{false}, release{false};
+    static bool speaker(void *value, const float *mic, const float *monitor,
+                        float *outMic, float *outSpeaker, UInt32 count) noexcept {
+        auto &state = *static_cast<DuplexTrace *>(value);
+        for (UInt32 i = 0; i < count; ++i) {
+            // Synthetic one-sample speaker delay and gain. The microphone
+            // sentinel verifies the duplex hook receives raw input instead.
+            outMic[i] = mic[i] + 100;
+            outSpeaker[2*i] = state.previousLeft;
+            outSpeaker[2*i+1] = state.previousRight;
+            state.previousLeft = monitor[2*i] * 2;
+            state.previousRight = monitor[2*i+1] * 2;
+        }
+        if (state.changeBeforeCommit) state.context->changed.store(true);
+        return true;
+    }
+    static bool process(void *value, const DuplexBlock &block, float *output) noexcept {
+        auto &state = *static_cast<DuplexTrace *>(value);
+        ++state.calls; state.frames = block.count; state.epoch = block.epoch;
+        state.microphoneTiming = block.microphoneTiming; state.referenceTiming = block.referenceTiming;
+        std::copy_n(block.finalPlayback, block.count*2, state.reference.data());
+        std::copy_n(block.rawMicrophone, block.count, state.microphone.data());
+        for (UInt32 i = 0; i < block.count; ++i) output[i] = block.rawMicrophone[i] * .5f;
+        // Only this injected test hook pauses. The production hook contract
+        // prohibits waiting. This forces a stop after the playback commit.
+        if (state.blockHook) {
+            state.entered.store(true);
+            while (!state.release.load()) std::this_thread::yield();
+        }
+        if (state.mode == 1) state.context->enabled.store(false);
+        if (state.mode == 2) state.context->changed.store(true);
+        if (state.mode == 4) output[block.count-1] = NAN;
+        return state.mode != 3;
+    }
+};
+void duplexSamples() {
+    for (UInt32 frames : {1u,479u,480u,481u,512u,4096u}) for (bool muted : {false,true}) {
+        DuplexTrace trace;
+        Context c(layout(),DuplexTrace::speaker,&trace,{},
+                  {DuplexTrace::process,&trace,{},71},true);
+        trace.context=&c; c.enabled=true;
+        assert(c.controls.publish({{.5f,false},{.25f,muted}}));
+        for (unsigned turn=0;turn<3;++turn) {
+            Cycle cycle(c.layout,frames);
+            cycle.inputTime.mSampleTime=100.25+turn*frames;
+            cycle.outputTime.mSampleTime=700.75+turn*frames;
+            cycle.inputTime.mHostTime=12345+turn;
+            cycle.outputTime.mHostTime=54321+turn;
+            cycle.inputTime.mFlags |= kAudioTimeStampHostTimeValid;
+            if(turn!=1)cycle.outputTime.mFlags |= kAudioTimeStampHostTimeValid;
+            for(UInt32 i=0;i<frames;++i){cycle.in[0][2*i]=float(i+turn+1)/64;cycle.in[0][2*i+1]=-float(i+turn+2)/128;cycle.in[1][i]=float(i+turn+3)/32;}
+            const float priorLeft=trace.previousLeft,priorRight=trace.previousRight;
+            assert(cycle.run(&c)==noErr && trace.calls==turn+1 && trace.frames==frames && trace.epoch==71);
+            assert(std::memcmp(trace.reference.data(),cycle.out[1].data(),frames*2*sizeof(float))==0);
+            for(UInt32 i=0;i<frames;++i) {
+                assert(trace.microphone[i]==cycle.in[1][i]);assert(cycle.out[0][i]==cycle.in[1][i]*.25f);
+                const auto expectedLeft=muted?0:(i?cycle.in[0][2*(i-1)]*2:priorLeft)*.25f;
+                const auto expectedRight=muted?0:(i?cycle.in[0][2*(i-1)+1]*2:priorRight)*.25f;
+                assert(cycle.out[1][2*i]==expectedLeft && cycle.out[1][2*i+1]==expectedRight);
+            }
+            assert(trace.microphoneTiming.inputSampleOrigin==cycle.inputTime.mSampleTime);
+            assert(trace.microphoneTiming.outputSampleOrigin==cycle.outputTime.mSampleTime);
+            assert(trace.referenceTiming.inputSampleOrigin==cycle.inputTime.mSampleTime);
+            assert(trace.referenceTiming.outputSampleOrigin==cycle.outputTime.mSampleTime);
+            assert(trace.microphoneTiming.sampleOriginsValid && trace.referenceTiming.sampleOriginsValid);
+            assert(trace.microphoneTiming.hostTime==12345+turn && trace.microphoneTiming.hostTimeValid);
+            assert(trace.referenceTiming.hostTime==54321+turn && trace.referenceTiming.hostTimeValid==(turn!=1));
+        }
+    }
+    // Stop/change after the hook begins affects the following callback. Even a
+    // failed hook may have accepted reference, so current playback is retained.
+    for(unsigned mode:{1u,2u,3u,4u}) {
+        DuplexTrace trace;trace.mode=mode;
+        Context c(layout(),nullptr,nullptr,{}, {DuplexTrace::process,&trace,{},12},true);
+        trace.context=&c;c.enabled=true;Cycle cycle(c.layout,480);
+        for(auto &buffer:cycle.in)for(float &value:buffer)value=.5f;
+        assert(cycle.run(&c)==noErr && trace.calls==1);
+        assert(std::memcmp(trace.reference.data(),cycle.out[1].data(),480*2*sizeof(float))==0);
+        for(UInt32 i=0;i<480;++i){assert(cycle.out[1][2*i]==.5f && cycle.out[1][2*i+1]==.5f);assert(cycle.out[0][i]==(mode<3?.25f:0));}
+        if(mode>=3)assert(c.changed.load());
+        Cycle next(c.layout,480);assert(next.run(&c)==noErr && next.zero() && trace.calls==1);
+    }
+    {DuplexTrace trace;trace.changeBeforeCommit=true;Context c(layout(),DuplexTrace::speaker,&trace,{}, {DuplexTrace::process,&trace,{},1},true);trace.context=&c;c.enabled=true;Cycle cycle(c.layout,480);assert(cycle.run(&c)==noErr && cycle.zero() && trace.calls==0);}
+    bool rejected=false;try{DuplexTrace trace;Context c(layout(),nullptr,nullptr,{}, {DuplexTrace::process,&trace,{},1});}catch(const std::invalid_argument &){rejected=true;}assert(rejected);
+    {Fake backend;Session session(backend);assert(!session.start({"input","output"},nullptr,nullptr,{}, {},[](const Layout &){ProcessorBinding binding;binding.duplex.processor=DuplexTrace::process;return binding;}));assert(session.error().find("microphone processing stage disabled")!=std::string::npos && !backend.aggregate);}
+}
+void duplexOwnership() {
+    for(const std::string failure:{"stop","unregister","unwatch","destroy"}) {
+        Fake backend;Session session(backend);std::weak_ptr<DuplexTrace> weak;
+        assert(session.start({"input","output"},nullptr,nullptr,{}, {},[&](const Layout &){auto state=std::make_shared<DuplexTrace>();weak=state;ProcessorBinding binding;binding.microphoneStageDisabled=true;binding.duplex={DuplexTrace::process,state.get(),state,42};return binding;}));
+        backend.fail=failure;assert(!session.stop() && !weak.expired());
+        backend.fail.clear();assert(session.stop() && weak.expired());
+    }
+    Fake backend;Session session(backend);std::weak_ptr<DuplexTrace> weak;
+    assert(session.start({"input","output"},nullptr,nullptr,{}, {},[&](const Layout &){auto state=std::make_shared<DuplexTrace>();state->blockHook=true;weak=state;ProcessorBinding binding;binding.microphoneStageDisabled=true;binding.duplex={DuplexTrace::process,state.get(),state,42};return binding;}));
+    auto state=weak.lock();state->context=backend.context;
+    Cycle cycle(backend.context->layout,480);for(auto &buffer:cycle.in)for(auto &value:buffer)value=.75f;
+    std::thread callback([&]{assert(cycle.run(backend.context)==noErr);});
+    while(!state->entered.load())std::this_thread::yield();
+    backend.fail="stop";assert(!session.stop() && !weak.expired());
+    state->release.store(true);callback.join();
+    assert(std::memcmp(state->reference.data(),cycle.out[1].data(),480*2*sizeof(float))==0);
+    Cycle next(backend.context->layout,480);assert(next.run(backend.context)==noErr && next.zero() && state->calls==1);
+    auto queued=backend.owner;
+    state.reset();backend.fail.clear();assert(session.stop() && !weak.expired());
+    assert(next.run(queued.get())==noErr && next.zero());queued.reset();assert(weak.expired());
+}
 } // namespace
 int main() {
     samples();
+    duplexSamples();
+    duplexOwnership();
     callbackRecording();
     recordingPausedCallback();
     failures();

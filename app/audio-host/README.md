@@ -156,3 +156,25 @@ clang++ -mmacosx-version-min=12.0 -std=c++20 -ffp-contract=off -pthread \
 Compilation does not load vendor code. The positional arguments are `node runtimeDir addon outboundModel inboundModel library adapterSHA workerSHA sessionSHA protocolSHA newOutputDir`. Node and both model roles have fixed reviewed pins. The four supplied hashes bind the already reviewed packaged adapter and scripts. Runtime execution belongs in an explicit REA process capture. The production builder applies network denial to each child and requires its EPERM gate before loading.
 
 The probe generates the known one-second mono fixture and alternates its doubled value between left and right monitor channels. Their Float32 average is exactly the mono fixture. It uses a 512-sample callback bound and two-frame scheduling budget, pads by the derived 2400-sample delay, then requires both 105-frame counts and clean worker stops before publishing exclusive mode-0600 files in a new mode-0700 directory. Output contains the aligned first 48,000 samples per lane. It validates finite output, silent initial buffering and identical speaker channels. Before/after hashes do not atomically bind loaded images. Results and timing limits are in `../../dual-installed-adapter-findings.md`.
+
+
+### Optional duplex reference hook
+
+`ProcessorBinding` can carry a `DuplexBinding` after the existing speaker stage.
+The factory must explicitly declare `microphoneStageDisabled`; the initial hook
+uses raw microphone input and does not chain microphone NC. The hook is not yet
+connected to the CLI or desktop. Existing bindings follow the original path.
+
+The route computes final playback after speaker processing and gain/mute into
+preallocated storage. One final enabled/changed check commits the callback before
+the hook receives that exact stereo reference. Later shutdown or hook failure
+cannot revise this callback's playback. Failure silences its microphone and
+ends subsequent callbacks. This preserves the reference even when a hook returns
+false after publishing part of its input. The next callback stays silent.
+
+Sample origins describe the aggregate callback input and scheduled output. A
+reference input origin is not historical capture time before speaker buffering.
+Host-time validity remains explicit. The hook owner stays with Context through
+failed HAL cleanup and queued callbacks. Synthetic tests verify byte equality,
+clock fields, gain/mute, speaker delay, failure/stop races and retained ownership.
+Actual AEC binding, physical timing and live playback remain pending.
