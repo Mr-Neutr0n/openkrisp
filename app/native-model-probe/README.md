@@ -235,3 +235,37 @@ requests, discontinuity, EOF/close errors, foreign exceptions, hash mismatch,
 unsandboxed rejection and parent loss during blocked foreign processing.
 Release and ASan/UBSan variants are supported. These tests use no hardware and
 execute no installed library.
+
+### Bounded supervised AEC runtime probe
+
+`aec_worker_runtime_probe.cpp` uses the fixed-vendor launch builder and real
+broker. Its arguments are `worker workerSHA256 library microphone.f32le
+reference.f32le newOutputDirectory`. Inputs must be absolute regular files
+with exactly 480000 mono microphone and 960000 stereo reference Float32
+little-endian values. The harness checks all values before launching and
+rechecks file identity, size and timestamps after processing and before
+publication. Input files and the output parent must remain private and stable;
+these checks do not lock out concurrent writers.
+
+The probe submits 1000 paired blocks under one epoch, with synthetic contiguous
+48 kHz sample origins. It does not claim these are captured hardware timestamps.
+Every broker result must succeed, and clean close must validate teardown ACK,
+response EOF and child exit before any output is published. A held private
+staging-directory descriptor anchors file creation, identity checks and failure
+cleanup. An exclusive directory rename publishes `worker-output.f32le` and
+`metadata.json` together. Existing destinations are refused. Files are mode
+0600 and the output directory is mode 0700.
+
+Stdout repeats the metadata JSON. It reports dimensions, teardown, unpaced
+execution, startup/processing/shutdown milliseconds and request latency p50,
+p95, p99 and maximum in microseconds. Request timing includes IPC and broker
+work. Startup includes input admission. Total time stops after worker shutdown
+and excludes publication. Quantiles use the nearest rank from 1000 sorted
+observations. These are CPU experiment timings, not live callback deadlines.
+
+`aec_worker_runtime_fixture.cpp` is an own-only test entry into the shared
+`aec_worker_runtime.hpp` core. It cannot change production admission. Its
+integration tests use the actual worker with our separately hashed dylib and
+check exact samples, metadata, permissions, collision preservation, invalid
+inputs, observed input mutation, foreign failure and failed close. Installed
+library execution remains a separate reviewed experiment.

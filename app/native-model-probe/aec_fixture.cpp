@@ -15,7 +15,7 @@ void trace(const char* event) {
         std::fputs(event, file); std::fputc('\n', file); std::fclose(file);
     }
 }
-struct Unload { ~Unload() { trace("unload"); } } unload;
+struct Unload { ~Unload() { trace("unload"); if(std::getenv("OPENKRISP_AEC_FIXTURE_UNLOAD_EXIT"))::_exit(71); } } unload;
 struct Spec { int rate; unsigned padding; std::size_t channels; std::size_t frames; };
 unsigned counts[5]{}; // created, destroyed, reference calls, forward calls, exceptions destroyed
 bool failFactory = false;
