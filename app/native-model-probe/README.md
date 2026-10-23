@@ -269,3 +269,75 @@ integration tests use the actual worker with our separately hashed dylib and
 check exact samples, metadata, permissions, collision preservation, invalid
 inputs, observed input mutation, foreign failure and failed close. Installed
 library execution remains a separate reviewed experiment.
+
+### Duplex AEC owner
+
+`aec_duplex_worker.hpp` owns the paired callback transport and a broker thread.
+The control thread calls `create` with an admitted `AECWorkerLaunchConfig` and
+validated buffering bounds. Creation waits for readiness before returning an
+owner. The broker is constructed, started, serviced, used, closed and destroyed
+on that one thread. Deadline values are bounded before calculating the startup
+wait. Scheduling can still delay readiness and join; these are not hard real-time
+limits.
+
+One serialized callback calls `exchange` with the microphone block, committed
+stereo playback reference and their observed timestamp records. Optional output
+metadata carries delayed frame identity and the first sample's callback anchor.
+An integer sample offset is not a host-clock conversion. Exchange only uses
+fixed storage and atomics through `AECDuplexTransport`; it performs no pipe I/O,
+foreign calls, allocation or waits. Invalid input, missing scheduled output or
+worker failure latches a fault and silences supported output sizes.
+
+Only the control thread may stop or release the owner. Stop disables exchange
+and joins the broker thread through its bounded operations. Repeated stop
+preserves the shutdown result. Keep a strong owner until callback removal and
+drain succeed, including cleanup failure. Stop does not free callback-visible
+storage, so a retained disabled callback can fail safely after workers stop.
+Actual route binding and callback-removal integration remain separate work.
+
+`aec_duplex_worker_test.cpp` runs the real own worker and own dylib with explicit
+processed-frame handshakes outside exchange. It checks 480, 512 and 4096 callback
+bounds, mixed block sizes, delayed samples, timestamp/provenance spans, readiness
+failure, malformed responses, process/close failures, repeated stop and stop
+during confirmed blocked foreign processing. Release, ASan/UBSan and TSan owner
+builds test lifetime and concurrency. These handshakes do not measure production
+scheduling or establish a live latency budget.
+
+
+### Paired callback transport
+
+`aec_duplex_transport.hpp` uses two fixed queues of 32 entries. One serialized
+callback produces paired microphone/reference frames and consumes microphone
+results. One broker thread consumes requests and returns one result at a time.
+Each model frame contains 480 microphone samples and 960 interleaved reference
+values. Partial frames span callbacks without padding. Neither queue retains
+caller buffers.
+
+The callback validates all finite samples, epoch and lane sample-clock continuity
+before publishing any frame. It rejects sample-origin increments that lose the
+required double precision and model-frame origins that cannot advance by exactly
+480. Each lane keeps distinct input/output origins. A discontinuity terminates
+the session; do not reset a live transport.
+
+Wire host-time validity stays false. Local provenance records the callback anchor
+containing the first sample of each model frame plus its integer sample offset.
+A frame may span later callbacks; its first anchor does not describe their host
+times. Optional output metadata uses at most ten spans to associate delayed
+samples with frame identity, original lane origins and first-sample provenance.
+Initial silence has no spans, and a failed block clears all spans.
+
+Startup delay is fixed by `(ceil((maximumCallbackFrames + 479) / 480) +
+schedulingBudgetFrames) * 480` samples. Bounds are 1..4096 callback frames and a
+delay below queue capacity. Tests cover budgets two and four. Default test
+configuration 4096/four gives 6720 samples, or 140 ms at 48 kHz. This is not a
+validated product latency. The transport never skips or repeats frames or changes
+its delay to hide late processing. A missing scheduled result silences the whole
+supported callback block and latches a terminal fault. Unsupported oversized
+buffers remain the caller's responsibility to silence.
+
+Tests use exact expected microphone/stereo reference sequences, ordinary and
+aligned C++ allocation guards around exchange, one-sample and irregular callback
+partitions, output metadata, stalled/burst workers, tampered responses and 5000
+concurrent queue wraps. Tiny callbacks run beyond startup delay and produce
+actual results. These checks exercise the independent implementation, not
+installed-library scheduling or final hardware playback-reference equality.

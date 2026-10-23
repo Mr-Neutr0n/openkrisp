@@ -163,3 +163,17 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-aec-worker-") as build:
         subprocess.run([*common, str(root / "aec_worker_runtime_fixture.cpp"), str(root / "aec_worker_broker.cpp"), "-o", runtime], check=True)
         subprocess.run([*common, str(root / "aec_worker_runtime_probe.cpp"), str(root / "aec_worker_broker.cpp"), "-o", production], check=True)
         subprocess.run(["python3", str(root / "aec_worker_runtime_test.py"), runtime, worker, library], check=True, timeout=60)
+        transport = str(Path(build) / (name + "-aec-duplex-transport"))
+        owner = str(Path(build) / (name + "-aec-duplex-owner"))
+        subprocess.run([*common, str(root / "aec_duplex_transport_test.cpp"), "-o", transport], check=True)
+        subprocess.run([transport], check=True, timeout=60)
+        subprocess.run([*common, str(root / "aec_duplex_worker_test.cpp"), str(root / "aec_worker_broker.cpp"), "-o", owner], check=True)
+        subprocess.run([owner, worker, library, digest, fixture], check=True, timeout=60)
+        if name == "release":
+            thread_common = ["clang++", "-std=c++20", "-arch", "arm64", "-Wall", "-Wextra", "-Werror", "-pedantic", "-pthread", "-O1", "-g", "-fsanitize=thread"]
+            thread_transport = str(Path(build) / "thread-aec-duplex-transport")
+            thread_owner = str(Path(build) / "thread-aec-duplex-owner")
+            subprocess.run([*thread_common, str(root / "aec_duplex_transport_test.cpp"), "-o", thread_transport], check=True)
+            subprocess.run([thread_transport], check=True, timeout=60)
+            subprocess.run([*thread_common, str(root / "aec_duplex_worker_test.cpp"), str(root / "aec_worker_broker.cpp"), "-o", thread_owner], check=True)
+            subprocess.run([thread_owner, worker, library, digest, fixture], check=True, timeout=60)
