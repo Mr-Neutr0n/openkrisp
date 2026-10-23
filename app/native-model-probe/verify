@@ -43,6 +43,7 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-aec-abi-") as build:
         doubletalk = str(Path(build) / (name + "-aec-doubletalk-probe"))
         subprocess.run([*common, str(root / "aec_doubletalk_probe.cpp"), "-o", doubletalk], check=True)
         subprocess.run(["python3", str(root / "aec_doubletalk_probe_test.py"), doubletalk, library], check=True, timeout=60)
+        subprocess.run(["python3", str(root / "aec_doubletalk_probe_test.py"), doubletalk, library, "48000"], check=True, timeout=60)
 
 
 subprocess.run(["node", str(root / "launcher_test.cjs")], check=True)

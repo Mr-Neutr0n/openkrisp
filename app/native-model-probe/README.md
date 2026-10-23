@@ -179,3 +179,15 @@ read and after processing. This detects observed changes, not an atomic lock
 against a concurrent writer. Inputs must remain private and stable through
 publication. Own-fixture tests cover exact retention, malformed inputs and a
 deterministic file mutation from the synthetic factory.
+
+Append `--forward-rate 48000` for the bounded host-rate gate. Only 32000 and
+48000 are accepted; the default remains 32000. Options may occur in either
+order, once each. At 48 kHz the forward block has 480 mono values, each forward
+file has 480000 values, echo delay is 2400 samples and near-end onset is sample
+144000. The shared 16 kHz base uses interpolation ratio 3 for both streams.
+The reference remains 48 kHz stereo with 960000 interleaved values. External
+near input must match the selected rate and ten-second duration, with its
+first three seconds zero. Metadata reports the selected rate and derived
+counts, delay and onset. Each engine still makes 1000 reverse-first duplex
+blocks. This option permits a later vendor rate-acceptance experiment. Its
+own-fixture verification does not establish vendor acceptance or live timing.

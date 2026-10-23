@@ -27,7 +27,7 @@ public:
     virtual void planarForward() { throw std::logic_error("wrong slot"); }
     virtual int forward(const float* input, const Spec& in, const Spec& out, float* output) {
         if (throwStage == 2) throw FactoryError();
-        if (in.rate != 32000 || in.channels != 1 || in.frames != 320 || in.padding ||
+        if ((in.rate != 32000 && in.rate != 48000) || in.channels != 1 || in.frames != static_cast<std::size_t>(in.rate / 100) || in.padding ||
             out.rate != in.rate || out.channels != in.channels || out.frames != in.frames ||
             out.padding || !referenceSeen_) throw std::runtime_error("forward ABI/config/order");
         ++counts[3];

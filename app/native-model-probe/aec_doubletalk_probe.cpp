@@ -46,14 +46,14 @@ struct NearInput {
     const char* path;
     struct stat identity{};
     std::vector<float> samples;
-    explicit NearInput(const char* source) : path(source), samples(320000) {
+    NearInput(const char* source, unsigned rate) : path(source), samples(rate * 10) {
         require(path[0] == '/', "near input must be an absolute path");
         fd = ::open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK);
         require(fd >= 0, "near input open failed");
         try {
             require(::fstat(fd, &identity) == 0 && S_ISREG(identity.st_mode) &&
                     identity.st_size == static_cast<off_t>(samples.size() * sizeof(float)),
-                    "near input must be exactly 320000 Float32 values");
+                    "near input has incorrect Float32 sample count");
             char* bytes = reinterpret_cast<char*>(samples.data());
             std::size_t remaining = samples.size() * sizeof(float);
             while (remaining) {
@@ -63,8 +63,8 @@ struct NearInput {
                 remaining -= static_cast<std::size_t>(count); bytes += count;
             }
             for (std::size_t i = 0; i < samples.size(); ++i)
-                require(std::isfinite(samples[i]) && (i >= 96000 || samples[i] == 0.0f),
-                        "near input must be finite with first 96000 values zero");
+                require(std::isfinite(samples[i]) && (i >= rate * 3 || samples[i] == 0.0f),
+                        "near input must be finite with first three seconds zero");
             require(unchanged(), "near input changed during read");
         } catch (...) { ::close(fd); fd = -1; throw; }
     }
@@ -85,13 +85,15 @@ struct NearInput {
 };
 struct Signals {
     const unsigned frames = 1000;
+    const unsigned rate, block;
     std::vector<float> forward, reference, echo, near;
-    explicit Signals(const NearInput* input) : forward(320000), reference(960000), echo(320000), near(320000) {
+    Signals(const NearInput* input, unsigned forwardRate) : rate(forwardRate), block(rate / 100),
+        forward(rate * 10), reference(960000), echo(rate * 10), near(rate * 10) {
         const auto farBase = noise(broadbandSeed), nearBase = noise(0x6a09e667u);
         for (std::size_t i = 0; i < forward.size(); ++i) {
-            echo[i] = i >= 1600 ? 0.6f * interpolate(farBase, i - 1600, 2) : 0.0f;
+            echo[i] = i >= rate / 20 ? 0.6f * interpolate(farBase, i - rate / 20, rate / 16000) : 0.0f;
             near[i] = input ? input->samples[i] :
-                i >= 96000 ? 0.6f * interpolate(nearBase, i - 96000, 2) : 0.0f;
+                i >= rate * 3 ? 0.6f * interpolate(nearBase, i - rate * 3, rate / 16000) : 0.0f;
             require(std::isfinite(echo[i] + near[i]), "nonfinite input mixture");
             forward[i] = echo[i] + near[i];
         }
@@ -104,13 +106,13 @@ std::vector<float> run(aec_probe::Factory factory, const Signals& signals, bool 
     std::unique_ptr<aec_probe::View> engine(factory());
     require(engine != nullptr, "null AEC factory result");
     // Factory already initializes the object. No initialize or delay setter call.
-    const aec_probe::StreamConfig forward{32000, 0, 1, 320}, reverse{48000, 0, 2, 480};
+    const aec_probe::StreamConfig forward{static_cast<int>(signals.rate), 0, 1, signals.block}, reverse{48000, 0, 2, 480};
     const std::array<float, 960> silence{};
     for (unsigned frame = 0; frame < signals.frames; ++frame) {
-        const auto mic = std::span(nearOnly ? signals.near : echoOnly ? signals.echo : signals.forward).subspan(frame * 320, 320);
+        const auto mic = std::span(nearOnly ? signals.near : echoOnly ? signals.echo : signals.forward).subspan(frame * signals.block, signals.block);
         const auto speaker = referenceOn ? std::span(signals.reference).subspan(frame * 960, 960)
                                         : std::span<const float>(silence);
-        auto output = std::span(result).subspan(frame * 320, 320);
+        auto output = std::span(result).subspan(frame * signals.block, signals.block);
         // Reference-first is an explicit experiment policy, not desktop parity.
         require(aec_probe::reverse(*engine, reverse, speaker) == 0, "AEC reverse status");
         require(aec_probe::process(*engine, forward, mic, output) == 0, "AEC forward status");
@@ -180,11 +182,24 @@ struct Directory {
 };
 int main(int argc, char** argv) {
     try {
-        require(argc == 3 || (argc == 5 && std::strcmp(argv[3], "--near-input") == 0),
-                "usage: aec-doubletalk-probe library new-private-output-directory [--near-input absolute-f32le-file]");
+        require(argc >= 3, "usage: aec-doubletalk-probe library new-private-output-directory [--near-input absolute-f32le-file] [--forward-rate 32000|48000]");
+        unsigned forwardRate = 32000;
+        const char* nearPath = nullptr;
+        bool rateSet = false;
+        for (int i = 3; i < argc; i += 2) {
+            require(i + 1 < argc, "missing option value");
+            if (std::strcmp(argv[i], "--near-input") == 0) {
+                require(!nearPath, "duplicate near input"); nearPath = argv[i + 1];
+            } else if (std::strcmp(argv[i], "--forward-rate") == 0) {
+                require(!rateSet, "duplicate forward rate"); rateSet = true;
+                require(std::strcmp(argv[i + 1], "32000") == 0 || std::strcmp(argv[i + 1], "48000") == 0,
+                        "forward rate must be 32000 or 48000");
+                forwardRate = std::strcmp(argv[i + 1], "48000") == 0 ? 48000 : 32000;
+            } else throw std::runtime_error("unknown option");
+        }
         static_assert(sizeof(float) == 4 && std::endian::native == std::endian::little);
-        const auto nearInput = argc == 5 ? std::make_unique<NearInput>(argv[4]) : nullptr;
-        const Signals signals(nearInput.get());
+        const auto nearInput = nearPath ? std::make_unique<NearInput>(nearPath, forwardRate) : nullptr;
+        const Signals signals(nearInput.get(), forwardRate);
         std::vector<float> on, zero, near, echo;
         {
             Library library(argv[1]);
@@ -224,11 +239,11 @@ int main(int argc, char** argv) {
         std::cout << "{\"fixture\":\"" << (nearInput ? "doubletalk-external-near-v1" : "doubletalk-xorshift32-linear16k-v1") << "\","
                   << "\"nearSource\":\"" << (nearInput ? "external-f32le" : "generated-noise") << "\","
                   << "\"framesPerEngine\":1000,\"engines\":4,\"successfulCallsPerEngine\":2000,"
-                  << "\"samplesPerOutput\":320000,\"referenceSamples\":960000,"
-                  << "\"forwardRate\":32000,\"forwardChannels\":1,\"referenceRate\":48000,\"referenceChannels\":2,"
+                  << "\"samplesPerOutput\":" << signals.forward.size() << ",\"referenceSamples\":960000,"
+                  << "\"forwardRate\":" << forwardRate << ",\"forwardChannels\":1,\"referenceRate\":48000,\"referenceChannels\":2,"
                   << "\"farSeed\":2447445413,\"nearSeed\":" << (nearInput ? "null" : "1779033703") << ","
-                  << "\"echoGain\":0.6,\"nearGain\":" << (nearInput ? "1.0" : "0.6") << ",\"echoDelaySamples\":1600,"
-                  << "\"nearStartSample\":96000,\"delaySetterCalled\":false,\"teardownComplete\":true}\n";
+                  << "\"echoGain\":0.6,\"nearGain\":" << (nearInput ? "1.0" : "0.6") << ",\"echoDelaySamples\":" << forwardRate / 20 << ","
+                  << "\"nearStartSample\":" << forwardRate * 3 << ",\"delaySetterCalled\":false,\"teardownComplete\":true}\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << error.what() << '\n';
