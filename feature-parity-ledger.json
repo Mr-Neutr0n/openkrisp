@@ -1054,7 +1054,17 @@
         }
       ],
       "original_evidence_ids": [
-        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4"
+        "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
+        "ev_6633cc56846dc24c1803403ef109b67197a17228f64422f75143e8dd616f85b1",
+        "ev_48289fc2d3d251a1c78a3d4bd60e7cbdd8e0a1b72b7a7052596a2b6aa93ff471",
+        "ev_ece7c942d90e27f063fd1be188d354a1a8d0f289e59aadea32bb6dc209566fa7",
+        "ev_a1fa9c2e6fd2779b99a70e03b58261d4f4ca70bf26d0e9d2cde7f052e4d623a6",
+        "ev_be36529423ed582e869c5228044603a589ff84167270d0169ee5bfb070fc157d",
+        "ev_391c67ddc4edb50b8106f42c98006931e40bbda7a269b5ce1a71ab352b792155",
+        "ev_452c9179b564f2bdfd1a12a765bf5873cccbb1fbd2f5899e56b0c6742369215c",
+        "ev_414ced988253990fbe6bf4f8c6274e88ab59aa533f34671147088cdc51cacc2d",
+        "ev_56b1a5141f8d1e8f0eee9728b1d110f18bb2d9e628735ed0e21cca79d2bbb9fe",
+        "ev_2f7141d178b135212d4f829f61124b34f138dcc284d300ba85dc65837dd2e446"
       ],
       "implemented_code": [
         {
@@ -1062,9 +1072,9 @@
           "exists": true
         }
       ],
-      "implementation": "RNNoise is not verified nearby-speaker isolation. No headset auto-detection, allowlist/manual confirmation or BVC processor exists.",
-      "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Recover/implement speaker isolation, headset behavior and manual override; validate speech preservation and nearby voice rejection without admin gate."
+      "implementation": "Evidence-only HVC candidate processing through the existing ordinary-NC factory is retained. Production ordinary-NC role admission remains unchanged. No selectable BVC processor, headset detection or manual override exists.",
+      "verified_scope": "Static control/native findings and bounded candidate CPU processing only. HVC active/bypass children each completed 100 frames, 100 callbacks and 48000 finite samples with clean teardown; outer capture exited 1 due to an invalid raw-input bypass assertion. Candidate bypass exactly matches retained ordinary bypass. Same-adapter ordinary active control exited 0 and differs from HVC in 47500 samples, supporting model-dependent output only. HVC declared 32 kHz work rate and tested 48 kHz interface do not establish internal conversion, voice isolation, persistent operation or original dispatch parity. See background-voice-{controls,native,candidate}-findings.md.",
+      "missing_acceptance": "Resolve shared NC descriptor-to-native dispatch and effective BVC settings, then implement a distinct pinned HVC persistent role without relaxing ordinary NC admission. Validate target speech preservation, nearby voice rejection, headset policy/manual override, AEC composition and hardware routing separately."
     },
     {
       "id": "performance",
@@ -1295,7 +1305,7 @@
       ],
       "implementation": "Independent HAL, transport and explicit route UI exist. Real installed routing, Bluetooth/exclusive access and app-select integration remain unverified.",
       "verified_scope": "No runtime parity pass. Read-only source inspection; existing component fixture/build verification is documented by component verify/README. Independent desktop REA established limited appearance and screen reachability, not audio processing.",
-      "missing_acceptance": "Approved installed HAL test and actual route must prove channels/formats/timestamps, permission attribution, simultaneous clients, unplug/reconnect, crash recovery and calling-app visibility."
+      "missing_acceptance": "Approved installed HAL test and actual route must prove channels/formats/timestamps, permission attribution, simultaneous clients, unplug/reconnect, crash recovery and calling-app visibility. Fresh October 23 read-only checks confirm the exact discovery-trace tree and that current coreaudiod and own remote-driver processes started October 13 at 10:27:21, before trace installation at 10:34:07. Deferred restart remains the diagnostic gate; no installed debug-driver code defect is established. See driver-current-discovery-findings.md."
     },
     {
       "id": "noise",
