@@ -186,11 +186,11 @@ Changing the selected app, AEC toggle or microphone-noise option invalidates
 AEC admission. A stale validation result cannot restore it. Start still checks
 permissions and requires the helper's exact configuration acknowledgement.
 Unexpected AEC fields when disabled, missing or wrong identities, invalid
-formats or delays, and microphone NC fields in an AEC route are rejected.
+formats or delays, and microphone NC fields in an AEC-only route are rejected.
 
-Microphone noise reduction and echo cancellation cannot run together yet.
+Microphone noise reduction can run after echo cancellation.
 Speaker processing remains available before the final playback reference.
-The app allows the worker startup budget for one or two selected workers.
+The app allows the worker startup budget for up to three selected workers.
 Stop and permission cancellation use the existing supervised route lifecycle.
 The choice and file selection remain in memory and do not auto-start audio.
 
@@ -199,3 +199,15 @@ and records its hash after signing; verification checks it again after app
 relocation. The build writes `build/aec-worker-packaged` and preserves the
 frozen probe worker. Physical echo alignment, speech quality, live route
 recovery and the new controls' visual acceptance remain unverified.
+
+
+When microphone noise reduction is selected with AEC, the desktop requires the
+explicit `aec-then-nc` acknowledgement, the selected NC identity and both stage
+buffering delays. Installed microphone and speaker callback bounds must match
+AEC. Missing, unexpected, null or incorrect chain fields reject startup. With
+both installed NC directions and AEC enabled, startup allows three worker
+launches. RNNoise runs in process and does not add a worker.
+
+The reported total is buffering only, not measured end-to-end latency. The
+processing order is independent and does not establish original app parity.
+Physical audio quality and the new combination's interactive UI remain pending.

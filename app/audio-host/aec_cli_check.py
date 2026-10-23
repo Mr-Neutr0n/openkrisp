@@ -33,13 +33,38 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-cli-') as temporary:
     for name in ['node-sha256','adapter-sha256']:speaker+=['--speaker-provider-'+name,'a'*64]
     result=subprocess.run(base+complete+speaker,capture_output=True,text=True,check=True,timeout=5)
     assert json.loads(result.stdout)['speaker']['role']=='inbound'
+    microphone=['--microphone-noise-suppression','--microphone-provider','installed-krisp']
+    for name in ['node','worker','addon','model','adapter','library']:
+        microphone+=['--provider-'+name,'/microphone-fixture/'+name]
+    for name in ['node-sha256','adapter-sha256']:microphone+=['--provider-'+name,'c'*64]
+    profiles=[(['--noise-suppression'],False,False),
+              (['--microphone-noise-suppression','--speaker-noise-suppression'],False,False),
+              (microphone,True,False),(microphone+speaker,True,True),
+              (['--microphone-noise-suppression']+speaker,False,True)]
+    for flags,installed_microphone,installed_speaker in profiles:
+        result=subprocess.run(base+complete+flags,capture_output=True,text=True,check=True,timeout=5)
+        value=json.loads(result.stdout);ack=value['aec_startup']
+        assert value['microphone_noise'] is True
+        assert (value['microphone'] is not None)==installed_microphone
+        assert (value['speaker'] is not None)==installed_speaker
+        assert ack['microphone_provider']==('installed-krisp' if installed_microphone else 'rnnoise')
+        assert ack['microphone_processing_order']=='aec-then-nc'
+        assert ack['aec_delay_samples']==5760
+        assert ack['microphone_nc_delay_samples']==(5760 if installed_microphone else 480)
+        assert ack['microphone_total_delay_samples']==5760+ack['microphone_nc_delay_samples']
+        if installed_microphone:
+            assert ack['provider_model_sha256']=='12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d'
+            assert ack['provider_addon_sha256']=='adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755'
+            assert ack['provider_adapter_sha256']==ack['provider_node_sha256']=='c'*64
+            assert ack['provider_delay_samples']==5760 and ack['provider_maximum_callback_frames']==4096
+            assert value['microphone']['role']=='outbound'
+        else:
+            assert not any(key.startswith('provider_') for key in ack)
     failures=[(complete[:-2],'all runtime options'),(complete[2:],'all runtime options'),
               (complete+['--aec-worker',str(worker)],'Repeated or incomplete'),
               (['--aec-worker'],'Repeated or incomplete'),(['--aec-provider','other'],'Unsupported AEC'),
               (complete+['--aec-library-sha256','b'*64],'Unknown AEC'),
-              (complete+['--noise-suppression'],'cannot be combined'),
-              (complete+['--microphone-noise-suppression'],'cannot be combined'),
-              (complete+['--microphone-provider','installed-krisp'],'cannot be combined')]
+              (complete+['--microphone-provider','installed-krisp'],'requires microphone suppression')]
     for flag,replacement,message in [('--aec-worker','relative','absolute path'),
                                      ('--aec-library','relative','absolute path'),
                                      ('--aec-worker-sha256','bad','lowercase SHA256'),
@@ -49,5 +74,5 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-cli-') as temporary:
         result=subprocess.run(base+flags,capture_output=True,text=True,timeout=5)
         assert result.returncode!=0 and message in result.stderr,(flags,result.stdout,result.stderr)
     off=json.loads(subprocess.run(base,capture_output=True,text=True,check=True,timeout=5).stdout)
-    assert not any(key.startswith('aec') for key in off)
-print('AEC CLI opt-in, conflicts, exact startup identity fields and legacy-off tests passed; no route started')
+    assert not any(key.startswith(('aec','microphone_processing_','microphone_nc_','microphone_total_')) for key in off)
+print('AEC CLI opt-in, post-AEC NC profiles, exact startup identity/order/delay fields and legacy-off tests passed; no route started')

@@ -21,8 +21,11 @@ int runRoute(const std::string&, const std::string&, bool microphone, bool speak
                   <<",\"worker_sha256\":"<<labvoice::jsonString(options.installedAEC->workerSha256)
                   <<",\"library\":"<<labvoice::jsonString(options.installedAEC->libraryPath)
                   <<",\"library_sha256\":"<<labvoice::jsonString(krisp_probe::installedAECLibrarySHA256)<<'}';
-        std::cout << ",\"aec_startup\":{\"microphone_provider\":\"installed-krisp-aec\""
-                  <<labvoice::aecStartupFields(*options.installedAEC,5760,4096,2)<<'}';
+        const auto ncDelay=microphone ? (options.installed ? 5760u : 480u) : 0u;
+        std::cout << ",\"aec_startup\":{\"microphone_provider\":"
+                  <<labvoice::jsonString(!microphone ? "installed-krisp-aec" : options.installed ? "installed-krisp" : "rnnoise")
+                  <<labvoice::microphoneChainStartupFields(*options.installedAEC,5760,4096,2,microphone,
+                                                          options.installed ? &*options.installed : nullptr,ncDelay)<<'}';
     }
     std::cout << "}\n";
     return 0;

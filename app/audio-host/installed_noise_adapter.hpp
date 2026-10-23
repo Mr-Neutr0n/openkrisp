@@ -39,7 +39,8 @@ class InstalledNoiseAdapter {
         : options_(std::move(options)), maximum_(maximum),
           fallback_(options_.microphoneRNNoise,options_.speakerRNNoise) {}
     bool reject(float* feed,float* playback,UInt32 count) noexcept {
-        callbackFailed_.store(true,std::memory_order_release);return silent(feed,playback,count);
+        if(!stopped_.load(std::memory_order_acquire))callbackFailed_.store(true,std::memory_order_release);
+        return silent(feed,playback,count);
     }
     static bool silent(float* feed,float* playback,UInt32 count) noexcept {
         std::fill_n(feed,count,0.f);std::fill_n(playback,count*2,0.f);return false;

@@ -3,7 +3,7 @@
 #include "control_protocol.hpp"
 #include "noise_adapter.hpp"
 #include "installed_noise_adapter.hpp"
-#include "installed_aec_adapter.hpp"
+#include "aec_microphone_chain.hpp"
 #include "routing.hpp"
 #include <cerrno>
 #include <chrono>
@@ -128,22 +128,21 @@ void serviceControls(labvoice::ControlFramer &input, labvoice::ControlProtocol &
 } // namespace
 int runRoute(const std::string &input, const std::string &output, bool microphoneNoise,
              bool speakerNoise, const RouteControlOptions &controls, const RouteProviderOptions &provider) {
-    if(provider.installedAEC && (microphoneNoise || provider.installed))
-        throw std::invalid_argument("AEC cannot be combined with microphone suppression or provider");
     // Merely compiling this function starts no audio. --route is an explicit start command.
     labvoice::CoreAudioBackend backend;
     std::shared_ptr<labvoice::NoiseAdapter> noise;
-    if (!provider.installed && !provider.installedSpeaker && (microphoneNoise || speakerNoise))
-        noise = std::make_shared<labvoice::NoiseAdapter>(microphoneNoise, speakerNoise);
+    const bool preMicrophoneNoise=microphoneNoise && !provider.installedAEC;
+    if ((!provider.installed || provider.installedAEC) && !provider.installedSpeaker && (preMicrophoneNoise || speakerNoise))
+        noise = std::make_shared<labvoice::NoiseAdapter>(preMicrophoneNoise, speakerNoise);
     // This separate control-thread owner outlives every Session cleanup attempt.
     // Explicit worker stop prevents a queued HAL block's final Context release
     // from performing a blocking worker join on its dispatch thread.
     std::shared_ptr<labvoice::InstalledNoiseAdapter> installed;
-    std::shared_ptr<labvoice::InstalledAECAdapter> aec;
+    std::shared_ptr<labvoice::AECMicrophoneChain> aec;
     labvoice::Session session(backend);
     struct WorkerStopGuard {
         std::shared_ptr<labvoice::InstalledNoiseAdapter>& owner;
-        std::shared_ptr<labvoice::InstalledAECAdapter>& aec;
+        std::shared_ptr<labvoice::AECMicrophoneChain>& aec;
         ~WorkerStopGuard() {
             if(owner){try{(void)owner->stop();}catch(...){}}
             if(aec){try{(void)aec->stop();}catch(...){}}
@@ -169,18 +168,23 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
             if (interrupted || getppid() != parent) throw std::runtime_error("Route startup cancelled");
             std::string error;
             labvoice::ProcessorBinding binding;
-            if(provider.installed || provider.installedSpeaker) {
+            if((provider.installed && !provider.installedAEC) || provider.installedSpeaker) {
                 labvoice::InstalledNoiseOptions options;
-                options.microphone=provider.installed;options.speaker=provider.installedSpeaker;
-                options.microphoneRNNoise=microphoneNoise && !provider.installed;
+                options.microphone=provider.installedAEC ? std::nullopt : provider.installed;
+                options.speaker=provider.installedSpeaker;
+                options.microphoneRNNoise=preMicrophoneNoise && !provider.installed;
                 options.speakerRNNoise=speakerNoise && !provider.installedSpeaker;
                 installed=labvoice::InstalledNoiseAdapter::create(layout,options,error);
                 if(!installed)throw std::runtime_error(error);
                 binding={labvoice::InstalledNoiseAdapter::process,installed.get(),installed};
             } else if(noise) binding={labvoice::NoiseAdapter::process,noise.get(),noise};
             if(provider.installedAEC) {
-                labvoice::InstalledAECOptions options{*provider.installedAEC,2};
-                aec=labvoice::InstalledAECAdapter::create(layout,options,true,error);
+                labvoice::AECMicrophoneChainOptions options;
+                options.aec={*provider.installedAEC,2};
+                options.microphone=provider.installed;
+                options.microphoneRNNoise=microphoneNoise && !provider.installed;
+                options.schedulingBudgetFrames=2;
+                aec=labvoice::AECMicrophoneChain::create(layout,options,error);
                 if(!aec)throw std::runtime_error(error);
                 binding.microphoneStageDisabled=true;
                 binding.duplex=aec->binding();
@@ -202,23 +206,17 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
               << ",\"microphone_noise\":" << (microphoneNoise ? "true" : "false")
               << ",\"speaker_noise\":" << (speakerNoise ? "true" : "false") << ","
               << labvoice::controlJSON(controls.initial);
-    std::cout << ",\"microphone_provider\":" << jsonString(provider.installedAEC ? "installed-krisp-aec" : provider.installed ? "installed-krisp" : (microphoneNoise ? "rnnoise" : "none"))
+    std::cout << ",\"microphone_provider\":" << jsonString(provider.installedAEC && !microphoneNoise ? "installed-krisp-aec" : provider.installed ? "installed-krisp" : (microphoneNoise ? "rnnoise" : "none"))
               << ",\"speaker_provider\":" << jsonString(provider.installedSpeaker ? "installed-krisp" : (speakerNoise ? "rnnoise" : "none"));
     if (installed) {
-        const auto acknowledge = [&](const char* prefix, const krisp_probe::InstalledWorkerSettings* settings, std::size_t delay) {
-            if (!settings) return;
-            std::cout << ',' << jsonString(std::string(prefix) + "model_sha256") << ':' << jsonString(settings->modelSha256)
-                      << ',' << jsonString(std::string(prefix) + "addon_sha256") << ':' << jsonString(krisp_probe::installed_worker_detail::addonSHA)
-                      << ',' << jsonString(std::string(prefix) + "adapter_sha256") << ':' << jsonString(settings->adapterSha256)
-                      << ',' << jsonString(std::string(prefix) + "node_sha256") << ':' << jsonString(settings->nodeSha256)
-                      << ',' << jsonString(std::string(prefix) + "delay_samples") << ':' << delay
-                      << ',' << jsonString(std::string(prefix) + "maximum_callback_frames") << ':' << installed->maximumCallbackFrames();
-        };
-        acknowledge("provider_", installed->microphoneSettings(), installed->microphoneDelaySamples());
-        acknowledge("speaker_provider_", installed->speakerSettings(), installed->speakerDelaySamples());
+        if(const auto* settings=installed->microphoneSettings())
+            std::cout<<labvoice::installedNCStartupFields("provider_",*settings,installed->microphoneDelaySamples(),installed->maximumCallbackFrames());
+        if(const auto* settings=installed->speakerSettings())
+            std::cout<<labvoice::installedNCStartupFields("speaker_provider_",*settings,installed->speakerDelaySamples(),installed->maximumCallbackFrames());
     }
-    if(aec)std::cout << labvoice::aecStartupFields(aec->settings(),aec->actualDelaySamples(),
-                                                 aec->maximumCallbackFrames(),aec->bufferingConfig().schedulingBudgetFrames);
+    if(aec)std::cout<<labvoice::microphoneChainStartupFields(aec->aecSettings(),aec->aecDelaySamples(),
+        aec->maximumCallbackFrames(),aec->bufferingConfig().schedulingBudgetFrames,
+        microphoneNoise,aec->microphoneSettings(),aec->microphoneDelaySamples());
     if (controls.stdinEnabled)
         std::cout << ",\"operationID\":" << jsonString(controls.operationID);
     std::cout << "}" << std::endl;
@@ -245,7 +243,7 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
         return 1;
     }
     if (!aecStopped) {
-        std::cerr << "Installed AEC provider failed: " << aec->error() << '\n';
+        std::cerr << "Microphone processing chain failed: " << aec->error() << '\n';
         return 1;
     }
     if (!stopped) {

@@ -110,13 +110,13 @@ final class InstalledAECStartupTests: XCTestCase {
     private func matches(_ value: [String: Any], _ options: AudioRouteOptions) throws -> Bool {
         try JSONDecoder().decode(AudioStartup.self, from: JSONSerialization.data(withJSONObject: value)).matches(options)
     }
-    func testArgumentsAndMicrophoneExclusion() {
+    func testArgumentsAndMicrophoneChainAdmission() {
         let options = expected()
         XCTAssertTrue(options.validProviderRoles)
         XCTAssertEqual(Array(options.arguments.suffix(8)), aecConfiguration().arguments)
         XCTAssertFalse(options.arguments.contains("--provider-node"))
         let conflict = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: true, speakerNoise: false, installedAEC: aecConfiguration())
-        XCTAssertFalse(conflict.validProviderRoles)
+        XCTAssertTrue(conflict.validProviderRoles)
     }
     func testStrictAECIdentityFormatsBoundsAndOffPresence() throws {
         for maximum in [1, 480, 512, 4096] { XCTAssertTrue(try matches(fields(maximum: maximum), expected())) }
@@ -148,8 +148,60 @@ final class InstalledAECStartupTests: XCTestCase {
             var changed = off; changed[key] = NSNull(); XCTAssertFalse(try matches(changed, offOptions))
         }
         let conflict = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: true, speakerNoise: false, installedAEC: aecConfiguration())
-        XCTAssertFalse(conflict.validProviderRoles)
+        XCTAssertTrue(conflict.validProviderRoles)
         XCTAssertFalse(try matches(valid, conflict))
+    }
+    func testChainOrderDelaysAndStrictPresence() throws {
+        let mic = InstalledNCConfiguration(nodePath: "/fixture/node", workerPath: "/fixture/worker", addonPath: "/fixture/addon", modelPath: "/fixture/model", adapterPath: "/fixture/adapter", libraryPath: "/fixture/lib", nodeSHA256: InstalledNCConfiguration.reviewedNodeSHA256, adapterSHA256: String(repeating: "c", count: 64))
+        let chainKeys = ["microphone_processing_order", "microphone_nc_delay_samples", "microphone_total_delay_samples"]
+        for installed in [false, true] { for maximum in [1, 480, 512, 4096] {
+            let options = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: true, speakerNoise: false, installedProvider: installed ? mic : nil, installedAEC: aecConfiguration())
+            let delay = ((maximum + 958) / 480 + 2) * 480, nc = installed ? delay : 480
+            var value = fields(maximum: maximum); value["microphone_noise"] = true
+            value["microphone_provider"] = installed ? "installed-krisp" : "rnnoise"
+            value["microphone_processing_order"] = "aec-then-nc"; value["microphone_nc_delay_samples"] = nc; value["microphone_total_delay_samples"] = delay + nc
+            if installed {
+                value["provider_model_sha256"] = InstalledNCConfiguration.modelSHA256; value["provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
+                value["provider_adapter_sha256"] = mic.adapterSHA256; value["provider_node_sha256"] = mic.nodeSHA256
+                value["provider_delay_samples"] = delay; value["provider_maximum_callback_frames"] = maximum
+            }
+            XCTAssertTrue(try matches(value, options))
+            for key in chainKeys {
+                var bad = value; bad.removeValue(forKey: key); XCTAssertFalse(try matches(bad, options))
+                bad = value; bad[key] = NSNull(); XCTAssertFalse(try matches(bad, options))
+            }
+            for (key, mutation) in [("microphone_processing_order", "nc-then-aec" as Any), ("microphone_total_delay_samples", delay + nc + 1), ("microphone_nc_delay_samples", nc + 1), ("microphone_nc_unknown", NSNull())] {
+                var bad = value; bad[key] = mutation; XCTAssertFalse(try matches(bad, options))
+            }
+            if installed { var bad = value; bad["provider_maximum_callback_frames"] = maximum == 480 ? 512 : 480; XCTAssertFalse(try matches(bad, options)) }
+        } }
+        let off = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: false, speakerNoise: false)
+        for key in chainKeys + ["microphone_processing_unknown"] {
+            var value = fields(); value[key] = NSNull(); XCTAssertFalse(try matches(value, expected()))
+            value = fields().filter { !$0.key.hasPrefix("aec_") }; value["microphone_provider"] = "none"; value[key] = NSNull(); XCTAssertFalse(try matches(value, off))
+        }
+    }
+    func testProductionCppChainAcknowledgmentDecodesInSwift() throws {
+        let temporary = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: temporary, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: temporary) }
+        let worker = temporary.appendingPathComponent("own-worker")
+        try Data("#!/bin/sh\nexit 70\n".utf8).write(to: worker)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: worker.path)
+        let config = InstalledAECConfiguration(workerPath: worker.path, workerSHA256: try InstalledAECResolver.hashFile(worker), libraryPath: "/unread/fixture-library")
+        let fixture = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("audio-host/build/provider-cli-fixture")
+        let mic = InstalledNCConfiguration(nodePath: "/fixture/node", workerPath: "/fixture/worker", addonPath: "/fixture/addon", modelPath: "/fixture/model", adapterPath: "/fixture/adapter", libraryPath: "/fixture/lib", nodeSHA256: InstalledNCConfiguration.reviewedNodeSHA256, adapterSHA256: String(repeating: "c", count: 64))
+        for mode in 0...2 {
+            let options = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: mode > 0, speakerNoise: false, installedProvider: mode == 2 ? mic : nil, installedAEC: config)
+            let process = Process(), pipe = Pipe(); process.executableURL = fixture; process.arguments = options.arguments; process.standardOutput = pipe
+            try process.run(); pipe.fileHandleForWriting.closeFile()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile(); process.waitUntilExit(); XCTAssertEqual(process.terminationStatus, 0)
+            let envelope = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            let ack = try XCTUnwrap(envelope["aec_startup"] as? [String: Any])
+            var value = fields(); value["microphone_noise"] = mode > 0
+            for (key, field) in ack { value[key] = field }
+            XCTAssertTrue(try matches(value, options))
+        }
     }
     func testSpeakerLaneMatchingRemainsIndependent() throws {
         let speaker = InstalledNCConfiguration(nodePath: "/fixture/node", workerPath: "/fixture/worker", addonPath: "/fixture/addon",

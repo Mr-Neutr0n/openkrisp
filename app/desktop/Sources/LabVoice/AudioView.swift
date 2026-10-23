@@ -79,7 +79,7 @@ struct AudioView: View {
                         .font(.caption).foregroundColor(.secondary)
                     Divider()
                     Text("Noise processing").font(.headline)
-                    Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked || audio.echoCancellation)
+                    Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)
                     Picker("Microphone provider", selection: $audio.microphoneProvider) {
                         ForEach(NoiseProvider.allCases) { provider in Text(provider.title).tag(provider) }
                     }.disabled(controlsLocked)
@@ -102,11 +102,7 @@ struct AudioView: View {
                             .font(.caption).foregroundColor(.secondary)
                     }
                     Toggle("Cancel speaker echo", isOn: $audio.echoCancellation)
-                        .disabled(controlsLocked || audio.microphoneNoise)
-                    if audio.microphoneNoise {
-                        Text("Turn off microphone noise reduction to select echo cancellation.")
-                            .font(.caption).foregroundColor(.secondary)
-                    }
+                        .disabled(controlsLocked)
                     if audio.echoCancellation {
                         Button("Choose Krisp app…", action: chooseProviderApp)
                             .disabled(controlsLocked || audio.aecValidating)
@@ -115,13 +111,13 @@ struct AudioView: View {
                             .disabled(controlsLocked || audio.aecValidating || audio.installedApp == nil)
                         if audio.aecValidating { ProgressView().controlSize(.small) }
                         Text(audio.aecStatus).font(.caption).textSelection(.enabled)
-                        Text("Uses the echo canceller in your installed Krisp app. Adds buffering delay. Microphone noise reduction cannot run with echo cancellation yet. Live audio quality has not been verified.")
+                        Text("Uses the echo canceller in your installed Krisp app. Adds buffering delay. When microphone noise reduction is enabled, it runs after echo cancellation. Live audio quality has not been verified.")
                             .font(.caption).foregroundColor(.secondary)
                     }
                     Text("Start captures the selected microphone and routes speaker audio. Each enabled direction uses its selected provider.")
                         .font(.caption).foregroundColor(.secondary)
                     if let active = audio.activeOptions, audio.phase == .running {
-                        Text("Microphone: \(active.installedAEC != nil ? "echo cancellation" : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
+                        Text("Microphone: \(active.installedAEC != nil ? (active.microphoneNoise ? "echo cancellation then noise reduction" : "echo cancellation") : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
                             .font(.caption)
                     }
                     Divider()

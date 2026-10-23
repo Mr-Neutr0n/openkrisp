@@ -162,7 +162,7 @@ The probe generates the known one-second mono fixture and alternates its doubled
 
 `ProcessorBinding` can carry a `DuplexBinding` after the existing speaker stage.
 The factory must explicitly declare `microphoneStageDisabled`; the initial hook
-uses raw microphone input and does not chain microphone NC. The CLI can explicitly bind the installed AEC adapter. Desktop selection remains
+uses raw microphone input. A separate wrapper can apply microphone NC after AEC. The CLI can explicitly bind the installed AEC adapter. Desktop selection remains
 pending. Existing bindings follow the original path.
 
 The route computes final playback after speaker processing and gain/mute into
@@ -188,17 +188,41 @@ the worker before route creation and again at adapter startup. The library hash
 is fixed to the reviewed installed version; no CLI override exists. Original
 libraries stay external. The desktop app bundles our AEC worker and can validate the selected installed app before an explicit Start.
 
-AEC rejects microphone suppression and installed microphone-provider options.
+AEC can run alone or before microphone suppression through RNNoise or the installed outbound provider.
 Speaker RNNoise or the installed speaker provider can run once before AEC takes
 its final playback reference. The adapter uses 48 kHz mono microphone and stereo
 reference frames, with two scheduling-budget frames and a delay derived from
 the validated maximum callback bound. Startup JSON reports the identities,
-format, callback bound and delay. `microphone_provider` is `installed-krisp-aec`,
-so older desktop clients reject an unexpected AEC route. AEC-off fields stay
+format, callback bound and delay. `microphone_provider` is `installed-krisp-aec`
+for AEC-only routes. Combined routes identify the selected NC provider and explicitly acknowledge the processing order. AEC-off fields stay
 unchanged.
 
 The control thread retains and stops the worker even when route startup or HAL
 cleanup fails. Late callbacks retain stopped storage. Synthetic fixture tests
 cover this ownership, final-reference samples, timing provenance, delayed
 microphone output and CLI admission. They do not establish physical routing,
-acoustic alignment, speech quality or the AEC-to-NC chain.
+acoustic alignment or speech quality.
+
+
+### AEC followed by microphone NC
+
+`AECMicrophoneChain` receives raw microphone and final stereo playback. It runs
+AEC, then feeds the complete AEC output stream into a microphone-only noise
+adapter. This includes startup silence and uses the same callback partitions.
+The separate speaker stage runs once before the reference tap. The chain owns
+preallocated scratch buffers and stops both workers even if one stop fails.
+
+Selecting microphone suppression with AEC now permits either RNNoise or the
+reviewed installed outbound NC model. Startup adds `microphone_processing_order`
+with value `aec-then-nc`, `microphone_nc_delay_samples` and
+`microphone_total_delay_samples`. Installed NC also reports the existing
+`provider_*` identities and callback bound. AEC-only and non-AEC fields stay
+unchanged. The sum describes transport buffering, excluding model algorithm
+latency, the speaker path and acoustic delay. It does not promise exact silence
+until that sum for arbitrary model outputs.
+
+This order is an independent implementation choice. Retained original evidence
+does not prove Krisp's microphone processing order. Synthetic tests compare the
+chain against explicit sequential AEC and NC, including the leading zeros that
+advance NC state. Installed-model quality and physical timing need separate
+acceptance.

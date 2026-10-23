@@ -53,7 +53,7 @@ struct ProcessorBinding {
     Processor processor = nullptr;
     void *data = nullptr;
     std::shared_ptr<void> owner;
-    bool microphoneStageDisabled = false; // Required declaration for initial duplex AEC.
+    bool microphoneStageDisabled = false; // The pre-duplex processor must leave microphone DSP disabled.
     DuplexBinding duplex{};
 };
 // Runs on the Session control thread after validated aggregate inspection and

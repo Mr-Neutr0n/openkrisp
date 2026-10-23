@@ -59,7 +59,7 @@ PY
 # AEC route integration uses only our worker and synthetic AEC library.
 python3 - <<'PY'
 from pathlib import Path
-import hashlib, subprocess, tempfile
+import hashlib, shutil, subprocess, tempfile
 root = Path.cwd()
 probe = root.parent / 'native-model-probe'
 with tempfile.TemporaryDirectory(prefix='openkrisp-aec-route-') as temporary:
@@ -73,4 +73,9 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-route-') as temporary:
         binary = root / 'build' / ('installed-aec-adapter-' + name)
         subprocess.run([*common, '-fblocks', *flags, 'installed_aec_adapter_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(binary)], check=True)
         subprocess.run([str(binary), str(worker), str(fixture), digest], check=True, timeout=90)
+        chain = root / 'build' / ('aec-microphone-chain-' + name)
+        rnnoise = '../noise-engine/build/' + ('sanitized' if name == 'sanitized' else 'release') + '/librnnoise.a'
+        subprocess.run([*common, '-fblocks', *flags, '-I../noise-engine/vendor/rnnoise/include', 'aec_microphone_chain_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), str(probe / 'worker_broker.cpp'), rnnoise, '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(chain)], check=True)
+        node = str(Path(shutil.which('node')).resolve())
+        subprocess.run([str(chain), str(worker), str(fixture), digest, node, str(probe / 'worker_broker_fixture.cjs')], check=True, timeout=120)
 PY

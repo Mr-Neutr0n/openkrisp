@@ -24,6 +24,22 @@ import AVFoundation
             "aec_library_sha256": InstalledAECConfiguration.librarySHA256, "aec_delay_samples": 5760,
             "aec_maximum_callback_frames": 4096, "aec_scheduling_budget_frames": 2,
             "aec_forward_rate": 48000, "aec_forward_channels": 1, "aec_reference_rate": 48000, "aec_reference_channels": 2]
+        if arguments.contains("--microphone-noise-suppression") {
+            let installed = arguments.contains("--microphone-provider")
+            value["microphone_noise"] = true
+            value["microphone_provider"] = installed ? "installed-krisp" : "rnnoise"
+            value["microphone_processing_order"] = "aec-then-nc"
+            value["microphone_nc_delay_samples"] = installed ? 5760 : 480
+            value["microphone_total_delay_samples"] = installed ? 11520 : 6240
+            if installed {
+                value["provider_model_sha256"] = InstalledNCConfiguration.modelSHA256
+                value["provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
+                value["provider_node_sha256"] = InstalledNCConfiguration.reviewedNodeSHA256
+                value["provider_adapter_sha256"] = String(repeating: "b", count: 64)
+                value["provider_delay_samples"] = 5760
+                value["provider_maximum_callback_frames"] = 4096
+            }
+        }
         if arguments.contains("--speaker-provider") {
             value["speaker_provider"] = "installed-krisp"
             value["speaker_provider_model_sha256"] = InstalledNCConfiguration.inboundModelSHA256
@@ -71,11 +87,11 @@ import AVFoundation
         XCTAssertEqual(model.startupWait(for: model.activeOptions!), 40_000_000_000)
         _ = await model.stop(); XCTAssertEqual(model.phase, .idle)
     }
-    func testConflictAndSelectionChangesRequireValidation() async throws {
+    func testProcessingAndSelectionChangesRequireValidation() async throws {
         let child = AECChild(), model = try await model(child)
         model.echoCancellation = true; await model.validateInstalledAEC(); XCTAssertTrue(model.canStart)
         model.microphoneNoise = true; XCTAssertNil(model.installedAECConfiguration); XCTAssertFalse(model.canStart)
-        await model.validateInstalledAEC(); model.start(); XCTAssertFalse(child.running)
+        await model.validateInstalledAEC(); XCTAssertTrue(model.canStart)
         model.microphoneNoise = false; XCTAssertNil(model.installedAECConfiguration)
         await model.validateInstalledAEC(); model.selectInstalledApp(URL(fileURLWithPath: "/replacement.app")); XCTAssertFalse(model.canStart)
         await model.validateInstalledAEC(); model.echoCancellation = false; XCTAssertNil(model.installedAECConfiguration)
@@ -111,6 +127,25 @@ import AVFoundation
         XCTAssertEqual(model.phase, .running); XCTAssertEqual(model.startupWait(for: model.activeOptions!), 70_000_000_000)
         XCTAssertTrue(child.arguments.contains("--aec-provider")); XCTAssertTrue(child.arguments.contains("--speaker-provider"))
         XCTAssertFalse(child.arguments.contains("--microphone-provider")); _ = await model.stop()
+    }
+    func testAECThenNCProfilesAndBadChainAckStop() async throws {
+        for installed in [false, true] { for installedSpeaker in [false, true] {
+            let snapshot = try inventory(), config = configuration(), child = AECChild()
+            let model = AudioRouteController(readInventory: { snapshot }, authorization: { .authorized }, requestAuthorization: { false }, factory: { child }, resolveInstalledProvider: { _, _, role in
+                InstalledNCConfiguration(nodePath: "/fixture/node", workerPath: "/fixture/worker", addonPath: "/fixture/addon", modelPath: "/fixture/model", adapterPath: "/fixture/adapter", libraryPath: "/fixture/lib", nodeSHA256: InstalledNCConfiguration.reviewedNodeSHA256, adapterSHA256: String(repeating: "b", count: 64), modelRole: role)
+            }, resolveInstalledAEC: { _ in config })
+            await model.refresh(); model.inputUID = "mic"; model.outputUID = "speaker"
+            model.selectInstalledApp(URL(fileURLWithPath: "/fixture.app")); model.selectInstalledNode(URL(fileURLWithPath: "/fixture/node"))
+            model.echoCancellation = true; model.microphoneNoise = true; model.microphoneProvider = installed ? .installedKrisp : .rnnoise
+            model.speakerNoise = true; model.speakerProvider = installedSpeaker ? .installedKrisp : .rnnoise
+            await model.validateInstalledAEC(); await model.validateInstalledProvider(); XCTAssertTrue(model.canStart)
+            model.start(); try await wait { child.running }; try child.ack()
+            XCTAssertEqual(model.phase, .running)
+            if let active = model.activeOptions { XCTAssertEqual(model.startupWait(for: active), UInt64(1 + (installed ? 1 : 0) + (installedSpeaker ? 1 : 0)) * 30_000_000_000 + 10_000_000_000) }
+            _ = await model.stop()
+            model.start(); try await wait { child.running }; try child.ack { $0["microphone_processing_order"] = "nc-then-aec" }
+            try await wait { child.terminations == 2 }; XCTAssertNil(model.activeOptions)
+        } }
     }
     func testCancellationDuringPermissionDoesNotLaunch() async throws {
         let snapshot = try inventory(), config = configuration(), child = AECChild()

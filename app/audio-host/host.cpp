@@ -635,8 +635,6 @@ int main(int argc, char **argv) {
             if(!aecFlags.empty()) {
                 if(!installedAEC || aecFlags.size()!=4)
                     throw std::invalid_argument("AEC provider requires all runtime options");
-                if(microphone || installedProvider || !providerFlags.empty())
-                    throw std::invalid_argument("AEC cannot be combined with microphone suppression or provider");
                 (void)krisp_probe::buildInstalledAECWorkerLaunch(aecSettings,{});
                 provider.installedAEC=std::move(aecSettings);
             }

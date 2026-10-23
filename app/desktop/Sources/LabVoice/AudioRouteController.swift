@@ -75,7 +75,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     var canStart: Bool {
         guard phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
-              !(echoCancellation && (microphoneNoise || installedAECConfiguration == nil)),
+              !(echoCancellation && installedAECConfiguration == nil),
               !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != .outbound),
               !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
         return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
@@ -190,7 +190,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func startupWait(for options: AudioRouteOptions) -> UInt64 {
         let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1) + (options.installedAEC == nil ? 0 : 1)
-        return workers == 2 ? 70_000_000_000 : (workers == 1 ? 40_000_000_000 : startupTimeout)
+        return workers > 0 ? UInt64(workers) * 30_000_000_000 + 10_000_000_000 : startupTimeout
     }
     // No permission request or --route launch occurs until this explicit Start action.
     func start() {
