@@ -5,7 +5,9 @@ const {runSession} = require('./worker_session.cjs');
 const ADDON_SHA256 = 'adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755';
 const MODEL_SHA256 = '12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d'; // Outbound compatibility export.
 const INBOUND_MODEL_SHA256 = 'd1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a';
-const MODEL_IDENTITIES = Object.freeze({outbound:MODEL_SHA256,inbound:INBOUND_MODEL_SHA256});
+// Candidate identity uses the ordinary NC ABI, not a verified desktop BVC graph.
+const OUTBOUND_HVC_MODEL_SHA256 = '54e2913ea45734adc3323407e43f55b14afade256ab4da6226c2b6e30604cbf4';
+const MODEL_IDENTITIES = Object.freeze({outbound:MODEL_SHA256,inbound:INBOUND_MODEL_SHA256,'outbound-hvc-lfb':OUTBOUND_HVC_MODEL_SHA256});
 // Caller must use the reviewed deny-network sandbox profile and clear NODE_OPTIONS
 // before Node starts. Broker must also clear NODE_PATH and DYLD injection variables,
 // permitting only the reviewed DYLD_LIBRARY_PATH needed for installed libraries.
@@ -89,7 +91,7 @@ async function runWorker(config, dependencies={}) {
     if (watch.close()?.stopped !== true) throw new Error('Parent watch stop was not confirmed');
   }
 }
-module.exports={validateConfig,admit,runWorker,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,MODEL_IDENTITIES};
+module.exports={validateConfig,admit,runWorker,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,OUTBOUND_HVC_MODEL_SHA256,MODEL_IDENTITIES};
 if(require.main===module) {
   Promise.resolve().then(()=>{
     if(process.argv.length!==3)throw new Error('Expected one JSON config argument');

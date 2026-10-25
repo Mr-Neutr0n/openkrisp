@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'), fs=require('node:fs'), os=require('node:os'), path=require('node:path'), crypto=require('node:crypto');
-const {runWorker,admit,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,validateConfig}=require('./audio_worker.cjs');
+const {runWorker,admit,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,OUTBOUND_HVC_MODEL_SHA256,validateConfig}=require('./audio_worker.cjs');
 const {encode,Parser}=require('./worker_protocol.cjs');
 const config={addonPath:'/fixture/addon',modelPath:'/fixture/model',adapterPath:'/fixture/adapter',adapterSha256:'a'.repeat(64),nodeSha256:'b'.repeat(64),token:'19'.repeat(16),suppressionLevel:100,bypass:false,parentPID:process.ppid,modelRole:'outbound',modelSha256:MODEL_SHA256};
 function fixture(options={}, selected=config) {
@@ -41,6 +41,25 @@ function fixture(options={}, selected=config) {
   const wrongInbound=fixture({},inbound), originalInboundHash=wrongInbound.deps.fileHash;
   wrongInbound.deps.fileHash=p=>p===inbound.modelPath?MODEL_SHA256:originalInboundHash(p);
   await assert.rejects(runWorker(inbound,wrongInbound.deps));assert.equal(wrongInbound.stats().loaded,0);
+  const hvc={...config,modelRole:'outbound-hvc-lfb',modelSha256:OUTBOUND_HVC_MODEL_SHA256};
+  const hvcFixture=fixture({},hvc);
+  assert.deepEqual(await runWorker(hvc,hvcFixture.deps),{requests:0,teardownComplete:true});
+  assert.equal(Buffer.concat(hvcFixture.writes).toString('ascii'),`OKREADY2 ${config.token} ordinary-nc-direct 48000 480 outbound-hvc-lfb ${ADDON_SHA256} ${OUTBOUND_HVC_MODEL_SHA256} ${config.adapterSha256} ${config.nodeSha256}\n`);
+  for(const selected of [config,inbound,hvc]) for(const digest of [MODEL_SHA256,INBOUND_MODEL_SHA256,OUTBOUND_HVC_MODEL_SHA256]) {
+    if(selected.modelSha256===digest)continue;
+    const rejected=fixture({},selected);
+    await assert.rejects(runWorker({...selected,modelSha256:digest},rejected.deps));
+    assert.deepEqual(rejected.events,[]);assert.equal(rejected.stats().loaded,0);
+  }
+  for(const role of ['outbound-hvc','outbound-hvc-lfb ', 'OUTBOUND-HVC-LFB']) {
+    const rejected=fixture({},hvc);
+    await assert.rejects(runWorker({...hvc,modelRole:role},rejected.deps));assert.deepEqual(rejected.events,[]);
+  }
+  for(const digest of [MODEL_SHA256,INBOUND_MODEL_SHA256,'0'.repeat(64)]) {
+    const rejected=fixture({},hvc), hash=rejected.deps.fileHash;
+    rejected.deps.fileHash=p=>p===hvc.modelPath?digest:hash(p);
+    await assert.rejects(runWorker(hvc,rejected.deps));assert.equal(rejected.stats().loaded,0);
+  }
   for(const options of [{network:'ECONNREFUSED'},{network:'CONNECTED'},{network:'TIMEOUT'},{badHash:true}]){
     const f=fixture(options);await assert.rejects(runWorker(config,f.deps));assert.equal(f.stats().loaded,0);
   }

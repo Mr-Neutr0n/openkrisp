@@ -46,3 +46,10 @@ The HVC catalog's declared 32 kHz work rate does not contradict this bounded 48 
 The next runtime gate should use the retained bypass output as a named comparison and preserve the failed raw-input assertion in history. The same-adapter control supports the tested output difference; any BVC quality gate still needs independent target/background speech controls. No production switch should be enabled from this candidate capture alone.
 
 The two candidate children and the ordinary control ran through REA with a deny-network sandbox and recorded loopback EPERM. Hashes are sampled file checks, not atomic loader binding. No physical audio, administrator operation or original application UI ran. This report performed only retained-evidence and output review; it did not rerun original code.
+
+
+## Persistent worker follow-up, 2026-10-25
+
+The subsequent persistent-worker gate passed independently of the historical failed raw-input assertion. Fresh active and bypass workers each returned 100 frames and 48000 finite samples, with byte-identical outputs to the retained direct-HVC files. REA `ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753` exited zero, retained complete raw output and verified owned cleanup. The fixed `outbound-hvc-lfb` role binds the reviewed model hash without relaxing ordinary outbound/inbound admission. See `background-voice-persistent-findings.md` for exact pins and limits.
+
+The current native findings also close the static NC descriptor construction join and identify packaged RD defaults and the alternate energy/statistics path. These supersede the corresponding unresolved items above. Product selection, headset policy, voice-isolation quality, real-time deadlines, AEC composition and physical routing remain incomplete or unverified.

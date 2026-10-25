@@ -32,7 +32,7 @@ int main(int argc,char** argv) {
         }
         assert(b.close()); assert(b.error().empty()); reaped(b.childPID());
     }
-    for(auto role:{InstalledModelRole::outbound,InstalledModelRole::inbound}) {
+    for(auto role:{InstalledModelRole::outbound,InstalledModelRole::inbound,InstalledModelRole::outboundHVC}) {
         InstalledWorkerSettings settings;
         settings.nodePath="/fixture/node";settings.workerPath="/fixture/worker";
         settings.addonPath="/fixture/addon";settings.modelPath="/fixture/model";

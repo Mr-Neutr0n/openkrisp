@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-23",
+  "snapshot_date": "2026-10-25",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -336,7 +336,7 @@
         },
         {
           "key": "all_done_today",
-          "text": "All done for today \u2705"
+          "text": "All done for today ✅"
         }
       ],
       "original_evidence_ids": [
@@ -1046,7 +1046,7 @@
         },
         {
           "key": "bvc.active_tooltip_text",
-          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won\u2019t be heard."
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
         },
         {
           "key": "bvc.bvc_device_enforced_tooltip",
@@ -1064,17 +1064,48 @@
         "ev_452c9179b564f2bdfd1a12a765bf5873cccbb1fbd2f5899e56b0c6742369215c",
         "ev_414ced988253990fbe6bf4f8c6274e88ab59aa533f34671147088cdc51cacc2d",
         "ev_56b1a5141f8d1e8f0eee9728b1d110f18bb2d9e628735ed0e21cca79d2bbb9fe",
-        "ev_2f7141d178b135212d4f829f61124b34f138dcc284d300ba85dc65837dd2e446"
+        "ev_2f7141d178b135212d4f829f61124b34f138dcc284d300ba85dc65837dd2e446",
+        "ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753",
+        "ev_baa4af283367bba30cbe58c37474d1eb54282bd8034da0f538141fe9214fa88c",
+        "ev_6bbf782b4100180664a50853b4c70a77e587d22a34fff0a18df9c0eb150557d5",
+        "ev_b38f113fcb47bc7b9fe6689706535e3568ac6c9e358ed958f32939de4112a5bc",
+        "ev_7598632c8be8f38508c1b4fbf03da7387c76b3e667bd5b2d4203b0df35f7267c",
+        "ev_54e65aea84f83eb3bf18ae040b90216e0dc3edb5a22919e934929a7e2cd8203b",
+        "ev_e7e57aa461cb151a4f59ced09cebff5763ab27fc2f30fca6a6bf298026f68eb7"
       ],
       "implemented_code": [
         {
           "path": "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/audio_worker.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/audio_worker_test.cjs",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/installed_worker_launch.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/installed_worker_probe.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/native-model-probe/worker_broker_test.cpp",
+          "exists": true
         }
       ],
-      "implementation": "Evidence-only HVC candidate processing through the existing ordinary-NC factory is retained. Production ordinary-NC role admission remains unchanged. No selectable BVC processor, headset detection or manual override exists.",
-      "verified_scope": "Static control/native findings and bounded candidate CPU processing only. HVC active/bypass children each completed 100 frames, 100 callbacks and 48000 finite samples with clean teardown; outer capture exited 1 due to an invalid raw-input bypass assertion. Candidate bypass exactly matches retained ordinary bypass. Same-adapter ordinary active control exited 0 and differs from HVC in 47500 samples, supporting model-dependent output only. HVC declared 32 kHz work rate and tested 48 kHz interface do not establish internal conversion, voice isolation, persistent operation or original dispatch parity. See background-voice-{controls,native,candidate}-findings.md.",
-      "missing_acceptance": "Resolve shared NC descriptor-to-native dispatch and effective BVC settings, then implement a distinct pinned HVC persistent role without relaxing ordinary NC admission. Validate target speech preservation, nearby voice rejection, headset policy/manual override, AEC composition and hardware routing separately."
+      "implementation": "A fixed outbound-hvc-lfb role is implemented in the persistent worker and private probe, with exact model hash admission. Ordinary outbound/inbound defaults remain unchanged. Product BVC, headset detection and manual override are not yet available.",
+      "verified_scope": "Static NC descriptor dispatch, packaged RD defaults and alternate energy/statistics path are recovered. REA ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753 exited zero with verified owned cleanup and complete raw output. Fresh active and bypass persistent HVC workers each returned 100 frames and 48000 finite samples, matching retained direct-HVC output bytes with clean teardown and unchanged pins. The historical failed raw-input bypass assertion remains recorded separately. This verifies bounded CPU processing, not voice isolation, live routing or full original BVC parity. See background-voice-persistent-findings.md and background-voice-native-findings.md.",
+      "missing_acceptance": "Integrate explicit microphone selection and matching startup identity, headset compatibility/manual override, target speech preservation, nearby voice rejection, AEC composition, real-time deadlines and physical routing. HVC-sfb and bypass energy/statistics lifecycle remain unverified."
     },
     {
       "id": "performance",
@@ -1627,7 +1658,7 @@
         },
         {
           "key": "test_nc.recording_will_not_leave_device",
-          "text": "Your recording will never leave your device and won\u2019t be saved."
+          "text": "Your recording will never leave your device and won’t be saved."
         }
       ],
       "original_evidence_ids": [
@@ -2267,7 +2298,7 @@
       "representative_labels": [
         {
           "key": "about_copy_right_text",
-          "text": "\u00a9 {{date}} Krisp Technologies, Inc. All right reserved."
+          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
         },
         {
           "key": "app_menu_edit.title",
@@ -2393,7 +2424,7 @@
         },
         {
           "key": "pref_notifications_on_off_indicator_body",
-          "text": "Shows key features\u2019 states at the start of each meeting and reminds to inform other participants if recording"
+          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
         }
       ],
       "original_evidence_ids": [
@@ -2427,7 +2458,7 @@
       "representative_labels": [
         {
           "key": "cant_find_page_text",
-          "text": "Can\u2019t find the page?"
+          "text": "Can’t find the page?"
         },
         {
           "key": "check_internet",
@@ -2998,17 +3029,17 @@
     "projects/krisp/app/native-model-probe/worker_protocol_cross_test.cjs": "9e7bd0275edf39ec1b6fd25c4f6397cf58deb7410a6556b3e6156dd1600ac6de",
     "projects/krisp/app/native-model-probe/worker_session.cjs": "3071ac60f848f3109f8f608eea57a82feaeb3eb02d2ce36fa276f250ffcf8888",
     "projects/krisp/app/native-model-probe/worker_session_test.cjs": "516f7be4a20e2cf3a1ad310cd9fbb4b90c24d266b0a4b2065644fbf35fd94043",
-    "projects/krisp/app/native-model-probe/audio_worker.cjs": "93c0fda34e544a108f19bf8fec1ee6a4d7219cce8beafbe36de5697ea7a648e8",
-    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "965821f16f3f0aa079d241b4fad4d19147365d29d8dd6585e99b9a15ddc8584b",
-    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "9595fcae3117181fb8bf05c48665c39a84f419857b45937ff758e4c16eb4e15c",
-    "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp": "fe597de9affc2e5ee1b491ae7705efc085c1dcf5d260eeebae0bd934d43ac09b",
-    "projects/krisp/app/native-model-probe/installed_worker_probe.cpp": "279c22af7002ce6b948201094eebd12e90620eb0f8a9212a25f8a9a1045e14cd",
+    "projects/krisp/app/native-model-probe/audio_worker.cjs": "6ceef5bc8e0e230bf3b595cd176d84788bec0e6cb79e3ec82b5bd6ac6a27ef53",
+    "projects/krisp/app/native-model-probe/audio_worker_test.cjs": "c3e31b9a03f3c921f3c97f50fcafb9f29369f43fb0fdf046c2ed5face9cffd03",
+    "projects/krisp/app/native-model-probe/installed_worker_launch.hpp": "3ee8b77c9e190e491d2e561d469adf723097e6427249248b1de31666206bc0c0",
+    "projects/krisp/app/native-model-probe/installed_worker_launch_test.cpp": "984fd9ba34add9ec7ffcfddb51e149d122cfc479526484f76163c2d0ff7818b7",
+    "projects/krisp/app/native-model-probe/installed_worker_probe.cpp": "0076989eb5973086e5fe7cd02c963e092c75d5a00c4719df2422bfc2248b15ea",
     "projects/krisp/app/native-model-probe/provider_worker.hpp": "9a26453630370cfafe17884dc8f933de753a465a37e786298ed4c93b4cfc2e88",
     "projects/krisp/app/native-model-probe/provider_worker_test.cpp": "2c5b9a17637f9a54651b8f18a2acd99408f87b168565d19f25cabe560c643d3a",
     "projects/krisp/app/native-model-probe/worker_broker.cpp": "91c438fd3dd48dfa5556783d4fe9f3bcca20849089a8053c76ddb1d67f61e054",
     "projects/krisp/app/native-model-probe/worker_broker.hpp": "5fe88279133265f1f3e504a835859d0e4e3712c5fd30983214cc108d48ea2c09",
     "projects/krisp/app/native-model-probe/worker_broker_fixture.cjs": "9c582434288b9b88b24515b2f0c3695e3fb97783fd0719286bef1d8829688d95",
-    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "a34cf0588578157f27704b9b644fad2931ff7367283bb54d6c63c0614eaccf4b",
+    "projects/krisp/app/native-model-probe/worker_broker_test.cpp": "cf4fba454d25edf3c89a376c3b808855914c8f4c9b01df1fab8132c2353bd003",
     "projects/krisp/app/native-model-probe/parent_watch.hpp": "e0fa1322d70384a494a944a64e351a8366938f2df1e8e1e85b3dbfacdc6d983b",
     "projects/krisp/app/native-model-probe/parent_watch_test.cpp": "74bb5165c102f863b406dd2ea0cb2680465747b960b4c488d23f1f169e65a80b",
     "projects/krisp/app/native-model-probe/parent_watch_native_test.cjs": "c436b663d58c0a03f6555a4c94c9d64abdc52614e388aa95c5d8b3b822f5c84e",
@@ -3085,7 +3116,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "Code fingerprints identify 165 referenced independent files at the verified offline transcript timing checkpoint. They are source snapshots, not runtime identity, original timestamp parity or completion certificates.",
+  "source_snapshot_note": "Code fingerprints identify 165 referenced independent files at the persistent HVC worker checkpoint. They are source snapshots, not runtime identity, voice-isolation quality or completion certificates.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

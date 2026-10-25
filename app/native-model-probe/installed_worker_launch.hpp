@@ -7,13 +7,16 @@
 #include <unistd.h>
 
 namespace krisp_probe {
-enum class InstalledModelRole { outbound, inbound };
+enum class InstalledModelRole { outbound, inbound, outboundHVC };
 inline constexpr const char* installedOutboundModelSHA256 = "12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d";
 inline constexpr const char* installedInboundModelSHA256 = "d1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a";
+// Candidate only: ordinary NC ABI, no claim of original desktop BVC dispatch.
+inline constexpr const char* installedOutboundHVCModelSHA256 = "54e2913ea45734adc3323407e43f55b14afade256ab4da6226c2b6e30604cbf4";
 inline const char* installedModelRoleName(InstalledModelRole role) {
     switch(role) {
         case InstalledModelRole::outbound: return "outbound";
         case InstalledModelRole::inbound: return "inbound";
+        case InstalledModelRole::outboundHVC: return "outbound-hvc-lfb";
     }
     throw std::invalid_argument("Unknown installed model role");
 }
@@ -21,6 +24,7 @@ inline const char* installedModelSha256(InstalledModelRole role) {
     switch(role) {
         case InstalledModelRole::outbound: return installedOutboundModelSHA256;
         case InstalledModelRole::inbound: return installedInboundModelSHA256;
+        case InstalledModelRole::outboundHVC: return installedOutboundHVCModelSHA256;
     }
     throw std::invalid_argument("Unknown installed model role");
 }

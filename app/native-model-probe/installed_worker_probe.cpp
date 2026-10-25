@@ -63,8 +63,23 @@ void publish(const char* path, const std::array<std::uint8_t, byteCount>& bytes)
 }
 int main(int argc, char** argv) {
     try {
-        if ((argc != 11 && argc != 12) || (argc == 12 && std::string(argv[11]) != "--bypass"))
-            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass]");
+        if (argc < 11)
+            throw std::invalid_argument("Expected node worker addon model adapter library nodeSha adapterSha input output [--bypass] [--model-role outbound|inbound|outbound-hvc-lfb]");
+        bool bypass=false, roleSeen=false;
+        auto role=krisp_probe::InstalledModelRole::outbound;
+        for(int i=11;i<argc;++i) {
+            const std::string option=argv[i];
+            if(option=="--bypass" && !bypass) {bypass=true;continue;}
+            if(option=="--model-role" && !roleSeen && i+1<argc) {
+                roleSeen=true;const std::string selected=argv[++i];
+                if(selected=="outbound")role=krisp_probe::InstalledModelRole::outbound;
+                else if(selected=="inbound")role=krisp_probe::InstalledModelRole::inbound;
+                else if(selected=="outbound-hvc-lfb")role=krisp_probe::InstalledModelRole::outboundHVC;
+                else throw std::invalid_argument("Unknown installed model role");
+                continue;
+            }
+            throw std::invalid_argument("Invalid or duplicate probe option");
+        }
         // Validate the complete synthetic input before constructing any child.
         FD input(::open(argv[9], O_RDONLY | O_NOFOLLOW | O_CLOEXEC));
         struct stat before{}, after{};
@@ -81,7 +96,8 @@ int main(int argc, char** argv) {
         krisp_probe::InstalledWorkerSettings settings;
         settings.nodePath=argv[1]; settings.workerPath=argv[2]; settings.addonPath=argv[3];
         settings.modelPath=argv[4]; settings.adapterPath=argv[5]; settings.libraryPath=argv[6];
-        settings.nodeSha256=argv[7]; settings.adapterSha256=argv[8]; settings.bypass=argc==12;
+        settings.nodeSha256=argv[7]; settings.adapterSha256=argv[8]; settings.bypass=bypass;
+        settings.modelRole=role;settings.modelSha256=krisp_probe::installedModelSha256(role);
         krisp_probe::wire::Token token{};
         for (unsigned i=0;i<token.size();++i) token[i]=static_cast<std::uint8_t>(0xa0+i);
         krisp_probe::WorkerBroker broker(krisp_probe::buildInstalledWorkerLaunch(settings,token));
@@ -99,7 +115,10 @@ int main(int argc, char** argv) {
         const auto processed=std::chrono::steady_clock::now();
         if (!broker.close()) throw std::runtime_error(broker.error());
         publish(argv[10],outputBytes);
-        std::cout << "{\"status\":\"completed\",\"frames\":100,\"samples\":48000,\"teardownComplete\":true,\"startupMs\":"
+        std::cout << "{\"modelRole\":\"" << krisp_probe::installedModelRoleName(role)
+                  << "\",\"modelSha256\":\"" << settings.modelSha256
+                  << "\",\"backend\":\"ordinary-nc-direct\",\"bypass\":" << (bypass?"true":"false")
+                  << ",\"status\":\"completed\",\"frames\":100,\"samples\":48000,\"teardownComplete\":true,\"startupMs\":"
                   << std::chrono::duration_cast<std::chrono::milliseconds>(ready-start).count()
                   << ",\"processingMs\":" << std::chrono::duration_cast<std::chrono::milliseconds>(processed-ready).count() << "}\n";
         return 0;

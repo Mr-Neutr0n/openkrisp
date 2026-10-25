@@ -1,4 +1,6 @@
-# Checkpoint: resumed 2026-10-15
+# Checkpoint
+
+Latest verified work: [Persistent HVC worker, 2026-10-25](#persistent-hvc-worker-checkpoint-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -497,3 +499,18 @@ Desktop import now preserves recognized segment text, order and timing through s
 ## Background voice evidence checkpoint, 2026-10-23
 
 Static controls/native recovery and bounded HVC candidate processing are documented in `background-voice-controls-findings.md`, `background-voice-native-findings.md` and `background-voice-candidate-findings.md`. REA `ev_56b1a5141f8d1e8f0eee9728b1d110f18bb2d9e628735ed0e21cca79d2bbb9fe` retains two successful 100-frame/48000-finite-sample children, but outer exit 1 remains recorded because raw-input bypass equality was an invalid oracle. Candidate bypass matches retained ordinary bypass. Same-adapter ordinary active control `ev_2f7141d178b135212d4f829f61124b34f138dcc284d300ba85dc65837dd2e446` exited 0; 47500 samples differ from HVC, establishing model-dependent output only. Production BVC remains unavailable and metadata-only in the ledger. Next recover shared NC descriptor dispatch and effective BVC settings before admitting a distinct persistent HVC role; quality and hardware remain separate gates. Fresh driver checks confirm the trace tree and current own services predating its installation, so the deferred restart remains diagnostic, not a proven fix. See `driver-current-discovery-findings.md`. All 165 source fingerprints match; source is unchanged and the latest 138-test desktop pass remains applicable. No tests or vendor runtime were rerun for this documentation update.
+
+
+## Persistent HVC worker checkpoint, 2026-10-25
+
+The own worker and probe now admit the exact `outbound-hvc-lfb` model as a separate role. Existing outbound/inbound defaults and identities remain unchanged. The probe accepts explicit model role and bypass options, rejects duplicates/unknown values before loading input, and reports the admitted role/hash. Product microphone selection and headset policy remain absent.
+
+REA `ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753` passed with complete raw output, unchanged before/after pins and verified owned cleanup. Fresh active and bypass persistent workers each returned 100 frames, 48000 finite samples and confirmed teardown. Their bytes match the retained direct-HVC outputs. See `background-voice-persistent-findings.md` for exact pins and comparison hashes. The historical direct capture's failed raw-input assertion remains recorded. Static REA findings now close the NC descriptor construction join and identify packaged RD defaults and the alternate energy/statistics branch.
+
+Full native-model-probe and audio-host verification passed, including their existing release and sanitizer suites. Desktop verification passed 138 tests, ARM64/macOS12 build, signing and relocated-resource checks. Its first packaging attempt rejected the stale audio helper; rebuilding the helper resolved that dependency failure. Independent GPT6.1sol reviews found no remaining source or report issues. All 165 source fingerprints match.
+
+- `evidence/hvc-persistent-native-verify-20261025.log` SHA256 `27fa4898b40c0dadccfd52bc7d07fb8f6c0374d9882ccb9c1d4e39913d019a6a`.
+- `evidence/hvc-persistent-audio-host-verify-20261025.log` SHA256 `acd06b866b17276a3bc787b10bc4276ca713356a7e513dead5c956ddc7c1a491`.
+- `evidence/hvc-persistent-desktop-verify-20261025.log` SHA256 `ff012b0ef7169ced5ca5453e5feeb1ee23c493712e17aa9fb5c2aa4d42916bac`.
+
+Next integrate explicit installed microphone HVC selection, exact role/hash startup checks and invalidation when settings change. Preserve inbound-only speaker admission and reject HVC with AEC until separate composition validation. This bounded CPU evidence does not establish voice isolation, target-speaker preservation, real-time deadlines, physical routing or full retained local parity. No physical audio, administrator action or original app UI ran. Vendor binaries/models remain external and excluded from Git.

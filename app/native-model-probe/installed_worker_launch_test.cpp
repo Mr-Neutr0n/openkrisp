@@ -26,6 +26,16 @@ int main(int argc,char** argv) {
     const auto inboundLaunch=buildInstalledWorkerLaunch(inbound,token);
     assert(inboundLaunch.arguments[8].find("\"modelRole\":\"inbound\",\"modelSha256\":\""+std::string(installedInboundModelSHA256)+"\"")!=std::string::npos);
     assert(inboundLaunch.expectedReadyLine=="OKREADY2 000102030405060708090a0b0c0d0e0f ordinary-nc-direct 48000 480 inbound "+std::string(installed_worker_detail::addonSHA)+" "+installedInboundModelSHA256+" "+s.adapterSha256+" "+s.nodeSha256+"\n");
+    auto hvc=s;hvc.modelRole=InstalledModelRole::outboundHVC;hvc.modelSha256=installedOutboundHVCModelSHA256;
+    const auto hvcLaunch=buildInstalledWorkerLaunch(hvc,token);
+    assert(hvcLaunch.arguments[8].find("\"modelRole\":\"outbound-hvc-lfb\",\"modelSha256\":\""+std::string(installedOutboundHVCModelSHA256)+"\"")!=std::string::npos);
+    assert(hvcLaunch.expectedReadyLine=="OKREADY2 000102030405060708090a0b0c0d0e0f ordinary-nc-direct 48000 480 outbound-hvc-lfb "+std::string(installed_worker_detail::addonSHA)+" "+installedOutboundHVCModelSHA256+" "+s.adapterSha256+" "+s.nodeSha256+"\n");
+    for(auto selected:{s,inbound,hvc}) for(const auto* digest:{installedOutboundModelSHA256,installedInboundModelSHA256,installedOutboundHVCModelSHA256}) {
+        if(selected.modelSha256==digest)continue;
+        selected.modelSha256=digest;
+        bool rejected=false;try{buildInstalledWorkerLaunch(selected,token);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);
+        selected.modelSha256=installedModelSha256(selected.modelRole);
+    }
     for(auto bad:{s,inbound}) {
         bad.modelSha256=bad.modelRole==InstalledModelRole::outbound?installedInboundModelSHA256:installedOutboundModelSHA256;
         bool rejected=false;try{buildInstalledWorkerLaunch(bad,token);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);
@@ -53,5 +63,6 @@ int main(int argc,char** argv) {
     }
     if(argc==2 && std::string(argv[1])=="--json-fixture")std::cout<<json<<'\n';
     else if(argc==2 && std::string(argv[1])=="--json-fixture-inbound")std::cout<<inboundLaunch.arguments[8]<<'\n';
+    else if(argc==2 && std::string(argv[1])=="--json-fixture-hvc")std::cout<<hvcLaunch.arguments[8]<<'\n';
     else std::cout<<"installed worker launch builder tests passed\n";
 }
