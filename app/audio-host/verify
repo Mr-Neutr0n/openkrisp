@@ -9,6 +9,10 @@ if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
   exit 1
 fi
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/audio-host
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test
+./build/device-metadata-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test-sanitized
+./build/device-metadata-test-sanitized
 python3 check.py
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror host.cpp provider_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework CoreFoundation -o build/provider-cli-fixture
 python3 provider_cli_check.py

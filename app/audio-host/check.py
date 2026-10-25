@@ -14,6 +14,10 @@ assert {d['uid'] for d in data['companion_devices']} == {'dev.hari.labvoice.feed
 (root / 'build/inventory.json').write_text(listing.stdout)
 for device in data['devices']:
     assert device['uid'] and device['id'] > 0
+    assert device['interface_name'] == device['name']
+    assert isinstance(device['manufacturer'], str) and isinstance(device['model_id'], str)
+    assert isinstance(device['metadata_read_errors'], list)
+    assert all(isinstance(warning, str) and warning.startswith(('manufacturer:', 'model_id:')) for warning in device['metadata_read_errors'])
     assert device['input']['channels'] >= 0 and device['output']['channels'] >= 0
     for direction in ('input', 'output'):
         for fmt in device[direction]['current_formats']:

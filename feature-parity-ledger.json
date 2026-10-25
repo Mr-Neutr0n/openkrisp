@@ -1074,7 +1074,13 @@
         "ev_e7e57aa461cb151a4f59ced09cebff5763ab27fc2f30fca6a6bf298026f68eb7",
         "ev_18778f368464b2a9e4ef67192d174ff8a8b7a42d22d3f2bd8638fe0074b9d253",
         "ev_bf65d20227611a5f87a999080958c3764e25cd504f1d34062dd8de9a1cf6545c",
-        "ev_a763befd06a4987fd6d43e2aab86f0eeee7b83ce95ceac5e22d7d19ff2785625"
+        "ev_a763befd06a4987fd6d43e2aab86f0eeee7b83ce95ceac5e22d7d19ff2785625",
+        "ev_4ad2c8e414301485ab5f380d309c19d3c6df3300b81c6c6911fe5714c26e927c",
+        "ev_68e84bfd79d0763fef4deaab837b8bef9880c22eca5303128fd680e95128c14c",
+        "ev_c30164d0fa6381a5cf3a3ecd23524d47fcd6f8651a00a7bc7ff25bfb5436c57a",
+        "ev_a6e4eb13b93abc992de36addc7fafcff31153762a70babcc328f83f2f50f6bbb",
+        "ev_c5f61626d1a0e91048aa8327247532e0f38deb7b0a0877621bd6a43a0c095726",
+        "ev_5a70b36a192d83f7f33c3d2f29b5cbf2c3b50d2285e012e23ab1c92d6440f893"
       ],
       "implemented_code": [
         {
@@ -1148,11 +1154,47 @@
         {
           "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/device_metadata.hpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/device_metadata_test.cpp",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/check.py",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/audio-host/verify",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Package.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/LocalHeadsetCompatibility.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioDeviceMetadataTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/LocalHeadsetCompatibilityTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/Fixtures/LocalHeadsetMatcherCases.json",
+          "exists": true
         }
       ],
-      "implementation": "Explicit experimental background-voice microphone mode selects the fixed installed HVC-lfb model. Local exact-UID headset confirmations persist with display names; confirmation, removal and reset do not start capture. HVC validation and Start require a confirmed selected input. Device/mode/policy changes invalidate admission, including pending permission requests. Startup checks exact role/hashes; speakers stay inbound-only; HVC with AEC rejects before launch. Ordinary NC is the default. Automatic compatibility is not implemented.",
-      "verified_scope": "The retained persistent HVC CPU gate ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753 passed with exact direct-output agreement and verified owned cleanup. New own-fixture tests cover explicit mode admission, stale validation, exact role acknowledgements, production C++ parser/formatter-to-Swift decoding, crossed hash and speaker-role rejection, and HVC/AEC rejection before workers start. Full audio-host release/sanitizer verification and desktop 148 tests, signing, packaging and relocated-resource checks pass. Product route with installed HVC, real-time deadlines, acoustic quality and visual interaction remain unverified. Static NC dispatch, packaged RD defaults and energy/statistics findings are retained separately. Manual policy own-fixture tests cover persistence, malformed records, renamed and same-name devices, confirmation/remove/reset, stale resolver results and permission-wait device/mode roundtrips. The stale admission race was reproduced before its revision-ID fix. New static REA captures recover exact original match fields/precedence and the observed cached list schema. See background-voice-controls-findings.md for evidence limits. A bounded native UI observation failed with process-identity-unavailable because macOS did not expose the selected app launch time. No native control interaction or visual acceptance is claimed.",
-      "missing_acceptance": "Original automatic compatibility using interfaceName/manufacturer/modelId and allow/block policy, original name-based manual semantics, target-speech preservation, nearby-voice rejection, real-time deadlines, physical routing, full native visual acceptance and separate AEC composition gate. HVC-sfb and original energy/bypass statistics remain unverified. Current exact-UID manual policy is an independent implementation, not exact original name matching."
+      "implementation": "Explicit experimental background-voice microphone mode selects the fixed installed HVC-lfb model. Local exact-UID headset confirmations persist with display names; confirmation, removal and reset do not start capture. HVC validation and Start require a confirmed selected input. Device/mode/policy changes invalidate admission, including pending permission requests. Startup checks exact role/hashes; speakers stay inbound-only; HVC with AEC rejects before launch. Ordinary NC is the default. Automatic compatibility is not implemented. The helper now exposes original-mapped global interface name, manufacturer and model UID; optional metadata read failures leave empty strings and per-device diagnostics without discarding the device. A standalone local compatibility engine implements recovered mode/rate gates, local blocked/allowed/manual precedence, branch-sensitive malformed values, UTF-16 substring matching and bounded cache loading. It is not yet connected to automatic microphone model selection.",
+      "verified_scope": "The retained persistent HVC CPU gate ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753 passed with exact direct-output agreement and verified owned cleanup. New own-fixture tests cover explicit mode admission, stale validation, exact role acknowledgements, production C++ parser/formatter-to-Swift decoding, crossed hash and speaker-role rejection, and HVC/AEC rejection before workers start. Full audio-host release/sanitizer verification and desktop 160 tests, signing, packaging and relocated-resource checks pass. Product route with installed HVC, real-time deadlines, acoustic quality and visual interaction remain unverified. Static NC dispatch, packaged RD defaults and energy/statistics findings are retained separately. Manual policy own-fixture tests cover persistence, malformed records, renamed and same-name devices, confirmation/remove/reset, stale resolver results and permission-wait device/mode roundtrips. The stale admission race was reproduced before its revision-ID fix. New static REA captures recover exact original match fields/precedence and the observed cached list schema. See background-voice-controls-findings.md for evidence limits. A bounded native UI observation failed with process-identity-unavailable because macOS did not expose the selected app launch time. No native control interaction or visual acceptance is claimed. Metadata selector/scope and Napi field mapping are bound by six accepted static REA captures. Optional read errors preserve routing and name-only matching in own fixtures. The standalone Swift suite exercises 35 local cases from 43 own statically expected cases; 8 team/account cases are excluded. Original extracted-method replay obtained no dynamic outcomes because of syntax and REA lifecycle failures, which remain retained separately.",
+      "missing_acceptance": "Connect the recovered local policy and offline cache to automatic microphone model selection and original manual-name behavior. Later original device grouping/display-name mutation, runtime device-policy comparison, cache provenance/freshness, malformed-rate coercion and Foundation/JavaScript JSON edge cases and cross-runtime Unicode lowercase parity remain open. Target-speech preservation, nearby-voice rejection, real-time deadlines, physical routing, native visual acceptance, HVC-sfb, AEC composition and original energy/bypass statistics remain unverified. Existing exact-UID confirmation policy remains an independent interim behavior."
     },
     {
       "id": "performance",
@@ -2989,7 +3031,7 @@
   ],
   "implementation_source_sha256": {
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
-    "projects/krisp/app/desktop/build": "ead3576595e02cdfe1b1d4804e589db4bab2b20c5de171f3919d49641ba9758a",
+    "projects/krisp/app/desktop/build": "21b650dd02c7eede64282d480610cda27c1bb8699d82d6572e1c59456e3b48bc",
     "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "74b89d527cd18dc325ae491332d133f44bb11381f8497dce4f03f54134180932",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "b1e9a95cadc305e07e69d963151877ade064656468dcd98577cd93a1a8c62bad",
     "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
@@ -3022,7 +3064,7 @@
     "projects/krisp/app/audio-host/microphone_test_wire_fixture.cpp": "104b0317817109fe838b05935d82b77b0450eb9b097278dcf275e7f609a3c751",
     "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
     "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
-    "projects/krisp/app/audio-host/host.cpp": "77e2f55ae547bb6bbada685f547a42e2154b6d7ba31b3641da4feb445a6ca5a8",
+    "projects/krisp/app/audio-host/host.cpp": "077620ccc481e35d2b51bf0c6c42d4ecf0c3e11d6dabfd983a6eca74e593b6b4",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "7ca02e333ed2f1a78f84ebba3f41df490273a5f4564e0cf3cd6e0a08aee3c1c0",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
@@ -3096,14 +3138,14 @@
     "projects/krisp/app/audio-host/routing_test.cpp": "f297a5c2b9f367c4cd32d656c0753c0eda1c63caf2110129f59798195de5bea0",
     "projects/krisp/app/desktop/verify": "ccc1cd8f891d70f2df7b7bc27b69acb1198137d0ec156e92ba649869a686e8e2",
     "projects/krisp/app/audio-host/route_cli.hpp": "3bb4cf3af2a05e244f7a82fa5c6c90a53ddb4a53e7021a9ed13dec5a1559628f",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "262f69ff84951a8df4916c39d7b0e13fc4db57ba335ac85c98e400812c7b61a2",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "62a9d18ef8e602a558e89e01e7c2a9289f1f9eed7abfde8d8303ba99b68157d5",
     "projects/krisp/app/audio-host/provider_cli_check.py": "fc1e407bc4d9912ef9bffe831166421bc4361c9db3558c161d76f027fe479b9b",
     "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift": "21c3b72ca475cb91c0b44a6ee670a4dc3d9c6f5a7758aa2725c6ab0f9ac8cf4c",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "3409a9776612e1895d49a8773e257cf27ac623eda4dfc41d7bbf64a882b108d1",
     "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "a92ad9f174414c734df571e3368a5905f8d6fcc9b1f5594dbc37fe83d548f3b2",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
     "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "79b58b67a74c0a6331f4394a6235dae4a39fd8cd210ecd1a352688c93fd43a08",
-    "projects/krisp/app/audio-host/verify": "fc8f69e56935ed5383a21951f4bdf533737155b30c95e953276c5eac315660a4",
+    "projects/krisp/app/audio-host/verify": "b3e029cca968fa4f723efac823b51d52760a02e36dc3f20abba6c5327778331f",
     "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "b601d0b472020ab2655a7b3bce13610f3ade51380884b9495be6e4a2246bc8d7",
     "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76",
     "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
@@ -3154,7 +3196,15 @@
     "projects/krisp/app/audio-host/aec_microphone_chain_probe_test.cpp": "8142f6fc5668df1469e39ed338cc6a3dc519651f96d88904cf6ad573cb34f56a",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift": "d151b3f651a886e512b1fde70cb5ea8208dc7eb07b27c5a322e77f42f01f002e",
     "projects/krisp/app/desktop/Sources/LabVoice/HeadsetConfirmations.swift": "ff4183b83ee1584d4524df69f5abbd618fcef48683d7ec6207b54927a5a1ba3f",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift": "109d10164144df799f24550c28ec57e682306fb2e5e3804742402d549373621a"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift": "109d10164144df799f24550c28ec57e682306fb2e5e3804742402d549373621a",
+    "projects/krisp/app/audio-host/device_metadata.hpp": "372913fe2e2650898d99c265352d9c72b479f8a1e60829819056af3896e95c03",
+    "projects/krisp/app/audio-host/device_metadata_test.cpp": "e3b30aab423d6db08e5b906cce168df9828f168bf700a0919c70a13d7e8de1e6",
+    "projects/krisp/app/audio-host/check.py": "5e56b12aa12965fcaeb7f5ab95caba623b8e853cc30f46c7ee7876630fec3ce0",
+    "projects/krisp/app/desktop/Package.swift": "b9cfb2c235d11e40dd1499c923647fa2c802b0415ae837a9291fbb37e115d714",
+    "projects/krisp/app/desktop/Sources/LabVoice/LocalHeadsetCompatibility.swift": "b503e7f603c440dfba3cf6f944c1a440d0c2f4304bb86d4cd2aa7610a9fc0b2c",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioDeviceMetadataTests.swift": "d5f19fcaa9038df96cc3a448f72c9b2115981b1e9cfc6385abc741832b4354c0",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/LocalHeadsetCompatibilityTests.swift": "5265a571cd9d61299273e8b4489c4ada76eced496f9e5daa9ee210b8afd23e4d",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/Fixtures/LocalHeadsetMatcherCases.json": "11b8603186fa7dcb57daef959d143e8e5bfbd9cb896f475b0d84692eb30bbc19"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3165,7 +3215,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "Code fingerprints identify 167 referenced independent files at the manual headset confirmation checkpoint. Source fingerprints do not establish original automatic-policy parity, voice-isolation quality or physical routing acceptance.",
+  "source_snapshot_note": "Code fingerprints identify 175 independent source, verification and own-fixture files at the device metadata/local compatibility engine checkpoint. Automatic product selection and original runtime-policy parity remain incomplete.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

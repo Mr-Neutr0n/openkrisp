@@ -255,3 +255,6 @@ exclusive staging publication and never overwrites an existing destination.
 The stateful own NC fixture and an independent scalar calculation test startup
 warmup. Changing only the oracle must leave chain output unchanged while
 reporting a mismatch. These tests execute no installed component.
+
+
+The read-only inventory includes `interface_name`, `manufacturer`, `model_id` and per-device `metadata_read_errors`. `interface_name` copies the existing global CoreAudio name without transformation. Manufacturer and model ID read `kAudioObjectPropertyManufacturer` and `kAudioDevicePropertyModelUID` at global scope, main element zero. Missing, null, unreadable or unconvertible optional strings remain empty. Their warnings do not enter top-level inventory `errors` or remove an otherwise routable device. These fields supply metadata only; they do not infer headset compatibility or reproduce unknown later original UI transformations.

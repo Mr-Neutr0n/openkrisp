@@ -1,0 +1,582 @@
+{
+  "schemaVersion": 1,
+  "expectationBasis": "Static retained decoded method, not observed original runtime. Rate threshold16000 is injected.",
+  "defaultDevice": {
+    "name": "Display",
+    "interfaceName": "USB Poly Headset",
+    "manufacturer": "Acme Corp",
+    "modelId": "Model-123",
+    "fmt": {
+      "sampleRate": 48000
+    }
+  },
+  "defaultState": {
+    "mode": "AUTO",
+    "allowed": true,
+    "team": {
+      "blocked": [],
+      "allowed": [],
+      "userChoice": []
+    },
+    "lists": {
+      "blocked": [],
+      "allowed": [],
+      "userChoice": []
+    }
+  },
+  "cases": [
+    {
+      "id": "unmatched",
+      "expected": "NOT_DEDICATED"
+    },
+    {
+      "id": "local-name-lowercase-substring",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "pOLY"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unicode-composed-matches-case",
+      "expected": "ALLOWED",
+      "device": {
+        "interfaceName": "USB Élite"
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "élite"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unicode-no-canonical-normalization",
+      "expected": "NOT_DEDICATED",
+      "device": {
+        "interfaceName": "USB Élite"
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "élite"
+          }
+        ]
+      }
+    },
+    {
+      "id": "display-name-not-used",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "Display"
+          }
+        ]
+      }
+    },
+    {
+      "id": "whitespace-not-trimmed",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "name": " poly  "
+          }
+        ]
+      }
+    },
+    {
+      "id": "name-precedes-matching-pair",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "absent",
+            "manufacturer": "acme",
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "matching-name-precedes-mismatching-pair",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly",
+            "manufacturer": "absent",
+            "model_uid": "absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pair-both-substrings",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          {
+            "manufacturer": "ACME",
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pair-model-required",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "manufacturer": "acme"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pair-manufacturer-required",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pair-model-mismatch",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {
+            "manufacturer": "acme",
+            "model_uid": "999"
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty-name-uses-pair",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "",
+            "manufacturer": "acme",
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "null-entry-skipped",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          null,
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty-entry-skipped",
+      "expected": "NOT_DEDICATED",
+      "lists": {
+        "allowed": [
+          {}
+        ]
+      }
+    },
+    {
+      "id": "empty-device-fields-do-not-match",
+      "expected": "NOT_DEDICATED",
+      "device": {
+        "interfaceName": "",
+        "manufacturer": "",
+        "modelId": ""
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          },
+          {
+            "manufacturer": "acme",
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing-device-interfaceName",
+      "expected": "THROW",
+      "omit": "interfaceName",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "null-device-interfaceName",
+      "expected": "THROW",
+      "device": {
+        "interfaceName": null
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "number-device-interfaceName",
+      "expected": "THROW",
+      "device": {
+        "interfaceName": 7
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing-device-manufacturer",
+      "expected": "THROW",
+      "omit": "manufacturer",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "null-device-manufacturer",
+      "expected": "THROW",
+      "device": {
+        "manufacturer": null
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "number-device-manufacturer",
+      "expected": "THROW",
+      "device": {
+        "manufacturer": 7
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing-device-modelId",
+      "expected": "THROW",
+      "omit": "modelId",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "null-device-modelId",
+      "expected": "THROW",
+      "device": {
+        "modelId": null
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "number-device-modelId",
+      "expected": "THROW",
+      "device": {
+        "modelId": 7
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "missing-format",
+      "expected": "THROW",
+      "omit": "fmt",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "numeric-name-entry",
+      "expected": "THROW",
+      "lists": {
+        "allowed": [
+          {
+            "name": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "numeric-manufacturer-entry",
+      "expected": "THROW",
+      "lists": {
+        "allowed": [
+          {
+            "manufacturer": 5,
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "numeric-model-entry",
+      "expected": "THROW",
+      "lists": {
+        "allowed": [
+          {
+            "manufacturer": "acme",
+            "model_uid": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-block-over-allow-and-manual",
+      "expected": "BLOCKED",
+      "lists": {
+        "blocked": [
+          {
+            "name": "poly"
+          }
+        ],
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ],
+        "userChoice": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-allow-over-manual",
+      "expected": "ALLOWED",
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ],
+        "userChoice": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-manual-only",
+      "expected": "USER_CHOICE_ALLOWED",
+      "lists": {
+        "userChoice": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mode-off-before-missing-fields",
+      "expected": "MODE_OPTION_SET_TO_ALWAYS_OFF",
+      "mode": "OFF",
+      "device": {
+        "interfaceName": null
+      }
+    },
+    {
+      "id": "not-allowed-before-missing-fields",
+      "expected": "IS_NOT_ALLOWED_FOR_USER",
+      "allowed": false,
+      "device": {
+        "interfaceName": null
+      }
+    },
+    {
+      "id": "low-rate-before-missing-fields",
+      "expected": "LOW_RATE",
+      "device": {
+        "interfaceName": null,
+        "fmt": {
+          "sampleRate": 15999
+        }
+      }
+    },
+    {
+      "id": "minimum-rate-boundary",
+      "expected": "ALLOWED",
+      "device": {
+        "fmt": {
+          "sampleRate": 16000
+        }
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-substring-does-not-match",
+      "expected": "NOT_DEDICATED",
+      "team": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-exact-lowercase-name",
+      "expected": "ALLOWED",
+      "team": {
+        "allowed": [
+          {
+            "name": "uSB pOLY hEADSET"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-exact-pair",
+      "expected": "ALLOWED",
+      "team": {
+        "allowed": [
+          {
+            "manufacturer": "ACME CORP",
+            "model_uid": "MODEL-123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-pair-substring-does-not-match",
+      "expected": "NOT_DEDICATED",
+      "team": {
+        "allowed": [
+          {
+            "manufacturer": "acme",
+            "model_uid": "123"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-block-over-local-allow",
+      "expected": "BLOCKED",
+      "team": {
+        "blocked": [
+          {
+            "name": "USB Poly Headset"
+          }
+        ]
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-user-choice-requires-local-choice",
+      "expected": "NOT_DEDICATED",
+      "team": {
+        "userChoice": [
+          {
+            "name": "USB Poly Headset"
+          }
+        ]
+      },
+      "lists": {
+        "allowed": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "team-user-choice-skips-local-block",
+      "expected": "USER_CHOICE_ALLOWED",
+      "team": {
+        "userChoice": [
+          {
+            "name": "USB Poly Headset"
+          }
+        ]
+      },
+      "lists": {
+        "blocked": [
+          {
+            "name": "poly"
+          }
+        ],
+        "userChoice": [
+          {
+            "name": "poly"
+          }
+        ]
+      }
+    }
+  ]
+}

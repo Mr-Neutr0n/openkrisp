@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Manual headset confirmation, 2026-10-25](#manual-headset-confirmation-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
+Latest verified work: [Native metadata and local compatibility engine, 2026-10-25](#native-metadata-and-local-compatibility-engine-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -549,3 +549,22 @@ Native UI acceptance remains unverified. Window inventory `ev_ca6fa1ca97f0069e2b
 The direct own-app launch reached its 180-second bound and received SIGTERM. Its partial observation records signal 15/timeout. REA returned cleanup incomplete because ownership tokens for three live candidates could not be read, and retained its temporary root. A subsequent read-only process check found the known app PID absent; two remaining candidate PIDs were Chrome renderers in a different process group, and the third was absent. None was signaled or modified. Preserve this as an incomplete cleanup report, not a successful REA capture. Raw result: `evidence/headset-ui-launch-20261025.result.json`. No physical audio, original application execution or administrator operation ran.
 
 Next recover the original CoreAudio metadata mapping and implement automatic local compatibility with the recovered precedence. Keep native UI, driver discovery, physical routing, acoustic quality and complete retained-feature parity as separate open requirements.
+
+
+## Native metadata and local compatibility engine, 2026-10-25
+
+The helper now exposes `interface_name`, `manufacturer`, `model_id` and per-device `metadata_read_errors`. It reads the original-mapped CoreAudio global name, manufacturer and model UID selectors at main element zero. Optional property failures keep empty strings and diagnostics without discarding an otherwise routable device or changing global inventory-error behavior. Swift preserves absent versus empty metadata and never derives interface identity from display names. Optional-read diagnostics are informational; name-only compatibility can still match, as in the recovered original path. The new header participates in stale-helper packaging checks.
+
+The standalone `LocalHeadsetPolicy` implements local mode/rate gates, blocked-before-allowed-before-manual precedence, truthiness and branch-sensitive malformed fields, UTF-16 substring matching and exact manual-name removal. Its bounded external-cache parser preserves previous lists on failed loads. Null entries skip matching because the recovered method guards null before field access. Account/team policy and network refresh are excluded. This engine is not yet connected to automatic model selection; explicit HVC and the interim exact-UID confirmation flow remain unchanged.
+
+Full audio-host verification passed release and sanitizer suites. Full desktop verification passed 160 tests, signed ARM64/macOS12 packaging and relocated-resource checks. Focused tests cover metadata selector/scope failures, optional-field continuation, absent/empty decoding and 35 local cases from an own 43-case static fixture; eight team/account cases are explicitly excluded. The fixture contains no original source or vendor list. Independent GPT6.1sol reviews found no actionable issue. All 175 recorded source/verification/fixture fingerprints match.
+
+- Host log `evidence/headset-metadata-host-verify-20261025.log`, SHA256 `a7598b0ff965c56836cb233fcdb817f9ffc36d5a720dc9a59f1e83d6aac7dc03`.
+- Desktop log `evidence/headset-metadata-desktop-verify-20261025.log`, SHA256 `612861afedb3ba60349a66612b25c158efbf80cc74432319a5c5d3bc59d77738`.
+- Focused log `evidence/headset-metadata-focused-20261025.log`, SHA256 `3fbe207c37874530e10a924d42b6ef4ff6e379174c94e9fb7565730cb759ce11`.
+
+The native mapping report binds six accepted static REA captures in `background-voice-controls-findings.md`. Later device grouping/name mutation remains unresolved. A string-conversion capture has complete disassembly but failed cleanup acceptance; a subsequent grouping query returned no usable observation. Those failures are retained and are not counted as accepted runtime evidence.
+
+Original extracted-method replay produced no dynamic outcomes. Attempt v1 failed before invocation because its method wrapper had a syntax error; corrected v2 failed REA process lifecycle cleanup. Exact scenarios, runner pins and failure records are retained under `evidence/model-probes/bvc-matcher-extracted-20261025-*`, summarized in its notes file. The own fixture expectations are derived from static source. They do not prove original JavaScript execution parity. A read-only check found candidate PID87915 absent and PID88374 a Chrome renderer in a different process group; neither was signaled, and no provider repair or bypass was attempted.
+
+Next connect offline list selection and recovered local/manual policy to automatic NC/HVC selection, with stale-admission protection and ordinary-NC fallback for unavailable compatibility. Preserve separate gates for actual policy execution, later native grouping, cache provenance, JSON/Unicode edge cases, physical routing, acoustic quality, visual acceptance and full retained-feature parity. No physical audio, original application execution or administrator action ran in this checkpoint. Vendor assets remain external.

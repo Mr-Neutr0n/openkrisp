@@ -6,6 +6,6 @@ let package = Package(
     products: [.executable(name: "LabVoice", targets: ["LabVoice"])],
     dependencies: [.package(path: "../local-store"), .package(path: "../model-catalog"), .package(path: "../local-transcription")],
     targets: [.executableTarget(name: "LabVoice", dependencies: [.product(name: "LocalStore", package: "local-store"), .product(name: "ModelCatalog", package: "model-catalog"), .product(name: "LocalTranscription", package: "local-transcription")]),
-              .testTarget(name: "LabVoiceTests", dependencies: ["LabVoice"])],
+              .testTarget(name: "LabVoiceTests", dependencies: ["LabVoice"], resources: [.copy("Fixtures")])],
     swiftLanguageModes: [.v5]
 )

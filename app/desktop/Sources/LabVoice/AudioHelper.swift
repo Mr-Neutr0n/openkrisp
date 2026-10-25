@@ -9,8 +9,24 @@ struct AudioHardwareDevice: Decodable, Identifiable, Sendable {
     let nominalRate: Double
     let input: AudioDirection
     let output: AudioDirection
+    var interfaceName: String? = nil
+    var manufacturer: String? = nil
+    var modelId: String? = nil
+    var metadataReadErrors: [String]? = nil
+    // Read diagnostics stay informational. Original optional-read failures leave
+    // empty identity strings, so a name-only match can still allow the device.
+    var localHeadsetPolicyDevice: LocalHeadsetDevice {
+        .init(interfaceName: interfaceName.map(LocalHeadsetField.string) ?? .missing,
+              manufacturer: manufacturer.map(LocalHeadsetField.string) ?? .missing,
+              modelId: modelId.map(LocalHeadsetField.string) ?? .missing,
+              sampleRate: nominalRate)
+    }
     var id: String { uid }
-    enum CodingKeys: String, CodingKey { case uid, name, alive, input, output; case nominalRate = "nominal_rate" }
+    enum CodingKeys: String, CodingKey {
+        case uid, name, alive, input, output, manufacturer
+        case nominalRate = "nominal_rate", interfaceName = "interface_name", modelId = "model_id"
+        case metadataReadErrors = "metadata_read_errors"
+    }
 }
 struct AudioCompanion: Decodable, Sendable { let uid: String; let present: Bool }
 struct AudioInventory: Decodable, Sendable {

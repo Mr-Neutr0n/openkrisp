@@ -25,7 +25,7 @@ helper_source = helper_root / "build" / "audio-host"
 if not helper_source.is_file() or helper_source.is_symlink():
     raise RuntimeError("Build app/audio-host with ./verify before packaging desktop.")
 helper_inputs = [helper_root / name for name in (
-    "host.cpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
+    "host.cpp", "device_metadata.hpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
     "coreaudio_backend.cpp", "noise_adapter.hpp", "installed_noise_adapter.hpp", "installed_aec_adapter.hpp", "aec_microphone_chain.hpp", "controls.hpp",
     "control_protocol.cpp", "control_protocol.hpp", "recording.cpp", "recording.hpp", "microphone_test.cpp", "microphone_test.hpp",
     "microphone_test_cli.cpp", "microphone_test_coreaudio.cpp")]

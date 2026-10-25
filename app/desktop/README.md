@@ -258,3 +258,12 @@ evidence records a persistent name-based manual headset allowlist. Original
 automatic matching fields, device lists, enterprise policy and effective defaults
 remain unresolved. The local confirmation list does not reproduce or claim
 original automatic headset detection.
+
+
+## Local compatibility engine and device metadata
+
+Inventory now carries the global CoreAudio interface name, manufacturer and model UID used by the recovered original matcher. Missing fields from an older helper remain missing; they are never inferred from display names. Optional property read failures produce empty strings with per-device diagnostics and do not discard the device or prevent an otherwise valid name-only match.
+
+`LocalHeadsetPolicy` implements the recovered local blocked, allowed and manual precedence, mode/rate gates and literal UTF-16 substring behavior. Its bounded JSON cache loader preserves prior lists on failed loads. It excludes account/team restrictions and network refresh. The original-method replay did not return dynamic outcomes; the 35 included local fixture expectations come from static source analysis. Host Unicode lowercase version differences and malformed rate coercion remain unverified.
+
+This engine is not yet connected to automatic model selection or a cache importer UI. The explicit experimental mode and exact-UID headset confirmation flow remain in effect. No vendor compatibility list is bundled.

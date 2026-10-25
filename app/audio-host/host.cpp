@@ -1,5 +1,6 @@
 #include <set>
 #include "control_protocol.hpp"
+#include "device_metadata.hpp"
 #include "route_cli.hpp"
 #include "microphone_test.hpp"
 #include <CoreAudio/CoreAudio.h>
@@ -74,8 +75,8 @@ template <class T> std::vector<T> array(AudioObjectID id, UInt32 selector, UInt3
         std::memcpy(result.data(), data.data(), data.size());
     return result;
 }
-std::string string(AudioObjectID id, UInt32 selector) {
-    auto value = scalar<CFStringRef>(id, selector);
+std::string string(AudioObjectID id, UInt32 selector, UInt32 scope = global) {
+    auto value = scalar<CFStringRef>(id, selector, scope);
     if (!value)
         throw std::runtime_error("Null string property");
     const auto count =
@@ -130,6 +131,7 @@ struct Direction {
 struct Device {
     AudioObjectID id = 0;
     std::string uid, name;
+    labvoice::DeviceMetadata metadata;
     UInt32 transport = 0, clock = 0, alive = 0, buffer = 0;
     double rate = 0;
     std::vector<AudioValueRange> nominalRates;
@@ -152,6 +154,9 @@ Device inspect(AudioObjectID id) {
     d.id = id;
     d.uid = string(id, kAudioDevicePropertyDeviceUID);
     d.name = string(id, kAudioObjectPropertyName);
+    d.metadata = labvoice::readDeviceMetadata(d.name,[id](const AudioObjectPropertyAddress& a) {
+        return string(id,a.mSelector,a.mScope);
+    });
     d.transport = scalar<UInt32>(id, kAudioDevicePropertyTransportType);
     d.clock = scalar<UInt32>(id, kAudioDevicePropertyClockDomain);
     d.alive = scalar<UInt32>(id, kAudioDevicePropertyDeviceIsAlive);
@@ -199,7 +204,15 @@ void directionJSON(const Direction &d) {
 }
 void deviceJSON(const Device &d) {
     std::cout << "{\"id\":" << d.id << ",\"uid\":" << quote(d.uid) << ",\"name\":" << quote(d.name)
-              << ",\"transport\":" << d.transport << ",\"clock_domain\":" << d.clock
+              << ",\"interface_name\":" << quote(d.metadata.interfaceName)
+              << ",\"manufacturer\":" << quote(d.metadata.manufacturer)
+              << ",\"model_id\":" << quote(d.metadata.modelId)
+              << ",\"metadata_read_errors\":[";
+    for(std::size_t i=0;i<d.metadata.warnings.size();++i) {
+        if(i)std::cout<<',';
+        std::cout<<quote(d.metadata.warnings[i]);
+    }
+    std::cout << ']' << ",\"transport\":" << d.transport << ",\"clock_domain\":" << d.clock
               << ",\"alive\":" << d.alive << ",\"nominal_rate\":" << d.rate
               << ",\"buffer_frames\":" << d.buffer << ",\"input\":";
     directionJSON(d.capture);

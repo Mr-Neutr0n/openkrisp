@@ -95,3 +95,56 @@ All three new captures are exported under ignored `evidence/model-probes/`. Each
 - `bvc-compatibility-cache-schema-20261025-v1`, Evidence `ev_a763befd06a4987fd6d43e2aab86f0eeee7b83ce95ceac5e22d7d19ff2785625`.
 
 `evidence/model-probes/bvc-compatibility-20261025.bundle.json` retains the complete exported session bundle with canonical record IDs. This export and the per-capture files were produced from retained REA records, without rerunning the readers.
+
+## CoreAudio metadata mapping, 2026-10-25
+
+This pass includes two failed capture lifecycles. The string-converter/list disassembly has complete static output and matching artifact hashes, but REA reports owned-group cleanup unverified and temporary root retained. A later grouping query returned no usable observations. The accepted field/selector captures report verified owned-group cleanup. Exact retained files and limits appear below; the failed calls are not counted as successful runtime or cleanup acceptance.
+
+The physical-device metadata comes from `kr-audio-dm`, not the ordinary MediaSP frame factory. The selected device-manager addon is `Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-audio-dm/build/Release/kr-audio-dm.node`, SHA256 `ef833e13e87064f51cbb547295b1c65138871906bcae651160b0daeeb3fcb3e6`. All native captures below record that same digest before and after. The ASAR remains SHA256 `40269da405babcd79c18780715c63625d0bb7035f03a480b1732fe067ba911b4`.
+
+### Native fields and selectors
+
+`CAApiHelper::GetDeviceInfo` at `0x29988` reads the CoreAudio device object through these wrappers. The property-address literals and wrapper instructions establish global scope `glob` and main element `0` for all three. They are not input-scope reads. Local Xcode SDK declarations identify the selector names below.
+
+| JavaScript field | Original CoreAudio source | Selector | Scope / element |
+| --- | --- | --- | --- |
+| `interfaceName` | `CAHALAudioObject::CopyName` | `kAudioObjectPropertyName`, `lnam`, `0x6c6e616d` | Global / 0 |
+| `modelId` | `CAHALAudioDevice::CopyModelUID` | `kAudioDevicePropertyModelUID`, `muid`, `0x6d756964` | Global / 0 |
+| `manufacturer` | `CAHALAudioObject::CopyManufacturer` | `kAudioObjectPropertyManufacturer`, `lmak`, `0x6c6d616b` | Global / 0 |
+
+The mapping is supported by a field-copy chain, not just symbol names:
+
+- `GetDeviceInfo` converts `CopyName` with `CFStringToString`, then copies it to `DeviceInfo` offsets `0x30` and `0x48`. It copies the `0x30` value to `0x60` for description. `CopyModelUID` supplies offset `0x90`; `CopyManufacturer` supplies `0xa8`.
+- `SystemDeviceInfo2AudioDeviceInfo` at `0x1a6f4` copies source offsets `0x30`, `0x48`, `0x60` to the same destination offsets. It copies source model offset `0x90` to destination `0x78`, and manufacturer `0xa8` to destination `0x90`.
+- The `InitializeNapi` device-list callback serializes `name` from `AudioDeviceInfo+0x30` at `0xfb60`, `interfaceName` from `+0x48` at `0xfb74`, `description` from `+0x60` at `0xfb88`, `modelId` from `+0x78` at `0xfb9c`, and `manufacturer` from `+0x90` at `0xfbb0`.
+
+Thus the native macOS enumeration emits the same converted CoreAudio name in `name`, `interfaceName` and `description`. These are distinct fields in the schema, but this path does not read separate hardware labels for them. `modelId` is the model UID, not the device UID. The native `id` is separately built from the numeric `AudioObjectID` with `std::to_string`.
+
+The JavaScript selectable-device projection preserves `name:S.name`, `interfaceName:S.interfaceName`, and `displayName:S.description`. Its default-device row instead uses the special default selection name and a translated display label. This establishes the native-to-JavaScript display boundary. It does not establish that every later grouping or UI path preserves those values without further changes.
+
+### Failure and transformation semantics
+
+Name is required by this enumerator. `CopyName` returns null when `AudioObjectHasProperty` is false and throws the integer OSStatus when the actual property read fails. A null or empty converted name makes `GetDeviceInfo` return false; the caller skips that record. A caught name-read OSStatus also logs and returns false. It does not substitute the device UID or a generated display label.
+
+Model and manufacturer are optional in this path. Model-read OSStatus logs a warning and continues at the manufacturer read. Manufacturer-read OSStatus logs an error and continues at the remaining device fields. The ordinary `GetDeviceList` path allocates fresh zero-initialized string fields before calling `GetDeviceInfo`; an optional read failure therefore leaves that field empty. `CopyManufacturer` also returns null when the property is absent, which converts to empty. The selected `CopyModelUID` wrapper calls the property reader directly without a preceding `HasProperty` test. No `unknown` placeholder, device-name fallback, UID fallback, or manufacturer/model synthesis appears in these bodies. A different caller that reuses an existing `DeviceInfo` can retain prior values when a read throws before assignment; universal clearing semantics are not established.
+
+The retained `CFStringToString` body requests UTF-8 encoding `0x08000100`. It first tries `CFStringGetCStringPtr`, then allocates a buffer for `CFStringGetCString`. Null input or failed conversion logs and returns an empty C++ string. It copies bytes without lowercasing or trimming. The BVC checker applies lowercase later, as documented above. The string-converter evidence has a lifecycle failure described below, so this transformation result has complete static output but incomplete process-cleanup acceptance.
+
+### Evidence, retention and limits
+
+All following basenames are under ignored `evidence/model-probes/`. Each has a complete `.result.json`, raw `.result.txt`, exact `.scenario.json`, and own `.runner.cjs` convenience copy. The scenario is the executed authority; convenience reader copies were saved afterward.
+
+| Basename | Evidence | Use |
+| --- | --- | --- |
+| `bvc-device-js-fields-20261025-v1` | `ev_4ad2c8e414301485ab5f380d309c19d3c6df3300b81c6c6911fe5714c26e927c` | Selectable-device display projection |
+| `bvc-device-js-manager-20261025-v1` | `ev_68e84bfd79d0763fef4deaab837b8bef9880c22eca5303128fd680e95128c14c` | DeviceAddon initialization and list callback |
+| `bvc-device-dm-symbols-20261025-v1` | `ev_c30164d0fa6381a5cf3a3ecd23524d47fcd6f8651a00a7bc7ff25bfb5436c57a` | Device-manager addon identity and symbol discovery |
+| `bvc-device-native-conversion-20261025-v1` | `ev_a6e4eb13b93abc992de36addc7fafcff31153762a70babcc328f83f2f50f6bbb` | Field copy and property wrapper bodies |
+| `bvc-device-native-info-20261025-v1` | `ev_c5f61626d1a0e91048aa8327247532e0f38deb7b0a0877621bd6a43a0c095726` | CoreAudio reads, assignments and error branches |
+| `bvc-device-native-napi-20261025-v1` | `ev_5a70b36a192d83f7f33c3d2f29b5cbf2c3b50d2285e012e23ab1c92d6440f893` | Literal selector/scope bytes and named Napi field writes |
+
+Those six captures exit zero and report `owned_process_group: verified`, `temporary_root: removed`. The Napi capture also lists one supplemental platform wrapper with reason `platform_binary_environment_withheld`; that is a visibility limit, not an owned-group cleanup failure. Raw PTY data for these accepted captures is complete even where rendered history is truncated. `bvc-device-metadata-20261025.bundle.json` retains the full canonical session export, including discovery captures not used as final mapping authority.
+
+`bvc-device-string-list-20261025-v1.result.json` retains the distinct REA `cleanup_incomplete` error and its full partial capture. Its `.result.txt` retains all 31,918 raw PTY bytes, including matching before/after addon hashes and zero process exit. Its scenario and reader copy are retained alongside it. REA could not read the ownership token of one live candidate, PID `87915`, reason `environment_unavailable`; the owned group remained unverified and the temporary root was retained. This is an actual cleanup-acceptance failure, unlike the supplemental-wrapper visibility limits above. It has no successful canonical Evidence ID. The static disassembly remains available with that limitation. A subsequent distinct `DeviceGroupCollection` query failed its capture lifecycle before returning usable observations; its error is retained at `bvc-device-groups-20261025-v1.failure.json`. No rerun or process termination was attempted to hide either failure.
+
+No original addon or application code was loaded or executed. The only executed programs were own static readers and Xcode LLVM tools through REA. No audio, original UI, settings mutation, network operation or administrator action ran. Remaining gaps include later device grouping/name mutation, runtime CoreAudio error behavior, entitlement/default policy, authenticated list freshness, and actual automatic headset classification. An independent host can now read global name/manufacturer/model UID for matching while preserving routing when optional manufacturer/model metadata is unavailable. That implementation would still need own fixture tests and separate runtime acceptance.
