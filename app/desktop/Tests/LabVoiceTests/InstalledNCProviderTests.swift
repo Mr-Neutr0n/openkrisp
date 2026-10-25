@@ -134,7 +134,10 @@ final class InstalledNCResolverTests: XCTestCase {
     }
     private func model(_ child: InstalledProviderChild, microphone: NoiseProvider? = .installedKrisp, speaker: NoiseProvider? = .rnnoise) async throws -> AudioRouteController {
         let inventory = try inventory()
-        let model = AudioRouteController(readInventory: { inventory }, authorization: { .authorized }, requestAuthorization: { XCTFail("Unexpected permission request"); return false }, factory: { child }, resolveInstalledProvider: { _, _, role in installedFixture(role) })
+        let suite = "headset-tests-" + UUID().uuidString
+        let defaults = UserDefaults(suiteName: suite)!
+        addTeardownBlock { defaults.removePersistentDomain(forName: suite) }
+        let model = AudioRouteController(readInventory: { inventory }, authorization: { .authorized }, requestAuthorization: { XCTFail("Unexpected permission request"); return false }, factory: { child }, headsetStore: HeadsetConfirmationStore(defaults: defaults), resolveInstalledProvider: { _, _, role in installedFixture(role) })
         await model.refresh(); model.inputUID = "mic"; model.outputUID = "speaker"
         model.microphoneNoise = microphone != nil; model.speakerNoise = speaker != nil
         model.microphoneProvider = microphone ?? .rnnoise; model.speakerProvider = speaker ?? .rnnoise
@@ -268,6 +271,7 @@ final class InstalledNCResolverTests: XCTestCase {
         XCTAssertEqual(model.installedMicrophoneMode, .ordinaryNC)
         await validate(model); XCTAssertTrue(model.canStart)
         model.installedMicrophoneMode = .backgroundVoice
+        model.confirmSelectedHeadset()
         XCTAssertNil(model.installedConfiguration); XCTAssertNil(model.installedSpeakerConfiguration); XCTAssertFalse(model.canStart)
         XCTAssertEqual(model.requestedInstalledRoles, [.outboundHVC, .inbound])
         await model.validateInstalledProvider(); XCTAssertTrue(model.canStart)
@@ -299,7 +303,7 @@ final class InstalledNCResolverTests: XCTestCase {
         for mode in [InstalledMicrophoneMode.ordinaryNC, .backgroundVoice] {
             for mutation in ["missing", "null", "wrong"] {
                 let child = InstalledProviderChild(), model = try await model(child, speaker: .installedKrisp)
-                model.installedMicrophoneMode = mode; await validate(model); model.start(); try await wait { child.running }
+                model.installedMicrophoneMode = mode; if mode == .backgroundVoice { model.confirmSelectedHeadset() }; await validate(model); model.start(); try await wait { child.running }
                 try child.ack { value in
                     if mutation == "missing" { value.removeValue(forKey: "provider_model_role") }
                     else { value["provider_model_role"] = mutation == "null" ? NSNull() : "inbound" as Any }

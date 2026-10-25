@@ -1071,7 +1071,10 @@
         "ev_b38f113fcb47bc7b9fe6689706535e3568ac6c9e358ed958f32939de4112a5bc",
         "ev_7598632c8be8f38508c1b4fbf03da7387c76b3e667bd5b2d4203b0df35f7267c",
         "ev_54e65aea84f83eb3bf18ae040b90216e0dc3edb5a22919e934929a7e2cd8203b",
-        "ev_e7e57aa461cb151a4f59ced09cebff5763ab27fc2f30fca6a6bf298026f68eb7"
+        "ev_e7e57aa461cb151a4f59ced09cebff5763ab27fc2f30fca6a6bf298026f68eb7",
+        "ev_18778f368464b2a9e4ef67192d174ff8a8b7a42d22d3f2bd8638fe0074b9d253",
+        "ev_bf65d20227611a5f87a999080958c3764e25cd504f1d34062dd8de9a1cf6545c",
+        "ev_a763befd06a4987fd6d43e2aab86f0eeee7b83ce95ceac5e22d7d19ff2785625"
       ],
       "implemented_code": [
         {
@@ -1137,11 +1140,19 @@
         {
           "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/HeadsetConfirmations.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift",
+          "exists": true
         }
       ],
-      "implementation": "Explicit experimental background-voice microphone mode selects the fixed installed HVC-lfb model. Model changes invalidate validation; startup requires exact selected role and hashes. Speaker processing stays inbound-only. Host CLI and desktop reject HVC with AEC before route launch. Ordinary NC remains the default. Automatic headset compatibility and persistent per-device manual policy remain absent.",
-      "verified_scope": "The retained persistent HVC CPU gate ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753 passed with exact direct-output agreement and verified owned cleanup. New own-fixture tests cover explicit mode admission, stale validation, exact role acknowledgements, production C++ parser/formatter-to-Swift decoding, crossed hash and speaker-role rejection, and HVC/AEC rejection before workers start. Full audio-host release/sanitizer verification and desktop 142 tests, signing, packaging and relocated-resource checks pass. Product route with installed HVC, real-time deadlines, acoustic quality and visual interaction remain unverified. Static NC dispatch, packaged RD defaults and energy/statistics findings are retained separately.",
-      "missing_acceptance": "Headset compatibility, persistent per-device manual activation/removal/reset, target-speech preservation, nearby-voice rejection, real-time deadlines, physical routing, visual acceptance, and separate AEC composition gate. HVC-sfb and original energy/bypass statistics lifecycle remain unverified. No full BVC parity claim."
+      "implementation": "Explicit experimental background-voice microphone mode selects the fixed installed HVC-lfb model. Local exact-UID headset confirmations persist with display names; confirmation, removal and reset do not start capture. HVC validation and Start require a confirmed selected input. Device/mode/policy changes invalidate admission, including pending permission requests. Startup checks exact role/hashes; speakers stay inbound-only; HVC with AEC rejects before launch. Ordinary NC is the default. Automatic compatibility is not implemented.",
+      "verified_scope": "The retained persistent HVC CPU gate ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753 passed with exact direct-output agreement and verified owned cleanup. New own-fixture tests cover explicit mode admission, stale validation, exact role acknowledgements, production C++ parser/formatter-to-Swift decoding, crossed hash and speaker-role rejection, and HVC/AEC rejection before workers start. Full audio-host release/sanitizer verification and desktop 148 tests, signing, packaging and relocated-resource checks pass. Product route with installed HVC, real-time deadlines, acoustic quality and visual interaction remain unverified. Static NC dispatch, packaged RD defaults and energy/statistics findings are retained separately. Manual policy own-fixture tests cover persistence, malformed records, renamed and same-name devices, confirmation/remove/reset, stale resolver results and permission-wait device/mode roundtrips. The stale admission race was reproduced before its revision-ID fix. New static REA captures recover exact original match fields/precedence and the observed cached list schema. See background-voice-controls-findings.md for evidence limits. A bounded native UI observation failed with process-identity-unavailable because macOS did not expose the selected app launch time. No native control interaction or visual acceptance is claimed.",
+      "missing_acceptance": "Original automatic compatibility using interfaceName/manufacturer/modelId and allow/block policy, original name-based manual semantics, target-speech preservation, nearby-voice rejection, real-time deadlines, physical routing, full native visual acceptance and separate AEC composition gate. HVC-sfb and original energy/bypass statistics remain unverified. Current exact-UID manual policy is an independent implementation, not exact original name matching."
     },
     {
       "id": "performance",
@@ -2985,11 +2996,11 @@
     "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
     "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift": "ba2a1b8342403879dd5b217805a65b2c14a6bbd9c7f4bbad5c4f0548340b3244",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "69e0f9c2052f4b5145c251459865ab28149f90e466f609de26a7a1e5ca16ce23",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "94d675500b8902634022807acaef7b7e5dec6e69a6b53a4af3b9403b0952bc48",
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "f1cb358676578116a77ee630d2deab48d3a576bf92694cff41ac1940d0f932e2",
     "projects/krisp/app/audio-host/routing.cpp": "7c9dbf04de0df447ac3a27637ab251a2c88c8f398736ace71f3020d013bcdb6d",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "41476cdee93231dde466f53acf632627a6f29d640ef234b6ff4a9a693ea18f2a",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "6ff55e9f67bc82356441f1f105feaba74805aae254f9cd7d78d657df397f9942",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
@@ -3088,7 +3099,7 @@
     "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "262f69ff84951a8df4916c39d7b0e13fc4db57ba335ac85c98e400812c7b61a2",
     "projects/krisp/app/audio-host/provider_cli_check.py": "fc1e407bc4d9912ef9bffe831166421bc4361c9db3558c161d76f027fe479b9b",
     "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift": "21c3b72ca475cb91c0b44a6ee670a4dc3d9c6f5a7758aa2725c6ab0f9ac8cf4c",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "8ccf8f7e966a41eaa725d12f2c00b5dd322cda4593b219861d1c355f4acc2e25",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "3409a9776612e1895d49a8773e257cf27ac623eda4dfc41d7bbf64a882b108d1",
     "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "a92ad9f174414c734df571e3368a5905f8d6fcc9b1f5594dbc37fe83d548f3b2",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
     "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "79b58b67a74c0a6331f4394a6235dae4a39fd8cd210ecd1a352688c93fd43a08",
@@ -3141,7 +3152,9 @@
     "projects/krisp/app/audio-host/aec_microphone_chain_probe.hpp": "f235a84a4f70452827f4b9e6fd3433172025c7612ad78cd66e69ff7b2a9f384e",
     "projects/krisp/app/audio-host/aec_microphone_chain_probe_fixture.cjs": "6efc7c99aa5b9c799d809ce41cb13e8fd925fcff67243bab7ee892a989975d98",
     "projects/krisp/app/audio-host/aec_microphone_chain_probe_test.cpp": "8142f6fc5668df1469e39ed338cc6a3dc519651f96d88904cf6ad573cb34f56a",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift": "d151b3f651a886e512b1fde70cb5ea8208dc7eb07b27c5a322e77f42f01f002e"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift": "d151b3f651a886e512b1fde70cb5ea8208dc7eb07b27c5a322e77f42f01f002e",
+    "projects/krisp/app/desktop/Sources/LabVoice/HeadsetConfirmations.swift": "ff4183b83ee1584d4524df69f5abbd618fcef48683d7ec6207b54927a5a1ba3f",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift": "109d10164144df799f24550c28ec57e682306fb2e5e3804742402d549373621a"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3152,7 +3165,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "Code fingerprints identify 165 referenced independent files at the experimental HVC microphone integration checkpoint. They are source snapshots, not runtime identity, voice-isolation quality or completion certificates.",
+  "source_snapshot_note": "Code fingerprints identify 167 referenced independent files at the manual headset confirmation checkpoint. Source fingerprints do not establish original automatic-policy parity, voice-isolation quality or physical routing acceptance.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

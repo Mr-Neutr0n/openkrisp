@@ -16,7 +16,29 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published private(set) var phase: AudioRoutePhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: phase == .idle ? .stopped : (phase == .running ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var activeOptions: AudioRouteOptions?
     @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
-    @Published var inputUID = ""
+    @Published var inputUID = "" { didSet { if oldValue != inputUID { invalidateProvider(); invalidateAEC() } } }
+    private let headsetStore: HeadsetConfirmationStore
+    @Published private(set) var headsetConfirmations: [HeadsetConfirmation]
+    var selectedMicrophone: AudioHardwareDevice? { inventory?.devices.first { $0.uid == inputUID && $0.input.channels > 0 } }
+    var selectedHeadsetConfirmed: Bool { headsetConfirmations.contains { $0.uid == inputUID } }
+    var requiresHeadsetConfirmation: Bool {
+        microphoneNoise && microphoneProvider == .installedKrisp && installedMicrophoneMode == .backgroundVoice && !selectedHeadsetConfirmed
+    }
+    var canEditHeadsetConfirmations: Bool { !engaged && captureAdmission.available && !QuitGate.shared.quitting }
+    func confirmSelectedHeadset() {
+        guard canEditHeadsetConfirmations, let device = selectedMicrophone, device.alive == 1,
+              headsetStore.confirm(uid: device.uid, name: device.name) else { return }
+        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
+    }
+    func removeHeadsetConfirmation(uid: String) {
+        guard canEditHeadsetConfirmations, headsetStore.remove(uid: uid) else { return }
+        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
+    }
+    func resetHeadsetConfirmations() {
+        guard canEditHeadsetConfirmations, headsetStore.reset() else { return }
+        headsetConfirmations = headsetStore.entries; installedMicrophoneMode = .ordinaryNC
+        invalidateProvider(); invalidateAEC()
+    }
     @Published var outputUID = ""
     @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise { invalidateAEC(); if microphoneProvider == .installedKrisp { invalidateProvider() } } } }
     @Published var speakerNoise = false { didSet { if oldValue != speakerNoise, speakerProvider == .installedKrisp { invalidateProvider() } } }
@@ -81,7 +103,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         }
     }
     var canStart: Bool {
-        guard !unsupportedHVCWithAEC, phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
+        guard !requiresHeadsetConfirmation, !unsupportedHVCWithAEC, phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
               !(echoCancellation && installedAECConfiguration == nil),
               !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != selectedMicrophoneRole),
               !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
@@ -89,6 +111,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             inventory.devices.contains { $0.uid == outputUID && $0.alive == 1 && $0.nominalRate == 48000 && $0.output.channels == 2 }
     }
     init() {
+        headsetStore = HeadsetConfirmationStore(); headsetConfirmations = headsetStore.entries
         recording = RecordingController()
         let aecResolver = InstalledAECResolver()
         resolveAEC = { app in try await aecResolver.resolve(app: app, runtime: InstalledAECResolver.packagedDirectory()) }
@@ -109,12 +132,14 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          requestAuthorization: @escaping () async -> Bool,
          factory: @escaping () throws -> any AudioHelperChild,
          startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil,
+         headsetStore: HeadsetConfirmationStore? = nil,
          resolveInstalledProvider: @escaping (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration = { app, node, role in
              try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role)
          },
          resolveInstalledAEC: @escaping (URL) async throws -> InstalledAECConfiguration = { app in
              try await InstalledAECResolver().resolve(app: app, runtime: InstalledAECResolver.packagedDirectory())
          }) {
+        self.headsetStore = headsetStore ?? HeadsetConfirmationStore(); self.headsetConfirmations = self.headsetStore.entries
         self.resolveAEC = resolveInstalledAEC
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider
@@ -175,7 +200,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func validateInstalledProvider() async {
         let roles = requestedInstalledRoles
-        guard phase == .idle, !providerValidating, !roles.isEmpty, let app = installedApp, let node = installedNode else { return }
+        guard !requiresHeadsetConfirmation, phase == .idle, !providerValidating, !roles.isEmpty, let app = installedApp, let node = installedNode else { return }
         let id = UUID(); providerValidationID = id; providerValidating = true
         installedConfiguration = nil; installedSpeakerConfiguration = nil
         providerStatus = "Checking requested installed NC models and packaged worker identities…"
@@ -211,6 +236,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                                         installedSpeakerProvider: speakerNoise && speakerProvider == .installedKrisp ? installedSpeakerConfiguration : nil,
                                         installedAEC: echoCancellation ? installedAECConfiguration : nil)
         guard options.validProviderRoles else { return }
+        let providerAdmissionID = providerValidationID, aecAdmissionID = aecValidationID
         let initialControls = desiredControls
         let id = UUID()
         guard captureAdmission.acquire(id, owner: .route) else { return }
@@ -225,6 +251,14 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             guard permitted else {
                 DiagnosticEventLog.shared.append(component: .audio, code: .permissionDenied, severity: .warning)
                 self.error = "Microphone permission is required to start audio. Allow Lab Voice in macOS privacy settings."
+                self.clear(); return
+            }
+            guard self.providerValidationID == providerAdmissionID, self.aecValidationID == aecAdmissionID,
+                  self.inputUID == options.inputUID,
+                  options.installedProvider == nil || self.selectedMicrophoneRole == options.installedProvider?.modelRole,
+                  options.installedProvider?.modelRole != .outboundHVC ||
+                    (self.selectedMicrophoneRole == .outboundHVC && self.selectedHeadsetConfirmed) else {
+                self.error = "Microphone selection changed before startup. Start again."
                 self.clear(); return
             }
             do {

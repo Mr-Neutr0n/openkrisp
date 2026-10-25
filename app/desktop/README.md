@@ -235,3 +235,26 @@ Injected resolver and controller tests use own fixtures. The production C++
 formatter fixture checks ordinary and HVC microphone acknowledgements with the
 independent inbound speaker role. These checks open no original app, audio
 hardware or permission prompt.
+
+Background voice now requires an explicit confirmation for the selected
+microphone. Confirm selected microphone is a headset stores its exact device
+UID and a display name in the versioned local `headsetConfirmations.v1`
+preference. It does not infer device type, request permission or launch audio.
+Names are labels: renaming a device keeps its UID confirmation, while two
+devices with the same name need separate confirmation. Invalid, duplicate or
+unsupported saved records grant no confirmations.
+
+Remove revokes one UID. Reset clears only headset confirmations, restores
+ordinary microphone mode and clears provider/AEC admission. These actions lock
+while audio, recording or another capture is engaged. Changing the selected
+microphone invalidates pending validation. A device or installed-role change
+while microphone permission is pending also prevents the captured route from
+launching. Unconfirmed HVC cannot validate or Start; ordinary NC and RNNoise do
+not require confirmation. Confirmations persist, while audio mode remains in
+memory and starts in ordinary NC mode.
+
+This exact-UID policy is an independent local design. Retained original controls
+evidence records a persistent name-based manual headset allowlist. Original
+automatic matching fields, device lists, enterprise policy and effective defaults
+remain unresolved. The local confirmation list does not reproduce or claim
+original automatic headset detection.

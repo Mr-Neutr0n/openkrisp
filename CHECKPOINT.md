@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Experimental HVC microphone integration, 2026-10-25](#experimental-hvc-microphone-integration-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
+Latest verified work: [Manual headset confirmation, 2026-10-25](#manual-headset-confirmation-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -530,3 +530,22 @@ Full audio-host verification passed, including release, ASan/UBSan and TSan inte
 This checkpoint adds product controls and own-fixture route integration. The retained persistent CPU gate remains the installed HVC processing evidence; no new vendor execution or real audio route ran here. Voice isolation, target-speaker preservation, real-time deadlines, physical driver/routing acceptance, native visual interaction and full feature parity remain unverified or incomplete. HVC with AEC stays unavailable until its own composition gate. Original models and binaries remain external and excluded from Git.
 
 Next implement the local per-device headset confirmation policy described in PLAN.md. Preserve the deferred administrator-dependent driver discovery step. Do not reinstall the driver merely to restart CoreAudio, and do not treat synthetic tests as physical routing acceptance.
+
+
+## Manual headset confirmation, 2026-10-25
+
+Desktop now persists explicit confirmations by exact device UID, with stored names used only for display. Experimental HVC validation and Start require a confirmed selected input. Remove and reset invalidate model admission; reset clears only confirmations and returns to ordinary microphone mode. Policy mutations reject while a route, recording, inventory load, other capture or quit is active. Confirmation itself never requests microphone permission or starts a helper. Malformed, duplicate, unsupported-version or oversized stored records grant no confirmations. This is an independent manual policy; the original matches manual name substrings, so original compatibility parity remains incomplete.
+
+A production-controller test reproduced stale startup when input UID or HVC mode changed away and back during the permission wait. The fix captures provider/AEC admission revisions at Start and requires them unchanged before helper creation. The regression verifies zero helper launches for both roundtrips. Full desktop verification passes 148 tests, ARM64/macOS12 build, signing and relocated-resource checks. Focused tests cover persistence, renamed devices, equal names with distinct UIDs, scoped remove/reset, malformed records, stale validation and capture-free confirmation. Independent GPT6.1sol review found no remaining issue. All 167 source fingerprints match.
+
+- Failed pre-fix reproduction: `evidence/headset-policy-repro-20261025.log`, SHA256 `d5a30b8c21fb9b9d8bd32d69809fc5b058d15dff7a696dd9a6450abe2fe28806`.
+- Passing 27 focused tests: `evidence/headset-policy-focused-20261025.log`, SHA256 `d7a30074e2dd4e1ba20cf915787bf8055c7e3da301a16b8e83f8c0388d8b6fc9`.
+- Full verification: `evidence/headset-policy-desktop-verify-20261025.log`, SHA256 `661679a12c6e7fef58abb747a453b01f9c45d39de3f0eb5b68b880844d58a617`.
+
+Static REA captures `ev_18778f368464b2a9e4ef67192d174ff8a8b7a42d22d3f2bd8638fe0074b9d253`, `ev_bf65d20227611a5f87a999080958c3764e25cd504f1d34062dd8de9a1cf6545c` and `ev_a763befd06a4987fd6d43e2aab86f0eeee7b83ce95ceac5e22d7d19ff2785625` recover exact original interfaceName/manufacturer/modelId matching, case handling, precedence, cache parsing and observed list schema. The cache contains 152 allow and 701 block entries; three model_uid-only blocks do not match the recovered predicate. See `background-voice-controls-findings.md` for retained paths, pins and bounded coverage. No vendor list is included in Git.
+
+Native UI acceptance remains unverified. Window inventory `ev_ca6fa1ca97f0069e2bc88581b5da05964fd6f59a1f2a8ea98e35c865e3302fb7` found the newly launched app PID 57664/window 487514. An initial empty-step request was rejected by schema; the corrected wait-only scenario then failed with `process-identity-unavailable` because the selected app exposed no launch time. No control was activated or screenshot accepted. Retained result: `evidence/headset-ui-observe-20261025.result.json`.
+
+The direct own-app launch reached its 180-second bound and received SIGTERM. Its partial observation records signal 15/timeout. REA returned cleanup incomplete because ownership tokens for three live candidates could not be read, and retained its temporary root. A subsequent read-only process check found the known app PID absent; two remaining candidate PIDs were Chrome renderers in a different process group, and the third was absent. None was signaled or modified. Preserve this as an incomplete cleanup report, not a successful REA capture. Raw result: `evidence/headset-ui-launch-20261025.result.json`. No physical audio, original application execution or administrator operation ran.
+
+Next recover the original CoreAudio metadata mapping and implement automatic local compatibility with the recovered precedence. Keep native UI, driver discovery, physical routing, acoustic quality and complete retained-feature parity as separate open requirements.

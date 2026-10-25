@@ -91,7 +91,28 @@ struct AudioView: View {
                         if audio.installedMicrophoneMode == .backgroundVoice {
                             Text("Use a headset. Background voice quality testing is pending. Echo cancellation is unavailable with this mode.")
                                 .font(.caption).foregroundColor(.secondary)
+                            Text(audio.selectedHeadsetConfirmed ? "Selected microphone confirmed as a headset." : "Confirm the selected microphone is a headset before validation.")
+                                .font(.caption)
+                            Button("Confirm selected microphone is a headset") { audio.confirmSelectedHeadset() }
+                                .disabled(!audio.canEditHeadsetConfirmations || audio.selectedMicrophone == nil)
+
                         }
+                    }
+                    if !audio.headsetConfirmations.isEmpty {
+                        Text("Confirmed headsets").font(.headline)
+                        ForEach(audio.headsetConfirmations) { entry in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(entry.name)
+                                    Text(entry.uid).font(.caption).foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Button("Remove") { audio.removeHeadsetConfirmation(uid: entry.uid) }
+                                    .disabled(!audio.canEditHeadsetConfirmations)
+                            }
+                        }
+                        Button("Reset headset confirmations") { audio.resetHeadsetConfirmations() }
+                            .disabled(!audio.canEditHeadsetConfirmations)
                     }
                     Picker("Speaker provider", selection: $audio.speakerProvider) {
                         ForEach(NoiseProvider.allCases) { provider in Text(provider.title(for: .inbound)).tag(provider) }
@@ -104,7 +125,7 @@ struct AudioView: View {
                         Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
                         Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
                         Button("Validate selected installed providers") { Task { await audio.validateInstalledProvider() } }
-                            .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil || audio.requestedInstalledRoles.isEmpty)
+                            .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil || audio.requestedInstalledRoles.isEmpty || audio.requiresHeadsetConfirmation)
                         if audio.providerValidating { ProgressView().controlSize(.small) }
                         Text(audio.providerStatus).font(.caption).textSelection(.enabled)
                         Text("Uses the selected reviewed microphone model and inbound NC for speaker. Installed speaker processing averages stereo to mono, then duplicates the result into both channels. Startup checks exact file hashes. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
