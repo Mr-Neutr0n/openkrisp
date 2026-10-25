@@ -211,3 +211,27 @@ launches. RNNoise runs in process and does not add a worker.
 The reported total is buffering only, not measured end-to-end latency. The
 processing order is independent and does not establish original app parity.
 Physical audio quality and the new combination's interactive UI remain pending.
+
+## Installed microphone background voice mode
+
+The installed microphone provider has a separate mode choice. Noise cancellation
+is the default. Background voice is experimental and explicitly selects the
+reviewed HVC-lfb asset. The speaker always uses its independent inbound NC model.
+The app does not detect headset suitability. Use a headset; speech quality and
+nearby-voice rejection testing remain pending.
+
+Changing microphone mode clears installed NC and AEC validation, including any
+pending validation result. Validate the selected files again before Start.
+Mode controls lock while the route is starting, running or stopping. HVC with
+AEC is unavailable and rejects Start before permission or helper launch.
+Ordinary installed NC and RNNoise can still run after AEC.
+
+The microphone CLI sends `--provider-model-role outbound` or
+`--provider-model-role outbound-hvc-lfb`. No speaker model-role flag is sent.
+Startup must acknowledge the selected installed microphone and speaker roles,
+even for ordinary NC. Wrong, missing or null roles reject startup. A role field
+on an RNNoise or disabled lane also rejects startup, including a null field.
+Injected resolver and controller tests use own fixtures. The production C++
+formatter fixture checks ordinary and HVC microphone acknowledgements with the
+independent inbound speaker role. These checks open no original app, audio
+hardware or permission prompt.

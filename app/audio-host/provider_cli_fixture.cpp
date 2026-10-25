@@ -16,6 +16,10 @@ int runRoute(const std::string&, const std::string&, bool microphone, bool speak
     std::cout << "{\"microphone_noise\":" << (microphone ? "true" : "false")
               << ",\"speaker_noise\":" << (speaker ? "true" : "false") << ",\"microphone\":";
     lane(options.installed); std::cout << ",\"speaker\":"; lane(options.installedSpeaker);
+    std::cout << ",\"startup\":{\"fixture\":true";
+    if(options.installed)std::cout<<labvoice::installedNCStartupFields("provider_",*options.installed,5760,4096);
+    if(options.installedSpeaker)std::cout<<labvoice::installedNCStartupFields("speaker_provider_",*options.installedSpeaker,5760,4096);
+    std::cout << '}';
     if(options.installedAEC) {
         std::cout << ",\"aec\":{\"worker\":"<<labvoice::jsonString(options.installedAEC->workerPath)
                   <<",\"worker_sha256\":"<<labvoice::jsonString(options.installedAEC->workerSha256)

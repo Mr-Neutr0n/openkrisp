@@ -32,6 +32,7 @@ import AVFoundation
             value["microphone_nc_delay_samples"] = installed ? 5760 : 480
             value["microphone_total_delay_samples"] = installed ? 11520 : 6240
             if installed {
+                value["provider_model_role"] = "outbound"
                 value["provider_model_sha256"] = InstalledNCConfiguration.modelSHA256
                 value["provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
                 value["provider_node_sha256"] = InstalledNCConfiguration.reviewedNodeSHA256
@@ -42,6 +43,7 @@ import AVFoundation
         }
         if arguments.contains("--speaker-provider") {
             value["speaker_provider"] = "installed-krisp"
+            value["speaker_provider_model_role"] = "inbound"
             value["speaker_provider_model_sha256"] = InstalledNCConfiguration.inboundModelSHA256
             value["speaker_provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
             value["speaker_provider_node_sha256"] = InstalledNCConfiguration.reviewedNodeSHA256

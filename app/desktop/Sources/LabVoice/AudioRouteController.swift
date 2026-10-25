@@ -21,6 +21,13 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise { invalidateAEC(); if microphoneProvider == .installedKrisp { invalidateProvider() } } } }
     @Published var speakerNoise = false { didSet { if oldValue != speakerNoise, speakerProvider == .installedKrisp { invalidateProvider() } } }
     @Published var microphoneProvider: NoiseProvider = .rnnoise { didSet { if oldValue != microphoneProvider, microphoneNoise { invalidateProvider() } } }
+    @Published var installedMicrophoneMode: InstalledMicrophoneMode = .ordinaryNC {
+        didSet { if oldValue != installedMicrophoneMode { invalidateProvider(); invalidateAEC() } }
+    }
+    var selectedMicrophoneRole: InstalledNCModelRole { installedMicrophoneMode.role }
+    var unsupportedHVCWithAEC: Bool {
+        echoCancellation && microphoneNoise && microphoneProvider == .installedKrisp && selectedMicrophoneRole == .outboundHVC
+    }
     @Published var speakerProvider: NoiseProvider = .rnnoise { didSet { if oldValue != speakerProvider, speakerNoise { invalidateProvider() } } }
     @Published var echoCancellation = false { didSet { if oldValue != echoCancellation { invalidateAEC() } } }
     @Published private(set) var installedAECConfiguration: InstalledAECConfiguration?
@@ -74,9 +81,9 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         }
     }
     var canStart: Bool {
-        guard phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
+        guard !unsupportedHVCWithAEC, phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
               !(echoCancellation && installedAECConfiguration == nil),
-              !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != .outbound),
+              !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != selectedMicrophoneRole),
               !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
         return inventory.devices.contains { $0.uid == inputUID && $0.alive == 1 && $0.nominalRate == 48000 && (1...2).contains($0.input.channels) } &&
             inventory.devices.contains { $0.uid == outputUID && $0.alive == 1 && $0.nominalRate == 48000 && $0.output.channels == 2 }
@@ -163,7 +170,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         if aecValidationID == id { aecValidating = false }
     }
     var requestedInstalledRoles: [InstalledNCModelRole] {
-        (microphoneNoise && microphoneProvider == .installedKrisp ? [.outbound] : []) +
+        (microphoneNoise && microphoneProvider == .installedKrisp ? [selectedMicrophoneRole] : []) +
         (speakerNoise && speakerProvider == .installedKrisp ? [.inbound] : [])
     }
     func validateInstalledProvider() async {
@@ -178,7 +185,10 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                 let configuration = try await resolveProvider(app, node, role)
                 guard providerValidationID == id, phase == .idle else { return }
                 guard configuration.modelRole == role else { throw InstalledNCError.invalid("Validated model role does not match the requested audio direction.") }
-                if role == .outbound { outbound = configuration } else { inbound = configuration }
+                switch role {
+                case .outbound, .outboundHVC: outbound = configuration
+                case .inbound: inbound = configuration
+                }
             }
             installedConfiguration = outbound; installedSpeakerConfiguration = inbound
             providerStatus = "Reviewed " + roles.map(\.rawValue).joined(separator: " and ") + " NC ready."

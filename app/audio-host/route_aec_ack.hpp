@@ -4,7 +4,8 @@
 #include "../native-model-probe/installed_worker_launch.hpp"
 #include <sstream>
 namespace labvoice {
-// Present only for explicit AEC routes. Existing non-AEC startup fields stay unchanged.
+// AEC fields are present only for explicit AEC routes. Installed NC lanes
+// always report their selected fixed model role with their artifact identities.
 inline std::string aecStartupFields(const krisp_probe::InstalledAECWorkerSettings& settings,
                                    std::size_t delay,std::size_t maximum,std::size_t budget){
     std::ostringstream json;
@@ -18,7 +19,8 @@ inline std::string aecStartupFields(const krisp_probe::InstalledAECWorkerSetting
 inline std::string installedNCStartupFields(const char* prefix,const krisp_probe::InstalledWorkerSettings& settings,
                                              std::size_t delay,std::size_t maximum){
     std::ostringstream json;
-    json << ',' << jsonString(std::string(prefix)+"model_sha256") << ':' << jsonString(settings.modelSha256)
+    json << ',' << jsonString(std::string(prefix)+"model_role") << ':' << jsonString(krisp_probe::installedModelRoleName(settings.modelRole))
+         << ',' << jsonString(std::string(prefix)+"model_sha256") << ':' << jsonString(settings.modelSha256)
          << ',' << jsonString(std::string(prefix)+"addon_sha256") << ':' << jsonString(krisp_probe::installed_worker_detail::addonSHA)
          << ',' << jsonString(std::string(prefix)+"adapter_sha256") << ':' << jsonString(settings.adapterSha256)
          << ',' << jsonString(std::string(prefix)+"node_sha256") << ':' << jsonString(settings.nodeSha256)

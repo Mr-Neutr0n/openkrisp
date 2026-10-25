@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Persistent HVC worker, 2026-10-25](#persistent-hvc-worker-checkpoint-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
+Latest verified work: [Experimental HVC microphone integration, 2026-10-25](#experimental-hvc-microphone-integration-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -514,3 +514,19 @@ Full native-model-probe and audio-host verification passed, including their exis
 - `evidence/hvc-persistent-desktop-verify-20261025.log` SHA256 `ff012b0ef7169ced5ca5453e5feeb1ee23c493712e17aa9fb5c2aa4d42916bac`.
 
 Next integrate explicit installed microphone HVC selection, exact role/hash startup checks and invalidation when settings change. Preserve inbound-only speaker admission and reject HVC with AEC until separate composition validation. This bounded CPU evidence does not establish voice isolation, target-speaker preservation, real-time deadlines, physical routing or full retained local parity. No physical audio, administrator action or original app UI ran. Vendor binaries/models remain external and excluded from Git.
+
+
+## Experimental HVC microphone integration, 2026-10-25
+
+The desktop installed microphone provider now offers explicit experimental background-voice selection using the fixed HVC-lfb model. Ordinary NC remains the default. Changing mode invalidates model validation and pending results. The selected microphone role is separate from the speaker, which stays inbound-only. Startup requires the exact selected role and artifact hashes for both installed lanes. Missing, null, unknown or inactive-lane role fields reject the acknowledgement.
+
+The host accepts optional microphone-only `--provider-model-role outbound|outbound-hvc-lfb` and derives the fixed hash internally. Old ordinary profiles remain valid. HVC with AEC rejects in the desktop controller/options, parser, route entry and AEC chain before worker or route startup. The UI locks selection during an active route, advises headset use and notes that quality testing remains pending. There is no automatic headset inference or persistent per-device confirmation yet.
+
+Full audio-host verification passed, including release, ASan/UBSan and TSan integration checks. Full desktop verification passed 142 tests, signed ARM64/macOS12 packaging and resource checks after relocation. New tests cover exact HVC model resolution, stale mode validation, malformed roles, crossed hashes, microphone-only admission, HVC/AEC no-launch behavior and real C++ parser/formatter-to-Swift acknowledgement decoding. Independent GPT6.1sol source/test reviews found no remaining issues. All 165 recorded source fingerprints match.
+
+- `evidence/hvc-route-host-verify-20261025.log` SHA256 `b7967306bc4858ad7e7d92aeab1685b21b83aeec708d4ba81533cc171f24f513`.
+- `evidence/hvc-route-desktop-verify-20261025.log` SHA256 `a3f0d662409551f0d3eb612866f168cbfbe726455c0abf8fb1a86ddad5e7206c`.
+
+This checkpoint adds product controls and own-fixture route integration. The retained persistent CPU gate remains the installed HVC processing evidence; no new vendor execution or real audio route ran here. Voice isolation, target-speaker preservation, real-time deadlines, physical driver/routing acceptance, native visual interaction and full feature parity remain unverified or incomplete. HVC with AEC stays unavailable until its own composition gate. Original models and binaries remain external and excluded from Git.
+
+Next implement the local per-device headset confirmation policy described in PLAN.md. Preserve the deferred administrator-dependent driver discovery step. Do not reinstall the driver merely to restart CoreAudio, and do not treat synthetic tests as physical routing acceptance.

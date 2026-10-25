@@ -128,6 +128,9 @@ void serviceControls(labvoice::ControlFramer &input, labvoice::ControlProtocol &
 } // namespace
 int runRoute(const std::string &input, const std::string &output, bool microphoneNoise,
              bool speakerNoise, const RouteControlOptions &controls, const RouteProviderOptions &provider) {
+    if(provider.installedAEC && provider.installed &&
+       provider.installed->modelRole==krisp_probe::InstalledModelRole::outboundHVC)
+        throw std::invalid_argument("HVC microphone processing cannot be combined with AEC");
     // Merely compiling this function starts no audio. --route is an explicit start command.
     labvoice::CoreAudioBackend backend;
     std::shared_ptr<labvoice::NoiseAdapter> noise;

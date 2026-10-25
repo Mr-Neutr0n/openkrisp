@@ -7,13 +7,31 @@ enum NoiseProvider: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String { title(for: .outbound) }
     func title(for role: InstalledNCModelRole) -> String {
-        self == .rnnoise ? "Independent RNNoise" : "Installed Krisp \(role.rawValue) NC"
+        self == .rnnoise ? "Independent RNNoise" : (role == .outboundHVC ? "Installed Krisp background voice" : "Installed Krisp \(role.rawValue) NC")
     }
 }
+enum InstalledMicrophoneMode: String, CaseIterable, Identifiable {
+    case ordinaryNC, backgroundVoice
+    var id: String { rawValue }
+    var title: String { self == .ordinaryNC ? "Noise cancellation" : "Background voice (experimental)" }
+    var role: InstalledNCModelRole { self == .ordinaryNC ? .outbound : .outboundHVC }
+}
 enum InstalledNCModelRole: String, Sendable {
-    case outbound, inbound
-    var modelFile: String { self == .outbound ? "c8.f.m.528d1f-1.0.1_1.0.kef" : "c8.w.m.d15e29_1.0.kef" }
-    var modelSHA256: String { self == .outbound ? InstalledNCConfiguration.modelSHA256 : InstalledNCConfiguration.inboundModelSHA256 }
+    case outbound, inbound, outboundHVC = "outbound-hvc-lfb"
+    var modelFile: String {
+        switch self {
+        case .outbound: return "c8.f.m.528d1f-1.0.1_1.0.kef"
+        case .inbound: return "c8.w.m.d15e29_1.0.kef"
+        case .outboundHVC: return "hs.c6.f.m.75df8f.berlin.kef"
+        }
+    }
+    var modelSHA256: String {
+        switch self {
+        case .outbound: return InstalledNCConfiguration.modelSHA256
+        case .inbound: return InstalledNCConfiguration.inboundModelSHA256
+        case .outboundHVC: return "54e2913ea45734adc3323407e43f55b14afade256ab4da6226c2b6e30604cbf4"
+        }
+    }
 }
 struct InstalledNCConfiguration: Equatable, Sendable {
     let nodePath, workerPath, addonPath, modelPath, adapterPath, libraryPath: String
@@ -27,10 +45,12 @@ struct InstalledNCConfiguration: Equatable, Sendable {
     var arguments: [String] { arguments(speaker: false) }
     func arguments(speaker: Bool) -> [String] {
         let prefix = speaker ? "--speaker-provider-" : "--provider-"
-        return [speaker ? "--speaker-provider" : "--microphone-provider", "installed-krisp",
+        var args = [speaker ? "--speaker-provider" : "--microphone-provider", "installed-krisp",
          prefix + "node", nodePath, prefix + "worker", workerPath, prefix + "addon", addonPath,
          prefix + "model", modelPath, prefix + "adapter", adapterPath, prefix + "library", libraryPath,
          prefix + "node-sha256", nodeSHA256, prefix + "adapter-sha256", adapterSHA256]
+        if !speaker { args += ["--provider-model-role", modelRole.rawValue] }
+        return args
     }
 }
 enum InstalledNCError: Error, LocalizedError {

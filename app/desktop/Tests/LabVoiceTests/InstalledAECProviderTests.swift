@@ -161,6 +161,7 @@ final class InstalledAECStartupTests: XCTestCase {
             value["microphone_provider"] = installed ? "installed-krisp" : "rnnoise"
             value["microphone_processing_order"] = "aec-then-nc"; value["microphone_nc_delay_samples"] = nc; value["microphone_total_delay_samples"] = delay + nc
             if installed {
+                value["provider_model_role"] = "outbound"
                 value["provider_model_sha256"] = InstalledNCConfiguration.modelSHA256; value["provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
                 value["provider_adapter_sha256"] = mic.adapterSHA256; value["provider_node_sha256"] = mic.nodeSHA256
                 value["provider_delay_samples"] = delay; value["provider_maximum_callback_frames"] = maximum
@@ -172,6 +173,12 @@ final class InstalledAECStartupTests: XCTestCase {
             }
             for (key, mutation) in [("microphone_processing_order", "nc-then-aec" as Any), ("microphone_total_delay_samples", delay + nc + 1), ("microphone_nc_delay_samples", nc + 1), ("microphone_nc_unknown", NSNull())] {
                 var bad = value; bad[key] = mutation; XCTAssertFalse(try matches(bad, options))
+            }
+            if installed {
+                for roleValue in [NSNull(), "outbound-hvc-lfb"] as [Any] {
+                    var bad = value; bad["provider_model_role"] = roleValue; XCTAssertFalse(try matches(bad, options))
+                }
+                var bad = value; bad.removeValue(forKey: "provider_model_role"); XCTAssertFalse(try matches(bad, options))
             }
             if installed { var bad = value; bad["provider_maximum_callback_frames"] = maximum == 480 ? 512 : 480; XCTAssertFalse(try matches(bad, options)) }
         } }
@@ -212,7 +219,8 @@ final class InstalledAECStartupTests: XCTestCase {
         options = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: false, speakerNoise: true,
                                     installedSpeakerProvider: speaker, installedAEC: aecConfiguration())
         var value = fields(); value["speaker_noise"] = true; value["speaker_provider"] = "installed-krisp"
-        value["speaker_provider_model_sha256"] = InstalledNCConfiguration.inboundModelSHA256
+        value["speaker_provider_model_role"] = "inbound"
+            value["speaker_provider_model_sha256"] = InstalledNCConfiguration.inboundModelSHA256
         value["speaker_provider_addon_sha256"] = InstalledNCConfiguration.addonSHA256
         value["speaker_provider_node_sha256"] = speaker.nodeSHA256
         value["speaker_provider_adapter_sha256"] = speaker.adapterSHA256

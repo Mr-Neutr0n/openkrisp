@@ -53,6 +53,7 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-cli-') as temporary:
         assert ack['microphone_nc_delay_samples']==(5760 if installed_microphone else 480)
         assert ack['microphone_total_delay_samples']==5760+ack['microphone_nc_delay_samples']
         if installed_microphone:
+            assert ack['provider_model_role']=='outbound'
             assert ack['provider_model_sha256']=='12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d'
             assert ack['provider_addon_sha256']=='adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755'
             assert ack['provider_adapter_sha256']==ack['provider_node_sha256']=='c'*64

@@ -17,7 +17,8 @@ static InstalledNoiseAdapter::WorkerFactory fixture(const char* node,const char*
     return [=](krisp_probe::WorkerLaunchConfig built,std::string& error,krisp_probe::ProviderBufferingConfig buffering) {
         assert(built.executable=="/usr/bin/sandbox-exec");
         assert(built.expectedReadyLine.find(krisp_probe::installedOutboundModelSHA256)!=std::string::npos ||
-               built.expectedReadyLine.find(krisp_probe::installedInboundModelSHA256)!=std::string::npos);
+               built.expectedReadyLine.find(krisp_probe::installedInboundModelSHA256)!=std::string::npos ||
+               built.expectedReadyLine.find(krisp_probe::installedOutboundHVCModelSHA256)!=std::string::npos);
         krisp_probe::WorkerLaunchConfig c;
         c.executable=node; c.arguments={script,mode,"fixture-ready","000102030405060708090a0b0c0d0e0f"};
         c.expectedReadyLine="fixture-ready\n";
@@ -32,6 +33,24 @@ static krisp_probe::InstalledWorkerSettings inboundSettings() {
 }
 int main(int argc,char** argv) {
     assert(argc==3);
+    {
+        auto hvc=settings();hvc.modelRole=krisp_probe::InstalledModelRole::outboundHVC;
+        hvc.modelSha256=krisp_probe::installedOutboundHVCModelSHA256;
+        InstalledNoiseOptions options;options.microphone=hvc;options.speaker=inboundSettings();
+        std::string error;
+        auto adapter=InstalledNoiseAdapter::create(layout(),options,error,fixture(argv[1],argv[2],"normal"));
+        assert(adapter && error.empty() && adapter->microphoneSettings()->modelRole==hvc.modelRole);
+        assert(adapter->microphoneSettings()->modelSha256==hvc.modelSha256);
+        assert(adapter->stop());
+        unsigned calls=0;
+        InstalledNoiseAdapter::WorkerFactory forbidden=[&](auto,auto&,auto){++calls;return std::shared_ptr<krisp_probe::ProviderWorker>{};};
+        options.speaker=hvc;
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+        options.speaker=inboundSettings();options.microphone->modelSha256=krisp_probe::installedOutboundModelSHA256;
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+        options.microphone=settings();options.microphone->modelSha256=krisp_probe::installedOutboundHVCModelSHA256;
+        assert(!InstalledNoiseAdapter::create(layout(),options,error,forbidden) && calls==0);
+    }
     for(bool speakerEnabled:{false,true}) {
         std::string error;
         auto adapter=InstalledNoiseAdapter::create(layout(),settings(),speakerEnabled,error,0,fixture(argv[1],argv[2],"normal"));
@@ -119,7 +138,7 @@ int main(int argc,char** argv) {
         inbound.modelRole=krisp_probe::InstalledModelRole::inbound;
         inbound.modelSha256=krisp_probe::installedInboundModelSHA256;
         assert(!InstalledNoiseAdapter::create(layout(),inbound,false,error,2,forbidden));
-        assert(error=="Installed microphone provider requires outbound model role" && calls==0);
+        assert(error=="Installed microphone provider requires outbound or outbound-hvc-lfb model role" && calls==0);
         auto invalid=layout(); invalid.maximumCallbackFrames=4097;
         assert(!InstalledNoiseAdapter::create(invalid,settings(),false,error,2,forbidden));
         assert(!InstalledNoiseAdapter::create(layout(),settings(),false,error,SIZE_MAX,forbidden));

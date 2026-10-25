@@ -151,13 +151,14 @@ int main(int argc,char** argv) {
     AECMicrophoneChain::AECWorkerFactory noAEC=[&](auto,auto&,auto){++aecCalls;return std::shared_ptr<krisp_probe::AECDuplexWorker>{};};
     AECMicrophoneChain::NCWorkerFactory noNC=[&](auto,auto&,auto){++ncCalls;return std::shared_ptr<krisp_probe::ProviderWorker>{};};
     options.microphone=ncSettings();options.microphoneRNNoise=false;
-    for(unsigned mutation=0;mutation<6;++mutation){auto bad=options;
+    for(unsigned mutation=0;mutation<7;++mutation){auto bad=options;
         if(mutation==0)bad.microphoneRNNoise=true;
         if(mutation==1)bad.microphone->modelRole=krisp_probe::InstalledModelRole::inbound;
         if(mutation==2)bad.microphone->bypass=true;
         if(mutation==3)bad.microphone->adapterSha256="bad";
         if(mutation==4)bad.microphone->modelPath="relative";
         if(mutation==5)bad.schedulingBudgetFrames=SIZE_MAX;
+        if(mutation==6){bad.microphone->modelRole=krisp_probe::InstalledModelRole::outboundHVC;bad.microphone->modelSha256=krisp_probe::installedOutboundHVCModelSHA256;}
         assert(!AECMicrophoneChain::create(layout(),bad,error,noAEC,noNC) && !error.empty() && aecCalls==0 && ncCalls==0);
     }
     // Failure starting NC stops the AEC child; a later valid create still works.

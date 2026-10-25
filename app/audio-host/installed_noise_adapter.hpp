@@ -64,7 +64,9 @@ class InstalledNoiseAdapter {
                             krisp_probe::InstalledModelRole role,const char* roleError)
                             -> std::optional<krisp_probe::WorkerLaunchConfig> {
                 if (!settings) return {};
-                if (settings->modelRole!=role) throw std::invalid_argument(roleError);
+                if (settings->modelRole!=role &&
+                    !(role==krisp_probe::InstalledModelRole::outbound && settings->modelRole==krisp_probe::InstalledModelRole::outboundHVC))
+                    throw std::invalid_argument(roleError);
                 if (settings->bypass) throw std::invalid_argument("Installed provider requires active suppression");
                 krisp_probe::wire::Token token{};arc4random_buf(token.data(),token.size());
                 return krisp_probe::buildInstalledWorkerLaunch(*settings,token);
@@ -72,7 +74,7 @@ class InstalledNoiseAdapter {
             // Build both commands before spawning either child. This validates
             // every path, role, digest and option, including the second lane.
             auto microphoneLaunch=launch(options.microphone,krisp_probe::InstalledModelRole::outbound,
-                                         "Installed microphone provider requires outbound model role");
+                                         "Installed microphone provider requires outbound or outbound-hvc-lfb model role");
             auto speakerLaunch=launch(options.speaker,krisp_probe::InstalledModelRole::inbound,
                                       "Installed speaker provider requires inbound model role");
             auto owner=std::shared_ptr<InstalledNoiseAdapter>(new InstalledNoiseAdapter(options,layout.maximumCallbackFrames));
@@ -94,7 +96,7 @@ class InstalledNoiseAdapter {
             return owner;
         } catch(const std::exception& failure) { error=failure.what();return {}; }
     }
-    // Existing microphone-installed/speaker-RNNoise API remains outbound-only.
+    // Microphone-installed/speaker-RNNoise API admits the two fixed microphone roles.
     static std::shared_ptr<InstalledNoiseAdapter> create(
         const Layout& layout,const krisp_probe::InstalledWorkerSettings& settings,
         bool speakerNoise,std::string& error,std::size_t schedulingBudgetFrames=2,

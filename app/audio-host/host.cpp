@@ -593,6 +593,12 @@ int main(int argc, char **argv) {
                     else if (name == "provider-worker") selected.workerPath = value;
                     else if (name == "provider-addon") selected.addonPath = value;
                     else if (name == "provider-model") selected.modelPath = value;
+                    else if (name == "provider-model-role" && !speakerOption) {
+                        if(value=="outbound")selected.modelRole=krisp_probe::InstalledModelRole::outbound;
+                        else if(value=="outbound-hvc-lfb")selected.modelRole=krisp_probe::InstalledModelRole::outboundHVC;
+                        else throw std::invalid_argument("Unsupported microphone model role");
+                        selected.modelSha256=krisp_probe::installedModelSha256(selected.modelRole);
+                    }
                     else if (name == "provider-adapter") selected.adapterPath = value;
                     else if (name == "provider-library") selected.libraryPath = value;
                     else if (name == "provider-node-sha256") selected.nodeSha256 = value;
@@ -632,6 +638,8 @@ int main(int argc, char **argv) {
                 std::cerr << "--control-stdin and --operation-id must be supplied together\n";
                 return 64;
             }
+            if(installedAEC && settings.modelRole==krisp_probe::InstalledModelRole::outboundHVC)
+                throw std::invalid_argument("HVC microphone processing cannot be combined with AEC");
             if(!aecFlags.empty()) {
                 if(!installedAEC || aecFlags.size()!=4)
                     throw std::invalid_argument("AEC provider requires all runtime options");
@@ -639,7 +647,7 @@ int main(int argc, char **argv) {
                 provider.installedAEC=std::move(aecSettings);
             }
             if (!providerFlags.empty()) {
-                if (!installedProvider || !microphone || providerFlags.size() != 9)
+                if (!installedProvider || !microphone || providerFlags.size() != (providerFlags.count("--provider-model-role") ? 10u : 9u))
                     throw std::invalid_argument("Installed provider requires microphone suppression and all runtime options");
                 // Syntax validation before aggregate creation. Worker admission
                 // checks actual artifacts before any callback can run.

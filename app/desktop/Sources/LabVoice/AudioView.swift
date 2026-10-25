@@ -84,6 +84,15 @@ struct AudioView: View {
                         ForEach(NoiseProvider.allCases) { provider in Text(provider.title).tag(provider) }
                     }.disabled(controlsLocked)
                     Toggle("Reduce speaker noise", isOn: $audio.speakerNoise).disabled(controlsLocked)
+                    if audio.microphoneProvider == .installedKrisp {
+                        Picker("Installed microphone mode", selection: $audio.installedMicrophoneMode) {
+                            ForEach(InstalledMicrophoneMode.allCases) { mode in Text(mode.title).tag(mode) }
+                        }.disabled(controlsLocked)
+                        if audio.installedMicrophoneMode == .backgroundVoice {
+                            Text("Use a headset. Background voice quality testing is pending. Echo cancellation is unavailable with this mode.")
+                                .font(.caption).foregroundColor(.secondary)
+                        }
+                    }
                     Picker("Speaker provider", selection: $audio.speakerProvider) {
                         ForEach(NoiseProvider.allCases) { provider in Text(provider.title(for: .inbound)).tag(provider) }
                     }.disabled(controlsLocked)
@@ -98,8 +107,11 @@ struct AudioView: View {
                             .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil || audio.requestedInstalledRoles.isEmpty)
                         if audio.providerValidating { ProgressView().controlSize(.small) }
                         Text(audio.providerStatus).font(.caption).textSelection(.enabled)
-                        Text("Uses reviewed outbound NC for microphone and inbound NC for speaker. Installed speaker processing averages stereo to mono, then duplicates the result into both channels. Startup checks exact file hashes. Other models remain unavailable. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
+                        Text("Uses the selected reviewed microphone model and inbound NC for speaker. Installed speaker processing averages stereo to mono, then duplicates the result into both channels. Startup checks exact file hashes. Added transport delay depends on callback size; speech quality and live audio behavior are unverified.")
                             .font(.caption).foregroundColor(.secondary)
+                    }
+                    if audio.unsupportedHVCWithAEC {
+                        Text("Choose noise cancellation or turn off echo cancellation before Start.").font(.caption).foregroundColor(.secondary)
                     }
                     Toggle("Cancel speaker echo", isOn: $audio.echoCancellation)
                         .disabled(controlsLocked)
@@ -117,7 +129,7 @@ struct AudioView: View {
                     Text("Start captures the selected microphone and routes speaker audio. Each enabled direction uses its selected provider.")
                         .font(.caption).foregroundColor(.secondary)
                     if let active = audio.activeOptions, audio.phase == .running {
-                        Text("Microphone: \(active.installedAEC != nil ? (active.microphoneNoise ? "echo cancellation then noise reduction" : "echo cancellation") : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : "installed Krisp outbound NC") : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
+                        Text("Microphone: \(active.installedAEC != nil ? (active.microphoneNoise ? "echo cancellation then noise reduction" : "echo cancellation") : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : (active.installedProvider?.modelRole == .outboundHVC ? "experimental background voice" : "installed Krisp outbound NC")) : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
                             .font(.caption)
                     }
                     Divider()

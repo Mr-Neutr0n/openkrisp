@@ -352,3 +352,10 @@ Static controls/native recovery and bounded HVC candidate processing are documen
 The private worker/probe now admits a separate fixed `outbound-hvc-lfb` role. The ordinary outbound/inbound identities and defaults are unchanged. REA `ev_f0e42f64a009b52eb8aed7c7e30177101eb560c64ade103e2096a899bb788753` passed: fresh active and bypass workers each produced 100 frames and 48000 finite samples, matching retained direct-HVC outputs byte for byte, with unchanged pins and verified owned cleanup. The historical failed raw-input bypass assertion remains separate. See `background-voice-persistent-findings.md`.
 
 The native findings close the static NC descriptor construction join and identify packaged RD defaults and the alternate energy/statistics path. Product BVC remains unavailable. Next add explicit microphone selection with exact startup role checks and preserve speaker-only inbound admission. Reject HVC with AEC until a separate composition gate passes. Headset policy, target-speaker preservation, nearby-voice rejection, real-time deadlines and physical audio remain open. No vendor assets are included. The JSON ledger records all 165 current source hashes.
+
+
+## Experimental background-voice microphone selection, 2026-10-25
+
+Desktop and audio host now expose an explicit installed HVC-lfb microphone mode with exact role/hash admission. Ordinary NC remains the default; speakers stay inbound-only. Mode changes invalidate validation, and startup must confirm the selected model. HVC with AEC is rejected before route launch. Own-fixture tests cover CLI admission, injected controller state, stale results, production C++ formatter-to-Swift acknowledgement and invalid role/hash combinations. See the latest CHECKPOINT section for full verification results.
+
+This supersedes the earlier product-unavailable status. The mode is experimental. Actual installed-HVC product routing, voice isolation, target-speaker preservation, real-time deadlines and visual acceptance are unverified. Per-device headset confirmation, automatic compatibility, remove/reset policy, HVC-sfb and original energy/bypass statistics remain incomplete. Vendor assets stay external.

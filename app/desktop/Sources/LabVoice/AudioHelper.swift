@@ -33,8 +33,9 @@ struct AudioRouteOptions: Equatable, Sendable {
     var installedSpeakerProvider: InstalledNCConfiguration? = nil
     var installedAEC: InstalledAECConfiguration? = nil
     var validProviderRoles: Bool {
-        (installedProvider == nil || (microphoneNoise && installedProvider?.modelRole == .outbound)) &&
-        (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound))
+        (installedProvider == nil || (microphoneNoise && (installedProvider?.modelRole == .outbound || installedProvider?.modelRole == .outboundHVC))) &&
+        (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound)) &&
+        !(installedAEC != nil && installedProvider?.modelRole == .outboundHVC)
     }
     var arguments: [String] {
         var args = ["--route", "--input", inputUID, "--output", outputUID]
@@ -57,6 +58,9 @@ struct AudioStartup: Decodable, Sendable {
     let speakerNoise: Bool
     let microphoneProvider: String?
     let speakerProvider: String?
+    let providerModelRole: String?
+    let speakerProviderModelRole: String?
+    private let roleFieldNames: Set<String>
     let providerModelSHA256: String?
     let providerAddonSHA256: String?
     let providerAdapterSHA256: String?
@@ -104,6 +108,7 @@ struct AudioStartup: Decodable, Sendable {
         case speakerProviderDelaySamples = "speaker_provider_delay_samples", speakerProviderMaximumCallbackFrames = "speaker_provider_maximum_callback_frames"
         case event, operationID, microphone, speaker
         case microphoneProvider = "microphone_provider", speakerProvider = "speaker_provider"
+        case providerModelRole = "provider_model_role", speakerProviderModelRole = "speaker_provider_model_role"
         case providerModelSHA256 = "provider_model_sha256", providerAddonSHA256 = "provider_addon_sha256"
         case providerAdapterSHA256 = "provider_adapter_sha256", providerNodeSHA256 = "provider_node_sha256"
         case providerDelaySamples = "provider_delay_samples", providerMaximumCallbackFrames = "provider_maximum_callback_frames"
@@ -128,6 +133,8 @@ struct AudioStartup: Decodable, Sendable {
         speakerNoise = try values.decode(Bool.self, forKey: .speakerNoise)
         microphoneProvider = try values.decodeIfPresent(String.self, forKey: .microphoneProvider)
         speakerProvider = try values.decodeIfPresent(String.self, forKey: .speakerProvider)
+        providerModelRole = try values.decodeIfPresent(String.self, forKey: .providerModelRole)
+        speakerProviderModelRole = try values.decodeIfPresent(String.self, forKey: .speakerProviderModelRole)
         providerModelSHA256 = try values.decodeIfPresent(String.self, forKey: .providerModelSHA256)
         providerAddonSHA256 = try values.decodeIfPresent(String.self, forKey: .providerAddonSHA256)
         providerAdapterSHA256 = try values.decodeIfPresent(String.self, forKey: .providerAdapterSHA256)
@@ -154,6 +161,7 @@ struct AudioStartup: Decodable, Sendable {
         microphoneNCDelaySamples = try values.decodeIfPresent(Int.self, forKey: .microphoneNCDelaySamples)
         microphoneTotalDelaySamples = try values.decodeIfPresent(Int.self, forKey: .microphoneTotalDelaySamples)
         let all = try decoder.container(keyedBy: AnyKey.self).allKeys.map(\.stringValue)
+        roleFieldNames = Set(all.filter { $0 == "provider_model_role" || $0 == "speaker_provider_model_role" })
         aecFieldNames = Set(all.filter { $0.hasPrefix("aec_") })
         microphoneNCFieldNames = Set(all.filter { $0.hasPrefix("provider_") })
         chainFieldNames = Set(all.filter { $0.hasPrefix("microphone_processing_") || $0.hasPrefix("microphone_nc_") || $0.hasPrefix("microphone_total_") })
@@ -166,15 +174,15 @@ struct AudioStartup: Decodable, Sendable {
         guard expected.validProviderRoles, inputUID == expected.inputUID, outputUID == expected.outputUID,
               microphoneNoise == expected.microphoneNoise, speakerNoise == expected.speakerNoise else { return false }
         func lane(noise: Bool, configuration: InstalledNCConfiguration?, role: InstalledNCModelRole,
-                  name: String?, model: String?, addon: String?, adapter: String?, node: String?, delay: Int?, maximum: Int?) -> Bool {
+                  name: String?, modelRole: String?, roleField: String, model: String?, addon: String?, adapter: String?, node: String?, delay: Int?, maximum: Int?) -> Bool {
             if let configuration {
-                guard noise, configuration.modelRole == role, name == "installed-krisp", model == role.modelSHA256,
+                guard noise, configuration.modelRole == role, modelRole == role.rawValue, name == "installed-krisp", model == role.modelSHA256,
                       addon == InstalledNCConfiguration.addonSHA256, adapter == configuration.adapterSHA256,
                       node == configuration.nodeSHA256, let maximum, (1...4096).contains(maximum),
                       delay == ((maximum + 958) / 480 + 2) * 480 else { return false }
                 return true
             }
-            return name == (noise ? "rnnoise" : "none") && model == nil && addon == nil && adapter == nil && node == nil && delay == nil && maximum == nil
+            return !roleFieldNames.contains(roleField) && name == (noise ? "rnnoise" : "none") && model == nil && addon == nil && adapter == nil && node == nil && delay == nil && maximum == nil
         }
         let microphoneMatches: Bool
         if let aec = expected.installedAEC {
@@ -189,14 +197,14 @@ struct AudioStartup: Decodable, Sendable {
             if expected.installedSpeakerProvider != nil && speakerProviderMaximumCallbackFrames != maximum { return false }
             if expected.microphoneNoise {
                 let chainRequired: Set<String> = ["microphone_processing_order", "microphone_nc_delay_samples", "microphone_total_delay_samples"]
-                let ncFields: Set<String> = ["provider_model_sha256", "provider_addon_sha256", "provider_adapter_sha256", "provider_node_sha256", "provider_delay_samples", "provider_maximum_callback_frames"]
+                let ncFields: Set<String> = ["provider_model_role", "provider_model_sha256", "provider_addon_sha256", "provider_adapter_sha256", "provider_node_sha256", "provider_delay_samples", "provider_maximum_callback_frames"]
                 let ncDelay = expected.installedProvider == nil ? 480 : ((maximum + 958) / 480 + 2) * 480
                 guard chainFieldNames == chainRequired, microphoneProcessingOrder == "aec-then-nc",
                       microphoneNCDelaySamples == ncDelay, microphoneTotalDelaySamples == aecDelaySamples! + ncDelay,
                       microphoneNCFieldNames == (expected.installedProvider == nil ? [] : ncFields),
                       expected.installedProvider == nil || providerMaximumCallbackFrames == maximum else { return false }
-                microphoneMatches = lane(noise: true, configuration: expected.installedProvider, role: .outbound,
-                    name: microphoneProvider, model: providerModelSHA256, addon: providerAddonSHA256,
+                microphoneMatches = lane(noise: true, configuration: expected.installedProvider, role: expected.installedProvider?.modelRole ?? .outbound,
+                    name: microphoneProvider, modelRole: providerModelRole, roleField: "provider_model_role", model: providerModelSHA256, addon: providerAddonSHA256,
                     adapter: providerAdapterSHA256, node: providerNodeSHA256, delay: providerDelaySamples, maximum: providerMaximumCallbackFrames)
             } else {
                 guard chainFieldNames.isEmpty, microphoneNCFieldNames.isEmpty, microphoneProvider == "installed-krisp-aec" else { return false }
@@ -204,13 +212,13 @@ struct AudioStartup: Decodable, Sendable {
             }
         } else {
             guard aecFieldNames.isEmpty, chainFieldNames.isEmpty else { return false }
-            microphoneMatches = lane(noise: expected.microphoneNoise, configuration: expected.installedProvider, role: .outbound,
-                name: microphoneProvider, model: providerModelSHA256, addon: providerAddonSHA256,
+            microphoneMatches = lane(noise: expected.microphoneNoise, configuration: expected.installedProvider, role: expected.installedProvider?.modelRole ?? .outbound,
+                name: microphoneProvider, modelRole: providerModelRole, roleField: "provider_model_role", model: providerModelSHA256, addon: providerAddonSHA256,
                 adapter: providerAdapterSHA256, node: providerNodeSHA256, delay: providerDelaySamples, maximum: providerMaximumCallbackFrames)
         }
         return microphoneMatches &&
             lane(noise: expected.speakerNoise, configuration: expected.installedSpeakerProvider, role: .inbound,
-                 name: speakerProvider, model: speakerProviderModelSHA256, addon: speakerProviderAddonSHA256,
+                 name: speakerProvider, modelRole: speakerProviderModelRole, roleField: "speaker_provider_model_role", model: speakerProviderModelSHA256, addon: speakerProviderAddonSHA256,
                  adapter: speakerProviderAdapterSHA256, node: speakerProviderNodeSHA256,
                  delay: speakerProviderDelaySamples, maximum: speakerProviderMaximumCallbackFrames)
     }
