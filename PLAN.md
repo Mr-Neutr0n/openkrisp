@@ -417,3 +417,19 @@ Full desktop verification passed 195 tests, ARM64/macOS12 packaging, signing and
 - Desktop log `evidence/power-lifecycle-desktop-20261028.log`: SHA256 `32c0b3096cb065bc9ee02114b9cbdd98a6ef15f95208cd47419a2503a225ab40`.
 
 The original native callback acknowledges OS sleep before async application cleanup. Neither the evidence nor this implementation promises recording publication before the machine sleeps. Actual listener delivery, system sleep/wake/shutdown, native simulation controls, physical routing and recording survival across sleep remain unverified. The original recording-reset handler, default-device restoration and later graph restart remain separate gaps. Native analysis close failed due unrelated process-capture resource ownership checks; the exported static evidence is preserved and provider shutdown is not claimed. No physical audio, forced OS power event or administrator action ran. Full retained-feature parity remains incomplete.
+
+
+## Native listener acceptance and activation evidence, 2026-10-28
+
+An opt-in integration test attached the own NativePowerNotifications class to real IOKit notifications in the test process, without posting or forcing any event. It observed nonzero connection/notifier handles, a notification port, main common-mode run-loop membership and the power-off observer. Repeated Start retained the same registration. Stop confirmed source removal, IODeregisterForSystemPower status 0 and IOServiceClose status 0; port destruction and observer removal were requested and all owned resource fields cleared. No callbacks occurred. This proves bounded listener attach/detach, not delivery during real sleep/wake, packaged app startup or shutdown behavior.
+
+The adapter now reports teardown outcomes instead of discarding statuses. Failed native cleanup retains handles and the callback owner, prevents registration over leftovers and allows explicit retry. Successful cleanup clears stale cleanup error. The native APIs for port destruction and observer removal have no return status, so those are reported as requested operations. Failure branches received source review, not forced kernel failures.
+
+Full desktop verification enumerated 196 tests: 195 passed and the opt-in listener test was skipped. That listener test passed separately once under a bounded run. ARM64/macOS12 packaging, signing and relocated-resource checks passed. The later successful-cleanup error-label correction did not change registration or native teardown calls and did not justify another live attach.
+
+- Live listener log `evidence/native-power-registration-runtime-20261028.log`, SHA256 `aa2bf67d7f54be7d8773b828878d9f00f5e5c083cb4c70ce68d98bfa9be5bc19`.
+- Full desktop log `evidence/native-power-registration-desktop-20261028.log`, SHA256 `a85ad110eaa941cdd936dfaf870ac325900dd2db85879b99651477c8e1f8b134`.
+
+A fresh own device inventory still reports feed/monitor endpoints absent with no inventory errors. CoreAudio and the own remote driver retain their October 13 start times, before the installed diagnostic build. No restart or installer ran. See `driver-current-discovery-findings.md`; the deferred administrator step remains pending.
+
+REA native analysis and qualified retained JavaScript excerpts recover local CoreAudio audio-use detection, responsible-process identity, client payload, stabilization, lowercased app-name blocking and competing-call selection. See `activation-findings.md`. Running/frontmost applications alone are not calls. Concrete delay defaults, stream grouping, older-OS fallback, auto-activation preferences and the call-to-note-taking path remain unresolved. No activation implementation or original runtime behavior is claimed. Full retained-feature parity remains incomplete.
