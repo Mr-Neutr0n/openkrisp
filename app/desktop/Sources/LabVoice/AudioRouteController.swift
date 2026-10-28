@@ -11,7 +11,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let captureAdmission = AudioCaptureAdmission.shared
     private var admissionObservation: AnyCancellable?
     private var recordingObservation: AnyCancellable?
-    @Published private(set) var inventory: AudioInventory?
+    @Published private(set) var inventory: AudioInventory? { didSet { invalidateProvider(); invalidateAEC() } }
     @Published private(set) var loading = false
     @Published private(set) var phase: AudioRoutePhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: phase == .idle ? .stopped : (phase == .running ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var activeOptions: AudioRouteOptions?
@@ -20,23 +20,57 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let headsetStore: HeadsetConfirmationStore
     @Published private(set) var headsetConfirmations: [HeadsetConfirmation]
     var selectedMicrophone: AudioHardwareDevice? { inventory?.devices.first { $0.uid == inputUID && $0.input.channels > 0 } }
-    var selectedHeadsetConfirmed: Bool { headsetConfirmations.contains { $0.uid == inputUID } }
+    private let compatibilityStore: LocalHeadsetCompatibilityStore
+    @Published private(set) var compatibilityLists = LocalHeadsetLists()
+    @Published private(set) var compatibilityStatus = "No offline compatibility list loaded."
+    var selectedCompatibility: LocalHeadsetCompatibility {
+        guard let device = selectedMicrophone else { return .unknown("Choose a microphone.") }
+        var lists = compatibilityLists
+        lists.manual = headsetConfirmations.map { .init(name: .string($0.name)) }
+        return LocalHeadsetPolicy.evaluate(device: device.localHeadsetPolicyDevice, lists: lists,
+            mode: installedMicrophoneMode == .ordinaryNC ? .alwaysOff : .auto)
+    }
+    var selectedHeadsetConfirmed: Bool { selectedCompatibility.compatible }
+    func importCompatibilityList(at url: URL) {
+        guard canEditHeadsetConfirmations else { return }
+        applyCompatibility(compatibilityStore.importFile(at: url, preserving: compatibilityLists))
+    }
+    func clearCompatibilityList() {
+        guard canEditHeadsetConfirmations else { return }
+        applyCompatibility(compatibilityStore.clear(preserving: compatibilityLists))
+    }
+    private func applyCompatibility(_ result: LocalHeadsetCacheLoad) {
+        compatibilityStatus = result.failure ?? "Offline list loaded: \(result.lists.allowed.count) allowed, \(result.lists.blocked.count) blocked."
+        if result.loaded { compatibilityLists = result.lists; invalidateProvider(); invalidateAEC() }
+    }
+    var compatibilityDescription: String {
+        switch selectedCompatibility {
+        case .alwaysOff: return "Background voice is off. Ordinary noise cancellation selected."
+        case .allowed: return "Offline allow list matched. Background voice selected."
+        case .manualAllowed: return "Manual interface name matched. Background voice selected."
+        case .blocked: return "Offline block list matched. Ordinary noise cancellation selected."
+        case .lowRate: return "Microphone rate is below 16 kHz. Ordinary noise cancellation selected."
+        case .userChoiceRequired: return "No compatibility match. Ordinary noise cancellation selected."
+        case .unknown(let reason): return reason + " Ordinary noise cancellation selected."
+        }
+    }
     var requiresHeadsetConfirmation: Bool {
-        microphoneNoise && microphoneProvider == .installedKrisp && installedMicrophoneMode == .backgroundVoice && !selectedHeadsetConfirmed
+        false // Unavailable compatibility falls back to ordinary NC.
     }
     var canEditHeadsetConfirmations: Bool { !engaged && captureAdmission.available && !QuitGate.shared.quitting }
     func confirmSelectedHeadset() {
         guard canEditHeadsetConfirmations, let device = selectedMicrophone, device.alive == 1,
-              headsetStore.confirm(uid: device.uid, name: device.name) else { return }
+              let name = device.interfaceName, !name.isEmpty,
+              headsetStore.confirm(name: name) else { return }
         headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
     }
-    func removeHeadsetConfirmation(uid: String) {
-        guard canEditHeadsetConfirmations, headsetStore.remove(uid: uid) else { return }
+    func removeHeadsetConfirmation(name: String) {
+        guard canEditHeadsetConfirmations, headsetStore.remove(name: name) else { return }
         headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
     }
     func resetHeadsetConfirmations() {
         guard canEditHeadsetConfirmations, headsetStore.reset() else { return }
-        headsetConfirmations = headsetStore.entries; installedMicrophoneMode = .ordinaryNC
+        headsetConfirmations = headsetStore.entries; installedMicrophoneMode = .backgroundVoice
         invalidateProvider(); invalidateAEC()
     }
     @Published var outputUID = ""
@@ -46,7 +80,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published var installedMicrophoneMode: InstalledMicrophoneMode = .ordinaryNC {
         didSet { if oldValue != installedMicrophoneMode { invalidateProvider(); invalidateAEC() } }
     }
-    var selectedMicrophoneRole: InstalledNCModelRole { installedMicrophoneMode.role }
+    var selectedMicrophoneRole: InstalledNCModelRole { selectedCompatibility.compatible ? .outboundHVC : .outbound }
     var unsupportedHVCWithAEC: Bool {
         echoCancellation && microphoneNoise && microphoneProvider == .installedKrisp && selectedMicrophoneRole == .outboundHVC
     }
@@ -112,6 +146,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     init() {
         headsetStore = HeadsetConfirmationStore(); headsetConfirmations = headsetStore.entries
+        compatibilityStore = LocalHeadsetCompatibilityStore()
+        let loaded = compatibilityStore.load(preserving: .init()); compatibilityLists = loaded.lists; compatibilityStatus = loaded.failure ?? "Offline compatibility list loaded."
         recording = RecordingController()
         let aecResolver = InstalledAECResolver()
         resolveAEC = { app in try await aecResolver.resolve(app: app, runtime: InstalledAECResolver.packagedDirectory()) }
@@ -133,6 +169,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          factory: @escaping () throws -> any AudioHelperChild,
          startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 10_000_000_000, controlTimeout: UInt64 = 2_000_000_000, recording: RecordingController? = nil,
          headsetStore: HeadsetConfirmationStore? = nil,
+         compatibilityStore: LocalHeadsetCompatibilityStore? = nil,
          resolveInstalledProvider: @escaping (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration = { app, node, role in
              try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role)
          },
@@ -140,6 +177,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
              try await InstalledAECResolver().resolve(app: app, runtime: InstalledAECResolver.packagedDirectory())
          }) {
         self.headsetStore = headsetStore ?? HeadsetConfirmationStore(); self.headsetConfirmations = self.headsetStore.entries
+        self.compatibilityStore = compatibilityStore ?? LocalHeadsetCompatibilityStore()
+        let loaded = self.compatibilityStore.load(preserving: .init()); compatibilityLists = loaded.lists; compatibilityStatus = loaded.failure ?? "Offline compatibility list loaded."
         self.resolveAEC = resolveInstalledAEC
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider

@@ -13,8 +13,7 @@ enum NoiseProvider: String, CaseIterable, Identifiable {
 enum InstalledMicrophoneMode: String, CaseIterable, Identifiable {
     case ordinaryNC, backgroundVoice
     var id: String { rawValue }
-    var title: String { self == .ordinaryNC ? "Noise cancellation" : "Background voice (experimental)" }
-    var role: InstalledNCModelRole { self == .ordinaryNC ? .outbound : .outboundHVC }
+    var title: String { self == .ordinaryNC ? "Background voice off" : "Automatic background voice (experimental)" }
 }
 enum InstalledNCModelRole: String, Sendable {
     case outbound, inbound, outboundHVC = "outbound-hvc-lfb"

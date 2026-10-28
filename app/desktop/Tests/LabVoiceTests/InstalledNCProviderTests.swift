@@ -125,7 +125,7 @@ final class InstalledNCResolverTests: XCTestCase {
 @MainActor final class InstalledProviderRouteTests: XCTestCase {
     private func inventory() throws -> AudioInventory {
         try JSONDecoder().decode(AudioInventory.self, from: Data("""
-        {"devices":[{"uid":"mic","name":"Mic","alive":1,"nominal_rate":48000,"input":{"channels":1},"output":{"channels":0}},{"uid":"speaker","name":"Speaker","alive":1,"nominal_rate":48000,"input":{"channels":0},"output":{"channels":2}}],"companion_devices":[{"uid":"dev.hari.labvoice.feed","present":true},{"uid":"dev.hari.labvoice.monitor","present":true}],"errors":[]}
+        {"devices":[{"uid":"mic","name":"Mic","interface_name":"Mic","manufacturer":"","model_id":"","alive":1,"nominal_rate":48000,"input":{"channels":1},"output":{"channels":0}},{"uid":"speaker","name":"Speaker","alive":1,"nominal_rate":48000,"input":{"channels":0},"output":{"channels":2}}],"companion_devices":[{"uid":"dev.hari.labvoice.feed","present":true},{"uid":"dev.hari.labvoice.monitor","present":true}],"errors":[]}
         """.utf8))
     }
     private func wait(_ predicate: () -> Bool) async throws {
@@ -137,7 +137,7 @@ final class InstalledNCResolverTests: XCTestCase {
         let suite = "headset-tests-" + UUID().uuidString
         let defaults = UserDefaults(suiteName: suite)!
         addTeardownBlock { defaults.removePersistentDomain(forName: suite) }
-        let model = AudioRouteController(readInventory: { inventory }, authorization: { .authorized }, requestAuthorization: { XCTFail("Unexpected permission request"); return false }, factory: { child }, headsetStore: HeadsetConfirmationStore(defaults: defaults), resolveInstalledProvider: { _, _, role in installedFixture(role) })
+        let model = AudioRouteController(readInventory: { inventory }, authorization: { .authorized }, requestAuthorization: { XCTFail("Unexpected permission request"); return false }, factory: { child }, headsetStore: HeadsetConfirmationStore(defaults: defaults), compatibilityStore: .init(directory: FileManager.default.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent(UUID().uuidString)), resolveInstalledProvider: { _, _, role in installedFixture(role) })
         await model.refresh(); model.inputUID = "mic"; model.outputUID = "speaker"
         model.microphoneNoise = microphone != nil; model.speakerNoise = speaker != nil
         model.microphoneProvider = microphone ?? .rnnoise; model.speakerProvider = speaker ?? .rnnoise

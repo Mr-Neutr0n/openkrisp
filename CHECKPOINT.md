@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Native metadata and local compatibility engine, 2026-10-25](#native-metadata-and-local-compatibility-engine-2026-10-25). Earlier sections below retain the history and may describe superseded implementation gaps.
+Latest verified work: [Automatic local headset policy, 2026-10-28](#automatic-local-headset-policy-2026-10-28). Earlier sections retain historical implementation gaps that may now be superseded.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -568,3 +568,18 @@ The native mapping report binds six accepted static REA captures in `background-
 Original extracted-method replay produced no dynamic outcomes. Attempt v1 failed before invocation because its method wrapper had a syntax error; corrected v2 failed REA process lifecycle cleanup. Exact scenarios, runner pins and failure records are retained under `evidence/model-probes/bvc-matcher-extracted-20261025-*`, summarized in its notes file. The own fixture expectations are derived from static source. They do not prove original JavaScript execution parity. A read-only check found candidate PID87915 absent and PID88374 a Chrome renderer in a different process group; neither was signaled, and no provider repair or bypass was attempted.
 
 Next connect offline list selection and recovered local/manual policy to automatic NC/HVC selection, with stale-admission protection and ordinary-NC fallback for unavailable compatibility. Preserve separate gates for actual policy execution, later native grouping, cache provenance, JSON/Unicode edge cases, physical routing, acoustic quality, visual acceptance and full retained-feature parity. No physical audio, original application execution or administrator action ran in this checkpoint. Vendor assets remain external.
+
+
+## Automatic local headset policy, 2026-10-28
+
+The desktop now connects the recovered local policy to installed microphone model selection. Automatic mode selects HVC only for an allowed or manually allowed device; blocked, low-rate, unmatched and unknown results use ordinary NC. Explicit off remains the independent initial default because the original effective first-run default is unresolved. Reset clears manual names and returns to automatic mode, preserving imported allow/block lists. HVC with AEC remains rejected.
+
+Manual choices now store interface names and match case-insensitive UTF-16 substrings. Removal and identity preserve exact UTF-16 spelling, including canonically equivalent names. The old UID-only preference is ignored rather than converted into broader name matches. Successful cache imports copy validated JSON atomically into this app's local cache. Failed imports preserve prior lists. The 1 MiB bounded reader rejects links and special files. No original list is bundled or automatically read, and no network refresh runs.
+
+Inventory replacement invalidates provider/AEC admission even when the selected UID stays the same. Successful cache changes, manual changes and mode changes also revoke admission. Pending validation and permission roundtrips cannot restore superseded model selection. Existing exact role/hash startup checks remain in force. Policy changes and import are locked while capture or other engaged operations run.
+
+Full desktop verification passed 171 tests, ARM64/macOS12 packaging, signing and relocated-resource checks. Tests cover imported allow-only HVC resolution, blocked precedence, ordinary fallback, reset retaining lists, persistence and malformed imports, exact Unicode identity, same-UID metadata changes and delayed validation/permission results. Three GPT 6.1 sol workers implemented and reviewed the changes; no review findings remain. The root AGENTS.md now documents repository-specific execution and evidence rules.
+
+Log: `evidence/headset-auto-desktop-verify-20261028.log`, SHA256 `69b5d2db93b49ae76fd7c1b37e5c30a739e981f674a120e561624b0ab1ef84cc`. Only desktop source changed, so the unchanged host remains covered by the previous host verification. No original execution, physical audio, administrator action or native UI interaction ran.
+
+Original runtime-policy comparison, first-run/mode persistence, later device grouping, cache provenance, JSON/Unicode edge cases, native picker/control acceptance, driver discovery, physical routing and acoustic quality remain open. Full retained-feature parity is incomplete. Next verify the actual automatic-policy workflow through REA when its native process identity/lifecycle path is usable, and continue the remaining feature ledger. The administrator-dependent driver step stays deferred while Hari is away.

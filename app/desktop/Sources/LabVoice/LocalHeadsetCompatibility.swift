@@ -1,7 +1,7 @@
 import Foundation
 
-// Standalone local subset of retained BvcService matching. Not connected to
-// AudioRouteController. Static native mapping binds interfaceName to the global
+// Local subset of retained BvcService matching used by AudioRouteController.
+// Static native mapping binds interfaceName to the global
 // device name, manufacturer to Manufacturer and modelId to ModelUID. Runtime
 // metadata and automatic-selection acceptance remain unverified.
 // No account, entitlement, team, cloud or automatic device-type policy runs here.

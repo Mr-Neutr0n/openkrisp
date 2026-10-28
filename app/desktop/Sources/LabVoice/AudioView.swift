@@ -39,6 +39,10 @@ struct AudioView: View {
         panel.allowsMultipleSelection = false; panel.message = "Choose the reviewed Node executable."
         if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledNode(url) }
     }
+    private func chooseCompatibilityList() {
+        let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; panel.allowsMultipleSelection = false
+        if panel.runModal() == .OK, let url = panel.url { audio.importCompatibilityList(at: url) }
+    }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -89,29 +93,37 @@ struct AudioView: View {
                             ForEach(InstalledMicrophoneMode.allCases) { mode in Text(mode.title).tag(mode) }
                         }.disabled(controlsLocked)
                         if audio.installedMicrophoneMode == .backgroundVoice {
-                            Text("Use a headset. Background voice quality testing is pending. Echo cancellation is unavailable with this mode.")
+                            Text("Use a headset. Background voice quality testing is pending. Echo cancellation is unavailable when the background-voice model is selected.")
                                 .font(.caption).foregroundColor(.secondary)
-                            Text(audio.selectedHeadsetConfirmed ? "Selected microphone confirmed as a headset." : "Confirm the selected microphone is a headset before validation.")
+                            Text(audio.compatibilityDescription)
                                 .font(.caption)
                             Button("Confirm selected microphone is a headset") { audio.confirmSelectedHeadset() }
                                 .disabled(!audio.canEditHeadsetConfirmations || audio.selectedMicrophone == nil)
 
                         }
                     }
+                    if audio.microphoneProvider == .installedKrisp {
+                        HStack {
+                            Button("Import offline compatibility list…", action: chooseCompatibilityList)
+                            Button("Clear offline list") { audio.clearCompatibilityList() }
+                        }.disabled(!audio.canEditHeadsetConfirmations)
+                        Text(audio.compatibilityStatus).font(.caption)
+                        Text("Manual choices match the interface name as a case-insensitive substring. Blocked entries take precedence. No network refresh runs.").font(.caption).foregroundColor(.secondary)
+                    }
                     if !audio.headsetConfirmations.isEmpty {
-                        Text("Confirmed headsets").font(.headline)
+                        Text("Manual headset interface names").font(.headline)
                         ForEach(audio.headsetConfirmations) { entry in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(entry.name)
-                                    Text(entry.uid).font(.caption).foregroundColor(.secondary)
+                                    Text("Interface name substring").font(.caption).foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                Button("Remove") { audio.removeHeadsetConfirmation(uid: entry.uid) }
+                                Button("Remove") { audio.removeHeadsetConfirmation(name: entry.name) }
                                     .disabled(!audio.canEditHeadsetConfirmations)
                             }
                         }
-                        Button("Reset headset confirmations") { audio.resetHeadsetConfirmations() }
+                        Button("Reset manual choices and enable automatic mode") { audio.resetHeadsetConfirmations() }
                             .disabled(!audio.canEditHeadsetConfirmations)
                     }
                     Picker("Speaker provider", selection: $audio.speakerProvider) {
