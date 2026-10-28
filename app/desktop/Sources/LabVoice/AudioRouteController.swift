@@ -109,6 +109,19 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let controlTimeout: UInt64
     private let readInventory: () async throws -> AudioInventory
     private let stopInventory: () async -> Bool
+    private struct InventoryQuery {
+        let id = UUID()
+        var cancelled = false
+        var finished = false
+        var stopID: UUID?
+        var stopTask: Task<Bool, Never>?
+    }
+    private var inventoryQuery: InventoryQuery?
+    private func finishInventoryQueryIfDrained() {
+        guard let query = inventoryQuery, query.finished, query.stopTask == nil else { return }
+        inventoryQuery = nil; loading = false
+    }
+
     private let authorization: () -> AVAuthorizationStatus
     private let requestAuthorization: () async -> Bool
     private let factory: () throws -> any AudioHelperChild
@@ -193,14 +206,24 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func refresh() async {
         guard phase == .idle, !loading, !QuitGate.shared.quitting else { return }
+        let query = InventoryQuery(); inventoryQuery = query
         loading = true; error = nil
-        defer { loading = false }
+        defer {
+            if inventoryQuery?.id == query.id {
+                inventoryQuery?.finished = true
+                finishInventoryQueryIfDrained()
+            }
+        }
         do {
             let result = try await readInventory()
+            guard inventoryQuery?.id == query.id, inventoryQuery?.cancelled == false else { return }
             inventory = result
             if !result.devices.contains(where: { $0.uid == inputUID && $0.input.channels > 0 }) { inputUID = "" }
             if !result.devices.contains(where: { $0.uid == outputUID && $0.output.channels > 0 }) { outputUID = "" }
-        } catch { inventory = nil; self.error = error.localizedDescription }
+        } catch {
+            guard inventoryQuery?.id == query.id, inventoryQuery?.cancelled == false else { return }
+            inventory = nil; self.error = error.localizedDescription
+        }
     }
     func selectInstalledApp(_ url: URL) {
         guard phase == .idle else { return }
@@ -439,8 +462,22 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         operationID = nil; child = nil; activeOptions = nil; phase = .idle
     }
     func stop() async -> Bool {
-        if loading, !(await stopInventory()) {
-            error = "The device query helper did not exit. Try Stop again before quitting."; return false
+        if var query = inventoryQuery {
+            query.cancelled = true
+            inventory = nil
+            if query.stopTask == nil {
+                query.stopID = UUID()
+                query.stopTask = Task { await self.stopInventory() }
+            }
+            inventoryQuery = query
+            let stopped = await query.stopTask!.value
+            guard inventoryQuery?.id == query.id, inventoryQuery?.stopID == query.stopID else { return stopped }
+            inventoryQuery?.stopTask = nil; inventoryQuery?.stopID = nil
+            error = stopped ? nil : "The device query helper did not exit. Try Stop again before quitting."
+            finishInventoryQueryIfDrained()
+            // A cancelled read must unwind before another query may use its service slot.
+            // This stop owns only that query, never a route started after its await.
+            return stopped
         }
         deadline?.cancel(); deadline = nil
         startTask?.cancel(); startTask = nil

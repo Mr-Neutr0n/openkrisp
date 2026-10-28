@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Native UI and power lifecycle evidence, 2026-10-28](#native-ui-and-power-lifecycle-evidence-2026-10-28). Latest implementation is the preceding automatic-policy checkpoint. Earlier sections retain historical gaps.
+Latest verified work: [Device inventory cancellation, 2026-10-28](#device-inventory-cancellation-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -594,3 +594,16 @@ Four accepted static REA captures recover original Sleep/Wake test commands, pac
 The production native notification mapping and recording reset-to-finalization path remain unresolved. Follow-up captures hit REA lifecycle cleanup failures and are not accepted evidence. Next recover these joins before implementing shared local suspend/resume with recording preservation and stale-admission invalidation. Local notifications and other retained services remain in scope; account/cloud/analytics dependencies stay excluded. Do not infer recording publication from graph removal or AppState completion.
 
 No source changed after `bd4d4d7`. Its 171-test desktop/signing/relocation result remains applicable; tests were not rerun for these reports. All 177 source fingerprints still match. No original application code, physical audio or administrator action ran. Full parity remains incomplete.
+
+
+## Device inventory cancellation, 2026-10-28
+
+A production-controller reproduction showed that a canceled device query could later replace inventory or publish an error. The query now carries its own identity, cancellation state, completion state and shared stop task. Cancellation revokes publication immediately. Loading remains engaged until the read continuation and stop flight both finish, protecting the helper service slot. Duplicate Stop calls share a flight; old completions cannot clear a replacement query or stop a new route. Failed stop remains retryable, and Quit refuses until the query drains. This prepares one required lifecycle invariant; it does not implement OS suspend/resume.
+
+The pre-fix test failed two assertions. Six new regression tests cover stale success/error, read and stop completion in both orders, replacement queries, failed stop/retry, duplicate Stop and the real QuitCoordinator path. Thirty focused tests and full desktop verification passed. Full verification ran 177 tests plus ARM64/macOS12 packaging, signing and relocated-resource checks. Independent GPT 6.1 sol review found no remaining issue.
+
+- Reproduction `evidence/inventory-cancel-repro-20261028.log`: SHA256 `db0038f6e08af60113e1d24eac9bb35b7ea05f6ef7b53dcbd7ed4e655a9b8c22`.
+- Focused `evidence/inventory-cancel-focused-20261028.log`: SHA256 `e20e95b7dfe34120f12cb475b29b9f0de6bc28d701025c3437db2f2ffa31e7bd`.
+- Full desktop `evidence/inventory-cancel-desktop-verify-20261028.log`: SHA256 `f280dba788e84f5841e6121f15fdfe70ed27fd06bba22383193af4b2a44632f2`.
+
+Retained original output adds a separate recording-stop event join: foreground/background stop calls run through an unawaited Promise.all. The suspend-reset handler and durable publication join remain unknown. REA advertises capture capability but still rejects execution because of unresolved process cleanup; no further original reads were attempted after one narrowed revalidation failed. See the latest section of `sleep-wake-findings.md`. No original application code, hardware capture or administrator action ran. Full retained-feature parity remains incomplete.
