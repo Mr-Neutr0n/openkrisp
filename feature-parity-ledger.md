@@ -392,3 +392,14 @@ Full desktop verification passed 171 tests, ARM64/macOS12 packaging, signing and
 Log: `evidence/headset-auto-desktop-verify-20261028.log`, SHA256 `69b5d2db93b49ae76fd7c1b37e5c30a739e981f674a120e561624b0ab1ef84cc`. Only desktop source changed, so the unchanged host remains covered by the previous host verification. No original execution, physical audio, administrator action or native UI interaction ran.
 
 Original runtime-policy comparison, first-run/mode persistence, later device grouping, cache provenance, JSON/Unicode edge cases, native picker/control acceptance, driver discovery, physical routing and acoustic quality remain open. Full retained-feature parity is incomplete. Next verify the actual automatic-policy workflow through REA when its native process identity/lifecycle path is usable, and continue the remaining feature ledger. The administrator-dependent driver step stays deferred while Hari is away.
+
+
+## Native UI and power lifecycle evidence, 2026-10-28
+
+REA now observed the own home window and opened Audio after LaunchServices launch. Accepted captures confirm stopped state, RNNoise defaults, disabled Start and unavailable driver. The provider popup failed exact-window binding; automatic-policy interaction remains unverified. Both bounded launch attempts have incomplete lifecycle evidence. Known app PIDs were absent afterward, but no clean launcher teardown is claimed. See `native-ui-headset-findings.md` for exact accepted IDs, screenshots and preserved failures.
+
+Four accepted static REA captures recover original Sleep/Wake test commands, packaged default false, shared application power callback, newest-event AppState coalescing and Main service dispatch. Suspend tears down audio graphs/streams/device management; resume reinitializes devices without directly restarting graphs in the inspected method. Hidden commands remain retained as power-event simulation, separate from production notifications. See `sleep-wake-findings.md`.
+
+The production native notification mapping and recording reset-to-finalization path remain unresolved. Follow-up captures hit REA lifecycle cleanup failures and are not accepted evidence. Next recover these joins before implementing shared local suspend/resume with recording preservation and stale-admission invalidation. Local notifications and other retained services remain in scope; account/cloud/analytics dependencies stay excluded. Do not infer recording publication from graph removal or AppState completion.
+
+No source changed after `bd4d4d7`. Its 171-test desktop/signing/relocation result remains applicable; tests were not rerun for these reports. All 177 source fingerprints still match. No original application code, physical audio or administrator action ran. Full parity remains incomplete.

@@ -1,0 +1,123 @@
+# Sleep and Wake menu commands
+
+Static investigation, 2026-10-28. The installed package identifies itself as Krisp 3.17.9.
+
+Sleep and Wake are test-mode tray commands. They inject application power-monitor events. The inspected handlers do not request operating-system sleep or wake. Both commands appear only when `configService.staticSelector().testMode` is truthy. The packaged `main.testMode` default is false. This does not establish the effective configuration of a running installation.
+
+No original code was executed. REA captured an independent bounded ASAR reader under a network-denial sandbox. The reader parses the archive and literal obfuscation table. It never imports, evaluates or calls the target modules. Application state changes below are static conclusions, not observed behavior.
+
+## Artifact identity and evidence
+
+The selected archive is `/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar`, 30,041,755 bytes, SHA256 `40269da405babcd79c18780715c63625d0bb7035f03a480b1732fe067ba911b4`. Each successful reader capture verifies unchanged archive identity before and after its read.
+
+Relevant members:
+
+- `.vite/build/BootstrapApp-3T6N5QeL.js`, SHA256 `bbaedd07bcd78d093f1011a41e3aeca92707c1f77fc7cca03305ffd4cd90cff0`.
+- `.vite/build/SentryManagerMain-DrYTrfPP.js`, SHA256 `cf21e7e4fa19deb6f960223a883fe8831f25d66ba68d15e127731de5aead8579`.
+- `.vite/build/BootstrapPreload-BNUgiXZm.js`, SHA256 `00e4b93b660924d2e6d9a45303c58d0798a46b07c64d4398e80566de3adb1d30`.
+
+Accepted static-reader captures:
+
+| Capture | Evidence ID | Relevant scope |
+| --- | --- | --- |
+| v4 | `ev_3f7ddb217bad6c20c880b2ca322fface88c7924efbe385a75c2c8e1b4edd9207` | Menu handlers, core event declaration, Main listener and power callback |
+| v5 | `ev_05b68a66c7559faa4ff37d10948940824d0d74d383dab9ad47f6a55841faa1b3` | Packaged false default, selector forwarding, complete Main suspend/resume dispatch |
+| v6 | `ev_d252ddf903248f2795a41f209f17bfea05bac47ba89580ee3b011c3234ef7ed5` | Complete AppState queue and transition methods |
+| v7 | `ev_9a7508fc22b011b377509f2f90e73f800b515f82435be264fddd6d2741f8ab3e` | AudioService, AudioRecordingService and WindowService methods |
+
+All four captures exit with code 0, verify the owned process group and remove the temporary root. Raw terminal records are complete. Rendered terminal snapshots can be truncated independently and are not the source used here. Scenarios and complete results are private files under `evidence/model-probes/sleep-wake-20261028-v{4,5,6,7}.{scenario,result}.json`.
+
+The independent reader is `evidence/model-probes/read-sleep-wake-asar-20261028.cjs`, SHA256 `23a3944405fd6140c70debe53f91e6ea9455ca5a0c3bc9b369406a31aa6b6917`. It derives from the retained speaker-graph reader. The BootstrapApp literal table has 28,833 entries and resolves after 183 rotations. Only literal strings and known direct decoder aliases are substituted. This is not a complete JavaScript deobfuscation claim.
+
+The first schema request, v1, was rejected because this connected capture tool does not accept an executable SHA256 input. The corrected v2 found only literal table entries. Its output included complete raw bytes but truncated rendered states. V3 found the handlers, but cleanup listed three unverified process candidates despite a verified owned group and removed root. V3 is retained as a caveated attempt; accepted v4 and v5 independently establish the menu logic. No candidate process was signaled or repaired.
+
+## Menu and event path
+
+`BaseTray.defaultContextMenu()` appends a separator and the test-only commands at the end of the normal context menu. Sleep and Wake are both unconditional within the test-mode branch. They have no checked state and no state-dependent enabled predicate. The adjacent Fetch profile item requires an account; Sleep and Wake do not share that account predicate.
+
+Sleep logs its click and sends `CoreEvents.POWER_MONITOR_EVENT_CHANGE` with one argument, `BootstrapPreload.PowerMonitorEvent.Suspend`. Wake sends the same core event with `PowerMonitorEvent.Resume`. The event channel is `krisp:core:power_monitor_event_change`.
+
+`Main` binds that event to `onPowerMonitorEventChange`. It also registers the same callback with `NativeUtils.registerTroubleshootingNotifications` during startup. Thus the menu injects an event into the application path used by native power notifications. A `PowerOff` event follows a separate quit branch and emits `system-poweroff`; neither menu handler supplies PowerOff.
+
+Useful decoded character offsets in v4 are 6,983,718 and 6,983,956 for the menu calls, 7,232,682 for the Main event binding, and 7,274,775 for the power callback region. These are offsets in the independently decoded text, not archive byte offsets. The raw default is visible at member character offset 115,042 in SentryManagerMain in v5. BootstrapPreload's static selector forwards `main.testMode` at raw member character offset 14,686.
+
+## State transitions
+
+`Main` constructs `AppState` with bound `resumeServices` and `suspendServices` callbacks. AppState starts in `Active` with an empty in-memory event queue. No persistent sleep preference is written in these inspected methods.
+
+1. Every event is appended to the queue. Suspend immediately awaits `doWork`. Resume schedules `doWork` through `setImmediate`.
+2. `doWork` waits in 25 ms intervals while the state is `Activating` or `Suspending`.
+3. Once stable, it pops the newest event and discards the remaining queue. While Suspended, only Resume calls `doResume`. While Active, only Suspend calls `doSuspend`.
+4. Suspend sets `Suspending`, awaits the suspend callback, then sets `Suspended` in `finally`. Resume sets `Activating`, awaits the resume callback, then sets `Active` in `finally`.
+5. Callback errors are logged. They do not stop the final state assignment. Repeating Suspend while already Suspended, or Resume while already Active, causes no callback.
+
+The queue therefore collapses pending events to the newest requested stable state. It does not promise completion of every intermediate request. The deferred Resume branch does not return the later `doWork` promise to the caller. Actual event timing and failures were not exercised.
+
+The complete class is present in v6 around decoded offset 2,555,546.
+
+## Feature dependencies and dispatch order
+
+Main calls each service only if the registrar has an instance. Calls run in source order; most calls are not awaited.
+
+Suspend order is ViewService, AudioRecordingService, ScreenRecordingService, UploadService, CallService, AsrService, AudioService, InterpreterService, InCallHelperService, CalendarService, AiChatService, ActivityService, AccountService, NotificationService, SupervisorInsightsService, VoiceMacrosService and WindowService. Only SupervisorInsightsService's suspend call is explicitly awaited in this dispatch method.
+
+Resume first awaits AccountService. It then calls CalendarService, ActivityService, InterpreterService, InCallHelperService, AiChatService, AudioService, AudioRecordingService, ScreenRecordingService, CallService, AsrService, UploadService, NotificationService, SupervisorInsightsService, VoiceMacrosService and WindowService. ViewService is absent from this explicit resume dispatch. The method does not await these later calls.
+
+This is a broad service lifecycle command. It cannot be reconstructed faithfully as a microphone mute toggle or a flag that only stops a route. AppState reaching a stable state proves only completion of its dispatch callback. It does not prove that every unawaited asynchronous service operation has completed.
+
+### Audio and recording effects
+
+For an initialized AudioService, suspend records whether Krisp microphone and speaker are default devices for Multimedia and Communication roles. It stops an active in-person call, stops and removes outbound microphone and inbound speaker graphs, stops both device audio streams and disposes DeviceManager. If AudioService is not initialized, it returns without these actions.
+
+AudioService resume also requires initialization. It calls DeviceManager.init, reapplies the stored microphone volume-control mode and sets the speaker mode to SYNC_WITH_KRISP. The inspected resume method does not itself restart a graph. Device initialization callbacks, native device restoration and later graph startup are separate dependencies. This report does not establish their full wake behavior.
+
+AudioRecordingService suspend emits CALL_AUDIO_RECORDING_STATE_RESET when initialized. Its resume method only checks initialization and logs. The adjacent ScreenRecordingService methods use the corresponding screen-recording reset event. These methods alone do not prove that recording bytes are finalized, saved or recovered; later event handlers remain outside this pass.
+
+WindowService forwards suspend/resume to DashboardViewHelper. The recovered helper pauses an existing resource-fetch timer and marks itself suspended, then clears that flag and resumes the timer or creates it on resume. No all-window hide operation appears in these methods.
+
+V7 begins the AudioService slice at raw member character offset 3,949,077, the WindowService slice at 6,255,557 and AudioRecordingService at 5,309,675. Some fixed-length slices extend into adjacent classes. Only the explicitly identified methods above support these claims.
+
+## Remaining limits and implementation decision
+
+Menu handlers, packaged default, core event connection, AppState transitions and Main's explicit dependency order are answered by static evidence. Actual runtime availability, effective configuration, native callback event values, wake-time device reenumeration, restored default devices, graph restart, physical routing, recording finalization and complete downstream service behavior remain unverified.
+
+Hidden local commands remain in the requested parity scope. Reconstruct the shared application power-event lifecycle first, then expose Sleep and Wake through the independent development/test surface. Keep their simulation role separate from production operating-system notifications. Preserve active recordings and invalidate stale admission before resume. The source does not justify automatic restart of a previously active route from AudioService.resume alone. This investigation makes no implementation change and claims no runtime parity.
+
+
+## Production source boundary and follow-up blocker
+
+Accepted v4 establishes that Main registers `onPowerMonitorEventChange` with `BootstrapPreload.NativeUtils.registerTroubleshootingNotifications`. It does not establish the operating-system notification registration inside the native addon. Therefore neither Electron powerMonitor nor NSWorkspace is a verified equivalent production source in this pass.
+
+A follow-up reader capture, v8, returned complete-looking raw output but failed REA cleanup. It reported candidate PID 87674 with an unreadable ownership environment and retained its temporary root. A changed, narrower v9 request then failed before capture because that lifecycle cleanup remained incomplete. These attempts are stored under the same private filename pattern. They have no accepted Evidence ID and do not extend the accepted claim set. No process was signaled, and no provider repair was attempted. Further static native/ASAR reads require the REA lifecycle blocker to be resolved through its supported workflow.
+
+V8's caveated output identifies useful next targets: the preload method forwards to `kr-native-utils.RegisterTroubleshootingNotifications`; the packaged `kr-native-utils/index.js` forwards that export to `./build/Release/kr-native-utils.node`. Electron powerMonitor hits occur in Sentry integration code and do not establish the application lifecycle source. The native registration function and callback mapping remain the next production-source question.
+
+## Recording preservation boundary
+
+Accepted v7 contains `AudioRecordingService.onGraphRemoved`. It invokes `reattachRecordingToActiveGraph`, which updates audio/transcript recording attachments and reapplies paused state from the meeting-assistant model. It does not itself call `stopCallRecord`.
+
+The separate accepted `stopCallRecord` method stops the native audio recorder, closes an open session interval, sets the call end date and updates upload-session metadata. It can discard a pending call or uploader task depending on its arguments, and it emits the recording-state change. `stopCallBackgroundRecord` has a parallel transcript-recorder path. Their presence does not prove that suspend invokes them or waits for them. `dispose` has explicit awaited recording-stop work, but Main's suspend path calls `suspend`, not `dispose`.
+
+V8's unaccepted partial output points to a meeting-assistant listener for `CALL_AUDIO_RECORDING_STATE_RESET`, named `onAudioRecordingStateReset`. Its method body was not recovered in accepted evidence. Whether this is only a UI reset or starts finalization remains unresolved. The call/session path from that reset through native recorder stop, finalized bytes and durable storage is therefore an explicit implementation blocker. Do not equate the reset event, graph teardown, helper stop success or AppState.Suspended with publication of a saved recording.
+
+## Retained and excluded dependency mapping
+
+The dispatch names are recovered; most individual service method bodies remain outside accepted coverage. Map functions to their actual local behavior before reconstructing them. The service name alone does not classify the whole service.
+
+| Dependency | Independent scope |
+| --- | --- |
+| ViewService, WindowService | Retain local UI lifecycle. Dashboard resource fetching needs its local/cloud boundary preserved. |
+| AudioService, AudioRecordingService | Retain local routes, recording and recovery. Recording publication on suspend remains unresolved above. |
+| ScreenRecordingService | Local screen-capture contract remains unresolved in the feature ledger. A paid label does not exclude it. |
+| AsrService | Retain established on-device transcription and local transcript state. Exclude remote ASR/upload services. |
+| InterpreterService | Voice Translation local/service boundary remains unresolved. Do not exclude by name. |
+| InCallHelperService | Retain established local helper behavior. Recover its methods before selecting lifecycle effects. |
+| CalendarService | Agenda/calendar source boundary remains unresolved. Preserve proven local state. |
+| AiChatService, SupervisorInsightsService | Local UI/state remains subject to evidence. Remote generation and telemetry are excluded. |
+| ActivityService, VoiceMacrosService | Retain proven local behavior; exact suspend/resume method effects are not recovered here. |
+| NotificationService | Local notifications remain retained. Cloud notification delivery, if present, is a separate boundary. |
+| CallService | Local call/session state remains retained. Usage upload, billing and telemetry are excluded. |
+| UploadService | Remote upload is excluded. Any local recording staging or persistence dependency must first be separated by evidence. |
+| AccountService | Vendor authentication, entitlement and account sync are excluded. Do not recreate their waits as local availability gates. |
+
+Next recover the native notification mapping and accepted reset-handler path, then implement the shared retained local lifecycle with explicit recording preservation. Hidden simulation commands reuse that lifecycle. No commercial gate, cloud operation or analytics dependency should be introduced into the independent local path.
