@@ -481,3 +481,12 @@ Full audio-host verification also passed release and sanitizer suites. Its exact
 The visible snapshot now uses recovered two-pass input normalization and responsible-app grouping. It includes idle helper PIDs and preserves exact byte keys, ascending candidate order and first-candidate deduplication. Unknown state stays incomplete; internal driver endpoints gain no call eligibility. Six grouping tests and the production C++-to-Swift path cover these rules. Native callback output ordering and app version remain unverified or unavailable.
 
 The call-to-ASR-to-recorder event join is now statically mapped. One changed-resource 2 GiB analysis still exhausted semantic extraction, leaving Call leg definitions and effective delay clamps unresolved. Continuous activation and physical audio remain incomplete. The ledger records 195 source and verification fingerprints; exact component results are in CHECKPOINT.md.
+
+
+## Continuous audio-use observation, 2026-10-28
+
+The activation prerequisite now has an explicit live observer, grouped display and power/Quit cleanup. Bounded NDJSON transport retains no stdout history; failed observations stay stale. Watching coexists with capture and never activates recording. A real process-exit failure led to strict invalid-object retirement, distinct from successful listener removal. Revised two-process appearance/disappearance and ownership cleanup passed without audio or forced termination.
+
+The tested helper, failed baseline, diagnostic proof and successful revised run are recorded in CHECKPOINT.md. Native UI, active audio changes, real service restart, sustained operation, recovered stabilization and call qualification remain incomplete. These tests do not establish full activation parity.
+
+Final verification passed the full host suites and 218 desktop tests with one opt-in skip, signing and relocation. The rebuilt helper exactly matches the successful runtime artifact. The ledger now records 203 source and verification fingerprints.

@@ -267,7 +267,10 @@ enum AudioHelperError: Error, LocalizedError {
 // Blocking pipe reads stay on utility queues. Main-queue delivery preserves stream order.
 // This class never starts a route unless its caller explicitly supplies --route arguments.
 @MainActor final class SystemAudioHelperChild: AudioHelperChild {
+    enum OutputMode { case collected, streaming(maxLineBytes: Int) }
     private let url: URL
+    private let outputMode: OutputMode
+    private var streamingFailure: String?
     private var process: Process?
     private var input: FileHandle?
     private var inputLimit = 0
@@ -278,7 +281,10 @@ enum AudioHelperError: Error, LocalizedError {
     private var exitStatus: Int32?
     private var overflow = false
     var running: Bool { process?.isRunning ?? false }
-    init(url: URL) { self.url = url }
+    init(url: URL, outputMode: OutputMode = .collected) {
+        self.url = url; self.outputMode = outputMode
+        if case .streaming(let limit) = outputMode { precondition((1...1_048_576).contains(limit)) }
+    }
     func launch(arguments: [String], line: @escaping (String) -> Void, exit: @escaping (HelperExit) -> Void) throws {
         guard process == nil else { throw AudioHelperError.inventoryFailed("The helper is already running.") }
         let child = Process(), output = Pipe(), error = Pipe(), commands = Pipe()
@@ -312,6 +318,8 @@ enum AudioHelperError: Error, LocalizedError {
         read(error.fileHandleForReading, isError: true)
     }
     private func read(_ handle: FileHandle, isError: Bool) {
+        let backpressure: Bool
+        if case .streaming = outputMode { backpressure = true } else { backpressure = false }
         DispatchQueue.global(qos: .utility).async { [weak self] in
             defer { try? handle.close() }
             var bytes = [UInt8](repeating: 0, count: 4096)
@@ -320,7 +328,11 @@ enum AudioHelperError: Error, LocalizedError {
                 if count < 0 && errno == EINTR { continue }
                 if count <= 0 { break }
                 let data = Data(bytes.prefix(count))
-                DispatchQueue.main.async { self?.receive(data, isError: isError) }
+                if backpressure {
+                    // One pending chunk per pipe. Main actor teardown only awaits;
+                    // it never synchronously waits for these reader queues.
+                    DispatchQueue.main.sync { self?.receive(data, isError: isError) }
+                } else { DispatchQueue.main.async { self?.receive(data, isError: isError) } }
             }
             DispatchQueue.main.async { self?.closed(isError: isError) }
         }
@@ -329,6 +341,9 @@ enum AudioHelperError: Error, LocalizedError {
         if isError {
             if stderr.count + data.count <= 65_536 { stderr.append(data) } else { overflow = true }
         } else {
+            if case .streaming(let maxLineBytes) = outputMode {
+                receiveStream(data, maxLineBytes: maxLineBytes); return
+            }
             if stdout.count + data.count <= 2_097_152 { stdout.append(data) } else { overflow = true }
             if lines.count + data.count <= 65_536 { lines.append(data) }
             else { overflow = true; lines.removeAll(keepingCapacity: true) }
@@ -339,6 +354,27 @@ enum AudioHelperError: Error, LocalizedError {
                 lineCallback?(text)
             }
         }
+    }
+    private func receiveStream(_ data: Data, maxLineBytes: Int) {
+        guard streamingFailure == nil else { return }
+        var remainder = data[...]
+        while let newline = remainder.firstIndex(of: 10) {
+            let fragment = remainder.prefix(upTo: newline)
+            guard lines.count + fragment.count + 1 <= maxLineBytes else { failStream("Helper stream line exceeded its byte limit."); return }
+            lines.append(contentsOf: fragment)
+            guard let text = String(data: lines, encoding: .utf8) else { failStream("Helper stream returned invalid UTF-8."); return }
+            lines.removeAll(keepingCapacity: true)
+            lineCallback?(text)
+            remainder = remainder.suffix(from: remainder.index(after: newline))
+            guard streamingFailure == nil else { return }
+        }
+        guard lines.count + remainder.count < maxLineBytes else { failStream("Helper stream line exceeded its byte limit."); return }
+        lines.append(contentsOf: remainder)
+    }
+    private func failStream(_ reason: String) {
+        streamingFailure = reason; lines.removeAll(keepingCapacity: false)
+        // Never interpret an oversized row's suffix as another protocol event.
+        terminate()
     }
     private func closed(isError: Bool) {
         if isError { stderrClosed = true } else { stdoutClosed = true }
@@ -352,6 +388,8 @@ enum AudioHelperError: Error, LocalizedError {
         closeInput()
         var diagnostic = String(decoding: stderr, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
         if overflow { diagnostic += "\nHelper output exceeded the diagnostic limit." }
+        if case .streaming = outputMode, streamingFailure == nil, !lines.isEmpty { streamingFailure = "Helper stream ended with an incomplete line." }
+        if let streamingFailure { diagnostic += "\n" + streamingFailure }
         callback?(HelperExit(status: status, output: stdout, diagnostic: diagnostic))
     }
     func send(_ line: Data) throws {

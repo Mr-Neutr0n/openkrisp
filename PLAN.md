@@ -443,3 +443,8 @@ Explicit helper and desktop snapshots now expose CoreAudio process activity with
 ## Grouped audio-use checkpoint, 2026-10-28
 
 The explicit snapshot now applies recovered normalization and grouping through the visible Audio flow. Exact two-pass ordering and first-candidate deduplication are evidenced and tested. The call-to-ASR-to-recorder join is recovered; Call leg definitions remain absent from the available partial graph even after one larger-heap analysis. See CHECKPOINT.md for verification. Continuous listener lifecycle, timing stabilization and local activation policy are next.
+
+
+## Continuous audio-use checkpoint, 2026-10-28
+
+Explicit live observation is implemented through the native helper and desktop. A real two-owned-process scenario now passes appearance, disappearance and ownership cleanup after correcting verified destroyed-object retirement. Separate retirement/removal outcomes remain visible. See CHECKPOINT.md for logs and limits. Next connect recovered stabilization, then call qualification and local activation preferences. Native UI, real service restart, active audio and full parity remain open.

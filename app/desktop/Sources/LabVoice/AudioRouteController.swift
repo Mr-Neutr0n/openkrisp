@@ -551,13 +551,17 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         let recording = audio.recording
         let saved = recording.savedSessionID != nil && !recording.busy
         let recordingActivity = recording.busy ? recording.libraryActivityID : nil
-        return QuitSnapshot(recordingActive: recording.busy, audioEngaged: audio.engaged,
+        return QuitSnapshot(recordingActive: recording.busy, audioEngaged: audio.engaged || AudioUseWatchController.shared.engaged,
                             testEngaged: test.engaged,
                             otherWork: LibraryLocation.shared.switching || LibraryLocation.shared.activities.keys.contains { $0 != recordingActivity } || AudioCaptureAdmission.shared.owner == .recordingRecovery,
                             recordingSaved: saved, recordingFailure: saved ? nil : recording.error,
-                            stopFailure: audio.error, testFailure: test.error)
+                            stopFailure: AudioUseWatchController.shared.engaged ? AudioUseWatchController.shared.error : audio.error, testFailure: test.error)
     }, confirmSave: { Self.confirmSave(intent: .quit) },
-       stopAudio: { await AudioRouteController.shared.stop() },
+       stopAudio: {
+           async let watchStopped = AudioUseWatchController.shared.stop()
+           let routeStopped = await AudioRouteController.shared.stop()
+           return await watchStopped && routeStopped
+       },
        cleanupTest: { await MicrophoneTestController.shared.cancelAndCleanup() },
        confirmRelaunchSave: { Self.confirmSave(intent: .relaunch) },
        launchForRelaunch: {

@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Grouped audio use, 2026-10-28](#grouped-audio-use-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Continuous audio-use observation, 2026-10-28](#continuous-audio-use-observation-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -698,3 +698,28 @@ Full audio-host verification passed release and sanitizer suites. Full desktop v
 - `evidence/audio-use-grouping-host-verify-20261028.log`, SHA256 `2f0e79ef4732e932dda97a0bcf2b54d2d036f2748c657ec94af0613c2a578a3d`.
 - `evidence/audio-use-grouping-desktop-verify-20261028.log`, SHA256 `2a574b8ec0a6316570e4581f41530b4596f9db9cfce3a014f19c2546376d6034`.
 - `evidence/audio-use-grouping-focused-20261028.log`, SHA256 `e625055353ceca8023cd764c62802366966d15f351c969d2816bda9f4d9d8b49`.
+
+
+## Continuous audio-use observation, 2026-10-28
+
+Audio now offers explicit Watch/Stop and feeds changing snapshots through the existing grouping path. The native helper registers system process-list/service-restart listeners and each process's input/output running and device-list listeners. Registrations retain exact object/address/queue/block identities. Generation checks reject old callbacks. Copied blocks use weak callback state, so late delivery cannot access a deleted owner. A source restart rebuilds registrations; failed process-list reads do not mean an empty list.
+
+The helper emits bounded NDJSON with one pending output line and nonblocking writes. A two-second write deadline initiates cleanup; CoreAudio cleanup calls have no hard API deadline. Desktop streaming applies backpressure, a 600 KiB line bound, strict UTF-8 and no accumulated stdout history. Oversized or incomplete lines fail instead of exposing a parsed suffix. The newest one-shot or watched observation wins display selection. Failed/stopped results remain stale.
+
+Watching owns no capture lease and can coexist with routes. Suspend and Quit stop it concurrently with existing audio/test cleanup. Resume does not restart watching or capture. Deferred cleanup is fenced to its operation, and unexpected drained exit releases process ownership while preserving the diagnostic. A live or undrained child remains owned for retry.
+
+Real membership testing reproduced a normal-exit failure after observer A saw owned helper B appear. Diagnostic collection identified OSStatus 560947818, BadObject, for the vanished process's device-list listener. The fix permits retirement only for an exact process registration when Remove returns BadObject, a fresh successful bounded process-list read excludes its ID and a class probe also returns BadObject. System registrations, unknown membership and other errors remain failures. Retirement is reported separately from successful removal.
+
+The revised bounded test passed in 0.86 seconds. A observed B present at sequence 2 and absent in an available snapshot with fully resolved PIDs at sequence 3. A reported 158 successful removals and four verified invalid-object retirements; B reported 162 successful removals and no retirements. Both reported resolved ownership and exited 0 without forced signals. A correctly reported that not every registration ended through successful Remove. Receipt during/after B's stop does not prove exact acquisition time. The tested helper SHA256 is `68debbdc54e4a5665e7349d3335ffdd82e48f3ad75e4372f6f5a0a0f6633b49b`.
+
+Independent GPT 6.1 sol review closed callback-lifetime, stream bounds, deferred-cleanup, stale-display and teardown-reporting findings. Tests cover ownership failures and strict retirement predicates, unknown states, power/Quit and actual own NDJSON child transport exceeding 2.8 MiB without retained history. No original code, microphone capture, audible playback, administrator action or CoreAudio restart ran. Native desktop controls, active audio changes, real restart delivery and sustained operation remain unverified.
+
+Next add the recovered timing stabilization and complete call qualification/local activation policy. The existing Call definitions and effective delay bounds remain unresolved in the available REA graph. Full retained-feature and acoustic parity remain incomplete.
+
+Final full host release/sanitizer verification passed, and its rebuilt helper hash exactly matches the successful membership artifact. Desktop verification enumerated 219 tests: 218 passed and one opt-in native power-listener test was skipped. Signed ARM64/macOS12 packaging and relocated resources passed against that helper. The host log uses unchanged pass-message text and therefore shares the previous log digest; source fingerprints bind the changed implementation.
+
+- `evidence/audio-use-watch-final-host-verify-20261028.log`, SHA256 `2f0e79ef4732e932dda97a0bcf2b54d2d036f2748c657ec94af0613c2a578a3d`.
+- `evidence/audio-use-watch-retirement-desktop-verify-20261028.log`, SHA256 `a4c28cd3fd7ac005861518827f0e323b32a0c170dea6aeedb524bf9eb0c622f7`.
+- `evidence/audio-use-watch-membership-runtime-20261028.log`, SHA256 `9fab283a004f5c50741443ffcce98986bdef54552e0a8c3f3d20d8c7c29a922b`.
+- `evidence/audio-use-watch-membership-diagnostic-20261028.log`, SHA256 `3b8d503a9174bbe54cf35e1b09f099e722c9842468ab38ee4fff425e4f8d69b0`.
+- `evidence/audio-use-watch-membership-retirement-runtime-20261028.log`, SHA256 `c01582e4b6155d68825d65eb83a3ed0ea35a7ef460f1f9349e13e7ad0f7b785d`.

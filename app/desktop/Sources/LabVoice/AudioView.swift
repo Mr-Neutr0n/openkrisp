@@ -4,8 +4,10 @@ import UniformTypeIdentifiers
 
 struct AudioView: View {
     @ObservedObject var audio: AudioRouteController
+    @ObservedObject private var watch = AudioUseWatchController.shared
     @State private var testingMicrophone = false
     @Environment(\.dismiss) private var dismiss
+    private var displayWatch: Bool { AudioUseDisplaySource.prefersWatch(watchObservedAt: watch.observedAt, oneShotObservedAt: audio.audioUseObservedAt) }
     private var controlsLocked: Bool { audio.phase != .idle || audio.loading || AudioCaptureAdmission.shared.owner == .microphoneTest }
     private var status: String {
         switch audio.phase {
@@ -83,7 +85,18 @@ struct AudioView: View {
                         .font(.caption).foregroundColor(.secondary)
                     Divider()
                     Button("Observe audio use") { Task { await audio.observeAudioUse() } }.disabled(controlsLocked)
-                    AudioProcessUsageView(snapshot: audio.inventory?.audioProcessUsage, observedAt: audio.audioUseObservedAt)
+                    HStack {
+                        Button("Watch audio use") { watch.start() }.disabled(!watch.canStart)
+                        Button(watch.phase == .failed ? "Retry Stop watching" : "Stop watching") { Task { _ = await watch.stop() } }.disabled(!watch.engaged || watch.phase == .stopping)
+                    }
+                    if let error = watch.error { Text(error).font(.caption).foregroundColor(.orange) }
+                    if let note = watch.cleanupNote { Text(note).font(.caption).foregroundColor(.secondary) }
+                    if displayWatch {
+                        Text(watch.stale ? "Last observation. Audio use may have changed." : "Watching audio-use changes.").font(.caption).foregroundColor(.secondary)
+                    }
+                    AudioProcessUsageView(snapshot: displayWatch ? watch.snapshot : audio.inventory?.audioProcessUsage,
+                        observedAt: displayWatch ? watch.observedAt : audio.audioUseObservedAt,
+                        watching: displayWatch && watch.phase == .watching, stale: displayWatch && watch.stale)
                     Divider()
                     Text("Noise processing").font(.headline)
                     Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)

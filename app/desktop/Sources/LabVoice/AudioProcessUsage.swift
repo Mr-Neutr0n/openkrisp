@@ -49,15 +49,22 @@ struct AudioProcessSnapshot: Decodable, Sendable {
         return "\(processes.count) audio processes checked." + (partial == 0 ? "" : " \(partial) have incomplete properties.")
     }
 }
+enum AudioUseDisplaySource {
+    static func prefersWatch(watchObservedAt: Date?, oneShotObservedAt: Date?) -> Bool {
+        watchObservedAt.map { $0 >= (oneShotObservedAt ?? .distantPast) } ?? false
+    }
+}
 struct AudioProcessUsageView: View {
     let snapshot: AudioProcessSnapshot?
     let observedAt: Date?
+    var watching = false
+    var stale = false
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Audio use").font(.headline)
-            Text("Shows audio use when you checked. Check again to refresh. This does not identify calls or start recording.").font(.caption).foregroundColor(.secondary)
+            Text(watching ? "Shows observed audio-use changes. This does not identify calls or start recording." : "Shows audio use when you checked. Check again to refresh. This does not identify calls or start recording.").font(.caption).foregroundColor(.secondary)
             if let snapshot {
-                if let observedAt { Text("Checked " + observedAt.formatted(date: .abbreviated, time: .standard)).font(.caption).foregroundColor(.secondary) }
+                if let observedAt { Text((watching || stale ? "Last observed " : "Checked ") + observedAt.formatted(date: .abbreviated, time: .standard)).font(.caption).foregroundColor(.secondary) }
                 Text(snapshot.summary).font(.caption)
                 ForEach(Array(snapshot.errors.enumerated()), id: \.offset) { Text($0.element).font(.caption).foregroundColor(.orange) }
                 if snapshot.status == "available" {

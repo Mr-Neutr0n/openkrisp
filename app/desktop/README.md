@@ -297,3 +297,14 @@ The snapshot does not detect calls or start recording. Continuous observation, t
 The desktop normalizes input devices with the recovered two-pass algorithm: remove devices without input streams, then remove output overlaps, visiting ascending device IDs and stopping each pass at one remaining input. An unknown property blocks only the branch that needs it. Output usage remains independent. Grouped clients retain sorted unique helper PIDs, including idle siblings, and use the native byte-exact application-ID plus decimal-device-ID deduplication key. The first candidate in ascending process-object order survives.
 
 Missing identity or metadata remains incomplete. Internal feed/monitor endpoints have distinct labels from the public microphone/speaker endpoints; these labels grant no call eligibility. The UI shows app names and devices rather than raw process identifiers. This is an instantaneous projection, without continuous listeners or timing stabilization.
+
+
+## Watch audio use
+
+Audio now offers **Watch audio use** and **Stop watching**. Watching coexists with routes and microphone tests. It reads CoreAudio process metadata without requesting capture permission or starting audio. The display uses the newest one-shot or watched snapshot; stopped or failed observations remain visibly stale.
+
+The streaming helper sends bounded JSON lines. The desktop limits each line to 600 KiB, retains no stdout history and applies read backpressure. Invalid UTF-8, oversized or unfinished lines fail the stream. Operation and source generations reject stale callbacks. An exited, drained helper releases ownership; an unconfirmed live helper stays owned for Stop retry.
+
+Suspend and Quit stop the observer concurrently with existing audio cleanup, so it does not delay recording finalization. Resume does not restart watching. Ownership cleanup and successful native Remove calls are separate results: a vanished process object can have its listener registration retired only after fresh absence and invalid-object checks. The UI reports those registrations separately.
+
+The real helper has passed bounded attach/detach and two-process appearance/disappearance checks. Native desktop Watch/Stop interaction, CoreAudio service restart, active input/output changes and long-running observation remain unverified. Recovered timing stabilization and call qualification are not yet connected; watching never starts recording.

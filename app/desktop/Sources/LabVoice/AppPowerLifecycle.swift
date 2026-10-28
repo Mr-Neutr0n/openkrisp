@@ -45,12 +45,15 @@ enum AppPowerState: Equatable { case active, suspending, suspended, resuming, fa
         self.revoke = revoke ?? {
             AudioRouteController.shared.revokeForPowerEvent()
             MicrophoneTestController.shared.revokeForPowerEvent()
+            AudioUseWatchController.shared.revokeForPowerEvent()
             AudioCaptureAdmission.shared.objectWillChange.send()
         }
         suspendResources = suspend ?? {
+            async let watchStopped = AudioUseWatchController.shared.stop()
             let test = MicrophoneTestController.shared
             let testStopped = await test.cancelAndCleanup()
             let routeFailure = await AudioRouteController.shared.suspendForPowerEvent()
+            if !(await watchStopped) { return .init(failure: AudioUseWatchController.shared.error ?? "Audio-use observer cleanup is not confirmed.", blocking: true) }
             if !testStopped { return .init(failure: test.error ?? "Temporary microphone-test cleanup is not confirmed.", blocking: true) }
             return routeFailure
         }
