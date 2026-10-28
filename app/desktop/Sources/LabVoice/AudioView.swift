@@ -82,6 +82,9 @@ struct AudioView: View {
                     Text("Choose devices currently running at 48 kHz. Device sample rates are not changed.")
                         .font(.caption).foregroundColor(.secondary)
                     Divider()
+                    Button("Observe audio use") { Task { await audio.observeAudioUse() } }.disabled(controlsLocked)
+                    AudioProcessUsageView(snapshot: audio.inventory?.audioProcessUsage, observedAt: audio.audioUseObservedAt)
+                    Divider()
                     Text("Noise processing").font(.headline)
                     Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)
                     Picker("Microphone provider", selection: $audio.microphoneProvider) {

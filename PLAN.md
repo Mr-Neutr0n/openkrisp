@@ -433,3 +433,8 @@ Full desktop verification enumerated 196 tests: 195 passed and the opt-in listen
 A fresh own device inventory still reports feed/monitor endpoints absent with no inventory errors. CoreAudio and the own remote driver retain their October 13 start times, before the installed diagnostic build. No restart or installer ran. See `driver-current-discovery-findings.md`; the deferred administrator step remains pending.
 
 REA native analysis and qualified retained JavaScript excerpts recover local CoreAudio audio-use detection, responsible-process identity, client payload, stabilization, lowercased app-name blocking and competing-call selection. See `activation-findings.md`. Running/frontmost applications alone are not calls. Concrete delay defaults, stream grouping, older-OS fallback, auto-activation preferences and the call-to-note-taking path remain unresolved. No activation implementation or original runtime behavior is claimed. Full retained-feature parity remains incomplete.
+
+
+## Current audio-use checkpoint, 2026-10-28
+
+Explicit helper and desktop snapshots now expose CoreAudio process activity without starting audio. See the latest CHECKPOINT.md section for verification and retained runtime evidence. Automatic call activation is still incomplete. Native evidence now supplies grouping, the macOS 14.4 source gate and packaged delays. Next complete continuous listener ownership/lifecycle and recover missing Call leg and note-taking joins. Physical routing and administrator-dependent driver discovery remain separate.

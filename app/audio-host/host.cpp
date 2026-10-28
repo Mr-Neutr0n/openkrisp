@@ -1,6 +1,7 @@
 #include <set>
 #include "control_protocol.hpp"
 #include "device_metadata.hpp"
+#include "audio_process_usage.hpp"
 #include "route_cli.hpp"
 #include "microphone_test.hpp"
 #include <CoreAudio/CoreAudio.h>
@@ -238,7 +239,7 @@ bool nativeFloat(const Direction &d, UInt32 channels) {
            f.mBytesPerFrame == channels * 4 && f.mFramesPerPacket == 1 &&
            f.mBytesPerPacket == channels * 4;
 }
-void list() {
+void list(bool observeAudioUse = false) {
     std::cout << "{\"operation\":\"read_only_inventory\",\"devices\":[";
     bool comma = false;
     std::vector<std::string> errors;
@@ -284,7 +285,9 @@ void list() {
         comma = true;
         std::cout << quote(e);
     }
-    std::cout << "]}\n";
+    std::cout << ']';
+    if (observeAudioUse) std::cout << ",\"audio_process_usage\":" << labvoice::audioProcessUsageJSON(labvoice::observeAudioProcessUsage());
+    std::cout << "}\n";
 }
 int plan(const std::string &inputUID, const std::string &outputUID) {
     std::vector<std::string> blockers;
@@ -538,8 +541,8 @@ int aggregatePlan(const std::string &inputUID, const std::string &outputUID) {
 } // namespace
 int main(int argc, char **argv) {
     try {
-        if (argc == 2 && std::string(argv[1]) == "--list") {
-            list();
+        if (argc == 2 && (std::string(argv[1]) == "--list" || std::string(argv[1]) == "--list-audio-use")) {
+            list(std::string(argv[1]) == "--list-audio-use");
             return 0;
         }
         if (argc == 6 && std::string(argv[1]) == "--plan" && std::string(argv[2]) == "--input" &&

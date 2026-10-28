@@ -465,3 +465,12 @@ Full desktop verification enumerated 196 tests: 195 passed and the opt-in listen
 A fresh own device inventory still reports feed/monitor endpoints absent with no inventory errors. CoreAudio and the own remote driver retain their October 13 start times, before the installed diagnostic build. No restart or installer ran. See `driver-current-discovery-findings.md`; the deferred administrator step remains pending.
 
 REA native analysis and qualified retained JavaScript excerpts recover local CoreAudio audio-use detection, responsible-process identity, client payload, stabilization, lowercased app-name blocking and competing-call selection. See `activation-findings.md`. Running/frontmost applications alone are not calls. Concrete delay defaults, stream grouping, older-OS fallback, auto-activation preferences and the call-to-note-taking path remain unresolved. No activation implementation or original runtime behavior is claimed. Full retained-feature parity remains incomplete.
+
+
+## Audio-use snapshot, 2026-10-28
+
+Activation now has a partial prerequisite implementation: explicit read-only process usage in the helper and Audio view. It preserves unknown/error states, actual/responsible identity and device UIDs, with bounded output, cancellation protection and a checked timestamp. It does not qualify calls or activate recording. Full desktop verification passed 198 tests with one opt-in skip and signed/relocated packaging. One runtime snapshot observed 39 idle processes; active-device mapping and native UI remain unverified. See CHECKPOINT.md for exact logs and the error-path corrections made after that runtime read.
+
+REA evidence recovers storage grouping, source selection and packaged timing defaults. Continuous observation, Call leg semantics, effective preferences and recording/transcription activation remain incomplete. No physical audio or original code ran. The ledger contains 193 source and verification fingerprints.
+
+Full audio-host verification also passed release and sanitizer suites. Its exact log hash is recorded in CHECKPOINT.md.

@@ -286,3 +286,10 @@ Settings has an opt-in toggle for simulated Sleep/Wake controls. These exercise 
 
 
 The opt-in listener integration check can be run from `app/desktop` with `LABVOICE_TEST_NATIVE_POWER_REGISTRATION=1 swift test --filter NativePowerRegistrationIntegrationTests`. It only attaches and detaches the own listener, using a callback that records events without invoking application actions. It never requests or posts sleep, wake, shutdown or audio events. The standard suite skips it. Bounded attach/detach passed on October 28; real OS event delivery remains unverified. Native cleanup reports checked return statuses and retains ownership if cleanup is incomplete.
+
+
+## Observe audio use
+
+Audio offers **Observe audio use** while stopped. It shows a one-time snapshot of apps using CoreAudio, with input/output activity and unavailable or failed-read states. Refresh Devices clears the observation. Pending observations use the existing cancellation, power and Quit protections. No process metadata is saved by the app.
+
+The snapshot does not detect calls or start recording. Continuous observation, two-leg call qualification, blocked-app preferences and competing-call switching remain incomplete. Native UI interaction and active-device runtime mapping still need acceptance.

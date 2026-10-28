@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Native listener acceptance and activation evidence, 2026-10-28](#native-listener-acceptance-and-activation-evidence-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Audio-use snapshot, 2026-10-28](#audio-use-snapshot-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -656,3 +656,24 @@ Full desktop verification enumerated 196 tests: 195 passed and the opt-in listen
 A fresh own device inventory still reports feed/monitor endpoints absent with no inventory errors. CoreAudio and the own remote driver retain their October 13 start times, before the installed diagnostic build. No restart or installer ran. See `driver-current-discovery-findings.md`; the deferred administrator step remains pending.
 
 REA native analysis and qualified retained JavaScript excerpts recover local CoreAudio audio-use detection, responsible-process identity, client payload, stabilization, lowercased app-name blocking and competing-call selection. See `activation-findings.md`. Running/frontmost applications alone are not calls. Concrete delay defaults, stream grouping, older-OS fallback, auto-activation preferences and the call-to-note-taking path remain unresolved. No activation implementation or original runtime behavior is claimed. Full retained-feature parity remains incomplete.
+
+
+## Audio-use snapshot, 2026-10-28
+
+The helper now supports explicit `--list-audio-use`, and Audio offers Observe audio use with a checked timestamp. Ordinary Refresh Devices does not inspect processes and clears the previous observation. The read-only snapshot preserves actual and responsible PIDs, optional input/output activity, current device UIDs and per-row errors. It does not start audio or infer calls. Cancellation, power and Quit use the existing inventory-generation protections.
+
+The original's macOS 14.4 source gate is implemented. Unsupported and failed sources stay distinct; failed direction reads remain unknown. Process, device, text and serialized-output bounds prevent optional process data from swallowing normal inventory. App version remains unknown. No continuous listener, grouping, normalization, debounce, blocked-app policy or recording activation is implemented by this checkpoint.
+
+A single bounded runtime query on macOS 26.4.1 returned 39 process records. All reported idle input/output flags. Responsibility lookup resolved 33 records and fell back for six; 15 had different actual and responsible PIDs. Active-device mapping was not exercised live. This observation preceded final serializer-error and missing-name diagnostic corrections. It supports the unchanged successful-read path, not an exact-final-build runtime claim. Raw process metadata remains private and ignored.
+
+Independent GPT 6.1 sol review caught and closed a nested oversized-JSON schema error. The regression exercises control-character escaping expansion. Full desktop verification enumerated 199 tests: 198 passed and the opt-in native power listener test was skipped. ARM64/macOS12 packaging, signing and relocated-resource checks passed. Native snapshot UI interaction remains unverified.
+
+Full audio-host verification also passed release and sanitizer suites. The default runtime process query remained skipped.
+
+- Host log `evidence/audio-process-usage-host-verify-20261028.log`, SHA256 `2f0e79ef4732e932dda97a0bcf2b54d2d036f2748c657ec94af0613c2a578a3d`.
+- Desktop log `evidence/audio-process-usage-desktop-verify-20261028.log`, SHA256 `05f69b8a32dd6cd209def5fd2a0e03f29d517776f8ef9113f5e97662f5e191d4`.
+- Runtime snapshot `evidence/audio-process-usage-runtime-20261028.json`, SHA256 `b81fbf7bc3f4343948f7a6cbf5f3568f435648851b462f100aca66df67e1e801`.
+
+REA static evidence also closes responsible-PID/device grouping, the source-version branch and packaged start/stop delay defaults. `activation-findings.md` records exact evidence and remaining limits. Call.hasBothLegs/addDeviceUsage, effective delay overrides, older-source behavior and the recording/transcription activation join remain unresolved. Original code did not execute. No physical audio or administrator action ran.
+
+Next implement the continuous observation lifecycle and recovered grouping, then connect call policy only after its missing leg and activation semantics are established. The administrator-dependent driver restart stays deferred. Full retained-feature and audio parity remain incomplete.

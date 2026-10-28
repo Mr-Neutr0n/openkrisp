@@ -121,3 +121,66 @@ Before claiming activation parity, recover the storage-to-StreamInfo grouping jo
 A safe implementation must retain the permission-boundary stream recheck, avoid treating an app launch as a call, distinguish helper actual PIDs from responsible app identity and invalidate old observations after device/policy changes. No source or test implementation is added by this report. No physical or synthetic activation scenario ran.
 
 After evidence export, close_binary was requested once. The global process-capture cleanup condition rejected close with candidates 32300, 35284 and 35285 reporting unreadable ownership environments. No candidate action, retry or repair followed. This does not invalidate the retained static native dossiers, but provider closure is not confirmed. The target may remain selected; recheck session state before another task changes it.
+
+## Storage grouping, source selection and defaults, 2026-10-28
+
+This follow-up closes the earlier storage-to-StreamInfo, source-version gate and packaged delay-default unknowns. The observed addon digest is unchanged. REA session state initially reported no open target, so the addon was explicitly rebound before these static queries.
+
+### Responsible PID and device grouping
+
+AudioProcInfoStorage keeps AudioProcessInfo records keyed by audio-process object ID. `AudioProcInfoChanged` replaces that object's record and compares the normalized input/output device sets against its previous record. It marks modified directions and either notifies immediately or starts its configured storage notification interval. It does not treat every identity-field refresh as a directional stream change.
+
+`GetStreams(inputDirection)` walks stored records that have at least one device in that direction. For each such record, it scans all stored records for the same responsible PID and inserts their actual PIDs into a numeric set. It serializes that sorted, unique set as decimal numbers separated by commas, with no spaces and no leading comma. This is the exact `actualPids` string. The sibling scan does not itself require each sibling record to be currently active in the selected direction.
+
+For every device ID in the selected record's active-direction device set, GetStreams produces a StreamInfo. It converts that CoreAudio device ID to a decimal string. The StreamInfo carries actual and responsible PIDs, the grouped actualPids string, app name, version and responsible app identifier. The later StreamInfo-to-ClientAppInfo conversion selects the responsible PID as the client `pid`. Thus one responsible application can yield multiple per-device stream records and one grouped helper-PID string.
+
+The KrispStreamContainer then deduplicates records by the concatenation of the StreamInfo responsible-app-ID string and device-ID string. This key contains no inserted separator. The map uses unique insertion, so duplicate input records with the same key do not create duplicate clients. Changed-list comparison includes StreamInfo equality, then emits a full current client snapshot. This is a two-level mechanism: actual PIDs are grouped by responsible PID, while the published client map keys app identity plus device. Do not replace it with grouping only by display name or only by actual PID.
+
+`NotifyChangesIfAny` regenerates streams independently for each modified direction and emits native device type 0 for input and 1 for output. It clears each modified flag after dispatch. Native callback payload conversion and exact string fields are already established above.
+
+Relevant new dossiers:
+
+| Function | Address | Evidence |
+| --- | --- | --- |
+| AudioProcInfoStorage.GetStreams | `0x5d5bc` | `ev_41f5318555259bf2b645ad53a8f5c551c1be056417beb209890cd89ac06da78c` |
+| AudioProcInfoChanged | `0x5cb7c` | `ev_bbf6e4fcf6991009e85c432c2eefeef14502968e950fcbe1113ea9b04aa47755` |
+| NotifyChangesIfAny | `0x5c958` | `ev_36e67c4c3c7849971aac09043e4497d4aa2b5f4164be0bc18d3a1b4efbbea72b` |
+
+The prior changed-list and conversion dossiers complete this join. Type propagation warnings remain in the decompiler output. Field meanings here are tied to the earlier identity loader, layout copies and N-API field serializer, rather than inferred only from variable names.
+
+### Native source version gate and failure behavior
+
+`IsAudioProcessTrackingAvailable` calls `__isPlatformVersionAtLeast(1, 14, 4, 0)`. The selected native source therefore uses the audio-process path on macOS 14.4 and later. This is the original's own gate, not an inference from SDK API availability.
+
+CreateAudioService creates the CA and Krisp handlers in either case. It creates an AudioProcessContainer only when that version gate passes, then passes the optional container into EventHandler. EventHandler.StartMonitor registers audio-process callbacks when the container is present; when absent, it registers the older CA and Krisp stream callbacks. It still registers the non-stream device/state callbacks in the process-container branch.
+
+This is version-selected fallback. It is not evidence that an initialization error in the selected process source silently falls back. EventHandler.Initialize returns a nonzero process-container initialization error instead of removing that container and switching source. A process-container factory error follows a service-creation failure branch. The independent implementation must keep unsupported-source and failed-source states distinct.
+
+| Function | Address | Evidence |
+| --- | --- | --- |
+| IsAudioProcessTrackingAvailable | `0x47818` | `ev_9fd96cf933b3a7125357596810acc9087b6d5ecc71bd6fe310025fa830363c7c` |
+| CreateAudioService | `0x2691c` | `ev_2d095a7c7294a391608fd5249aa7106bd1490de0f5fdbb2577cde1699e9cbcca` |
+| EventHandler.Initialize | `0x4a67c` | `ev_f1f8e58fe5b1df55d574acb9a4b0c92f6a58f5e9244825316c7b9c7cb79a00b9` |
+| EventHandler.StartMonitor | `0x4a9e4` | `ev_dc85f32438dda2385e2693abfee3a52c8377573df852c0c7f63e55bbad0ba267` |
+| RegisterAudioProcessEvents | `0x4af60` | `ev_8024de28173ccbb78380a31cd1dd8c798420c853e354b9eaf9ca0c6ef7b1dab5` |
+| RegisterStreamEvents | `0x4b078` | `ev_c0c687ced8052b70ca663e6ba408fd0367780013226e2f20d737a4eeea47dcee` |
+
+The complete older-source callback registration, app attribution and removal behavior remain incomplete. Full activation on macOS 12 through 14.3 therefore still needs that separate source contract.
+
+### Packaged delay defaults recovered from retained evidence
+
+No new original read was needed for these values. Retained accepted static reader Evidence `ev_f5ab7c72b42ff4a4d14cb47d3bf91893363610cf6acf2c89937c3802d073a6cf`, in `speaker-graph-config-processors-20261018-v1.result.json`, contains the SentryManagerMain default configuration around raw member character offsets 120,172 and 120,198. It pins member SHA256 `cf21e7e4fa19deb6f960223a883fe8831f25d66ba68d15e127731de5aead8579` and the unchanged ASAR digest before/after. The reader exited 0 with verified owned-group cleanup, removed its temporary root and retained all 70,167 raw bytes. A second retained capture, `ev_1953b11976e37a492f97468487890af71345e9f07220ec36772b095dab209764`, contains the same defaults.
+
+| Configuration | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| startStreamEventsDelayThreshold | 250 ms | 250 ms | 250 ms |
+| endStreamEventsDelayThreshold | 1,200 ms | 1,200 ms | 1,000 ms |
+| newDeviceInteractionDelayThreshold | 0 ms | 1,000 ms | 0 ms |
+
+The common audio defaults are `appCallStartDelayMs: 500` and `appCallStopDelayMs: 1000`. These are packaged defaults. They do not establish effective values after account/config overrides or identify the still-unrecovered min/max clamp constants and app-specific extra-delay map.
+
+Retained `bvc-mic-default-20261025.result.json`, Evidence `ev_56863d4bf5c4fb6368bf35daad401a9def860da402711c0297391e5cf39b40b7`, contains the platform-selection helper: on macOS it copies the mac start/end/new-device thresholds into the device-manager configuration. The snippet includes direct macOS branch and end-threshold access; some adjacent decoded aliases remain unresolved, so this is used with the exact N-API configuration keys and literal default object rather than claimed as a fully decoded helper.
+
+The Call.hasBothLegs and Call.addDeviceUsage bodies are still absent from the retained excerpts searched. Known CallService policy and accepted AudioService Krisp-device filtering must remain in the reconstruction contract. A name such as hasBothLegs alone does not establish whether the call requires matching process/device identities, which leg takes precedence, or how bridge metadata changes those legs. No replacement leg semantics are invented here.
+
+New dossiers are exported in `evidence/model-probes/activation-grouping-20261028.bundle.json`, 11,818,980 bytes and 14 records. A single close request after export again failed on global process-capture cleanup, listing candidates 32300, 36132 and 36133. No retry, signal or repair followed. All new conclusions are static and carry the installed native digest above. No code or runtime activation changed.

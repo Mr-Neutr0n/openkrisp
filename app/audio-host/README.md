@@ -258,3 +258,14 @@ reporting a mismatch. These tests execute no installed component.
 
 
 The read-only inventory includes `interface_name`, `manufacturer`, `model_id` and per-device `metadata_read_errors`. `interface_name` copies the existing global CoreAudio name without transformation. Manufacturer and model ID read `kAudioObjectPropertyManufacturer` and `kAudioDevicePropertyModelUID` at global scope, main element zero. Missing, null, unreadable or unconvertible optional strings remain empty. Their warnings do not enter top-level inventory `errors` or remove an otherwise routable device. These fields supply metadata only; they do not infer headset compatibility or reproduce unknown later original UI transformations.
+
+
+## Audio-use observation
+
+`build/audio-host --list-audio-use` adds an optional `audio_process_usage` snapshot to the ordinary device inventory. `--list` keeps its existing schema and does not query processes. Observation reads CoreAudio properties and application identity metadata. It creates no audio tap, IOProc or stream.
+
+The source requires macOS 14.4, matching the recovered original gate. Older systems report unavailable; a failed list read reports failed. Per-process failures preserve unknown fields and diagnostics. Actual and responsible PIDs stay separate, and device object IDs resolve to current UIDs. App version remains unknown. This snapshot does not apply grouping, normalization, stabilization or call policy.
+
+Bounds limit process count to 1,024, device entries to 256 per direction and 4,096 total, individual text to 4 KiB, aggregate text to 256 KiB and serialized observation to 512 KiB. Exceeding the serialized bound returns a failed optional snapshot while preserving normal inventory.
+
+The standard `./verify` runs synthetic release and sanitizer checks. `LABVOICE_TEST_AUDIO_PROCESS_USAGE=1 python3 audio_process_usage_check.py` opts into a read-only runtime query with a 15-second deadline. It retains private JSON under ignored `build/`; its console summary contains counts only.

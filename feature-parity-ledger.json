@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-25",
+  "snapshot_date": "2026-10-28",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -336,7 +336,7 @@
         },
         {
           "key": "all_done_today",
-          "text": "All done for today ✅"
+          "text": "All done for today \u2705"
         }
       ],
       "original_evidence_ids": [
@@ -1046,7 +1046,7 @@
         },
         {
           "key": "bvc.active_tooltip_text",
-          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won’t be heard."
+          "text": "Background Voice Cancellation \nis ON. Voices of people talking \nnear you won\u2019t be heard."
         },
         {
           "key": "bvc.bvc_device_enforced_tooltip",
@@ -1755,7 +1755,7 @@
         },
         {
           "key": "test_nc.recording_will_not_leave_device",
-          "text": "Your recording will never leave your device and won’t be saved."
+          "text": "Your recording will never leave your device and won\u2019t be saved."
         }
       ],
       "original_evidence_ids": [
@@ -1900,7 +1900,7 @@
       "id": "activation",
       "feature": "Automatic call activation, blocked apps and competing calls",
       "scope": "retained",
-      "implementation_state": "unimplemented",
+      "implementation_state": "independent_partial",
       "catalog_keys": [
         "auto_open_banner",
         "call_indicator.call_started_note_taker_off_2",
@@ -1979,12 +1979,33 @@
         "ev_b508de79db0e127c99cd375b5a26c5d1c6314964e3f2e783872f4bf1e73111ad",
         "ev_0a4f5eb5b8ab9d0a8b57b22b2c82fd1ce1f9a528cbb15f38c4d6a5f58d80a182",
         "ev_4039010543c34c6bb98ddab74ec7aa73e3fcf3d3e3bb28e6b68f017ade4b1833",
-        "ev_9a7508fc22b011b377509f2f90e73f800b515f82435be264fddd6d2741f8ab3e"
+        "ev_9a7508fc22b011b377509f2f90e73f800b515f82435be264fddd6d2741f8ab3e",
+        "ev_41f5318555259bf2b645ad53a8f5c551c1be056417beb209890cd89ac06da78c",
+        "ev_bbf6e4fcf6991009e85c432c2eefeef14502968e950fcbe1113ea9b04aa47755",
+        "ev_36e67c4c3c7849971aac09043e4497d4aa2b5f4164be0bc18d3a1b4efbbea72b",
+        "ev_9fd96cf933b3a7125357596810acc9087b6d5ecc71bd6fe310025fa830363c7c",
+        "ev_2d095a7c7294a391608fd5249aa7106bd1490de0f5fdbb2577cde1699e9cbcca",
+        "ev_f1f8e58fe5b1df55d574acb9a4b0c92f6a58f5e9244825316c7b9c7cb79a00b9",
+        "ev_dc85f32438dda2385e2693abfee3a52c8377573df852c0c7f63e55bbad0ba267",
+        "ev_8024de28173ccbb78380a31cd1dd8c798420c853e354b9eaf9ca0c6ef7b1dab5",
+        "ev_c0c687ced8052b70ca663e6ba408fd0367780013226e2f20d737a4eeea47dcee",
+        "ev_f5ab7c72b42ff4a4d14cb47d3bf91893363610cf6acf2c89937c3802d073a6cf",
+        "ev_1953b11976e37a492f97468487890af71345e9f07220ec36772b095dab209764",
+        "ev_56863d4bf5c4fb6368bf35daad401a9def860da402711c0297391e5cf39b40b7"
       ],
-      "implemented_code": [],
-      "implementation": "Routes and recording start only by explicit user click. No call detection, app exclusion list, automatic activation or concurrent-call switch.",
-      "verified_scope": "Catalog/static candidate only; no implementation verification. Static REA native and qualified retained JS evidence now recover CoreAudio process audio-use source, responsible identity/client payload, stabilization, name-based blocking, both-leg qualification and competing-call ordering. See activation-findings.md; no activation runtime or source implementation is claimed.",
-      "missing_acceptance": "Recover concrete delay defaults, used-device stream grouping and Call.hasBothLegs semantics, native-source older-OS fallback, auto-activation preference/manual-choice policies and APP_CALL_STARTED/CONFIRMED recording/transcription join. Then implement local detection, exclusion persistence and competing-call transitions; do not infer calls from app launch or foreground state. Runtime and full activation parity remain unverified."
+      "implemented_code": [
+        "projects/krisp/app/audio-host/audio_process_usage.hpp",
+        "projects/krisp/app/audio-host/audio_process_usage.cpp",
+        "projects/krisp/app/audio-host/audio_process_usage_native.mm",
+        "projects/krisp/app/audio-host/host.cpp",
+        "projects/krisp/app/desktop/Sources/LabVoice/AudioProcessUsage.swift",
+        "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift",
+        "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
+        "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift"
+      ],
+      "implementation": "Explicit read-only audio-use snapshot in the helper and Audio view. Optional unknown/error states, actual/responsible identity, current device UIDs and bounded output. Ordinary inventory does not observe processes. Routes and recording still start only by explicit user click. Continuous observation, call detection, blocked-app preferences and competing-call switching remain unimplemented.",
+      "verified_scope": "Recovered static native grouping, macOS 14.4 source gate and packaged defaults in activation-findings.md. Explicit snapshot passes own C++ formatter and Swift decode/unknown/cancellation fixtures. Full desktop suite: 198 passed, 1 opt-in skip; ARM64/macOS12 packaging, signing and relocated resources passed. One bounded runtime snapshot observed 39 idle processes with no direction unknowns, 33 responsibility resolutions and 6 actual-PID fallbacks. That query preceded final serializer-error and missing-name diagnostic fixes; it supports unchanged successful reads, not exact-final-build runtime acceptance. Active-device usage, native UI, continuous observation and call activation remain unverified. Full audio-host release and sanitizer verification passed; default process runtime query skipped.",
+      "missing_acceptance": "Implement continuous process/device listeners and lifecycle cleanup, recovered grouping and stabilization. Recover Call.hasBothLegs/addDeviceUsage semantics, older-OS source details, effective delay overrides/clamps, auto-activation preference/manual-choice policies and the recording/transcription join. Native snapshot UI and active-device runtime mapping remain unverified. Do not infer calls from app launch, frontmost state or raw audio activity. Full activation parity remains incomplete."
     },
     {
       "id": "transcription",
@@ -2432,7 +2453,7 @@
       "representative_labels": [
         {
           "key": "about_copy_right_text",
-          "text": "© {{date}} Krisp Technologies, Inc. All right reserved."
+          "text": "\u00a9 {{date}} Krisp Technologies, Inc. All right reserved."
         },
         {
           "key": "app_menu_edit.title",
@@ -2600,7 +2621,7 @@
         },
         {
           "key": "pref_notifications_on_off_indicator_body",
-          "text": "Shows key features’ states at the start of each meeting and reminds to inform other participants if recording"
+          "text": "Shows key features\u2019 states at the start of each meeting and reminds to inform other participants if recording"
         }
       ],
       "original_evidence_ids": [
@@ -2634,7 +2655,7 @@
       "representative_labels": [
         {
           "key": "cant_find_page_text",
-          "text": "Can’t find the page?"
+          "text": "Can\u2019t find the page?"
         },
         {
           "key": "check_internet",
@@ -3118,18 +3139,18 @@
   ],
   "implementation_source_sha256": {
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
-    "projects/krisp/app/desktop/build": "21b650dd02c7eede64282d480610cda27c1bb8699d82d6572e1c59456e3b48bc",
+    "projects/krisp/app/desktop/build": "6a304d5f1154e2be76a222ff409152feca395fe9c47e6f3ecc366fce2744e372",
     "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "54f090743e4a12301fd5bbf661840d273bd509d497182e1fb1c6bdb2818dd66c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "b1e9a95cadc305e07e69d963151877ade064656468dcd98577cd93a1a8c62bad",
     "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
     "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
     "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift": "ba2a1b8342403879dd5b217805a65b2c14a6bbd9c7f4bbad5c4f0548340b3244",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "a79cab35507d5b3875cef8953e7b5fe8a833e1624e09d12eceddf53f39ef8b29",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "f2320c339eaa0e61d61ba7760e456b76dbcd7c69b18be07c401b62220fe24ab3",
     "projects/krisp/app/audio-driver/driver.cpp": "548b9ab3a7fd071e0e6d9086cb3649a8342c5edccc75cdfebd2036afb0af6df7",
     "projects/krisp/app/audio-host/coreaudio_backend.cpp": "f1cb358676578116a77ee630d2deab48d3a576bf92694cff41ac1940d0f932e2",
     "projects/krisp/app/audio-host/routing.cpp": "7c9dbf04de0df447ac3a27637ab251a2c88c8f398736ace71f3020d013bcdb6d",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "f944caa72d473acc36349a79534dfd3c910384bc2dd36f591f1b7d4668fd14ba",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "28faa2451e6e5f4361a68c3252363a6d7159418bbc09b5cf15101456babf71f8",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
@@ -3151,7 +3172,7 @@
     "projects/krisp/app/audio-host/microphone_test_wire_fixture.cpp": "104b0317817109fe838b05935d82b77b0450eb9b097278dcf275e7f609a3c751",
     "projects/krisp/app/audio-host/microphone_test_wire_check.py": "15d1ed8cf3fe34d76003def920b816c22b243aeb28bc0623dd0cf9f7ce21fe46",
     "projects/krisp/app/audio-host/control_protocol.cpp": "f2f3828f24e1838fa57287661f48bce102876b4e5779c8c7ea2acf35bd466aa4",
-    "projects/krisp/app/audio-host/host.cpp": "077620ccc481e35d2b51bf0c6c42d4ecf0c3e11d6dabfd983a6eca74e593b6b4",
+    "projects/krisp/app/audio-host/host.cpp": "59ca964958001f4dd7a451b245075e7d83ee1570707cc7142b22656ea5ad274b",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestController.swift": "75d58b39b108e4bba9bbb7bfce2e1cf7b14dc3ef74541fb206384b958ac39ee0",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestFiles.swift": "a7f2f1bad2cef62b807bc4a899db7446d2fc6dcd198a02a0a4e4ec2093823d5a",
     "projects/krisp/app/desktop/Sources/LabVoice/MicrophoneTestView.swift": "345db232ae28184ad84a91ba44657d0f9aca71c6ff3c146f4230d4c5527745bf",
@@ -3225,14 +3246,14 @@
     "projects/krisp/app/audio-host/routing_test.cpp": "f297a5c2b9f367c4cd32d656c0753c0eda1c63caf2110129f59798195de5bea0",
     "projects/krisp/app/desktop/verify": "ccc1cd8f891d70f2df7b7bc27b69acb1198137d0ec156e92ba649869a686e8e2",
     "projects/krisp/app/audio-host/route_cli.hpp": "3bb4cf3af2a05e244f7a82fa5c6c90a53ddb4a53e7021a9ed13dec5a1559628f",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "62a9d18ef8e602a558e89e01e7c2a9289f1f9eed7abfde8d8303ba99b68157d5",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift": "1d670caea54faa1914dafd21f0cbb766ca897a1e6cc3048465ebc4f586787175",
     "projects/krisp/app/audio-host/provider_cli_check.py": "fc1e407bc4d9912ef9bffe831166421bc4361c9db3558c161d76f027fe479b9b",
     "projects/krisp/app/desktop/Sources/LabVoice/InstalledNCProvider.swift": "0c0ba3f8834b88b4c38deae9807fbefc52bf650c2e1bfa372a21ba9700c2a415",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/InstalledNCProviderTests.swift": "952ec17916621152fc15fbd8f95935fe35d21f4f0f576872069f89512a4976a4",
     "projects/krisp/app/audio-host/installed_noise_adapter_test.cpp": "a92ad9f174414c734df571e3368a5905f8d6fcc9b1f5594dbc37fe83d548f3b2",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioRouteTests.swift": "96a2d15ba8d808741e1d52490024e6d67704f4c6bb93ef9ec6c19f9a6532825f",
     "projects/krisp/app/audio-host/installed_noise_adapter.hpp": "79b58b67a74c0a6331f4394a6235dae4a39fd8cd210ecd1a352688c93fd43a08",
-    "projects/krisp/app/audio-host/verify": "b3e029cca968fa4f723efac823b51d52760a02e36dc3f20abba6c5327778331f",
+    "projects/krisp/app/audio-host/verify": "96056857178f61777815dbed7aaa055345edc949d6d11a33f6d3270cfb924e31",
     "projects/krisp/app/audio-host/provider_cli_fixture.cpp": "b601d0b472020ab2655a7b3bce13610f3ade51380884b9495be6e4a2246bc8d7",
     "projects/krisp/app/audio-host/installed_dual_probe.cpp": "a0714e861e0f8808319a19c16a54aba5f180bd4cc42b116905a81146e5a86e76",
     "projects/krisp/app/desktop/Sources/LabVoice/Relaunch.swift": "50c253839c59c24319aca00a40e1b19180634070a57ff2b68ada2289555ad5a8",
@@ -3302,7 +3323,14 @@
     "projects/krisp/app/desktop/Sources/LabVoice/AppPowerLifecycle.swift": "b2a7fbec1f0a9605d275f0047ee04869e0ea3b2380a4996fd311bcddb800d239",
     "projects/krisp/app/desktop/Sources/LabVoice/NativePowerNotifications.swift": "952a68743aa26e49f158d58b44bc1e84ffa7807af37c331b3161ee31200f3f2a",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AppPowerLifecycleTests.swift": "f3f93c7c1be0e21ac53c3e8e0201548f7ca4d793f29cf45049b9f81b1dce3597",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/NativePowerNotificationsTests.swift": "34fea0d833755f4a347065a2a7f673dd1439c986aa03a2cda63d826b1d889aeb"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/NativePowerNotificationsTests.swift": "34fea0d833755f4a347065a2a7f673dd1439c986aa03a2cda63d826b1d889aeb",
+    "projects/krisp/app/audio-host/audio_process_usage.hpp": "f691ae0777af3aa09f0450302b0894e87cc1d081f570410ae462321c3d61c612",
+    "projects/krisp/app/audio-host/audio_process_usage.cpp": "415878f236ba46795e9632208f213033757a5bab72ca95b2030fb5c64abe5abd",
+    "projects/krisp/app/audio-host/audio_process_usage_native.mm": "8c74fb39e7c033b8d8470a7c24ca72b803696853f9886c879374cf89f61d08f4",
+    "projects/krisp/app/audio-host/audio_process_usage_test.cpp": "3ce2aabc261b0f28b8fcaa634ba382595c9896b28757924b2f938e646ec283a4",
+    "projects/krisp/app/audio-host/audio_process_usage_check.py": "aee9d7a03cad58997476fd6b5897fe5e286807667a353a8a58aeefb30aeabc46",
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioProcessUsage.swift": "ec878b97f65cfe51dc08b29e3a38ef53fc1728a85897e6c4e21b7ba4132baf8e",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioProcessUsageTests.swift": "6351ba2e56813ab54468ba0c10a8cc3eb3e542ab7776a5e68fc06ef96ad50d22"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3313,7 +3341,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "186 source/verification/own-fixture fingerprints at native listener acceptance checkpoint. Standard desktop195 tests pass; opt-in actual listener test passes separately. Real OS power delivery, physical audio, activation and full retained local parity remain incomplete.",
+  "source_snapshot_note": "193 source/verification/own-fixture fingerprints at audio-use snapshot checkpoint. Desktop 198 tests pass with 1 opt-in skip; signed and relocated packaging passes. Bounded own runtime metadata read observed 39 idle processes before final error-path corrections. Continuous activation, real OS power delivery, physical audio and full retained local parity remain incomplete.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

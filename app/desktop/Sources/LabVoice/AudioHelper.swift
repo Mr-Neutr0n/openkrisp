@@ -33,7 +33,8 @@ struct AudioInventory: Decodable, Sendable {
     let devices: [AudioHardwareDevice]
     let companions: [AudioCompanion]
     let errors: [String]
-    enum CodingKeys: String, CodingKey { case devices, errors; case companions = "companion_devices" }
+    var audioProcessUsage: AudioProcessSnapshot? = nil
+    enum CodingKeys: String, CodingKey { case devices, errors; case companions = "companion_devices", audioProcessUsage = "audio_process_usage" }
     var driverPresent: Bool {
         ["dev.hari.labvoice.feed", "dev.hari.labvoice.monitor"].allSatisfy { uid in
             companions.contains { $0.uid == uid && $0.present }
@@ -390,7 +391,7 @@ enum AudioHelperError: Error, LocalizedError {
         return await child.waitForExit(timeoutNanoseconds: 10_000_000_000)
     }
 
-    func inventory() async throws -> AudioInventory {
+    func inventory(observeAudioUse: Bool = false) async throws -> AudioInventory {
         guard inventoryChild == nil else { throw AudioHelperError.inventoryFailed("A refresh is already pending.") }
         let child = SystemAudioHelperChild(url: try Self.packagedURL())
         inventoryChild = child
@@ -401,7 +402,7 @@ enum AudioHelperError: Error, LocalizedError {
         defer { inventoryDeadline?.cancel(); inventoryDeadline = nil; inventoryChild = nil }
         return try await withCheckedThrowingContinuation { continuation in
             do {
-                try child.launch(arguments: ["--list"], line: { _ in }, exit: { event in
+                try child.launch(arguments: [observeAudioUse ? "--list-audio-use" : "--list"], line: { _ in }, exit: { event in
                     guard event.status == 0 else {
                         continuation.resume(throwing: AudioHelperError.inventoryFailed(event.diagnostic)); return
                     }

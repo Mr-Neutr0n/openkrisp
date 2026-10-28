@@ -11,7 +11,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let captureAdmission = AudioCaptureAdmission.shared
     private var admissionObservation: AnyCancellable?
     private var recordingObservation: AnyCancellable?
-    @Published private(set) var inventory: AudioInventory? { didSet { invalidateProvider(); invalidateAEC() } }
+    @Published private(set) var inventory: AudioInventory? { didSet { audioUseObservedAt = nil; invalidateProvider(); invalidateAEC() } }
+    @Published private(set) var audioUseObservedAt: Date?
     @Published private(set) var loading = false
     @Published private(set) var phase: AudioRoutePhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: phase == .idle ? .stopped : (phase == .running ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var activeOptions: AudioRouteOptions?
@@ -108,6 +109,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private var controlDeadline: Task<Void, Never>?
     private let controlTimeout: UInt64
     private let readInventory: () async throws -> AudioInventory
+    private let readAudioUse: () async throws -> AudioInventory
     private let stopInventory: () async -> Bool
     private struct InventoryQuery {
         let id = UUID()
@@ -168,6 +170,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         resolveProvider = { app, node, role in try await resolver.resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role) }
         let services = AudioHelperServices()
         readInventory = { try await services.inventory() }
+        readAudioUse = { try await services.inventory(observeAudioUse: true) }
         stopInventory = { await services.stopInventory() }
         authorization = { MicrophonePermission.status() }
         requestAuthorization = { await MicrophonePermission.request() }
@@ -176,6 +179,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         observeRecording()
     }
     init(readInventory: @escaping () async throws -> AudioInventory,
+         readAudioUse: (() async throws -> AudioInventory)? = nil,
          stopInventory: @escaping () async -> Bool = { true },
          authorization: @escaping () -> AVAuthorizationStatus,
          requestAuthorization: @escaping () async -> Bool,
@@ -195,7 +199,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         self.resolveAEC = resolveInstalledAEC
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider
-        self.readInventory = readInventory; self.stopInventory = stopInventory
+        self.readInventory = readInventory; self.readAudioUse = readAudioUse ?? readInventory; self.stopInventory = stopInventory
         self.authorization = authorization; self.requestAuthorization = requestAuthorization
         self.factory = factory; self.startupTimeout = startupTimeout; self.stopTimeout = stopTimeout; self.controlTimeout = controlTimeout
         observeRecording()
@@ -205,7 +209,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         recordingObservation = recording.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
     func refresh() async { await refresh(allowSuspended: false) }
-    private func refresh(allowSuspended: Bool) async {
+    func observeAudioUse() async { await refresh(allowSuspended: false, observeAudioUse: true) }
+    private func refresh(allowSuspended: Bool, observeAudioUse: Bool = false) async {
         guard (allowSuspended || PowerAdmission.shared.allowed), phase == .idle, !loading, !QuitGate.shared.quitting else { return }
         let query = InventoryQuery(); inventoryQuery = query
         loading = true; error = nil
@@ -216,9 +221,10 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
             }
         }
         do {
-            let result = try await readInventory()
+            let result = try await (observeAudioUse ? readAudioUse() : readInventory())
             guard inventoryQuery?.id == query.id, inventoryQuery?.cancelled == false else { return }
             inventory = result
+            if observeAudioUse, result.audioProcessUsage != nil { audioUseObservedAt = Date() }
             if !result.devices.contains(where: { $0.uid == inputUID && $0.input.channels > 0 }) { inputUID = "" }
             if !result.devices.contains(where: { $0.uid == outputUID && $0.output.channels > 0 }) { outputUID = "" }
         } catch {
