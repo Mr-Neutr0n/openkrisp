@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Continuous audio-use observation, 2026-10-28](#continuous-audio-use-observation-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Native audio-use timing, 2026-10-28](#native-audio-use-timing-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -723,3 +723,24 @@ Final full host release/sanitizer verification passed, and its rebuilt helper ha
 - `evidence/audio-use-watch-membership-runtime-20261028.log`, SHA256 `9fab283a004f5c50741443ffcce98986bdef54552e0a8c3f3d20d8c7c29a922b`.
 - `evidence/audio-use-watch-membership-diagnostic-20261028.log`, SHA256 `3b8d503a9174bbe54cf35e1b09f099e722c9842468ab38ee4fff425e4f8d69b0`.
 - `evidence/audio-use-watch-membership-retirement-runtime-20261028.log`, SHA256 `c01582e4b6155d68825d65eb83a3ed0ea35a7ef460f1f9349e13e7ad0f7b785d`.
+
+
+## Native audio-use timing, 2026-10-28
+
+Watch now requests `--watch-audio-use-stabilized`. Raw watch and one-shot observation remain available. REA recovered the native listener's >=200 ms first-event window, per-process tracker strict >250/>1200 ms thresholds and shared >=100 ms storage batch. The end threshold applies only when a previously nonempty direction becomes empty. Initial/new records and actual process disappearance bypass the tracker delay. `activation-findings.md` records exact constructor values, overrides, timer comparisons and evidence identities.
+
+The production engine uses integer monotonic milliseconds and a native 20 ms timer independent of stdout backpressure. Bulk reads update only due process rows. Candidate replacement preserves its first time; reverting cancels it. Storage accumulates direction flags without restarting its batch. Recovery retains settled history and compares against prior storage publications so read failures do not turn an undisclosed transition into a readiness-only event. The deterministic same-tick ordering does not reproduce every possible ordering of the original's separate timer queues.
+
+Restart timing clears state, permits the forced reset at 1100 ms and holds reload for 2000 ms, with repeated requests serialized. Explicit restarting/reset metadata keeps the desktop's last good view stale rather than presenting reset as observed absence. Ordinary read failures remain recoverable. Unknown per-process usage freezes published state and marks it stale; this is an explicit independent divergence from the original's default/partial failure handling. Arbitrary native exception paths remain unresolved.
+
+Every stabilized snapshot identifies timing mode, source state, publication reason and affected directions. Independent all-idle readiness is labeled separately. Bounded latest-only transport reports coalesced publication counts and preserves direction flags where applicable. The desktop retains per-operation loss counts without falsely marking the latest full snapshot stale. Intermediate notification history is not guaranteed.
+
+The one authorized live test connected the actual native helper to the production Swift controller and bounded streaming reader. It passed in 0.279 seconds with 40 processes, zero partial rows, running/available stabilized readiness and coalesced count zero. Explicit Stop drained exit 0, with 162 verified successful removals and no retirements or failures. No fallback signal was needed. Helper SHA256 before and after matched `4ef3192b17d221acca2dc1af33ecd697e7c248ed57bcb3b83a13e470613c9d19`. The separate Python stabilized harness remains unrun; raw membership testing was not repeated because inactive helper changes intentionally need not produce stabilized directional callbacks.
+
+Native fake-clock tests cover boundaries, transient/reverting/changing candidates, initial/destruction cases, batching, recovery provenance, restart cycles and coalesced history. Desktop fixtures cover mode/provenance rejection, reconnects, transient failures, stale groups and production streaming. Independent GPT 6.1 sol review found no remaining blocker. Full host verification passed; full desktop verification enumerated 227 tests, with 225 passed and two opt-in skips, plus signed ARM64/macOS12 packaging and relocation.
+
+No original code, physical audio, administrator action or actual CoreAudio restart ran. Live activity timing, real restart delivery, native controls, sustained operation and original runtime comparison remain open. Next complete Call leg definitions and local automatic-activation, blocked-app and competing-call policy. Full retained-feature and acoustic parity remain incomplete.
+
+- `evidence/audio-use-stabilized-final-host-verify-20261028.log`, SHA256 `7dbe723eb3275c5fe746f094681d24335e7e1b747f3f12f1ac5c3c30810d4b14`.
+- `evidence/audio-use-stabilized-final-desktop-verify-20261028.log`, SHA256 `a2c5ec901b73686505a14d535d7279568a608c6cb81aec65aa1092e7b948e44e`.
+- `evidence/audio-use-stabilized-native-controller-20261028.log`, SHA256 `cac0062e93e9b00bc985e60529f1c627f5ea53a50b80e9425149f2cdb7515fd4`.

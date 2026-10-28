@@ -24,6 +24,7 @@ struct AudioProcessUsage {
     AudioObjectID objectID;
     std::optional<int> actualPID, responsiblePID;
     std::optional<std::string> appName, processBundleID, responsibleBundleID, appID, appVersion;
+    std::optional<bool> usageStale, stabilizationPending;
     bool responsibleFallback = false;
     std::string responsibleResolution;
     AudioProcessDirection input, output;
@@ -35,6 +36,6 @@ struct AudioProcessSnapshot {
     std::vector<std::string> errors;
 };
 AudioProcessSnapshot readAudioProcessUsage(const AudioProcessReader &reader);
-std::string audioProcessUsageJSON(const AudioProcessSnapshot &snapshot);
+std::string audioProcessUsageJSON(const AudioProcessSnapshot &snapshot, bool* boundsFailed=nullptr);
 AudioProcessSnapshot observeAudioProcessUsage();
 }

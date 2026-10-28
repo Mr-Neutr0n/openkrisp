@@ -29,13 +29,13 @@ Each process listener registers these properties:
 | `pdv#` | Input | Devices used by process input |
 | `pdv#` | Output | Devices used by process output |
 
-Property callbacks mark the first pending change time for that process. A timer scans the pending records and invokes a stored callback once the configured elapsed threshold has been reached, then clears the timestamp. Additional callbacks while pending do not reset that first timestamp. The timer interval is 20 ms. The timer constructor multiplies the supplied 20.0 by 1,000,000 before configuring dispatch time and interval; this closes the units join.
+Property callbacks mark the first pending change time for that process. A timer scans pending records and clears the timestamp before invoking the stored callback once the configured elapsed threshold has been reached. The exact timing section below resolves this threshold to 200 ms. Additional callbacks while pending do not reset that first timestamp. The timer interval is 20 ms. The timer constructor multiplies the supplied 20.0 by 1,000,000 before configuring dispatch time and interval; this closes the units join.
 
 The used-device loader first checks `piri` or `piro`. A false running value yields an empty set for that direction. A true value reads `pdv#` in the respective scope. It builds a set of device object IDs. This is per-process device usage, not an acoustic speech detector.
 
 The process tracker normalizes input-device lists when more than one input device remains. It removes devices without input streams and removes devices that also occur in the output set, stopping once fewer than two input entries remain. The exact normalization is more specific than taking any device with a nonzero running flag.
 
-A second tracker cache compares normalized used-device sets against the last published state. A different state is cached with a first-change timestamp. Further changes update that cached state without resetting the first timestamp. Returning to the published state clears the pending cache and pauses its timer. On a timer tick, a transition that removes an existing input or output leg selects the configured end threshold; otherwise it selects the start threshold. Once the elapsed time strictly exceeds that threshold, the cache becomes the published state and a copied AudioProcessInfo is sent through the stored callback. Packaged threshold defaults are recovered in the follow-up below; effective overrides remain separate.
+A second tracker cache compares normalized used-device sets against the last published state. A different state is cached with a first-change timestamp. Further changes update that cached state without resetting the first timestamp. Returning to the published state clears the pending cache and pauses its timer. On a timer tick, a transition that makes a previously nonempty input or output direction empty selects the configured end threshold; otherwise it selects the start threshold. Once the elapsed time strictly exceeds that threshold, the cache becomes the published state and a copied AudioProcessInfo is sent through the stored callback. Packaged threshold defaults are recovered in the follow-up below; effective overrides remain separate.
 
 There is also an older CAStreamTracker/device-activity path. Its ActivityStateChange reads whether a tracked device is in use and emits a device-based stream record. Its callback and device lookup were inspected. The follow-up below resolves registration and version selection; the complete older-source attribution/removal contract remains incomplete. Do not assume that the newer audio-process path is available or selected on every supported macOS version.
 
@@ -55,7 +55,7 @@ The client callback delivers a Number device type and an array of objects. Nativ
 - `actualPids`, a string in the native ClientAppInfo representation.
 - `appName`, `appVersion`, `appId` and `deviceId`, strings.
 
-Do not convert `actualPids` into an array based only on its plural spelling. Its native field is serialized as a string. Native stream records are converted into ClientAppInfo, and the client-list callback emits the complete current list for its device type. A container compares prior/current records before triggering a changed-list notification. Exact grouping across helper processes and all fallback paths still need the storage-to-StreamInfo join.
+Do not convert `actualPids` into an array based only on its plural spelling. Its native field is serialized as a string. Native stream records are converted into ClientAppInfo, and the client-list callback emits the complete current list for its device type. A container compares prior/current records before triggering a changed-list notification. The follow-up below closes grouping across helpers; the older-source attribution/removal contract remains separate.
 
 ## Native evidence
 
@@ -233,3 +233,78 @@ A later schema check exposed max_heap_mb, so the earlier access-limit conclusion
 The resulting parent Evidence is `ev_9a04cdcd2661f996e180422aa68080f3ee315c1a1285383f22260aa0253026db`; summary view is `ev_7ec29c5a7845db78bf3252ea28bef463093cb8a04a80f36106d3127dc6d0ec37`. The observed archive digest remained unchanged. It parsed 19 JavaScript files with zero parse failures and visited 3,984,680 AST nodes. BootstrapApp still exhausted its heap during semantic extraction. The reported worker heap limit was 2,172,649,472 bytes. The summary also reports semantic heap failures in other members and a parent remaining-result-budget limit for SentryManagerMain. The analysis therefore remains partial, with 4,293 semantic unknowns and 10 application unknowns.
 
 A focused property hasBothLegs callers trace against the new parent (`ev_ac371f76731331724d5b531b68e7fc09570edb86783adba472c3d48e6ed69699`) returned partial coverage and zero seed matches. This bounds the available graph, not the original application's behavior. The new three-record evidence bundle is `evidence/model-probes/activation-js-heap2048-20261028.bundle.json`, 27,898,204 bytes. No additional heap increase, process capture retry or provider repair followed. Missing Call method definitions and effective clamp values remain unresolved after the larger supported heap attempt.
+
+## Exact native timing contract, 2026-10-28
+
+This follow-up reuses the retained listener/tracker/init/change dossiers and adds focused REA native analysis. The selected ARM64 addon digest remains `ef833e13e87064f51cbb547295b1c65138871906bcae651160b0daeeb3fcb3e6`; the different archive-declared addon digest above still applies. No original application or addon code ran. The new native evidence is exported in `evidence/model-probes/activation-timing-20261028.bundle.json`, 30,300,336 bytes and 18 records.
+
+### Three distinct timing stages
+
+| Stage | Configured threshold in the observed process source | Poll interval | Due comparison |
+| --- | --- | --- | --- |
+| Per-process property listener | 200 ms | 20 ms | elapsed >= 200 |
+| Normalized per-process tracker | packaged macOS start 250 ms, end 1,200 ms | 20 ms | now > firstPending + selected delay |
+| Shared storage notification batch | 100 ms | 20 ms at this setting | elapsed >= 100 |
+
+The container constructor writes four little-endian 32-bit values at offsets `0xa8..0xb7`: 200, 100, 300, 1000. REA read of `0xea880` returned exact bytes `c8000000640000002c010000e8030000` (`ev_ed76f1ba22b6a52ca0f55ea020f975029d678f3d439f5e8436400d83eb11a2bd`). Constructor assembly at `0x59708..0x59710` loads that vector and writes it to the container. Initialize passes `0xa8` to the listener and `0xac` to storage. It replaces only the tracker start/end fields `0xb0/0xb4` from the supplied configuration. The packaged macOS 250/1200 defaults therefore override constructor-only 300/1000 tracker values. The separately named `newDeviceInteractionDelayThreshold` default 1000 is not an extra stage in this process-source initialization path.
+
+The GCD timer constructor multiplies its double argument by 1,000,000 for both dispatch start and interval, and sets leeway to 100,000 ns. Thus the supplied 20.0 is 20 ms, not the listener's pending threshold. Dispatch scheduling, queue contention, timer phase and whole-millisecond truncation mean these are polling conditions, not proof of a fixed 550 ms end-to-end delay or a hard wall-clock upper bound.
+
+### Listener coalescing
+
+HandleAudioProcEvent uses the process object ID to find its registration and sets its pending timestamp only when the previous timestamp is zero. Additional property callbacks while pending do not reset it. On each timer tick the listener checks nonzero timestamp and `threshold <= nowMilliseconds - firstTimestamp`, clears the timestamp before invoking the stored process callback, and leaves subsequent events to establish a new pending window. This first stage does not compare device sets. A transient property change that reverts within its window still causes a later read, which the tracker can then discard as unchanged.
+
+### Tracker state and end selection
+
+`UsedDevices.HasStream(true)` returns input-set count != 0; false selects output-set count != 0. Its exact body is at `0x20d18`, including the observed offsets `0x10` and `0x28`. The end threshold applies if either direction is nonempty in the published state and empty in the pending state. Removing one device while that direction retains another device does not select end. Switching `{deviceA}` to `{deviceB}` within one direction uses start, as does adding devices or changing a nonempty direction without emptying it. If one direction empties while the other gains devices, end takes precedence.
+
+After the listener callback, HandleUsedDevicesChange reads and normalizes current device sets. A change away from published state creates a pending cache and records the first pending time. Later different pending device sets replace that cache's sets without changing its first timestamp. A repeated identical pending state is a no-op. Returning to the published state clears the pending cache and pauses its timer. Each tracker tick recomputes start versus end from the current pending and published sets, so changing pending content can change the selected threshold without restarting the first timestamp. Publication uses strict `pendingFirst + threshold < nowMilliseconds`, copies pending sets to published, emits a copied AudioProcessInfo, clears pending and pauses the timer.
+
+A tracker property callback reloads used devices, not application identity metadata. Identity is loaded during tracker initialization. Storage does replace a supplied record, but its dirty flags compare only the input/output device sets. Metadata-only replacement therefore does not itself schedule client notification. An inactive sibling's arrival/removal can also change the potential actualPids group without marking a direction dirty, so that metadata can become visible only incidentally with a later directional notification. The independent diagnostic carrier must distinguish this callback contract from its richer raw process inventory.
+
+### Initial state and disappearance
+
+Tracker initialization loads metadata and used devices directly into published AudioProcessInfo, starts the process listener, then normalizes the published input sets. It does not manufacture a pending start transition. GetProcessInfo returns a copy of that published object. The container's new-object path calls GetProcessInfo and storage.AudioProcInfoChanged immediately after tracker creation. Initial/new-process active usage thus bypasses both the 200 ms property coalescer and the tracker start delay. It still enters the shared storage batch. A fully inactive new record is stored but does not by itself dirty either directional callback.
+
+A successful process-list reconciliation calls storage.AudioProcessRemoved for a missing object before retiring its tracker. Removal erases the storage record immediately. It sets input/output dirty bits only for directions that were nonempty in that removed record, and enters the same storage batch. Actual process disappearance does not wait the 1,200 ms per-process end delay. It also discards that tracker's pending state with the tracker. A failed system process-list read is not an authoritative empty membership list and does not justify disappearance.
+
+There is a separate failure-policy distinction: the retained original HandleUsedDevicesChange logs a used-device read failure but continues to normalize its default or partially loaded local sets. It does not return at that error branch. The independent observer's unknown-read policy must remain explicit as a safety divergence. A failed or unknown read must not invent an empty direction or complete a pending absence publication.
+
+### Storage batching
+
+Storage marks input/output dirty bits using OR, so multiple changes during a batch accumulate. The first dirty change resumes its timer and records now only if its batch timestamp was zero. Later changes preserve that first time. At a timer tick, notification occurs when elapsed >= the configured storage interval. Notification builds the current input list first, then current output list, for their respective dirty bits. It clears each sent bit, clears the timestamp, and pauses the timer. This is a fixed first-change batch window, not a trailing quiet-period debounce.
+
+Storage interval zero means no timer and immediate notification. A positive interval below 20 is raised to 20. Its general poll period is max(20, integer interval/10); the observed 100 ms interval therefore polls every 20 ms. The minimum constant at `0xeafe4` is exact bytes `14000000`, Evidence `ev_af44fbe45bb511c965e93e15996385eabfd78c37cb19968cffd3d1b3008b19ba`.
+
+### CoreAudio restart is a separate retained branch
+
+The restart block clears storage, destroys the tracker map, calls ForceNotifyChanges(1000), waits two seconds, then reloads the process list unless the container has been destroyed. Clear cancels pending storage flags/time. ForceNotify sets both directional flags and, with a timer, stores `existingFirstOrNow + 1000`; the normal storage comparator still adds the 100 ms interval. Its empty notification is therefore eligible after approximately 1,100 ms plus polling/scheduling, while the reload happens after the separate two-second wait. This is static behavior, not an executed system restart. The independent generation reset already prevents stale results; reproducing the original timed restart sequence needs its own explicit implementation and synthetic acceptance rather than being silently folded into ordinary start/end stabilization.
+
+### Evidence joins
+
+| Observation | Address | Evidence |
+| --- | --- | --- |
+| Container constructor and fixed listener/storage defaults | `0x5965c` | `ev_d4eef57bc6d8134bcc1e580c335efe0013ca522f93fb14830a986aa505a11ef9` |
+| UsedDevices.HasStream | `0x20d18` | `ev_df02b2ca549aad9ffcf42ffa6ae9af3a3f52fc85ce944b9371029432e89ebcac` |
+| Storage constructor, minimum and poll period | `0x5c6c4` | `ev_f7656dd5bf1524e9f26620640009bffe8d98768327aadf8c2157bdeb85f5bcf6` |
+| Storage tick comparator | `0x5c8cc` | `ev_45133b47f513808e15901b904d661c5259ca435b67be1ed0fcb77e30d6715640` |
+| Storage process removal | `0x5d27c` | `ev_eb55f04feb8f769848a6c5feab2ff50037f25a815586d48ab93930dd9b0971e0` |
+| Tracker GetProcessInfo copy | `0x612e8` | `ev_4543e40cbeb89a5d126cb9762182957ef33a1ab4b7c63ec63b5a24b6e6c06136` |
+| GCD timer units/start/interval/leeway | `0x6cdb8` | `ev_4039010543c34c6bb98ddab74ec7aa73e3fcf3d3e3bb28e6b68f017ade4b1833` |
+| CoreAudio restart block | `0x5b340` | `ev_38cc02c453e14b6ef7a6af4a5e2cd5c2094cab207a9234328f097b175fd7334d` |
+| Storage force-notify | `0x5d520` | `ev_b327cf80e127ccc41d56aca483e119d21a4eb4eba9d325d8a562534c8350ffc9` |
+| Storage clear | `0x5de88` | `ev_b08005519fbfb7b865a7bb7a08c6588296e0f0d8e25c03b4f90caa3da87b0dfa` |
+
+Existing accepted listener timer `ev_6c816574348037ed14c1b51ef045d09ab2c4cca0c9a3bd6cff084fd7ee5fd6e7`, tracker timer `ev_631f9e92407633e80e6a0b171b86f976628bfab118f0407e862fb78df359a6db`, tracker initialization `ev_e20c4eba7adbfafb843386e9680f5891394ac933cddc98db2532bc95e9c39567` and process-list change `ev_b4dbf406cfb5d2ffac88aee25fad7f89dad6282b6dc7cfb66692c4a318961bf8` complete these joins.
+
+One close request after export again returned cleanup_incomplete for global process-capture ownership checks, listing live candidates 32300, 45346, 45348 and 45349 as environment_unavailable. No retry, process signal, capture or repair followed. Provider closure is not claimed. These retained static dossiers remain pinned to the observed addon digest.
+
+### Error-path precision and independent implementation boundary
+
+Retained `LoadAudioProcUsedDevices` (`0x30604`, `ev_4138b7225f13fb0146c89879749922e562b7585788e9eeb01c89e4406972ce72`) checks object/class, then loads input first. A false input result prevents the output loader call. Output runs only after input succeeds. The directional helper (`0x30738`, `ev_d4b6c4623b50855663655c796f08537ea28f3f1c5a8dbf706d0e899f83632d28`) clears its destination set before checking the running property. A missing running property returns false with an empty destination. A false running value returns success with an empty destination. A true running value requires the scoped device-list property; a missing list returns false after that direction was cleared. Thus explicit false branches can leave both sets empty, or successfully loaded input plus empty output. The caller's logged failure branch still proceeds to normalization/cache comparison. Native CAHAL GetPropertyData/GetPropertyDataSize exception behavior and all exceptional unwind paths were not recovered in this timing task. No claim covers every original OSStatus failure.
+
+The independent stabilized mode therefore records its unknown-read policy as a parity gap: it preserves settled usage, marks held usage stale, cancels only the affected candidate (or all candidates for a failed system-list observation), and requires a valid read before freshness resumes. It does not emulate original default/partial false-return sets as observed emptiness. Settled tracker state and last storage-created publication state remain separate: interrupted batches retain directional provenance, and final valid sets are compared against the last storage-created valid sets before a recovery publication. It does not roll back legitimately settled but unreported tracker history merely because a later raw read differs.
+
+The implementation uses one deterministic native serial queue and a 20 ms source timer. Due listener rows are the only existing-process rows admitted from a bulk read. Its deterministic processing order is listener sampling, tracker promotion, then storage flushing. Original listener/tracker/storage dispatch timers use separate global-queue callbacks and locks; the exact winner of a same-millisecond lock race is not claimed. Bounded transport can coalesce full diagnostic frames while retaining directional invalidations for coalesced available frames. Initial all-idle readiness, immediate restart warning and richer raw diagnostics are labeled carrier events rather than invented native directional callbacks.
+
+The wire exposes `coalesced_publications` whenever the bounded latest-publication slot replaces unsent producer frames. Same-generation available frames retain the union of directional invalidations; failure and generation replacement retain the loss count without joining incompatible directional data. The storage-created comparison map is not an acknowledgment from a wire consumer. A complete current snapshot and a gap count therefore do not prove that every distinct timed transition was delivered. Pure tests cover unsent active-to-empty changed transitions, failure/generation boundaries, and taking the slot before a new publication.

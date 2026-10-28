@@ -89,6 +89,7 @@ struct AudioView: View {
                         Button("Watch audio use") { watch.start() }.disabled(!watch.canStart)
                         Button(watch.phase == .failed ? "Retry Stop watching" : "Stop watching") { Task { _ = await watch.stop() } }.disabled(!watch.engaged || watch.phase == .stopping)
                     }
+                    if watch.phase == .reconnecting { Text("Audio-use source is reconnecting.").font(.caption).foregroundColor(.secondary) }
                     if let error = watch.error { Text(error).font(.caption).foregroundColor(.orange) }
                     if let note = watch.cleanupNote { Text(note).font(.caption).foregroundColor(.secondary) }
                     if displayWatch {
@@ -96,7 +97,8 @@ struct AudioView: View {
                     }
                     AudioProcessUsageView(snapshot: displayWatch ? watch.snapshot : audio.inventory?.audioProcessUsage,
                         observedAt: displayWatch ? watch.observedAt : audio.audioUseObservedAt,
-                        watching: displayWatch && watch.phase == .watching, stale: displayWatch && watch.stale)
+                        watching: displayWatch && watch.phase == .watching, stale: displayWatch && watch.stale,
+                        stabilized: displayWatch && watch.timingMode == "stabilized")
                     Divider()
                     Text("Noise processing").font(.headline)
                     Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)

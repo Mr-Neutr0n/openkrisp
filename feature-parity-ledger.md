@@ -490,3 +490,12 @@ The activation prerequisite now has an explicit live observer, grouped display a
 The tested helper, failed baseline, diagnostic proof and successful revised run are recorded in CHECKPOINT.md. Native UI, active audio changes, real service restart, sustained operation, recovered stabilization and call qualification remain incomplete. These tests do not establish full activation parity.
 
 Final verification passed the full host suites and 218 desktop tests with one opt-in skip, signing and relocation. The rebuilt helper exactly matches the successful runtime artifact. The ledger now records 203 source and verification fingerprints.
+
+
+## Native audio-use timing, 2026-10-28
+
+Watch now uses recovered source-side listener, tracker and storage timing. Initial/destruction, first-timestamp preservation, direction-empty end selection and timed restart branches are implemented and clock-tested. Explicit publication provenance and coalesced-history counts prevent readiness/reset carriers from being mistaken for complete directional history. Unknown-read behavior remains a documented divergence.
+
+One actual native-helper-to-production-Swift-controller readiness/Stop test passed against the exact helper hash. Full host verification and 225 desktop tests passed, with two opt-in skips and packaging/relocation checks. This does not verify live activity timing, real service restart, original runtime parity or complete automatic activation. Exact logs and remaining scope are in CHECKPOINT.md.
+
+The ledger records 208 source and verification fingerprints at this checkpoint.

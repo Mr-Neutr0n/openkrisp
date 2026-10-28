@@ -448,3 +448,8 @@ The explicit snapshot now applies recovered normalization and grouping through t
 ## Continuous audio-use checkpoint, 2026-10-28
 
 Explicit live observation is implemented through the native helper and desktop. A real two-owned-process scenario now passes appearance, disappearance and ownership cleanup after correcting verified destroyed-object retirement. Separate retirement/removal outcomes remain visible. See CHECKPOINT.md for logs and limits. Next connect recovered stabilization, then call qualification and local activation preferences. Native UI, real service restart, active audio and full parity remain open.
+
+
+## Native timing checkpoint, 2026-10-28
+
+The live Watch path now uses recovered native listener/tracker/storage timing and timed restart recovery. Source-state and publication metadata separate readiness, change, reset and errors. A real native-helper-to-Swift-controller readiness/Stop test passed; activity timing and actual restart remain unverified. See CHECKPOINT.md and activation-findings.md. Next recover missing Call leg definitions and implement local activation, blocked-app and competing-call behavior without cloud gates.

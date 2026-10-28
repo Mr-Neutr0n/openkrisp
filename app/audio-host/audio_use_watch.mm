@@ -1,5 +1,6 @@
 #include "audio_use_watch.hpp"
 #include "audio_process_usage.hpp"
+#include "audio_use_timing.hpp"
 #include <Block.h>
 #include <dispatch/dispatch.h>
 #include <fcntl.h>
@@ -20,26 +21,32 @@ AudioUseListenerKey key(AudioObjectID object, UInt32 selector, UInt32 scope = kA
 }
 struct NativeWatch;
 struct CallbackState { NativeWatch* owner=nullptr; };
+int64_t nowMS() { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+using TimedFrame=AudioUseTimedFrame;
 struct NativeWatch {
+    bool stabilized;
+    AudioUseTiming timing;
+    dispatch_source_t timer=nullptr;
+    std::optional<TimedFrame> latest;
     std::shared_ptr<CallbackState> callbackState=std::make_shared<CallbackState>();
     dispatch_queue_t queue = dispatch_queue_create("openkrisp.audio-use", DISPATCH_QUEUE_SERIAL);
     AudioUseListenerRegistry registry;
     std::map<uint64_t, AudioObjectPropertyListenerBlock> blocks;
-    bool dirty=true, restart=false, stopping=false;
+    bool dirty=true, restart=false, stopping=false, timingFault=false;
     std::string failure;
-    NativeWatch() {
+    explicit NativeWatch(bool mode):stabilized(mode) {
         callbackState->owner=this;
         registry.add=[this](const auto& e) {
             const auto id=e.id, epoch=e.generation;
             const UInt32 selector=e.key.address.mSelector;
+            const AudioObjectID object=e.key.object;
             const std::weak_ptr<CallbackState> weak=callbackState;
             AudioObjectPropertyListenerBlock block=Block_copy(^(UInt32, const AudioObjectPropertyAddress*) {
                 const auto state=weak.lock();
                 if(!state || !state->owner) return;
                 auto* owner=state->owner;
                 if(owner->stopping || !owner->registry.accepts(id,epoch)) return;
-                owner->dirty=true;
-                if(selector==kAudioHardwarePropertyServiceRestarted) owner->restart=true;
+                owner->notification(object,selector);
             });
             auto a=e.key.address;
             const auto status=AudioObjectAddPropertyListenerBlock(e.key.object,&a,queue,block);
@@ -78,6 +85,58 @@ struct NativeWatch {
             Block_release(blocks.at(e.id)); blocks.erase(e.id); return outcome;
         };
     }
+    void capture(int64_t now) {
+        if(auto publication=timing.tick(now))retainLatestAudioUsePublication(latest,TimedFrame{std::move(*publication),registry.generation});
+    }
+
+    bool resetRegistrations() {
+        registry.invalidate();
+        if(registry.reconcile(systemKeys()))return true;
+        timingFault=true;retainLatestAudioUsePublication(latest,TimedFrame{{{"failed",{}, {failure}},"running","read_error",{}},registry.generation});return false;
+    }
+    void notification(AudioObjectID object,UInt32 selector) {
+        if(!stabilized) {dirty=true;if(selector==kAudioHardwarePropertyServiceRestarted)restart=true;return;}
+        const auto now=nowMS();
+        if(selector==kAudioHardwarePropertyServiceRestarted) {
+            if(timing.requestRestart(now) && !resetRegistrations())return;
+            capture(now);return;
+        }
+        if(object==kAudioObjectSystemObject)dirty=true;
+        else timing.property(object,now);
+    }
+    void advance() {
+        if(stopping || timingFault)return;
+        auto now=nowMS();
+        if(timing.restarting()) {
+            capture(now);
+            if(timing.needsReload(now)) {
+                auto source=refresh();
+                const bool next=timing.reload(source,nowMS());
+                if(next && !resetRegistrations())return;
+                capture(nowMS());
+            }
+            return;
+        }
+        if(dirty) {
+            auto source=refresh();timing.membership(source,nowMS());
+        }
+        const auto requested=timing.due(nowMS());
+        if(!requested.empty()) {
+            auto source=observeAudioProcessUsage();
+            timing.sample(source,requested,nowMS());
+        }
+        capture(nowMS());
+    }
+    void startTimer() {
+        const std::weak_ptr<CallbackState> weak=callbackState;
+        timer=dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER,0,0,queue);
+        if(!timer) {latest=TimedFrame{{{"failed",{}, {"Unable to create source timing timer."}},"running","read_error",{}},registry.generation};return;}
+        dispatch_source_set_timer(timer,dispatch_time(DISPATCH_TIME_NOW,20000000),20000000,100000);
+        dispatch_source_set_event_handler(timer, ^{
+            const auto state=weak.lock();if(state && state->owner && !state->owner->stopping)state->owner->advance();
+        });
+        dispatch_resume(timer);advance();
+    }
     std::vector<AudioUseListenerKey> systemKeys() { return {key(kAudioObjectSystemObject,kAudioHardwarePropertyProcessObjectList),key(kAudioObjectSystemObject,kAudioHardwarePropertyServiceRestarted)}; }
     AudioProcessSnapshot refresh() {
         dirty=false;
@@ -108,18 +167,20 @@ struct NativeWatch {
     }
 };
 }
-int watchAudioProcessUsage() {
-    auto* watch=new NativeWatch; // Retain callback storage on a failed detach until owned process exit.
+int watchAudioProcessUsage(bool stabilized) {
+    auto* watch=new NativeWatch(stabilized); // Retain callback storage on a failed detach until owned process exit.
     interrupted=0; struct sigaction action{}, oldTerm{}, oldInt{}, oldPipe{};
     action.sa_handler=interrupt; sigemptyset(&action.sa_mask);
     sigaction(SIGTERM,&action,&oldTerm); sigaction(SIGINT,&action,&oldInt);
     action.sa_handler=SIG_IGN; sigaction(SIGPIPE,&action,&oldPipe);
     const int flags=fcntl(STDOUT_FILENO,F_GETFL); if(flags<0 || fcntl(STDOUT_FILENO,F_SETFL,flags|O_NONBLOCK)<0) return 2;
-    uint64_t sequence=0; std::string pending, input; size_t written=0;
+    if(stabilized)dispatch_sync(watch->queue, ^{watch->startTimer();});
+    uint64_t wireGeneration=1;
+    uint64_t sequence=0; std::string pending, input, controlMessage; size_t written=0;
     auto deadline=std::chrono::steady_clock::now(); bool stop=false, outputFailed=false, controlFailed=false;
     const auto operation=std::to_string(getpid());
     auto envelope=[&](const std::string& event,const std::string& fields) {
-        return "{\"version\":1,\"event\":\""+event+"\",\"operation_id\":\""+operation+"\",\"sequence\":"+std::to_string(++sequence)+",\"generation\":"+std::to_string(watch->registry.generation)+fields+"}\n";
+        return "{\"version\":1,\"event\":\""+event+"\",\"operation_id\":\""+operation+"\",\"sequence\":"+std::to_string(++sequence)+",\"generation\":"+std::to_string(wireGeneration)+",\"timing_mode\":\""+(stabilized ? "stabilized":"raw")+"\""+fields+"}\n";
     };
     auto enqueue=[&](std::string line) { pending=std::move(line); written=0; deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2); };
     auto flush=[&] {
@@ -131,11 +192,17 @@ int watchAudioProcessUsage() {
     };
     while(!stop && !interrupted && !outputFailed) {
         if(pending.empty()) {
-            __block bool dirty=false; dispatch_sync(watch->queue, ^{ dirty=watch->dirty; });
-            if(dirty) {
-                __block AudioProcessSnapshot snapshot; dispatch_sync(watch->queue, ^{ snapshot=watch->refresh(); });
-                auto line=envelope("audio_use_snapshot",",\"snapshot\":"+audioProcessUsageJSON(snapshot));
-                if(line.size()>524800) line=envelope("audio_use_snapshot",",\"snapshot\":"+audioProcessUsageJSON({"failed",{}, {"Snapshot exceeds streaming line bound."}}));
+            __block std::optional<TimedFrame> frame;
+            if(stabilized)dispatch_sync(watch->queue, ^{frame=std::move(watch->latest);watch->latest.reset();});
+            else {
+                __block bool dirty=false;dispatch_sync(watch->queue, ^{dirty=watch->dirty;});
+                if(dirty)dispatch_sync(watch->queue, ^{frame=TimedFrame{{watch->refresh(),"running","raw",{}},watch->registry.generation};});
+            }
+            if(frame) {
+                wireGeneration=frame->generation;
+                const auto fields=stabilized ? ",\"coalesced_publications\":"+std::to_string(frame->coalescedPublications)+audioUsePublicationJSONFields(frame->publication) : ",\"snapshot\":"+audioProcessUsageJSON(frame->publication.snapshot);
+                auto line=envelope("audio_use_snapshot",fields);
+                if(line.size()>524800)line=envelope("audio_use_snapshot",(stabilized ? ",\"coalesced_publications\":"+std::to_string(frame->coalescedPublications)+",\"source_state\":\""+frame->publication.sourceState+"\",\"publication_reason\":\"read_error\",\"changed_directions\":[]":"")+std::string(",\"snapshot\":")+audioProcessUsageJSON({"failed",{}, {"Snapshot exceeds streaming line bound."}}));
                 enqueue(std::move(line));
             }
         }
@@ -144,27 +211,28 @@ int watchAudioProcessUsage() {
         if(result>0 && (fd.revents&(POLLIN|POLLHUP|POLLERR|POLLNVAL))) {
             char bytes[256]; auto n=read(STDIN_FILENO,bytes,sizeof bytes);
             if(n<=0) {if(n==0 || errno!=EINTR) stop=true;} else {
-                input.append(bytes,static_cast<size_t>(n)); if(input.size()>1024) {stop=true;controlFailed=true;watch->failure="Observer control exceeds bound.";}
-                size_t end; while((end=input.find('\n'))!=std::string::npos) {if(input.substr(0,end)=="stop") stop=true;else {stop=true;controlFailed=true;watch->failure="Invalid observer control command.";}input.erase(0,end+1);}
+                input.append(bytes,static_cast<size_t>(n)); if(input.size()>1024) {stop=true;controlFailed=true;controlMessage="Observer control exceeds bound.";}
+                size_t end; while((end=input.find('\n'))!=std::string::npos) {if(input.substr(0,end)=="stop") stop=true;else {stop=true;controlFailed=true;controlMessage="Invalid observer control command.";}input.erase(0,end+1);}
             }
         } else if(result<0 && errno!=EINTR) stop=true;
     }
     __block bool cleaned=false;
-    dispatch_sync(watch->queue, ^{ watch->stopping=true; watch->callbackState->owner=nullptr; cleaned=watch->registry.stop(); });
+    dispatch_sync(watch->queue, ^{ watch->stopping=true; watch->callbackState->owner=nullptr; if(watch->timer)dispatch_source_cancel(watch->timer); cleaned=watch->registry.stop(); });
     dispatch_sync(watch->queue, ^{}); // Drain callbacks already submitted before successful removals.
     // Finish any partial line first. Never interleave terminal JSON with a snapshot.
     while(!pending.empty() && !outputFailed) { flush(); if(!pending.empty()) {pollfd out{STDOUT_FILENO,POLLOUT,0};poll(&out,1,20);} }
+    wireGeneration=watch->registry.generation;
     if(!outputFailed) {
         const auto cleanupFields=",\"listeners_removed\":"+std::to_string(watch->registry.removed)+
             ",\"listeners_invalid_object_retired\":"+std::to_string(watch->registry.invalidObjectRetired)+
             ",\"listeners_remove_failed\":"+std::to_string(watch->registry.removeFailed)+
             ",\"all_listener_removals_verified\":"+(watch->registry.invalidObjectRetired==0 && watch->registry.removeFailed==0 ? "true" : "false");
-        enqueue(cleaned && !controlFailed ? envelope("audio_use_stopped",",\"cleanup_verified\":true"+cleanupFields) : envelope("audio_use_error",",\"message\":\"Observer stop failed; inspect diagnostic.\",\"snapshot\":"+audioProcessUsageJSON({"failed",{}, {watch->failure}})+cleanupFields));
+        enqueue(cleaned && !controlFailed ? envelope("audio_use_stopped",",\"cleanup_verified\":true"+cleanupFields) : envelope("audio_use_error",",\"message\":\"Observer stop failed; inspect diagnostic.\",\"snapshot\":"+audioProcessUsageJSON({"failed",{}, {controlFailed ? controlMessage:watch->failure}})+cleanupFields));
         while(!pending.empty() && !outputFailed) {flush();if(!pending.empty()){pollfd out{STDOUT_FILENO,POLLOUT,0};poll(&out,1,20);}}
     }
     fcntl(STDOUT_FILENO,F_SETFL,flags);
     sigaction(SIGTERM,&oldTerm,nullptr);sigaction(SIGINT,&oldInt,nullptr);sigaction(SIGPIPE,&oldPipe,nullptr);
-    if(cleaned) {dispatch_release(watch->queue);delete watch;}
+    if(cleaned) {if(watch->timer)dispatch_release(watch->timer);dispatch_release(watch->queue);delete watch;}
     return cleaned && !outputFailed && !controlFailed ? 0 : 2;
 }
 }

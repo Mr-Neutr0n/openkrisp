@@ -292,11 +292,11 @@ The opt-in listener integration check can be run from `app/desktop` with `LABVOI
 
 Audio offers **Observe audio use** while stopped. It shows a one-time snapshot of active app audio, grouped by responsible application, with unavailable or failed-read states. Refresh Devices clears the observation. Pending observations use the existing cancellation, power and Quit protections. No process metadata is saved by the app.
 
-The snapshot does not detect calls or start recording. Continuous observation, two-leg call qualification, blocked-app preferences and competing-call switching remain incomplete. Native UI interaction and active-device runtime mapping still need acceptance.
+The snapshot does not detect calls or start recording. Two-leg call qualification, blocked-app preferences and competing-call switching remain incomplete. Native UI interaction and active-device runtime mapping still need acceptance.
 
 The desktop normalizes input devices with the recovered two-pass algorithm: remove devices without input streams, then remove output overlaps, visiting ascending device IDs and stopping each pass at one remaining input. An unknown property blocks only the branch that needs it. Output usage remains independent. Grouped clients retain sorted unique helper PIDs, including idle siblings, and use the native byte-exact application-ID plus decimal-device-ID deduplication key. The first candidate in ascending process-object order survives.
 
-Missing identity or metadata remains incomplete. Internal feed/monitor endpoints have distinct labels from the public microphone/speaker endpoints; these labels grant no call eligibility. The UI shows app names and devices rather than raw process identifiers. This is an instantaneous projection, without continuous listeners or timing stabilization.
+Missing identity or metadata remains incomplete. Internal feed/monitor endpoints have distinct labels from the public microphone/speaker endpoints; these labels grant no call eligibility. The UI shows app names and devices rather than raw process identifiers. This one-shot path is instantaneous. Watch uses the native timing described below.
 
 
 ## Watch audio use
@@ -307,4 +307,10 @@ The streaming helper sends bounded JSON lines. The desktop limits each line to 6
 
 Suspend and Quit stop the observer concurrently with existing audio cleanup, so it does not delay recording finalization. Resume does not restart watching. Ownership cleanup and successful native Remove calls are separate results: a vanished process object can have its listener registration retired only after fresh absence and invalid-object checks. The UI reports those registrations separately.
 
-The real helper has passed bounded attach/detach and two-process appearance/disappearance checks. Native desktop Watch/Stop interaction, CoreAudio service restart, active input/output changes and long-running observation remain unverified. Recovered timing stabilization and call qualification are not yet connected; watching never starts recording.
+The real helper has passed bounded attach/detach and two-process appearance/disappearance checks. Native desktop Watch/Stop interaction, CoreAudio service restart, active input/output changes and long-running observation remain unverified. Watch now requests the native stabilized mode; call qualification remains incomplete and watching never starts recording.
+
+Watch applies recovered timing in the native helper, before desktop delivery. Brief changes can be delayed or disappear before publication. The controller requires explicit timing mode, source state, publication reason and direction flags. Readiness is distinct from a directional change. During restart recovery it retains the prior view as stale instead of displaying the reset as an observed absence. Transient source-read errors keep the helper alive for recovery.
+
+Unknown per-process reads preserve last published usage with explicit stale markers. This differs from the original native loader's default/partial error behavior and remains a parity gap. Bounded latest-only delivery reports merged publication counts; the current full snapshot can be valid even when intermediate transition history is incomplete.
+
+The opt-in `StabilizedAudioUseIntegrationTests` test uses the real helper through the production Swift controller, with an exact helper SHA admission pin. It skips in ordinary verification. Its single accepted run verified stabilized readiness and Stop without starting audio. This does not establish live transition timing, restart behavior or native UI acceptance.

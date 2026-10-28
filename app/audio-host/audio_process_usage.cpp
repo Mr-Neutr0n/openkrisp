@@ -123,20 +123,24 @@ AudioProcessSnapshot readAudioProcessUsage(const AudioProcessReader &reader) {
     }
     return result;
 }
-std::string audioProcessUsageJSON(const AudioProcessSnapshot &snapshot) {
+std::string audioProcessUsageJSON(const AudioProcessSnapshot &snapshot, bool* boundsFailed) {
+    if(boundsFailed)*boundsFailed=false;
     std::string out = "{\"status\":" + quote(snapshot.status) + ",\"errors\":" + strings(snapshot.errors) + ",\"processes\":[";
     bool comma = false;
     for (const auto& process : snapshot.processes) {
-        if (out.size() > 524288) return "{\"status\":\"failed\",\"processes\":[],\"errors\":[\"Audio-use JSON exceeds 512 KiB snapshot bound.\"]}";
+        if (out.size() > 524288) {if(boundsFailed)*boundsFailed=true;return "{\"status\":\"failed\",\"processes\":[],\"errors\":[\"Audio-use JSON exceeds 512 KiB snapshot bound.\"]}";}
         if (comma) out += ','; comma = true;
         out += "{\"object_id\":" + std::to_string(process.objectID) + ",\"actual_pid\":" + pid(process.actualPID) +
             ",\"responsible_pid\":" + pid(process.responsiblePID) + ",\"responsible_pid_fallback\":" + (process.responsibleFallback ? "true" : "false") +
             ",\"responsible_pid_resolution\":" + quote(process.responsibleResolution) + ",\"app_name\":" + text(process.appName) + ",\"app_version\":" + text(process.appVersion) +
             ",\"process_bundle_id\":" + text(process.processBundleID) + ",\"responsible_bundle_id\":" + text(process.responsibleBundleID) +
-            ",\"app_id\":" + text(process.appID) + ",\"input\":" + direction(process.input) + ",\"output\":" + direction(process.output) + ",\"errors\":" + strings(process.errors) + '}';
+            ",\"app_id\":" + text(process.appID) + ",\"input\":" + direction(process.input) + ",\"output\":" + direction(process.output) + ",\"errors\":" + strings(process.errors);
+        if(process.usageStale)out += ",\"usage_stale\":" + std::string(*process.usageStale ? "true":"false");
+        if(process.stabilizationPending)out += ",\"stabilization_pending\":" + std::string(*process.stabilizationPending ? "true":"false");
+        out += '}';
     }
     out += "]}";
-    if (out.size() > 524288) return "{\"status\":\"failed\",\"processes\":[],\"errors\":[\"Audio-use JSON exceeds 512 KiB snapshot bound.\"]}";
+    if (out.size() > 524288) {if(boundsFailed)*boundsFailed=true;return "{\"status\":\"failed\",\"processes\":[],\"errors\":[\"Audio-use JSON exceeds 512 KiB snapshot bound.\"]}";}
     return out;
 }
 }

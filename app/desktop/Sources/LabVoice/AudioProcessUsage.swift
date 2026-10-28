@@ -28,6 +28,8 @@ struct AudioProcessUsage: Decodable, Identifiable, Sendable {
     let appID: String?
     let processBundleID: String?
     let responsibleBundleID: String?
+    var usageStale: Bool? = nil
+    var stabilizationPending: Bool? = nil
     let input: AudioProcessDirection
     let output: AudioProcessDirection
     let errors: [String]
@@ -36,6 +38,7 @@ struct AudioProcessUsage: Decodable, Identifiable, Sendable {
         case objectID = "object_id", actualPID = "actual_pid", responsiblePID = "responsible_pid"
         case responsiblePIDFallback = "responsible_pid_fallback", responsiblePIDResolution = "responsible_pid_resolution"
         case appName = "app_name", appID = "app_id", processBundleID = "process_bundle_id", responsibleBundleID = "responsible_bundle_id"
+        case usageStale = "usage_stale", stabilizationPending = "stabilization_pending"
         case input, output, errors
     }
 }
@@ -45,7 +48,7 @@ struct AudioProcessSnapshot: Decodable, Sendable {
     let processes: [AudioProcessUsage]
     var summary: String {
         guard status == "available" else { return status == "unavailable" ? "Audio-use observation is unavailable." : "Audio-use observation failed. Process usage is unknown." }
-        let partial = processes.filter { !$0.errors.isEmpty }.count
+        let partial = processes.filter { !$0.errors.isEmpty || $0.usageStale == true }.count
         return "\(processes.count) audio processes checked." + (partial == 0 ? "" : " \(partial) have incomplete properties.")
     }
 }
@@ -59,12 +62,13 @@ struct AudioProcessUsageView: View {
     let observedAt: Date?
     var watching = false
     var stale = false
+    var stabilized = false
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Audio use").font(.headline)
-            Text(watching ? "Shows observed audio-use changes. This does not identify calls or start recording." : "Shows audio use when you checked. Check again to refresh. This does not identify calls or start recording.").font(.caption).foregroundColor(.secondary)
+            Text(stabilized ? "Shows settled audio use. Brief changes may be delayed or ignored. This does not identify calls or start recording." : watching ? "Shows observed audio-use changes. This does not identify calls or start recording." : "Shows audio use when you checked. Check again to refresh. This does not identify calls or start recording.").font(.caption).foregroundColor(.secondary)
             if let snapshot {
-                if let observedAt { Text((watching || stale ? "Last observed " : "Checked ") + observedAt.formatted(date: .abbreviated, time: .standard)).font(.caption).foregroundColor(.secondary) }
+                if let observedAt { Text((stabilized ? "Last update " : watching || stale ? "Last observed " : "Checked ") + observedAt.formatted(date: .abbreviated, time: .standard)).font(.caption).foregroundColor(.secondary) }
                 Text(snapshot.summary).font(.caption)
                 ForEach(Array(snapshot.errors.enumerated()), id: \.offset) { Text($0.element).font(.caption).foregroundColor(.orange) }
                 if snapshot.status == "available" {
@@ -76,7 +80,7 @@ struct AudioProcessUsageView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(app.name).font(.caption).bold()
                             ForEach(app.clients) { client in
-                                Text("\(client.direction == .input ? "Input" : "Output"): \(client.deviceDescription)" + (client.incomplete ? " · partial" : ""))
+                                Text("\(client.direction == .input ? "Input" : "Output"): \(client.deviceDescription)" + (client.stale ? " · last observed" : client.stabilizationPending ? " · settling" : client.incomplete ? " · partial" : ""))
                                     .font(.caption).textSelection(.enabled)
                             }
                         }

@@ -542,6 +542,7 @@ int aggregatePlan(const std::string &inputUID, const std::string &outputUID) {
 } // namespace
 int main(int argc, char **argv) {
     try {
+        if (argc == 2 && std::string(argv[1]) == "--watch-audio-use-stabilized") return labvoice::watchAudioProcessUsage(true);
         if (argc == 2 && std::string(argv[1]) == "--watch-audio-use") return labvoice::watchAudioProcessUsage();
         if (argc == 2 && (std::string(argv[1]) == "--list" || std::string(argv[1]) == "--list-audio-use")) {
             list(std::string(argv[1]) == "--list-audio-use");

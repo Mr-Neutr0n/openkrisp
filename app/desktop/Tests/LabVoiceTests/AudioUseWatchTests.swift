@@ -10,7 +10,7 @@ import XCTest
     func testSnapshotReadinessGenerationAndLateCallbacksNeverOverwriteReplacement() async throws {
         let first = WatchFixtureChild(), second = WatchFixtureChild(); var created = 0
         let model = AudioUseWatchController(factory: { created += 1; return created == 1 ? first : second })
-        model.start(); XCTAssertEqual(first.arguments, ["--watch-audio-use"]); XCTAssertEqual(model.phase, .starting)
+        model.start(); XCTAssertEqual(first.arguments, ["--watch-audio-use-stabilized"]); XCTAssertEqual(model.phase, .starting)
         first.snapshot(sequence: 1, generation: 1, object: 10)
         XCTAssertEqual(model.phase, .watching); XCTAssertFalse(model.stale)
         first.snapshot(sequence: 2, generation: 2, object: 20)
@@ -75,14 +75,17 @@ import XCTest
         let second = WatchFixtureChild(), watch = AudioUseWatchController(factory: { second })
         watch.start(); second.snapshot(sequence: 1, generation: 1, object: 10)
         second.snapshot(sequence: 2, generation: 1, object: 20, status: "failed")
-        try await ready { !watch.engaged }
+        XCTAssertTrue(watch.engaged); XCTAssertTrue(second.running)
         XCTAssertEqual(watch.snapshot?.processes.first?.objectID, 10); XCTAssertTrue(watch.stale)
         XCTAssertNotNil(watch.error)
+        second.snapshot(sequence: 3, generation: 1, object: 30)
+        XCTAssertFalse(watch.stale); XCTAssertNil(watch.error)
+        _ = await watch.stop()
     }
     func testTerminalNativeErrorDetailsSurviveImmediateDrainedFailureExit() {
         let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
         model.start()
-        child.raw("{\"version\":1,\"event\":\"audio_use_error\",\"sequence\":1,\"generation\":1,\"message\":\"Cleanup failed\",\"snapshot\":{\"status\":\"failed\",\"errors\":[\"OSStatus=-1 object=22\"],\"processes\":[]}}")
+        child.raw("{\"version\":1,\"timing_mode\":\"stabilized\",\"event\":\"audio_use_error\",\"sequence\":1,\"generation\":1,\"message\":\"Cleanup failed\",\"snapshot\":{\"status\":\"failed\",\"errors\":[\"OSStatus=-1 object=22\"],\"processes\":[]}}")
         child.finish(status: 2)
         XCTAssertTrue(model.error?.contains("OSStatus=-1 object=22") == true)
         XCTAssertFalse(model.engaged); XCTAssertFalse(model.cleanDetachVerified)
@@ -113,6 +116,80 @@ import XCTest
             XCTAssertTrue(model.error?.contains("contradictory") == true)
         }
     }
+    func testRestartResetDoesNotPublishNoAppsAndRecoveryPreservesPublicationScope() async {
+        let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
+        model.start(); child.snapshot(sequence: 1, generation: 1, object: 10, activeInput: true)
+        child.snapshot(sequence: 2, generation: 2, object: 0, status: "unavailable", source: "restarting", reason: "restart_begin", empty: true)
+        XCTAssertEqual(model.phase, .reconnecting); XCTAssertTrue(model.stale)
+        XCTAssertEqual(model.snapshot.map(AudioUsageGrouping.group)?.clients.count, 1)
+        XCTAssertEqual(model.snapshot?.processes.first?.objectID, 10); XCTAssertEqual(model.changedDirections, [])
+        child.snapshot(sequence: 3, generation: 2, object: 0, status: "unavailable", source: "restarting", reason: "restart_reset", directions: ["input", "output"], empty: true)
+        XCTAssertEqual(model.snapshot?.processes.first?.objectID, 10)
+        XCTAssertEqual(model.changedDirections, [.input, .output])
+        child.snapshot(sequence: 4, generation: 3, object: 20, reason: "changed", directions: ["input", "output"])
+        XCTAssertFalse(model.stale); XCTAssertNil(model.error); XCTAssertEqual(model.sourceState, "running")
+        XCTAssertEqual(model.publicationReason, "changed"); XCTAssertEqual(model.changedDirections, [.input, .output])
+        XCTAssertEqual(model.snapshot?.processes.first?.objectID, 20)
+        _ = await model.stop()
+    }
+    func testInitialRecoverableReadErrorKeepsSourceAliveWithoutPublishingEmptyUsage() async throws {
+        let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child }, startupTimeout: 1_000_000)
+        model.start(); child.snapshot(sequence: 1, generation: 1, object: 0, status: "failed", empty: true)
+        try await Task.sleep(nanoseconds: 5_000_000)
+        XCTAssertTrue(model.engaged); XCTAssertTrue(child.running); XCTAssertNil(model.snapshot)
+        XCTAssertTrue(model.stale); XCTAssertEqual(model.publicationReason, "read_error")
+        child.snapshot(sequence: 2, generation: 1, object: 10)
+        XCTAssertFalse(model.stale); XCTAssertNil(model.error)
+        XCTAssertEqual(model.snapshot?.processes.first?.objectID, 10)
+        _ = await model.stop()
+    }
+    func testContradictoryPublicationScopeIsRejectedWithoutReplacingLastObservation() async throws {
+        let invalid: [(String, String, String, [String])] = [
+            ("restarting", "readiness", "available", []),
+            ("restarting", "changed", "available", ["input"]),
+            ("running", "restart_begin", "unavailable", []),
+            ("running", "restart_reset", "unavailable", ["input", "output"]),
+            ("running", "changed", "failed", ["input"]),
+            ("restarting", "restart_reset", "unavailable", [])]
+        for (source, reason, status, directions) in invalid {
+            let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
+            model.start(); child.snapshot(sequence: 1, generation: 1, object: 10)
+            child.snapshot(sequence: 2, generation: 2, object: 20, status: status, source: source, reason: reason, directions: directions)
+            try await ready { !model.engaged }
+            XCTAssertEqual(model.snapshot?.processes.first?.objectID, 10)
+            XCTAssertTrue(model.error?.contains("invalid stabilized snapshot") == true); XCTAssertTrue(model.stale)
+        }
+    }
+    func testRawModeCannotMasqueradeAsStabilizedObservation() async throws {
+        let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
+        model.start(); child.snapshot(sequence: 1, generation: 1, object: 10, mode: "raw")
+        try await ready { !model.engaged }
+        XCTAssertNil(model.snapshot); XCTAssertNil(model.timingMode)
+        XCTAssertTrue(model.error?.contains("stabilized timing mode") == true)
+    }
+    func testMissingStabilizedProvenanceCannotPresentRawRowsAsSettled() async throws {
+        let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
+        model.start(); child.snapshot(sequence: 1, generation: 1, object: 10, includeProvenance: false)
+        try await ready { !model.engaged }
+        XCTAssertNil(model.snapshot); XCTAssertTrue(model.error?.contains("provenance") == true)
+        let missingCount = WatchFixtureChild(), unknownHistory = AudioUseWatchController(factory: { missingCount })
+        unknownHistory.start(); missingCount.snapshot(sequence: 1, generation: 1, object: 10, coalesced: nil)
+        try await ready { !unknownHistory.engaged }
+        XCTAssertNil(unknownHistory.snapshot)
+        XCTAssertTrue(unknownHistory.error?.contains("invalid stabilized snapshot") == true)
+    }
+    func testCoalescedPublicationHistoryIsRetainedWithoutMakingCurrentSnapshotStale() async {
+        let child = WatchFixtureChild(), model = AudioUseWatchController(factory: { child })
+        model.start(); child.snapshot(sequence: 1, generation: 1, object: 10, reason: "changed", directions: ["input"], coalesced: 2, activeInput: true)
+        XCTAssertEqual(model.snapshot.map(AudioUsageGrouping.group)?.clients.count, 1)
+        XCTAssertEqual(model.coalescedPublications, 2); XCTAssertEqual(model.coalescedPublicationTotal, 2)
+        XCTAssertFalse(model.stale)
+        child.snapshot(sequence: 2, generation: 1, object: 20, reason: "changed", directions: ["input"], coalesced: 0)
+        XCTAssertEqual(model.snapshot.map(AudioUsageGrouping.group)?.clients.count, 0)
+        XCTAssertEqual(model.coalescedPublications, 0); XCTAssertEqual(model.coalescedPublicationTotal, 2)
+        XCTAssertFalse(model.stale); XCTAssertEqual(model.snapshot?.processes.first?.objectID, 20)
+        _ = await model.stop()
+    }
     func testFreshOneShotOverridesStoppedWatchAndNewWatchOverridesOlderOneShot() {
         let old = Date(timeIntervalSince1970: 10), fresh = Date(timeIntervalSince1970: 20)
         XCTAssertFalse(AudioUseDisplaySource.prefersWatch(watchObservedAt: old, oneShotObservedAt: fresh))
@@ -134,19 +211,28 @@ import XCTest
     }
     func raw(_ row: String) { line?(row) }
     private func emit(_ object: [String: Any]) { raw(String(decoding: try! JSONSerialization.data(withJSONObject: object), as: UTF8.self)) }
-    func snapshot(sequence: UInt64, generation: UInt64, object: Int, status: String = "available") {
+    func snapshot(sequence: UInt64, generation: UInt64, object: Int, status: String = "available",
+                  mode: String = "stabilized", source: String = "running", reason: String? = nil,
+                  directions: [String] = [], usageStale: Bool = false, pending: Bool = false, empty: Bool = false, includeProvenance: Bool = true, coalesced: UInt64? = 0, activeInput: Bool = false) {
         self.sequence = sequence; self.generation = generation
-        emit(["version": 1, "event": "audio_use_snapshot", "sequence": sequence, "generation": generation,
-              "snapshot": ["status": status, "errors": status == "available" ? [] : ["source failed"], "processes": [[
-                "object_id": object, "actual_pid": 10, "responsible_pid": 20, "responsible_pid_fallback": false,
-                "responsible_pid_resolution": "responsibility_lookup", "app_name": "Fixture", "app_id": "own.fixture",
-                "process_bundle_id": "own.fixture", "responsible_bundle_id": "own.fixture", "errors": [],
-                "input": ["running": false, "devices": []], "output": ["running": false, "devices": []]]]]])
+        var row: [String: Any] = ["object_id": object, "actual_pid": 10, "responsible_pid": 20, "responsible_pid_fallback": false,
+            "responsible_pid_resolution": "responsibility_lookup", "app_name": "Fixture", "app_id": "own.fixture",
+            "process_bundle_id": "own.fixture", "responsible_bundle_id": "own.fixture", "errors": [],
+            "usage_stale": usageStale, "stabilization_pending": pending,
+            "input": ["running": false, "devices": []], "output": ["running": false, "devices": []]]
+        if activeInput { row["input"] = ["running": true, "devices": [["object_id": 100, "uid": "own.fixture.input", "has_input_streams": true]]] }
+        if !includeProvenance { row.removeValue(forKey: "usage_stale"); row.removeValue(forKey: "stabilization_pending") }
+        var envelope: [String: Any] = ["version": 1, "event": "audio_use_snapshot", "sequence": sequence, "generation": generation,
+            "timing_mode": mode, "source_state": source,
+            "publication_reason": reason ?? (status == "available" ? "readiness" : "read_error"), "changed_directions": directions,
+            "snapshot": ["status": status, "errors": status == "available" ? [] : ["source failed"], "processes": empty ? [] : [row]]]
+        if let coalesced { envelope["coalesced_publications"] = coalesced }
+        emit(envelope)
     }
     func send(_ line: Data) throws {
         XCTAssertEqual(line, Data("stop\n".utf8)); stopCommands += 1
         if drains {
-            var object: [String: Any] = ["version": 1, "event": "audio_use_stopped", "sequence": sequence + 1, "generation": generation + 1, "cleanup_verified": true,
+            var object: [String: Any] = ["version": 1, "timing_mode": "stabilized", "event": "audio_use_stopped", "sequence": sequence + 1, "generation": generation + 1, "cleanup_verified": true,
                 "listeners_removed": removed, "listeners_invalid_object_retired": retired, "listeners_remove_failed": removalFailed]
             if let allRemovalsVerified { object["all_listener_removals_verified"] = allRemovalsVerified }
             emit(object)
@@ -180,15 +266,15 @@ import XCTest
     private(set) var lastExit: HelperExit?
     var running: Bool { child.running }
     func launch(arguments: [String], line: @escaping (String) -> Void, exit: @escaping (HelperExit) -> Void) throws {
-        XCTAssertEqual(arguments, ["--watch-audio-use"])
+        XCTAssertEqual(arguments, ["--watch-audio-use-stabilized"])
         let script = """
         import sys,json
         for sequence in range(1,9):
-            row={"object_id":sequence,"actual_pid":10,"responsible_pid":20,"responsible_pid_fallback":False,"responsible_pid_resolution":"responsibility_lookup","app_name":"Own fixture","app_id":"own.fixture","process_bundle_id":"own.fixture","responsible_bundle_id":"own.fixture","errors":[],"input":{"running":False,"devices":[]},"output":{"running":False,"devices":[]}}
-            print(json.dumps({"version":1,"event":"audio_use_snapshot","sequence":sequence,"generation":1,"snapshot":{"status":"available","errors":[],"processes":[row]},"own_fixture_padding":"a"*350000}),flush=True)
+            row={"object_id":sequence,"actual_pid":10,"responsible_pid":20,"responsible_pid_fallback":False,"responsible_pid_resolution":"responsibility_lookup","usage_stale":False,"stabilization_pending":False,"app_name":"Own fixture","app_id":"own.fixture","process_bundle_id":"own.fixture","responsible_bundle_id":"own.fixture","errors":[],"input":{"running":False,"devices":[]},"output":{"running":False,"devices":[]}}
+            print(json.dumps({"version":1,"timing_mode":"stabilized","source_state":"running","publication_reason":"readiness","changed_directions":[],"coalesced_publications":0,"event":"audio_use_snapshot","sequence":sequence,"generation":1,"snapshot":{"status":"available","errors":[],"processes":[row]},"own_fixture_padding":"a"*350000}),flush=True)
         for command in sys.stdin:
             if command.strip()=="stop":
-                print(json.dumps({"version":1,"event":"audio_use_stopped","sequence":9,"generation":2,"cleanup_verified":True,"all_listener_removals_verified":True,"listeners_removed":0,"listeners_invalid_object_retired":0,"listeners_remove_failed":0}),flush=True)
+                print(json.dumps({"version":1,"timing_mode":"stabilized","event":"audio_use_stopped","sequence":9,"generation":2,"cleanup_verified":True,"all_listener_removals_verified":True,"listeners_removed":0,"listeners_invalid_object_retired":0,"listeners_remove_failed":0}),flush=True)
                 break
         """
         try child.launch(arguments: ["-c", script], line: line, exit: { [weak self] event in self?.lastExit = event; exit(event) })

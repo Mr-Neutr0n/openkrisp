@@ -33,6 +33,8 @@ struct GroupedAudioClient: Identifiable, Sendable {
     let deviceUID: String?
     let sourceObjectID: UInt32
     let incomplete: Bool
+    var stale = false
+    var stabilizationPending = false
     var deviceRole: AudioUsageDeviceRole { .init(uid: deviceUID) }
     // Native dedup concatenates strings without a separator. Data preserves exact
     // UTF-8 identity rather than Swift String's canonical-equivalence comparison.
@@ -105,10 +107,14 @@ enum AudioUsageGrouping {
             guard let owner = record.responsiblePID, owner > 0 else { continue }
             if let actual = record.actualPID, actual > 0 { siblingPIDs[owner, default: []].insert(actual) }
             else { incompleteSiblingOwners.insert(owner) }
+            // Conservative provenance: a held stale sibling may retain identity
+            // from before a failed read. Do not claim its helper list is current.
+            if record.usageStale == true { incompleteSiblingOwners.insert(owner) }
         }
         var inputKeys: [Data: GroupedAudioClient] = [:], outputKeys: [Data: GroupedAudioClient] = [:]
         var clients: [GroupedAudioClient] = []
         for record in records {
+            if record.usageStale == true { issues.append("Process object \(record.objectID) retains last observed usage.") }
             if !record.errors.isEmpty { issues.append("Process object \(record.objectID) has incomplete properties.") }
             let normalized = normalizeInput(record.input, output: record.output)
             let directions: [(AudioUsageDirection, [AudioUsedDevice]?, String?)] = [
@@ -128,7 +134,8 @@ enum AudioUsageGrouping {
                 for device in devices {
                     let client = GroupedAudioClient(direction: direction, clientPID: owner, actualPids: actualPids,
                         appName: record.appName, appID: appID, deviceID: String(device.objectID), deviceUID: device.uid,
-                        sourceObjectID: record.objectID, incomplete: !record.errors.isEmpty || !siblingsComplete || device.uid == nil || record.appName == nil)
+                        sourceObjectID: record.objectID, incomplete: !record.errors.isEmpty || !siblingsComplete || device.uid == nil || record.appName == nil || record.usageStale == true,
+                        stale: record.usageStale == true, stabilizationPending: record.stabilizationPending == true)
                     let previous = direction == .input ? inputKeys[client.dedupKey] : outputKeys[client.dedupKey]
                     if let previous {
                         if previous.clientPID != client.clientPID || Data(previous.appID.utf8) != Data(client.appID.utf8) || previous.deviceID != client.deviceID {

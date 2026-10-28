@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-enum AudioUseWatchPhase { case idle, starting, watching, stopping, failed }
+enum AudioUseWatchPhase { case idle, starting, watching, reconnecting, stopping, failed }
 private struct AudioUseWatchEvent: Decodable {
     let version: Int
     let event: String
@@ -9,6 +9,11 @@ private struct AudioUseWatchEvent: Decodable {
     let generation: UInt64
     let snapshot: AudioProcessSnapshot?
     let message: String?
+    let timingMode: String?
+    let sourceState: String?
+    let publicationReason: String?
+    let changedDirections: [String]?
+    let coalescedPublications: UInt64?
     let cleanupVerified: Bool?
     let allListenerRemovalsVerified: Bool?
     let listenersRemoved: UInt64?
@@ -16,6 +21,8 @@ private struct AudioUseWatchEvent: Decodable {
     let listenersRemoveFailed: UInt64?
     enum CodingKeys: String, CodingKey {
         case version, event, sequence, generation, snapshot, message
+        case timingMode = "timing_mode", sourceState = "source_state"
+        case publicationReason = "publication_reason", changedDirections = "changed_directions", coalescedPublications = "coalesced_publications"
         case cleanupVerified = "cleanup_verified"
         case allListenerRemovalsVerified = "all_listener_removals_verified", listenersRemoved = "listeners_removed"
         case listenersInvalidObjectRetired = "listeners_invalid_object_retired", listenersRemoveFailed = "listeners_remove_failed"
@@ -28,6 +35,12 @@ private struct AudioUseWatchEvent: Decodable {
     @Published private(set) var snapshot: AudioProcessSnapshot?
     @Published private(set) var observedAt: Date?
     @Published private(set) var stale = true
+    @Published private(set) var timingMode: String?
+    @Published private(set) var sourceState: String?
+    @Published private(set) var publicationReason: String?
+    @Published private(set) var changedDirections: [AudioUsageDirection] = []
+    @Published private(set) var coalescedPublications: UInt64 = 0
+    @Published private(set) var coalescedPublicationTotal: UInt64 = 0
     @Published private(set) var error: String?
     @Published private(set) var cleanupVerified = false
     @Published private(set) var cleanDetachVerified = false
@@ -65,8 +78,8 @@ private struct AudioUseWatchEvent: Decodable {
             sequence = 0; generation = 0; stoppedAcknowledged = false; cleanupVerified = false; cleanDetachVerified = false
             allListenerRemovalsVerified = nil; listenersRemoved = nil; listenersInvalidObjectRetired = nil
             listenersRemoveFailed = nil; cleanupNote = nil
-            exitEvent = nil; error = nil; stale = true; phase = .starting
-            try process.launch(arguments: ["--watch-audio-use"], line: { [weak self] in self?.receive($0, id: id) }, exit: { [weak self] in self?.exited($0, id: id) })
+            exitEvent = nil; error = nil; stale = true; sourceState = nil; publicationReason = nil; changedDirections = []; coalescedPublications = 0; coalescedPublicationTotal = 0; phase = .starting
+            try process.launch(arguments: ["--watch-audio-use-stabilized"], line: { [weak self] in self?.receive($0, id: id) }, exit: { [weak self] in self?.exited($0, id: id) })
             if operationID == id, phase == .starting {
                 deadline = Task { [weak self] in
                     do { try await Task.sleep(nanoseconds: self?.startupTimeout ?? 0) } catch { return }
@@ -86,21 +99,43 @@ private struct AudioUseWatchEvent: Decodable {
               event.version == 1, event.sequence > 0, event.generation > 0 else {
             fail("The audio-use helper returned an invalid stream event.", id: id); return
         }
+        guard event.timingMode == "stabilized" else {
+            fail("The audio-use helper did not return the requested stabilized timing mode.", id: id); return
+        }
         guard event.sequence > sequence, event.generation >= generation else { return }
         sequence = event.sequence; generation = event.generation
         switch event.event {
         case "audio_use_snapshot":
             guard publicationAllowed, PowerAdmission.shared.allowed,
                   powerRevision == PowerAdmission.shared.revision else { return }
-            guard let snapshot = event.snapshot, ["available", "failed", "unavailable"].contains(snapshot.status) else {
-                fail("The audio-use helper returned an invalid snapshot.", id: id); return
+            guard let snapshot = event.snapshot, ["available", "failed", "unavailable"].contains(snapshot.status),
+                  let source = event.sourceState, ["running", "restarting"].contains(source),
+                  let reason = event.publicationReason, let directions = event.changedDirections, let coalesced = event.coalescedPublications,
+                  Self.validPublication(source: source, status: snapshot.status, reason: reason, directions: directions) else {
+                fail("The audio-use helper returned an invalid stabilized snapshot.", id: id); return
+            }
+            let total = coalescedPublicationTotal.addingReportingOverflow(coalesced)
+            guard !total.overflow else { fail("The audio-use helper overflowed its publication-history counter.", id: id); return }
+            coalescedPublications = coalesced; coalescedPublicationTotal = total.partialValue
+            sourceState = source; publicationReason = reason
+            changedDirections = directions.compactMap(AudioUsageDirection.init(rawValue:))
+            deadline?.cancel(); deadline = nil
+            if source == "restarting" {
+                stale = true; phase = .reconnecting
+                error = String((snapshot.errors.isEmpty ? "The audio-use source is reconnecting." : snapshot.errors.joined(separator: " ")).prefix(4096))
+                return // Reset notifications are not an observed absence of apps.
             }
             guard snapshot.status == "available" else {
-                fail(String((snapshot.errors.isEmpty ? "Audio-use observation is unavailable or failed." : snapshot.errors.joined(separator: " ")).prefix(4096)), id: id)
-                return
+                stale = true; phase = .watching
+                error = String((snapshot.errors.isEmpty ? "Audio-use observation is temporarily unavailable." : snapshot.errors.joined(separator: " ")).prefix(4096))
+                return // A recoverable read failure does not terminate the source.
             }
-            self.snapshot = snapshot; observedAt = Date(); stale = child?.running != true
-            phase = .watching; deadline?.cancel(); deadline = nil
+            guard snapshot.processes.allSatisfy({ $0.usageStale != nil && $0.stabilizationPending != nil }),
+                  reason != "restart_begin", reason != "restart_reset" else {
+                fail("The audio-use helper omitted stabilized usage provenance.", id: id); return
+            }
+            self.snapshot = snapshot; observedAt = Date(); timingMode = "stabilized"
+            stale = child?.running != true; error = nil; phase = .watching
         case "audio_use_error":
             preserveCleanupReport(event)
             let details = ([event.message ?? "Audio-use observation failed."] + (event.snapshot?.errors ?? [])).joined(separator: " ")
@@ -118,6 +153,17 @@ private struct AudioUseWatchEvent: Decodable {
             preserveCleanupReport(event)
             stoppedAcknowledged = true; publicationAllowed = false; stale = true
         default: fail("The audio-use helper returned an unknown stream event.", id: id)
+        }
+    }
+    private static func validPublication(source: String, status: String, reason: String, directions: [String]) -> Bool {
+        guard directions == [] || directions == ["input"] || directions == ["output"] || directions == ["input", "output"] else { return false }
+        switch reason {
+        case "readiness": return source == "running" && status == "available" && directions.isEmpty
+        case "changed": return source == "running" && status == "available" && !directions.isEmpty
+        case "restart_begin": return source == "restarting" && status == "unavailable" && directions.isEmpty
+        case "restart_reset": return source == "restarting" && status == "unavailable" && directions == ["input", "output"]
+        case "read_error": return directions.isEmpty // Failed, unavailable, or partial available observations.
+        default: return false
         }
     }
     private func preserveCleanupReport(_ event: AudioUseWatchEvent) {

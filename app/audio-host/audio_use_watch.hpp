@@ -61,5 +61,5 @@ public:
     bool stop() { invalidate(); return reconcile({}); }
 private: uint64_t nextID = 0;
 };
-int watchAudioProcessUsage();
+int watchAudioProcessUsage(bool stabilized=false);
 }
