@@ -1991,7 +1991,11 @@
         "ev_c0c687ced8052b70ca663e6ba408fd0367780013226e2f20d737a4eeea47dcee",
         "ev_f5ab7c72b42ff4a4d14cb47d3bf91893363610cf6acf2c89937c3802d073a6cf",
         "ev_1953b11976e37a492f97468487890af71345e9f07220ec36772b095dab209764",
-        "ev_56863d4bf5c4fb6368bf35daad401a9def860da402711c0297391e5cf39b40b7"
+        "ev_56863d4bf5c4fb6368bf35daad401a9def860da402711c0297391e5cf39b40b7",
+        "ev_7db961a418a25cdf13782fde221628e96275f062eca583f00b0eba3bfb1bddf2",
+        "ev_9a04cdcd2661f996e180422aa68080f3ee315c1a1285383f22260aa0253026db",
+        "ev_7ec29c5a7845db78bf3252ea28bef463093cb8a04a80f36106d3127dc6d0ec37",
+        "ev_ac371f76731331724d5b531b68e7fc09570edb86783adba472c3d48e6ed69699"
       ],
       "implemented_code": [
         "projects/krisp/app/audio-host/audio_process_usage.hpp",
@@ -2001,11 +2005,12 @@
         "projects/krisp/app/desktop/Sources/LabVoice/AudioProcessUsage.swift",
         "projects/krisp/app/desktop/Sources/LabVoice/AudioHelper.swift",
         "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift",
-        "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift"
+        "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift",
+        "projects/krisp/app/desktop/Sources/LabVoice/GroupedAudioUsage.swift"
       ],
-      "implementation": "Explicit read-only audio-use snapshot in the helper and Audio view. Optional unknown/error states, actual/responsible identity, current device UIDs and bounded output. Ordinary inventory does not observe processes. Routes and recording still start only by explicit user click. Continuous observation, call detection, blocked-app preferences and competing-call switching remain unimplemented.",
-      "verified_scope": "Recovered static native grouping, macOS 14.4 source gate and packaged defaults in activation-findings.md. Explicit snapshot passes own C++ formatter and Swift decode/unknown/cancellation fixtures. Full desktop suite: 198 passed, 1 opt-in skip; ARM64/macOS12 packaging, signing and relocated resources passed. One bounded runtime snapshot observed 39 idle processes with no direction unknowns, 33 responsibility resolutions and 6 actual-PID fallbacks. That query preceded final serializer-error and missing-name diagnostic fixes; it supports unchanged successful reads, not exact-final-build runtime acceptance. Active-device usage, native UI, continuous observation and call activation remain unverified. Full audio-host release and sanitizer verification passed; default process runtime query skipped.",
-      "missing_acceptance": "Implement continuous process/device listeners and lifecycle cleanup, recovered grouping and stabilization. Recover Call.hasBothLegs/addDeviceUsage semantics, older-OS source details, effective delay overrides/clamps, auto-activation preference/manual-choice policies and the recording/transcription join. Native snapshot UI and active-device runtime mapping remain unverified. Do not infer calls from app launch, frontmost state or raw audio activity. Full activation parity remains incomplete."
+      "implementation": "Explicit read-only audio-use snapshot in the helper and Audio view. Desktop applies recovered two-pass input normalization, ascending process/device candidate order, responsible-PID grouping including idle helpers and byte-exact per-direction native deduplication with first-candidate retention. Unknown identities and properties remain incomplete. App version remains unknown. Ordinary inventory does not observe processes. Routes and recording still require explicit user Start; continuous observation, call detection, blocked-app preferences and competing-call switching remain unimplemented.",
+      "verified_scope": "Recovered native two-pass normalization, ascending producer order and first-candidate per-direction deduplication. Six grouping fixtures and production C++ formatter-to-Swift projection integration pass; nine focused tests pass. Full host release/sanitizer verification and desktop 204 passing tests with one opt-in skip, signing and relocated packaging pass. The earlier bounded snapshot observed 39 idle processes before grouping existed; no active-device runtime or grouped UI acceptance is claimed. Continuous observation and activation remain unverified. The call-to-ASR-to-recorder event join is statically recovered with account/remote dependencies and stale-start/error limits distinguished in activation-findings.md. A single changed-resource 2 GiB analysis remained partial and did not recover Call leg definitions.",
+      "missing_acceptance": "Implement continuous process/device listeners, lifecycle cleanup and recovered timing stabilization. Recover Call.hasBothLegs/addDeviceUsage definitions, older-OS source details, effective delay overrides/clamps and local auto/manual activation preferences. The call-to-ASR-to-recorder event join is now statically recovered, but local processing/error adaptation and durable recording acceptance remain incomplete. A changed-resource 2 GiB REA analysis still exhausted semantic extraction; zero matches in that partial graph do not prove absence. Native grouped UI and active-device runtime mapping remain unverified. Full activation parity remains incomplete."
     },
     {
       "id": "transcription",
@@ -3324,13 +3329,15 @@
     "projects/krisp/app/desktop/Sources/LabVoice/NativePowerNotifications.swift": "952a68743aa26e49f158d58b44bc1e84ffa7807af37c331b3161ee31200f3f2a",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AppPowerLifecycleTests.swift": "f3f93c7c1be0e21ac53c3e8e0201548f7ca4d793f29cf45049b9f81b1dce3597",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/NativePowerNotificationsTests.swift": "34fea0d833755f4a347065a2a7f673dd1439c986aa03a2cda63d826b1d889aeb",
-    "projects/krisp/app/audio-host/audio_process_usage.hpp": "f691ae0777af3aa09f0450302b0894e87cc1d081f570410ae462321c3d61c612",
-    "projects/krisp/app/audio-host/audio_process_usage.cpp": "415878f236ba46795e9632208f213033757a5bab72ca95b2030fb5c64abe5abd",
+    "projects/krisp/app/audio-host/audio_process_usage.hpp": "2ea8dd7d16af4d3543c8f0e66dc462e7ebd4e2b741a9a979292cd649fc8afbf3",
+    "projects/krisp/app/audio-host/audio_process_usage.cpp": "8a1d41f3f7175bf4080dfd008b343827ccfb53f4ea7095bde924a1666d156c5c",
     "projects/krisp/app/audio-host/audio_process_usage_native.mm": "8c74fb39e7c033b8d8470a7c24ca72b803696853f9886c879374cf89f61d08f4",
-    "projects/krisp/app/audio-host/audio_process_usage_test.cpp": "3ce2aabc261b0f28b8fcaa634ba382595c9896b28757924b2f938e646ec283a4",
+    "projects/krisp/app/audio-host/audio_process_usage_test.cpp": "ba3192f3315e6d614721afc30482e7d5e56351951877eae9636f0d2563a0549b",
     "projects/krisp/app/audio-host/audio_process_usage_check.py": "aee9d7a03cad58997476fd6b5897fe5e286807667a353a8a58aeefb30aeabc46",
-    "projects/krisp/app/desktop/Sources/LabVoice/AudioProcessUsage.swift": "ec878b97f65cfe51dc08b29e3a38ef53fc1728a85897e6c4e21b7ba4132baf8e",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioProcessUsageTests.swift": "6351ba2e56813ab54468ba0c10a8cc3eb3e542ab7776a5e68fc06ef96ad50d22"
+    "projects/krisp/app/desktop/Sources/LabVoice/AudioProcessUsage.swift": "bcfa51f87afae125c3db89bcd0525bdb1b17f48dba1c826da1d65a64e5bc381b",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioProcessUsageTests.swift": "3bab59312cebb13c823395bed5c1fcc347548a619964a8fa9202941854caf5cb",
+    "projects/krisp/app/desktop/Sources/LabVoice/GroupedAudioUsage.swift": "a5add8504f157c20cf3119305dd11f2a5e86cab0176539957ce92b03cea7f6cc",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/GroupedAudioUsageTests.swift": "2821ffc06febc0298b9945fee6ace9311495783f39f17756e94965af43bf16de"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3341,7 +3348,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "193 source/verification/own-fixture fingerprints at audio-use snapshot checkpoint. Desktop 198 tests pass with 1 opt-in skip; signed and relocated packaging passes. Bounded own runtime metadata read observed 39 idle processes before final error-path corrections. Continuous activation, real OS power delivery, physical audio and full retained local parity remain incomplete.",
+  "source_snapshot_note": "195 source/verification/own-fixture fingerprints at grouped audio-use checkpoint. Host release/sanitizer suites and desktop 204 tests pass with one opt-in skip; signed and relocated packaging passes. Grouping is synthetic/integration verified, with no new runtime process query. Continuous activation, physical audio and full retained local parity remain incomplete.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

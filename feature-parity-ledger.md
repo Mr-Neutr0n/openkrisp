@@ -474,3 +474,10 @@ Activation now has a partial prerequisite implementation: explicit read-only pro
 REA evidence recovers storage grouping, source selection and packaged timing defaults. Continuous observation, Call leg semantics, effective preferences and recording/transcription activation remain incomplete. No physical audio or original code ran. The ledger contains 193 source and verification fingerprints.
 
 Full audio-host verification also passed release and sanitizer suites. Its exact log hash is recorded in CHECKPOINT.md.
+
+
+## Grouped audio use, 2026-10-28
+
+The visible snapshot now uses recovered two-pass input normalization and responsible-app grouping. It includes idle helper PIDs and preserves exact byte keys, ascending candidate order and first-candidate deduplication. Unknown state stays incomplete; internal driver endpoints gain no call eligibility. Six grouping tests and the production C++-to-Swift path cover these rules. Native callback output ordering and app version remain unverified or unavailable.
+
+The call-to-ASR-to-recorder event join is now statically mapped. One changed-resource 2 GiB analysis still exhausted semantic extraction, leaving Call leg definitions and effective delay clamps unresolved. Continuous activation and physical audio remain incomplete. The ledger records 195 source and verification fingerprints; exact component results are in CHECKPOINT.md.

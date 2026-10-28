@@ -15,7 +15,7 @@ struct AudioProcessReader {
     std::function<std::optional<int>(int)> responsiblePID;
     std::function<AudioProcessApp(int)> app;
 };
-struct AudioUsedDevice { AudioObjectID objectID; std::optional<std::string> uid; };
+struct AudioUsedDevice { AudioObjectID objectID; std::optional<std::string> uid; std::optional<bool> hasInputStreams = std::nullopt; };
 struct AudioProcessDirection {
     std::optional<bool> running;
     std::optional<std::vector<AudioUsedDevice>> devices;

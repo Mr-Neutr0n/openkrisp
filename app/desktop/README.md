@@ -290,6 +290,10 @@ The opt-in listener integration check can be run from `app/desktop` with `LABVOI
 
 ## Observe audio use
 
-Audio offers **Observe audio use** while stopped. It shows a one-time snapshot of apps using CoreAudio, with input/output activity and unavailable or failed-read states. Refresh Devices clears the observation. Pending observations use the existing cancellation, power and Quit protections. No process metadata is saved by the app.
+Audio offers **Observe audio use** while stopped. It shows a one-time snapshot of active app audio, grouped by responsible application, with unavailable or failed-read states. Refresh Devices clears the observation. Pending observations use the existing cancellation, power and Quit protections. No process metadata is saved by the app.
 
 The snapshot does not detect calls or start recording. Continuous observation, two-leg call qualification, blocked-app preferences and competing-call switching remain incomplete. Native UI interaction and active-device runtime mapping still need acceptance.
+
+The desktop normalizes input devices with the recovered two-pass algorithm: remove devices without input streams, then remove output overlaps, visiting ascending device IDs and stopping each pass at one remaining input. An unknown property blocks only the branch that needs it. Output usage remains independent. Grouped clients retain sorted unique helper PIDs, including idle siblings, and use the native byte-exact application-ID plus decimal-device-ID deduplication key. The first candidate in ascending process-object order survives.
+
+Missing identity or metadata remains incomplete. Internal feed/monitor endpoints have distinct labels from the public microphone/speaker endpoints; these labels grant no call eligibility. The UI shows app names and devices rather than raw process identifiers. This is an instantaneous projection, without continuous listeners or timing stabilization.

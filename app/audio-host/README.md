@@ -264,7 +264,7 @@ The read-only inventory includes `interface_name`, `manufacturer`, `model_id` an
 
 `build/audio-host --list-audio-use` adds an optional `audio_process_usage` snapshot to the ordinary device inventory. `--list` keeps its existing schema and does not query processes. Observation reads CoreAudio properties and application identity metadata. It creates no audio tap, IOProc or stream.
 
-The source requires macOS 14.4, matching the recovered original gate. Older systems report unavailable; a failed list read reports failed. Per-process failures preserve unknown fields and diagnostics. Actual and responsible PIDs stay separate, and device object IDs resolve to current UIDs. App version remains unknown. This snapshot does not apply grouping, normalization, stabilization or call policy.
+The source requires macOS 14.4, matching the recovered original gate. Older systems report unavailable; a failed list read reports failed. Per-process failures preserve unknown fields and diagnostics. Actual and responsible PIDs stay separate, and device object IDs resolve to current UIDs. App version remains unknown. The raw snapshot does not apply grouping, normalization, stabilization or call policy. Used input devices now include optional `has_input_streams`, read from the input-scoped CoreAudio streams property. Failed reads remain null with a row error. Desktop normalization uses this metadata; output device records leave it null.
 
 Bounds limit process count to 1,024, device entries to 256 per direction and 4,096 total, individual text to 4 KiB, aggregate text to 256 KiB and serialized observation to 512 KiB. Exceeding the serialized bound returns a failed optional snapshot while preserving normal inventory.
 

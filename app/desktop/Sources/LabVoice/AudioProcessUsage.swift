@@ -4,7 +4,8 @@ import SwiftUI
 struct AudioUsedDevice: Decodable, Sendable {
     let objectID: UInt32
     let uid: String?
-    enum CodingKeys: String, CodingKey { case objectID = "object_id", uid }
+    var hasInputStreams: Bool? = nil
+    enum CodingKeys: String, CodingKey { case objectID = "object_id", uid, hasInputStreams = "has_input_streams" }
 }
 struct AudioProcessDirection: Decodable, Sendable {
     let running: Bool?
@@ -60,15 +61,21 @@ struct AudioProcessUsageView: View {
                 Text(snapshot.summary).font(.caption)
                 ForEach(Array(snapshot.errors.enumerated()), id: \.offset) { Text($0.element).font(.caption).foregroundColor(.orange) }
                 if snapshot.status == "available" {
-                    ForEach(snapshot.processes) { process in
+                    let grouped = AudioUsageGrouping.group(snapshot)
+                    if grouped.applications.isEmpty {
+                        Text(grouped.issues.isEmpty ? "No active app audio was reported." : "Audio use could not be fully resolved.").font(.caption).foregroundColor(.secondary)
+                    }
+                    ForEach(grouped.applications) { app in
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(process.appName ?? "Unknown application").font(.caption).bold()
-                            Text("Actual PID \(process.actualPID.map(String.init) ?? "unknown"), responsible PID \(process.responsiblePID.map(String.init) ?? "unknown")").font(.caption)
-                            Text("Input: \(process.input.description). Output: \(process.output.description).").font(.caption).textSelection(.enabled)
-                            Text("Application ID: \(process.appID ?? "unknown")").font(.caption).textSelection(.enabled)
-                            if process.responsiblePIDFallback { Text("Responsibility lookup fell back to the actual PID.").font(.caption).foregroundColor(.secondary) }
-                            if !process.errors.isEmpty { Text(process.errors.joined(separator: "\n")).font(.caption).foregroundColor(.orange) }
+                            Text(app.name).font(.caption).bold()
+                            ForEach(app.clients) { client in
+                                Text("\(client.direction == .input ? "Input" : "Output"): \(client.deviceDescription)" + (client.incomplete ? " · partial" : ""))
+                                    .font(.caption).textSelection(.enabled)
+                            }
                         }
+                    }
+                    if !grouped.issues.isEmpty {
+                        Text("Some input, output, or helper details are unknown.").font(.caption).foregroundColor(.orange)
                     }
                 }
             } else { Text("Choose Observe audio use to check current usage.").font(.caption).foregroundColor(.secondary) }

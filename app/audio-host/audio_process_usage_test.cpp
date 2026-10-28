@@ -5,13 +5,14 @@
 using namespace labvoice;
 int main(int argc, char**) {
     int lists = 0, deviceReads = 0;
-    bool supported = true, listFailure = false, inputFailure = false, bundleFailure = false;
+    bool supported = true, listFailure = false, inputFailure = false, bundleFailure = false, streamFailure = false;
     std::optional<int> responsible = 22;
     AudioProcessApp app{"Owner", "Binary", "owner.bundle", "", {}};
     AudioProcessReader reader;
     reader.hasList = [&] { return supported; };
     reader.array = [&](AudioObjectID id, UInt32 selector, UInt32 scope) {
         if (selector == kAudioHardwarePropertyProcessObjectList) { ++lists; if (listFailure) throw std::runtime_error("list failed"); return std::vector<AudioObjectID>{4}; }
+        if (selector == kAudioDevicePropertyStreams) { assert(scope == kAudioObjectPropertyScopeInput); if (streamFailure) throw std::runtime_error("streams failed"); return id == 31 ? std::vector<AudioObjectID>{100} : std::vector<AudioObjectID>{}; }
         assert(id == 4 && selector == kAudioProcessPropertyDevices && scope == kAudioObjectPropertyScopeInput);
         ++deviceReads; return std::vector<AudioObjectID>{31, 32, 31};
     };
@@ -36,9 +37,16 @@ int main(int argc, char**) {
     assert(!process.responsibleFallback && process.appName == "Owner" && process.processBundleID == "process.bundle" && process.appID == "owner.bundle");
     assert(process.input.running == true && process.input.devices->size() == 2);
     assert(process.input.devices->at(0).uid == "dev.hari.labvoice.feed" && !process.input.devices->at(1).uid);
+    assert(process.input.devices->at(0).hasInputStreams == true && process.input.devices->at(1).hasInputStreams == false);
     assert(process.output.running == false && process.output.devices->empty() && deviceReads == 1);
     assert(!process.errors.empty());
     if (argc > 1) { std::cout << audioProcessUsageJSON(snapshot) << '\n'; return 0; }
+    streamFailure = true;
+    auto missingStreams = readAudioProcessUsage(reader).processes.at(0);
+    assert(missingStreams.input.running == true && missingStreams.input.devices->at(0).uid == "dev.hari.labvoice.feed");
+    assert(!missingStreams.input.devices->at(0).hasInputStreams && !missingStreams.errors.empty());
+    assert(missingStreams.output.running == false && missingStreams.output.devices->empty());
+    streamFailure = false;
     supported = false; const auto priorLists = lists;
     assert(readAudioProcessUsage(reader).status == "unavailable" && lists == priorLists);
     supported = true; listFailure = true;

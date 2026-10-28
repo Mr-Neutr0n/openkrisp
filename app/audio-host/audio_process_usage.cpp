@@ -28,7 +28,7 @@ std::string direction(const AudioProcessDirection &value) {
     out += '['; bool comma = false;
     for (const auto& device : *value.devices) {
         if (comma) out += ','; comma = true;
-        out += "{\"object_id\":" + std::to_string(device.objectID) + ",\"uid\":" + text(device.uid) + '}';
+        out += "{\"object_id\":" + std::to_string(device.objectID) + ",\"uid\":" + text(device.uid) + ",\"has_input_streams\":" + (device.hasInputStreams ? (*device.hasInputStreams ? "true" : "false") : "null") + '}';
     }
     return out + "]}";
 }
@@ -105,6 +105,13 @@ AudioProcessSnapshot readAudioProcessUsage(const AudioProcessReader &reader) {
                         AudioUsedDevice used{device, std::nullopt};
                         try { auto uid = readText(device, kAudioDevicePropertyDeviceUID); if (uid.empty()) throw std::runtime_error("Empty UID."); used.uid = uid; }
                         catch (const std::exception& error) { process.errors.push_back(std::string(label) + " device " + std::to_string(device) + ": " + error.what()); }
+                        if (scope == kAudioObjectPropertyScopeInput) {
+                            try {
+                                const auto streams = reader.array(device, kAudioDevicePropertyStreams, kAudioObjectPropertyScopeInput);
+                                if (streams.size() > 4096) throw std::runtime_error("Input stream count exceeds snapshot bound.");
+                                used.hasInputStreams = !streams.empty();
+                            } catch (const std::exception& error) { process.errors.push_back("input device " + std::to_string(device) + " streams: " + error.what()); }
+                        }
                         value.devices->push_back(used);
                     }
                 } catch (const std::exception& error) { process.errors.push_back(std::string(label) + ": " + error.what()); }

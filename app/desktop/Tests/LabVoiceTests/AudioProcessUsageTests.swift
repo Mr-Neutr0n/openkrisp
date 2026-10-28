@@ -26,6 +26,14 @@ import XCTest
         XCTAssertEqual(process.input.devices?.first?.uid, "dev.hari.labvoice.feed")
         XCTAssertNil(process.input.devices?.last?.uid); XCTAssertFalse(process.errors.isEmpty)
         XCTAssertEqual(process.output.description, "not running")
+        XCTAssertEqual(process.input.devices?.first?.hasInputStreams, true)
+        XCTAssertEqual(process.input.devices?.last?.hasInputStreams, false)
+        let grouped = AudioUsageGrouping.group(value)
+        XCTAssertEqual(grouped.clients.count, 1)
+        XCTAssertEqual(grouped.clients.first?.clientPID, 22)
+        XCTAssertEqual(grouped.clients.first?.actualPids, "11")
+        XCTAssertEqual(grouped.clients.first?.deviceID, "31")
+        XCTAssertEqual(grouped.clients.first?.deviceRole, .privateFeed)
     }
     func testUnknownDirectionAndSourceFailureAreNotEmptyIdleObservations() throws {
         let unknown = try JSONDecoder().decode(AudioProcessDirection.self, from: Data("{\"running\":null,\"devices\":null}".utf8))

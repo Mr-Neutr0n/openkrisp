@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Audio-use snapshot, 2026-10-28](#audio-use-snapshot-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Grouped audio use, 2026-10-28](#grouped-audio-use-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -677,3 +677,24 @@ Full audio-host verification also passed release and sanitizer suites. The defau
 REA static evidence also closes responsible-PID/device grouping, the source-version branch and packaged start/stop delay defaults. `activation-findings.md` records exact evidence and remaining limits. Call.hasBothLegs/addDeviceUsage, effective delay overrides, older-source behavior and the recording/transcription activation join remain unresolved. Original code did not execute. No physical audio or administrator action ran.
 
 Next implement the continuous observation lifecycle and recovered grouping, then connect call policy only after its missing leg and activation semantics are established. The administrator-dependent driver restart stays deferred. Full retained-feature and audio parity remain incomplete.
+
+
+## Grouped audio use, 2026-10-28
+
+The explicit Audio snapshot now shows active app usage grouped by responsible application. The helper supplies optional input-stream metadata for each used input device. Desktop normalization follows two separate ascending-ID passes: remove devices without input streams, then remove output overlaps. Each pass stops at one remaining input. Unknown metadata blocks only decisions that need it; output usage remains independently available.
+
+Grouping includes sorted unique actual PIDs from all records for each responsible PID, including idle helpers. It visits processes and devices in ascending object-ID order, then deduplicates each direction by the exact UTF-8 application-ID plus decimal device-ID key. The first candidate survives, matching retained native unique insertion. Unknown owners invalidate complete helper-PID lists. Key collisions remain visible as incomplete results. Public microphone/speaker and internal feed/monitor UIDs stay distinct without granting call eligibility.
+
+The view shows app names and device use instead of raw PID rows. Presentation groups sort by responsible PID; original callback output ordering is not claimed. App version remains unknown. This is still an explicit instantaneous snapshot, without continuous listeners, timing stabilization, call qualification or recording activation. Native UI and active-device runtime mapping remain unverified.
+
+Six new grouping tests cover the two-pass counterexample, singleton stopping, branch-sensitive unknowns, output independence, inactive sibling PIDs, ascending collision selection, Unicode byte identity and public/private device roles. The production C++ formatter feeds Swift decoding and grouping in an existing integration test. A native injected stream-property failure preserves unknown metadata and row errors. Nine focused tests passed. Independent GPT 6.1 sol review found no remaining issue.
+
+Retained REA evidence now establishes the direct APP_CALL_STARTED to ASR admission to recorder-start event path, including stale-call rejection and failure boundaries. Account and remote-service gates are separated from local mechanics in `activation-findings.md`. A single static reanalysis with a larger 2 GiB heap still exhausted semantic extraction. Its partial graph cannot recover the missing Call leg definitions or effective delay clamps; zero trace matches are not an absence proof. No original application code, physical audio, runtime process query or administrator action ran in this checkpoint.
+
+Next implement continuous observation and recovered stabilization, and obtain the remaining Call and local activation-policy definitions through a supported bounded source path. The driver restart remains deferred. Full retained-feature and acoustic parity remain incomplete.
+
+Full audio-host verification passed release and sanitizer suites. Full desktop verification enumerated 205 tests: 204 passed and one opt-in native listener test was skipped. ARM64/macOS12 packaging, signing and relocated-resource checks passed. Host pass-message text matches the prior run, so its log hash is unchanged; source fingerprints and stale-helper packaging checks bind this rebuilt source.
+
+- `evidence/audio-use-grouping-host-verify-20261028.log`, SHA256 `2f0e79ef4732e932dda97a0bcf2b54d2d036f2748c657ec94af0613c2a578a3d`.
+- `evidence/audio-use-grouping-desktop-verify-20261028.log`, SHA256 `2a574b8ec0a6316570e4581f41530b4596f9db9cfce3a014f19c2546376d6034`.
+- `evidence/audio-use-grouping-focused-20261028.log`, SHA256 `e625055353ceca8023cd764c62802366966d15f351c969d2816bda9f4d9d8b49`.

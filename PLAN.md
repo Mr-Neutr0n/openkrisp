@@ -438,3 +438,8 @@ REA native analysis and qualified retained JavaScript excerpts recover local Cor
 ## Current audio-use checkpoint, 2026-10-28
 
 Explicit helper and desktop snapshots now expose CoreAudio process activity without starting audio. See the latest CHECKPOINT.md section for verification and retained runtime evidence. Automatic call activation is still incomplete. Native evidence now supplies grouping, the macOS 14.4 source gate and packaged delays. Next complete continuous listener ownership/lifecycle and recover missing Call leg and note-taking joins. Physical routing and administrator-dependent driver discovery remain separate.
+
+
+## Grouped audio-use checkpoint, 2026-10-28
+
+The explicit snapshot now applies recovered normalization and grouping through the visible Audio flow. Exact two-pass ordering and first-candidate deduplication are evidenced and tested. The call-to-ASR-to-recorder join is recovered; Call leg definitions remain absent from the available partial graph even after one larger-heap analysis. See CHECKPOINT.md for verification. Continuous listener lifecycle, timing stabilization and local activation policy are next.
