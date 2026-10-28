@@ -86,6 +86,7 @@ enum ImportTranscriptDraft: Sendable {
         requestAuthorization = { try await OfflineTranscriber.requestAuthorization() }
         recognize = { file, locale in try await transcriber.transcribe(file, localeIdentifier: locale) }
         cancelRecognition = { transcriber.cancel() }
+        AppPowerLifecycle.shared.register(self)
     }
     // Tests replace permission and recognition without requesting OS consent or starting Speech.
     init(authorization: @escaping () -> SpeechAuthorization,
@@ -97,11 +98,12 @@ enum ImportTranscriptDraft: Sendable {
         self.requestAuthorization = requestAuthorization
         self.recognize = recognize
         self.cancelRecognition = cancelRecognition
+        AppPowerLifecycle.shared.register(self)
     }
 
     // Only the explicit Transcribe/Replace buttons call this method.
     func start(file: URL, locale: String) {
-        guard !busy else { return }
+        guard PowerAdmission.shared.allowed, !busy else { return }
         guard !locale.isEmpty else { error = "Choose a transcription language."; return }
         let selected: UserSelectedWAV
         do { selected = try UserSelectedWAV(userSelectedURL: file) }

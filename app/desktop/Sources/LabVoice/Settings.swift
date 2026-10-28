@@ -35,20 +35,26 @@ actor CatalogWorker {
     private let worker = CatalogWorker()
     func clearResults() { assessments = []; resultSource = ""; error = nil }
     func validateInstalled() async {
-        guard !busy, appBundle != nil || downloaded != nil else { return }
+        guard PowerAdmission.shared.allowed, !busy, appBundle != nil || downloaded != nil else { return }
+        let powerRevision = PowerAdmission.shared.revision
         busy = true; clearResults(); defer { busy = false }
         do {
-            assessments = try await worker.installed(app: appBundle, downloaded: downloaded)
+            let result = try await worker.installed(app: appBundle, downloaded: downloaded)
+            guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { return }
+            assessments = result
             resultSource = "Installed-provider validation"
-        } catch { self.error = "Cannot validate selected locations: \(error)" }
+        } catch { guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { return }; self.error = "Cannot validate selected locations: \(error)" }
     }
     func validateIndependent() async {
-        guard !busy, let root = independentRoot, let manifest else { return }
+        guard PowerAdmission.shared.allowed, !busy, let root = independentRoot, let manifest else { return }
+        let powerRevision = PowerAdmission.shared.revision
         busy = true; clearResults(); defer { busy = false }
         do {
-            assessments = try await worker.independent(root: root, manifest: manifest)
+            let result = try await worker.independent(root: root, manifest: manifest)
+            guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { return }
+            assessments = result
             resultSource = "Independent-provider validation"
-        } catch { self.error = "Cannot validate independent manifest: \(error)" }
+        } catch { guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { return }; self.error = "Cannot validate independent manifest: \(error)" }
     }
     func selectIndependentRoot(_ root: URL) { independentRoot = root; manifest = nil; clearResults() }
     func selectManifest(_ file: URL) {
@@ -72,6 +78,7 @@ struct AppSettingsView: View {
     @ObservedObject private var startup = StartupController.shared
     @ObservedObject private var libraryLocation = LibraryLocation.shared
     var showDone = false
+    @AppStorage("powerSimulationCommands") private var powerSimulationCommands = false
     @AppStorage("appearance") private var appearance: AppAppearance = .system
     @Environment(\.dismiss) private var dismiss
     private func chooseDirectory() -> URL? {
@@ -139,6 +146,16 @@ struct AppSettingsView: View {
                     if startup.changing { ProgressView().controlSize(.small) }
                     if let error = startup.error { Text(error).font(.caption).foregroundColor(.red) }
                     Button("Refresh login status") { Task { await startup.refresh() } }.disabled(startup.changing)
+                    Divider()
+                    Toggle("Show simulated Sleep and Wake commands", isOn: $powerSimulationCommands)
+                    Text("Development controls send app lifecycle events. They never put this Mac to sleep.").font(.caption).foregroundColor(.secondary)
+                    if powerSimulationCommands {
+                        HStack {
+                            Button("Simulate Sleep") { AppPowerLifecycle.shared.request(.suspend) }
+                            Button("Simulate Wake") { AppPowerLifecycle.shared.request(.resume) }
+                        }
+                    }
+                    PowerStatusView()
                     Divider()
                     Text("Storage location").font(.headline)
                     Text(libraryLocation.displayPath).font(.caption).textSelection(.enabled)

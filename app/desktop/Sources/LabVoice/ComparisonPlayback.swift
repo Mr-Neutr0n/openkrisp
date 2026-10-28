@@ -33,8 +33,10 @@ actor ComparisonPlayback: ComparisonPlaying {
     private let makePlayer: @Sendable (URL) throws -> any ComparisonAudioPlayer
     init(makePlayer: @escaping @Sendable (URL) throws -> any ComparisonAudioPlayer = { try AVAudioPlayer(contentsOf: $0) }) { self.makePlayer = makePlayer }
     private var position = 0.0
+    private var powerRevision = PowerAdmission.shared.revision
     func configure(id: UUID, original: URL, processed: URL) {
         player?.stop(); player = nil; self.id = id
+        powerRevision = PowerAdmission.shared.revision
         paths = [.original: original, .processed: processed]; selected = .original; position = 0
     }
     func select(id: UUID, variant: ComparisonVariant) throws -> ComparisonPlaybackState {
@@ -46,7 +48,7 @@ actor ComparisonPlayback: ComparisonPlaying {
         return ComparisonPlaybackState(playing: false, position: position)
     }
     func play(id: UUID, replay: Bool) throws -> ComparisonPlaybackState {
-        guard self.id == id, let url = paths[selected] else { throw MicrophoneTestError.unavailable }
+        guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision, self.id == id, let url = paths[selected] else { throw MicrophoneTestError.unavailable }
         if replay { position = 0; player?.stop(); player = nil }
         if player == nil {
             let value = try makePlayer(url)
@@ -56,7 +58,7 @@ actor ComparisonPlayback: ComparisonPlaying {
         guard let player else { throw MicrophoneTestError.unavailable }
         if player.currentTime >= player.duration { player.currentTime = 0 }
         guard player.prepareToPlay() else { throw MicrophoneTestError.unavailable }
-        guard player.play() else { throw MicrophoneTestError.unavailable }
+        guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision, player.play() else { throw MicrophoneTestError.unavailable }
         return ComparisonPlaybackState(playing: true, position: player.currentTime)
     }
     func pause(id: UUID) -> ComparisonPlaybackState {

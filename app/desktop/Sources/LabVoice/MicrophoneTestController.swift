@@ -57,6 +57,9 @@ private struct TestResult: Decodable {
         do { retainedPaths = try await files.retained().filter { phase == .failed || $0 != job?.directory.path } }
         catch { self.error = "Cannot inspect temporary microphone tests: \(error)" }
     }
+    func revokeForPowerEvent() {
+        cancelIntent = true; startTask?.cancel(); playbackPoll?.cancel()
+    }
     func start(input: AudioHardwareDevice?, microphoneUnmuted: Bool, routeStopped: Bool) {
         guard !engaged, !LibraryLocation.shared.switching else { return }
         guard routeStopped else { error = "Stop this app's audio route before starting the independent microphone test."; return }
@@ -74,7 +77,7 @@ private struct TestResult: Decodable {
             let permission = self.authorization()
             var granted = permission == .authorized
             if permission == .notDetermined { granted = await self.requestAuthorization() }
-            guard self.id == token, !self.cancelIntent, !Task.isCancelled else { return }
+            guard PowerAdmission.shared.allowed, self.id == token, !self.cancelIntent, !Task.isCancelled else { return }
             guard granted else {
                 self.error = "Microphone permission is required for this explicit test."; self.status = "Test did not start."; self.phase = .failed; self.captureAdmission.release(token); self.id = nil; return
             }
@@ -83,7 +86,7 @@ private struct TestResult: Decodable {
                 let created = try await self.files.prepare(id: token, inputUID: input.uid)
                 guard self.id == token else { try await self.files.remove(created); return }
                 self.job = created // Cancellation now owns this stage even if its removal fails.
-                guard !self.cancelIntent, !Task.isCancelled else { return }
+                guard PowerAdmission.shared.allowed, !self.cancelIntent, !Task.isCancelled else { return }
                 self.retainedPaths.removeAll { $0 == created.directory.path }
                 let process = try self.factory(); self.child = process
                 self.phase = .starting; self.status = "Starting selected microphone capture…"
@@ -174,7 +177,7 @@ private struct TestResult: Decodable {
             self.phase = .validating; self.status = "Checking the completed comparison files…"
             do {
                 try await self.files.validate(job, frames: result.frames, originalPath: original, processedPath: processed)
-                guard self.id == token, !self.cancelIntent, !Task.isCancelled else { return }
+                guard PowerAdmission.shared.allowed, self.id == token, !self.cancelIntent, !Task.isCancelled else { return }
                 await self.playback.configure(id: token, original: job.original, processed: job.processed)
                 guard self.id == token, !self.cancelIntent else { return }
                 self.frames = result.frames; self.variant = .original; self.playing = false; self.playbackPosition = 0
@@ -187,7 +190,7 @@ private struct TestResult: Decodable {
         }
     }
     func select(_ selected: ComparisonVariant) {
-        guard phase == .comparison, let token = id else { return }
+        guard PowerAdmission.shared.allowed, phase == .comparison, let token = id else { return }
         variant = selected
         Task { [weak self] in
             guard let self else { return }
@@ -196,7 +199,7 @@ private struct TestResult: Decodable {
         }
     }
     func play(replay: Bool = false) {
-        guard phase == .comparison, let token = id else { return }
+        guard PowerAdmission.shared.allowed, phase == .comparison, let token = id else { return }
         Task { [weak self] in
             guard let self else { return }
             do {

@@ -12,8 +12,15 @@ protocol LibraryWorking: Sendable {
     func remove(_ id: UUID, location: LibraryLocationSnapshot) async throws
     func export(_ id: UUID, to url: URL, location: LibraryLocationSnapshot) async throws
     func play(_ id: UUID, location: LibraryLocationSnapshot) async throws
+    func play(_ id: UUID, location: LibraryLocationSnapshot, powerRevision: UUID) async throws
     func stop(revision: UUID?) async
     func isPlaying(revision: UUID) async -> Bool
+}
+extension LibraryWorking {
+    func play(_ id: UUID, location: LibraryLocationSnapshot, powerRevision: UUID) async throws {
+        guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { return }
+        try await play(id, location: location)
+    }
 }
 actor LibraryWorker: LibraryWorking {
     private var player: AVAudioPlayer?
@@ -33,11 +40,15 @@ actor LibraryWorker: LibraryWorking {
     }
     func export(_ id: UUID, to url: URL, location: LibraryLocationSnapshot) throws { try location.open().exportTranscript(id, to: url) }
     func play(_ id: UUID, location: LibraryLocationSnapshot) throws {
+        try play(id, location: location, powerRevision: PowerAdmission.shared.revision)
+    }
+    func play(_ id: UUID, location: LibraryLocationSnapshot, powerRevision: UUID) throws {
+        guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else { throw StoreError.invalidRecording }
         player?.stop(); player = nil
         guard let url = try location.open().recordingURL(for: id) else { throw StoreError.invalidRecording }
         let value = try AVAudioPlayer(contentsOf: url)
         value.prepareToPlay()
-        guard value.play() else { throw StoreError.invalidRecording }
+        guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision, value.play() else { throw StoreError.invalidRecording }
         player = value; playerRevision = location.revision
     }
     func stop(revision: UUID?) {
@@ -81,6 +92,7 @@ actor LibraryWorker: LibraryWorking {
     init(location: LibraryLocation? = nil, worker: any LibraryWorking = LibraryWorker()) {
         self.location = location ?? .shared; self.worker = worker
         displayedRevision = self.location.snapshot.revision
+        AppPowerLifecycle.shared.register(self)
         locationObservation = self.location.$snapshot.dropFirst().sink { [weak self] next in
             guard let self else { return }
             let old = self.displayedRevision
@@ -168,13 +180,18 @@ actor LibraryWorker: LibraryWorking {
         catch { self.error = "Cannot export transcript. Choose a new filename. \(error)" }
     }
     func play(_ id: UUID, expectedRevision: UUID? = nil) async {
+        guard PowerAdmission.shared.allowed else { return }
+        let powerRevision = PowerAdmission.shared.revision
         guard accepts(expectedRevision) else { return }
         guard !busy else { return }
         guard let activity = try? location.begin("Playback setup") else { return }
         busy = true; defer { location.end(activity); finishWork() }
         playbackTask?.cancel()
         do {
-            try await worker.play(id, location: activity.location)
+            try await worker.play(id, location: activity.location, powerRevision: powerRevision)
+            guard PowerAdmission.shared.allowed, PowerAdmission.shared.revision == powerRevision else {
+                await worker.stop(revision: activity.location.revision); return
+            }
             playing = true
             playbackTask = Task { [weak self] in
                 while !Task.isCancelled {
@@ -317,6 +334,7 @@ struct LibraryView: View {
                 Button("Settings…") { showingSettings = true }
                 Button("Refresh") { Task { await model.load() } }.disabled(model.busy)
             }.padding()
+            PowerStatusView()
             Text(libraryLocation.displayPath).font(.caption).foregroundColor(.secondary).textSelection(.enabled)
             if let error = libraryLocation.error { Text(error).font(.caption).foregroundColor(.red).textSelection(.enabled) }
             Divider()
@@ -431,6 +449,7 @@ struct LibraryView: View {
     @StateObject private var widget = FloatingWidgetController.shared
     @StateObject private var model = LibraryModel()
     @StateObject private var catalog = CatalogModel()
+    @AppStorage("powerSimulationCommands") private var powerSimulationCommands = false
     @AppStorage("appearance") private var appearance: AppAppearance = .system
     init() {
         // Headless bundle check exits before scenes or the session store open.

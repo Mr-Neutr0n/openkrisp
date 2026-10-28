@@ -204,8 +204,9 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         admissionObservation = captureAdmission.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
         recordingObservation = recording.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
     }
-    func refresh() async {
-        guard phase == .idle, !loading, !QuitGate.shared.quitting else { return }
+    func refresh() async { await refresh(allowSuspended: false) }
+    private func refresh(allowSuspended: Bool) async {
+        guard (allowSuspended || PowerAdmission.shared.allowed), phase == .idle, !loading, !QuitGate.shared.quitting else { return }
         let query = InventoryQuery(); inventoryQuery = query
         loading = true; error = nil
         defer {
@@ -242,7 +243,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         aecStatus = "Validate echo cancellation for the selected app before Start."
     }
     func validateInstalledAEC() async {
-        guard phase == .idle, echoCancellation, !aecValidating, let app = installedApp else { return }
+        guard PowerAdmission.shared.allowed, phase == .idle, echoCancellation, !aecValidating, let app = installedApp else { return }
         let id = UUID(); aecValidationID = id; aecValidating = true; installedAECConfiguration = nil
         aecStatus = "Checking the installed echo canceller and packaged worker…"
         do {
@@ -262,7 +263,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func validateInstalledProvider() async {
         let roles = requestedInstalledRoles
-        guard !requiresHeadsetConfirmation, phase == .idle, !providerValidating, !roles.isEmpty, let app = installedApp, let node = installedNode else { return }
+        guard PowerAdmission.shared.allowed, !requiresHeadsetConfirmation, phase == .idle, !providerValidating, !roles.isEmpty, let app = installedApp, let node = installedNode else { return }
         let id = UUID(); providerValidationID = id; providerValidating = true
         installedConfiguration = nil; installedSpeakerConfiguration = nil
         providerStatus = "Checking requested installed NC models and packaged worker identities…"
@@ -290,6 +291,37 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         return workers > 0 ? UInt64(workers) * 30_000_000_000 + 10_000_000_000 : startupTimeout
     }
     // No permission request or --route launch occurs until this explicit Start action.
+    private var powerRecordingPending = false
+    func revokeForPowerEvent() {
+        if recording.busy { powerRecordingPending = true }
+        invalidateProvider(); invalidateAEC()
+        startTask?.cancel()
+        inventoryQuery?.cancelled = true
+        recording.objectWillChange.send()
+    }
+    func suspendForPowerEvent() async -> PowerSuspendResult {
+        if recording.busy { powerRecordingPending = true }
+        guard await stop() else { return .init(failure: error ?? "Audio cleanup is not confirmed.", blocking: true) }
+        let deadline = DispatchTime.now().uptimeNanoseconds + stopTimeout
+        while loading, DispatchTime.now().uptimeNanoseconds < deadline {
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        guard !engaged else { return .init(failure: "Audio or recording cleanup is still pending. Retry Suspend.", blocking: true) }
+        if powerRecordingPending {
+            guard recording.savedSessionID != nil else {
+                powerRecordingPending = false
+                return .init(failure: "The interrupted recording was not saved. Any retained files remain available for recording recovery. No writer is active.", blocking: false)
+            }
+            powerRecordingPending = false
+        }
+        return .stopped
+    }
+    func refreshForPowerResume() async -> String? {
+        invalidateProvider(); invalidateAEC(); inventory = nil
+        await refresh(allowSuspended: true)
+        guard inventory != nil, !loading else { return error ?? "Device refresh did not complete. Retry Wake." }
+        return nil
+    }
     func start() {
         guard canStart else { return }
         let options = AudioRouteOptions(inputUID: inputUID, outputUID: outputUID,
@@ -504,6 +536,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     @Published private(set) var actionPending = false
     @Published private(set) var relaunchBlocked = false
     private var pendingIntent: AppExitIntent = .quit
+    func applicationDidFinishLaunching(_ notification: Notification) { NativePowerNotifications.shared.start() }
+    func applicationWillTerminate(_ notification: Notification) { NativePowerNotifications.shared.stop() }
     private var terminationApproved = false
     private var quitTask: Task<Void, Never>?
     private lazy var quit = QuitCoordinator(snapshot: {

@@ -149,3 +149,60 @@ The module inventory page `ev_e149f9e5c32e04184ca57569d38a0666e1ffc1f31ffdf19eb4
 An exact outgoing string-seed trace for `onAudioRecordingStateReset`, `ev_0868a665bb178a2fb073787db44c0f4493f1174d4d445ca3614fac5c321f90b9`, returns zero matches with `source_graph_status: partial`. The module views expose retained identities, observations and source ranges, not a generic raw-source window. The exact reset-handler body is therefore still unresolved. A negative trace in this partial graph does not contradict the prior static listener excerpts.
 
 Private results are `evidence/model-probes/sleep-wake-static-analysis-20261028*.result.json`, `sleep-wake-static-module-page-20261028.result.json`, `sleep-wake-static-module-asset-20261028.result.json` and `sleep-wake-static-reset-trace-20261028.result.json`. The complete parent graph is retained in the current REA session. Reuse its Evidence ID while available. No broad analysis rerun, process capture, source extraction or provider repair followed the bounded trace. The next useful capability is a focused inert member/method read or retained decoded-source query, rather than another whole-application semantic analysis at the same limit.
+
+## Native production notification source, 2026-10-28
+
+Focused native REA analysis closes the production-source question. This supersedes the earlier source-boundary unknown. The selected installed artifact is `/Users/harikp/Applications/krisp.app/Contents/Resources/app.asar.unpacked/.vite/build/node_modules/kr-native-utils/build/Release/kr-native-utils.node`, ARM64 Mach-O, observed SHA256 `17eb466b1092c37b0bbc8e04d4a29163a9fbef1a5e1e802be7c842dd59bc94ea`.
+
+Keep its identity separate from the ASAR declaration. The archive declares `5143abf99794e68e3421aca64703108271eb515483857faf672cedac044ce7f0` for this unpacked member. The static application graph records contradiction `ic_515edbb718c3f7c33b0ab50f6dcb98be768bf1376abc9412c3f6aeeb189612f6` with observed-untrusted status. These native conclusions apply to the observed installed digest. They do not prove equivalence to the archive-declared bytes.
+
+REA bound Ghidra 12.1.4 with analysis profile digest `20565088524a2d0359b9b96f46ac48e679d774c7b0092c56abc06de8fdbec11c`. It analyzed the artifact as immutable source. No native addon function ran.
+
+| Function | Address | Evidence |
+| --- | --- | --- |
+| RegisterTroubleshootingNotificationsNapi | `0xaad8` | `ev_d2a9c62a5bac530e51e866c7f0c0ed066147c4a9e2a6ccb75ea0b517233d05c3` |
+| NativeUtilsApi::RegisterTroubleshootingNotifications | `0x7ee04` | `ev_4b670ae6f7f2cfcadc24b757c4266b15410812a057c06833d7edccb7612597e7` |
+| HostTroubleshootingService::StartMonitor | `0x8c390` | `ev_be53a11e6a16c4ac8336631e424e217c549ae42a769e39e6a087eaff9ae12a41` |
+| HostTroubleshootingService::StartEventListener | `0x8c4fc` | `ev_4ca375f122dce3896b76134fb0a6640ad95576d46cfc20cf4fa1cdc2ae47b9d5` |
+| HostTroubleshootingService::EventCallback | `0x8be0c` | `ev_094a77e255f986a67d9883fc97345c715495a9457370dcfd75eacd4c75192eeb` |
+| StartSystemShutdownListener | `0x8e3a0` | `ev_563df6349a613486f3ae6e49b5cbff86f99550fd4f075b6198a045969a3e83d3` |
+| SystemShutdownNotifier::startWithCallback: | `0x8e208` | `ev_bd03f5d81e257f52d93edc769d8b55ca9be9db339be98ceb497b122abb1f83e5` |
+| SystemShutdownNotifier::handlePowerOff: | `0x8e364` | `ev_ea3fd9373e7298b6dd9e755ff160f9fac1b405335fc095706720143466199cc7` |
+| PowerManagementEventRaiseCB | `0xa7d8` | `ev_68f6ce82ac4569636f275bb3447fd17edc1676ef3445b975554b102116761e15` |
+| Async bridge closure | `0x1b938` | `ev_c8386cae996650e208c8f3b8326607fb0963eb0d8e5c1b4103ee9cb0c284d09a` |
+| JavaScript delivery closure | `0x1bc00` | `ev_44abb6c319bea2ba5748d8c5da76c65d5dc82792c4e99c67e279c687062626c4` |
+| HostTroubleshootingService::StopMonitor | `0x8c65c` | `ev_fd32d15452107aa9b56baa784d88091f7e615dddfec0833be705edaf8e2e5ac0` |
+
+### Registration and event values
+
+The N-API registration requires exactly one function argument. It creates the asynchronous invoke owner and a Napi ThreadSafeFunction, then passes `PowerManagementEventRaiseCB` into NativeUtilsApi. The API calls its host-troubleshooting service through virtual offset `0x10`. The recovered factory installs vtable `0x311e68`; complete 48-byte read `ev_58cc9f7e8df2e3daa0ec986272ea56481983d91898d67afed598c52e24763368` places `StartMonitor` at that offset and `StopMonitor` at offset `0x18`. Factory dossier `ev_e05e73f958fd9fa7f7366da9420dcf3352e86b9c6988c34f3297e37c0ce8a067` binds the installed concrete implementation.
+
+StartMonitor stores the supplied callback, registers the separate shutdown listener and starts IOKit power listening. StartEventListener calls `IORegisterForSystemPower` with its service instance and EventCallback. On success it adds the IONotificationPort run-loop source to the current CFRunLoop in common modes. An unsuccessful registration returns failure. This source uses IOKit, not Electron powerMonitor or NSWorkspace sleep/wake notifications.
+
+| Native notification | Numeric message | Application event | Other action |
+| --- | --- | --- | --- |
+| CanSystemSleep | `0xe0000270` | None | Calls IOAllowPowerChange |
+| SystemWillSleep | `0xe0000280` | `0`, suspend | Calls IOAllowPowerChange before callback dispatch |
+| SystemWillPowerOn | `0xe0000320` | None | Logs that wake has started |
+| SystemHasPoweredOn | `0xe0000300` | `1`, resume | Dispatches after the has-powered-on notification |
+| NSWorkspaceWillPowerOffNotification | Separate notification | `2`, power off | Calls the stored shutdown callback |
+
+The IOKit constant names were checked against the installed SDK's `IOKit.framework/Headers/IOMessage.h`, definitions at lines 137, 156, 166 and 175. The exact numeric branches and emitted integers come from the original native dossier. Other message values return without dispatch. A null service pointer logs and returns.
+
+SystemShutdownNotifier registers `handlePowerOff:` with the shared NSWorkspace notification center for NSWorkspaceWillPowerOffNotification. That method emits integer 2. Its stored callback forwards the event to the same host-troubleshooting callback. It is distinct from the IOKit suspend/resume source.
+
+### Delivery and preservation implications
+
+PowerManagementEventRaiseCB copies the integer into the async invocation path. The next closure copies it again into an owned task and calls `napi_call_threadsafe_function` in nonblocking mode. Queueing failure is logged. The JavaScript delivery closure checks native-utils initialization, creates a Number from that copied integer and calls the supplied JavaScript function with that number and an empty array. Main's known callback consumes the first event argument.
+
+The system sleep acknowledgement does not await JavaScript dispatch, service suspension or recording save. It occurs before the native suspend callback reaches the async bridge. Therefore the original path does not provide an evidenced operating-system sleep delay for durable recording publication. This makes the existing recording-reset-to-save unknown material: application state, OS acknowledgement and saved recording publication are separate outcomes.
+
+StopMonitor removes the current run-loop source, deregisters IOKit system-power notifications, closes the root service connection and destroys the notification port. Its body does not show removal of the NSWorkspace shutdown observer. That observer's full teardown remains outside this focused question. Actual OS notification timing, delivery during shutdown, application suspension and recording preservation have not been exercised.
+
+### Retained evidence and close limitation
+
+The focused procedure-name search is `ev_558968646ddeb26481a6831712005f169db536ccbbc409ce570ed3c90e793063`. Individual complete native dossier results are private files matching `evidence/model-probes/sleep-wake-native-*-20261028.result.json`. The exported bundle `evidence/model-probes/sleep-wake-native-20261028.bundle.json` contains 36 records in 37,357,933 bytes, including the prior static application graph and the native dossiers.
+
+After export, close_binary was requested. It returned cleanup_incomplete because global process_capture_resources still listed candidates 29629, 32300, 32677 and 32857 with unreadable ownership environments. This was a close failure, not original execution or a native-analysis failure. No cleanup retry, candidate signal or provider repair followed. The target may remain selected; do not assume provider resources closed. The native facts above remain retained with their exact observed artifact identity and complete static dossiers.
+
+The production event source and integer mapping are now answered statically. The remaining immediate prerequisite is the original meeting-assistant reset-handler body and its recording/session completion chain. That question remains separate from the recovered OS notification path.

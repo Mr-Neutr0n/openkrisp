@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Saved recording transcription, 2026-10-28](#saved-recording-transcription-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Local power lifecycle, 2026-10-28](#local-power-lifecycle-2026-10-28). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -624,3 +624,19 @@ Verification passed 18 local-store tests, 29 focused desktop tests and the full 
 - Desktop log `evidence/history-transcript-desktop-20261028.log`, SHA256 `3199445feea6ac2ea349f60ec15d8fc5949bb39e550586e00fdcbad61f0a5cb9`.
 
 REA's purpose-built inert application analysis worked independently of process capture but produced a partial graph after semantic workers exhausted their budgets. The exact BootstrapApp identity matches prior evidence; unpacked native integrity contradictions are explicitly retained. An empty reset-handler trace in that partial graph is not an absence proof. The original recording-reset handler remains unresolved. See `sleep-wake-findings.md` for IDs, pins and limits. No original code, OS recognition, physical audio or administrator action ran. Next complete native/real offline recognition acceptance when available and continue lifecycle/feature gaps; full parity remains incomplete.
+
+
+## Local power lifecycle, 2026-10-28
+
+The app now listens for IOKit system-power events on the main common run loop. Can-sleep is acknowledged without suspension; will-sleep is acknowledged before dispatching Suspend; has-powered-on dispatches Resume. Will-power-on does not resume services. NSWorkspace power-off enters the existing normal termination pipeline. Registration errors remain visible, and termination removes listeners. Native source/mapping is recovered statically in `sleep-wake-findings.md`, including observed-versus-declared addon identities and retained evidence. No original code ran.
+
+The shared lifecycle closes admission synchronously on Suspend, cancels pending recognition without discarding review text, invalidates device/model/permission results and stops registered history/comparison playback. It serializes cleanup and the newest requested event, including Suspend arriving during Resume. Route shutdown uses existing recording finalization. Unconfirmed live cleanup keeps admission closed and exposes retry. A terminal recording publication failure with no live writer retains files and a warning; Resume may proceed without claiming that recording was saved. This is an explicit independent preservation policy because the original reset-to-publication join remains unresolved.
+
+Resume refreshes device metadata and revokes model admission. It never restarts capture, recording, recognition or playback. File-only writes/reviews retain their existing leases and preservation rules. Quit stays separate from the power gate. Settings can reveal labeled simulated Sleep/Wake controls, default hidden; they call the same lifecycle without requesting OS sleep or wake. Their Settings placement is not original tray-menu parity.
+
+Full desktop verification passed 195 tests, ARM64/macOS12 packaging, signing and relocated-resource checks. The 53-test focused run includes nine lifecycle tests and two native mapping tests. Fixtures cover newest-event ordering, interrupted Resume, cleanup failure/retry, stale inventory/provider/permission results, two history players, comparison playback epochs, recognition cancellation preserving a timed draft, recording publication and retained failure across Wake, and no automatic helper restart. Independent GPT 6.1 sol review found no blocking issue.
+
+- Focused log `evidence/power-lifecycle-focused-20261028.log`: SHA256 `41da04041f030e06a6db66f6e3e10d72f5b2305b0069550c9389ae3149006e7c`.
+- Desktop log `evidence/power-lifecycle-desktop-20261028.log`: SHA256 `32c0b3096cb065bc9ee02114b9cbdd98a6ef15f95208cd47419a2503a225ab40`.
+
+The original native callback acknowledges OS sleep before async application cleanup. Neither the evidence nor this implementation promises recording publication before the machine sleeps. Actual listener delivery, system sleep/wake/shutdown, native simulation controls, physical routing and recording survival across sleep remain unverified. The original recording-reset handler, default-device restoration and later graph restart remain separate gaps. Native analysis close failed due unrelated process-capture resource ownership checks; the exported static evidence is preserved and provider shutdown is not claimed. No physical audio, forced OS power event or administrator action ran. Full retained-feature parity remains incomplete.

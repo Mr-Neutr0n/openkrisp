@@ -48,7 +48,7 @@ private struct RecordingResult: Decodable {
     private var failureToken: UUID?
     var busy: Bool { phase != .idle || settling }
     var libraryActivityID: UUID? { libraryActivity?.id }
-    var canStart: Bool { operation != nil && !busy && !stoppingRoute && !QuitGate.shared.quitting }
+    var canStart: Bool { operation != nil && !busy && !stoppingRoute && !QuitGate.shared.quitting && PowerAdmission.shared.allowed }
     init(storage: any RecordingStoring = RecordingStorage(), timeout: UInt64 = 10_000_000_000, location: LibraryLocation? = nil) {
         self.location = location ?? .shared
         self.storage = storage; self.timeout = timeout
@@ -76,7 +76,7 @@ private struct RecordingResult: Decodable {
                 let prepared = try await self.storage.prepare(operationID: id, location: activity.location)
                 self.job = prepared
                 self.retainedPaths.removeAll { $0 == prepared.directory.path }
-                guard self.operation == id, !self.stoppingRoute, !Task.isCancelled else {
+                guard self.operation == id, !self.stoppingRoute, PowerAdmission.shared.allowed, !Task.isCancelled else {
                     await self.fail("Recording cancelled before capture started.", terminal: true); return
                 }
                 self.phase = .starting; self.message = "Waiting for recording start confirmation…"
@@ -85,7 +85,7 @@ private struct RecordingResult: Decodable {
         }
     }
     func pauseOrResume() {
-        guard let job, phase == .recording || phase == .paused else { return }
+        guard PowerAdmission.shared.allowed, let job, phase == .recording || phase == .paused else { return }
         let action = phase == .recording ? "pause" : "resume"
         phase = action == "pause" ? .pausing : .resuming
         message = "Waiting for recording \(action) confirmation…"

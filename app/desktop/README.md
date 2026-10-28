@@ -276,3 +276,10 @@ History offers **Transcribe on this Mac…** for a session with a saved recordin
 Save updates the same session without copying audio. Unedited recognition keeps segment timing; editing and then reverting text still loses recognition timing and uses the recording-wide range. Session, recording, selection or library changes invalidate the review or reject its save. Library leases block folder switching and Quit while review is open; explicit save also locks that window's selection. In-process store commits and deletion share a lock across windows.
 
 This uses the existing on-device-only Apple backend and requests Speech permission only on an explicit recognition action. It does not implement automatic transcription at recording stop, live captions, diarization or original post-save UI parity. Injected-recognition tests cover the complete saved-WAV-to-timed-export path; OS recognition and native dialog interaction remain separate acceptance steps.
+
+
+## System power events
+
+The app listens for IOKit sleep/wake and NSWorkspace power-off notifications. Suspend closes new audio admission, cancels pending recognition, stops local playback and finalizes route recording through the existing stop path. Resume refreshes devices and requires explicit user Start and renewed installed-model validation. Cleanup failures stay closed with retry controls. Terminal recording-save failures retain their files and visible warning; they are never reported as saved.
+
+Settings has an opt-in toggle for simulated Sleep/Wake controls. These exercise the application lifecycle only and do not put the Mac to sleep. Simulation is hidden by default. OS acknowledgement happens before asynchronous cleanup, so pre-sleep recording durability is not promised. Actual system sleep/wake and physical audio acceptance remain unverified.

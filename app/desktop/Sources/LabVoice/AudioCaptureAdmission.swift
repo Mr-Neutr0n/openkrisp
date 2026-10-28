@@ -7,7 +7,7 @@ import Combine
     enum Owner: Equatable { case route, microphoneTest, recordingRecovery }
     @Published private(set) var operationID: UUID?
     private(set) var owner: Owner?
-    var available: Bool { operationID == nil && !QuitGate.shared.quitting }
+    var available: Bool { operationID == nil && !QuitGate.shared.quitting && PowerAdmission.shared.allowed }
     func acquire(_ id: UUID, owner: Owner) -> Bool {
         guard available else { return false }
         self.owner = owner; operationID = id; return true
