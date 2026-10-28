@@ -267,3 +267,12 @@ Inventory now carries the global CoreAudio interface name, manufacturer and mode
 `LocalHeadsetPolicy` implements the recovered local blocked, allowed and manual precedence, mode/rate gates and literal UTF-16 substring behavior. Its bounded JSON cache loader preserves prior lists on failed loads. It excludes account/team restrictions and network refresh. The original-method replay did not return dynamic outcomes; the 35 included local fixture expectations come from static source analysis. Host Unicode lowercase version differences and malformed rate coercion remain unverified.
 
 This engine is not yet connected to automatic model selection or a cache importer UI. The explicit experimental mode and exact-UID headset confirmation flow remain in effect. No vendor compatibility list is bundled.
+
+
+## Transcribe a saved recording
+
+History offers **Transcribe on this Mac…** for a session with a saved recording. Choose an available on-device Speech language, start recognition, review the result and choose **Save transcript**. Recognition only changes the review draft. Cancel or recognition failure preserves the saved transcript. Replacing nonempty review text requires confirmation, and the previous review stays until recognition succeeds. An empty draft cannot be saved through this workflow.
+
+Save updates the same session without copying audio. Unedited recognition keeps segment timing; editing and then reverting text still loses recognition timing and uses the recording-wide range. Session, recording, selection or library changes invalidate the review or reject its save. Library leases block folder switching and Quit while review is open; explicit save also locks that window's selection. In-process store commits and deletion share a lock across windows.
+
+This uses the existing on-device-only Apple backend and requests Speech permission only on an explicit recognition action. It does not implement automatic transcription at recording stop, live captions, diarization or original post-save UI parity. Injected-recognition tests cover the complete saved-WAV-to-timed-export path; OS recognition and native dialog interaction remain separate acceptance steps.

@@ -416,3 +416,20 @@ The pre-fix test failed two assertions. Six new regression tests cover stale suc
 - Full desktop `evidence/inventory-cancel-desktop-verify-20261028.log`: SHA256 `f280dba788e84f5841e6121f15fdfe70ed27fd06bba22383193af4b2a44632f2`.
 
 Retained original output adds a separate recording-stop event join: foreground/background stop calls run through an unawaited Promise.all. The suspend-reset handler and durable publication join remain unknown. REA advertises capture capability but still rejects execution because of unresolved process cleanup; no further original reads were attempted after one narrowed revalidation failed. See the latest section of `sleep-wake-findings.md`. No original application code, hardware capture or administrator action ran. Full retained-feature parity remains incomplete.
+
+
+## Saved recording transcription, 2026-10-28
+
+History now offers explicit on-device transcription for an existing saved recording. The user chooses a language, starts recognition, reviews or edits the draft and chooses Save transcript. Recognition changes only the draft. Cancellation and failure preserve the saved transcript; replacing nonempty review text needs confirmation. Empty text is not accepted by this UI. Unedited recognition retains word timing; any text edit invalidates timing even if later reverted.
+
+LocalStore captures the expected session and root/session-directory/manifest/recording identities. Save validates that snapshot and segment bounds, synchronizes a private temporary manifest, rechecks the snapshot and atomically replaces only session.json. Session ID/title/date/duration and audio stay unchanged. Shared process locking serializes commits and deletion across store instances. File metadata detects ordinary mutation/replacement; it is not a cryptographic recording snapshot or compare-and-swap against arbitrary external writers. Power-loss directory durability is not claimed.
+
+Desktop review holds a library activity lease, fences selection roundtrips and late recognition/preparation results, and locks selection/dismissal during save. Failed saves preserve the review and show an error. A real own finalized WAV fixture runs through saved history, injected recognition, reviewed same-session replacement, phrase search and timed export; tests verify unchanged audio bytes/inode/mtime and one session. This is an independent local workflow, not recovered original post-save UI semantics. Live ASR, diarization, automatic recording transcription and accuracy remain open.
+
+Verification passed 18 local-store tests, 29 focused desktop tests and the full 184-test desktop suite, including ARM64/macOS12 packaging, signing and relocated-resource checks. GPT 6.1 sol implementation and independent review found no remaining blocking issue. A development selection didSet recursion failure was corrected with a guarded selection setter; its full raw crash log was not retained, so only the final passing test evidence is claimed.
+
+- Store log `evidence/history-transcript-store-20261028.log`, SHA256 `1952db980442e33dc063c9b364026a149501dda151b776a2c9a5f0c1cc45effe`.
+- Focused log `evidence/saved-transcript-focused-20261028.log`, SHA256 `a73aee95ab1ee35aa3d557144c8284d09d88cda5c9cea84d47a8d5c7003122f6`.
+- Desktop log `evidence/history-transcript-desktop-20261028.log`, SHA256 `3199445feea6ac2ea349f60ec15d8fc5949bb39e550586e00fdcbad61f0a5cb9`.
+
+REA's purpose-built inert application analysis worked independently of process capture but produced a partial graph after semantic workers exhausted their budgets. The exact BootstrapApp identity matches prior evidence; unpacked native integrity contradictions are explicitly retained. An empty reset-handler trace in that partial graph is not an absence proof. The original recording-reset handler remains unresolved. See `sleep-wake-findings.md` for IDs, pins and limits. No original code, OS recognition, physical audio or administrator action ran. Next complete native/real offline recognition acceptance when available and continue lifecycle/feature gaps; full parity remains incomplete.

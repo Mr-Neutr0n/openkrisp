@@ -79,8 +79,8 @@ enum ImportTranscriptDraft: Sendable {
     private var operationID: UUID?
     private var task: Task<Void, Never>?
 
-    init() {
-        location = .shared
+    init(location: LibraryLocation? = nil) {
+        self.location = location ?? .shared
         let transcriber = OfflineTranscriber()
         authorization = { OfflineTranscriber.authorizationStatus }
         requestAuthorization = { try await OfflineTranscriber.requestAuthorization() }

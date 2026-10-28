@@ -174,6 +174,8 @@ public struct LocalStore: Sendable {
 
     /// Explicit user action only. Never call automatic retention or cleanup against this store.
     public func remove(_ id: UUID) throws {
+        transcriptReplacementLock.lock()
+        defer { transcriptReplacementLock.unlock() }
         try validateRoot()
         let folder = root.appendingPathComponent(id.uuidString, isDirectory: true)
         try requirePlainDirectory(folder)

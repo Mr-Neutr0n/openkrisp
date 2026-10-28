@@ -49,7 +49,26 @@ actor LibraryWorker: LibraryWorking {
 
 @MainActor final class LibraryModel: ObservableObject {
     @Published var sessions: [Session] = []
-    @Published var selection: UUID?
+    @Published private var selectedID: UUID?
+    var selection: UUID? {
+        get { selectedID }
+        set {
+            guard transcriptSaveSelection == nil || newValue == selectedID else { return }
+            if newValue != selectedID { selectionRevision = UUID(); selectedID = newValue }
+        }
+    }
+    @Published private(set) var selectionRevision = UUID()
+    private var transcriptSaveSelection: UUID?
+    func beginTranscriptSave(session: Session, revision: UUID, selectionRevision: UUID) -> Bool {
+        guard !busy, location.snapshot.revision == revision, self.selectionRevision == selectionRevision,
+              selected == session else { return false }
+        transcriptSaveSelection = session.id; busy = true
+        return true
+    }
+    func finishTranscriptSave(_ session: Session?) {
+        if let session, let index = sessions.firstIndex(where: { $0.id == session.id }) { sessions[index] = session }
+        transcriptSaveSelection = nil; finishWork()
+    }
     @Published var query = ""
     @Published var busy = false { didSet { if busy != oldValue { DiagnosticEventLog.shared.append(component: .library, code: busy ? .started : .stopped, severity: .info) } } }
     @Published var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .library, code: .operationFailed, severity: .error) } } }
@@ -274,6 +293,8 @@ struct LibraryView: View {
     @State private var showingSettings = false
     @State private var showingAudio = false
     @State private var importing = false
+    @State private var transcribing: Session?
+    @State private var showingTranscription = false
     @State private var deleting: Session?
     @State private var deletingRevision: UUID?
     private func duration(_ seconds: Double) -> String {
@@ -337,6 +358,8 @@ struct LibraryView: View {
                             }.disabled(session.transcript.isEmpty || model.busy)
                             Button("Delete…") { deletingRevision = model.location.snapshot.revision; deleting = session }.disabled(model.busy)
                         }
+                        Button("Transcribe on this Mac…") { transcribing = session; showingTranscription = true }
+                            .disabled(session.recordingFilename == nil || model.busy)
                         Divider()
                         Text("Transcript").font(.headline)
                         ScrollView {
@@ -378,8 +401,11 @@ struct LibraryView: View {
         .sheet(isPresented: $showingAudio) { AudioView(audio: audio) }
         .sheet(isPresented: $showingSettings) { AppSettingsView(catalog: catalog, library: model, audio: audio, showDone: true) }
         .sheet(isPresented: $importing) { ImportView(model: model) }
+        .sheet(isPresented: $showingTranscription) {
+            if let session = transcribing { SavedSessionTranscriptionView(model: model, session: session) }
+        }
         .alert(deleting == nil ? "Operation failed" : "Delete local session?",
-               isPresented: Binding(get: { deleting != nil || (model.error != nil && !importing) },
+               isPresented: Binding(get: { deleting != nil || (model.error != nil && !importing && !showingTranscription) },
                                     set: { if !$0 { deleting = nil; model.error = nil } })) {
             if let session = deleting {
                 Button("Cancel", role: .cancel) { deleting = nil }

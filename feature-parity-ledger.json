@@ -2065,10 +2065,26 @@
         {
           "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/TranscriptImportTimingTests.swift",
           "exists": true
+        },
+        {
+          "path": "projects/krisp/app/local-store/Sources/LocalStore/TranscriptReplacement.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/local-store/Tests/LocalStoreTests/TranscriptReplacementTests.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Sources/LabVoice/SavedSessionTranscription.swift",
+          "exists": true
+        },
+        {
+          "path": "projects/krisp/app/desktop/Tests/LabVoiceTests/SavedSessionTranscriptionTests.swift",
+          "exists": true
         }
       ],
-      "implementation": "Selected-WAV Apple offline recognition now preserves unchanged recognized segment text, order and timing through desktop review, import, storage and timed export. Manual edits irreversibly invalidate the timing candidate, selected-file changes clear it, and failed/cancelled replacement recognition preserves the previous candidate. Manual text and missing segments retain a recording-wide fallback. Desktop phrase search spans stored word boundaries; LocalStore.search remains per-segment. No live meeting ASR, diarization, speaker labels, transcript-only capture, original ASR model inference or automatic recording transcription.",
-      "verified_scope": "Full desktop verification passed 138 tests and signed packaging/relocation checks. Focused tests passed 22 cases, including seven new timing tests covering real local-store import/export, timing rejection, edits/reverts, missing segments, replacement cancellation/failure, late results, selected-file changes, phrase search and stale library revisions. Unchanged local-transcription and local-store suites passed 14 and 12 tests. Tests use own WAVs and injected recognition; no Speech prompt, real recognition, hardware audio or original runtime timestamp comparison ran. Formatted recognition paragraphs are not separately stored; timed export retains segment text with millisecond-formatted start markers. See offline-transcript-timing-findings.md. Verification log SHA256: {\"evidence/transcript-timing-local-transcription-verify-20261023.log\": \"57eacd32abab9ca067872fe5948531c4d5f33a5f233d23f249d703baa9af1ff8\", \"evidence/transcript-timing-local-store-verify-20261023.log\": \"7a31ad53ae070d24ec5825955416931dee73c48c26d7e617819f9f3a19a52d61\", \"evidence/transcript-timing-desktop-verify-20261023.log\": \"3dae16820385bfedd235c3746941dd01eec430e44639d2c9609ca41ed395d580\"}.",
+      "implementation": "Selected-WAV Apple offline recognition now preserves unchanged recognized segment text, order and timing through desktop review, import, storage and timed export. Manual edits irreversibly invalidate the timing candidate, selected-file changes clear it, and failed/cancelled replacement recognition preserves the previous candidate. Manual text and missing segments retain a recording-wide fallback. Desktop phrase search spans stored word boundaries; LocalStore.search remains per-segment. No live meeting ASR, diarization, speaker labels, transcript-only capture, original ASR model inference or automatic recording transcription. History now supports explicit on-device transcription/review/save of an existing recorded session. Same-session transcript replacement preserves metadata/audio, checks session and source identities, and serializes commits/deletion across windows. Recognition and cancellation leave saved text unchanged until explicit Save. Selection/library/result revisions prevent stale review publication.",
+      "verified_scope": "Full desktop verification passed 138 tests and signed packaging/relocation checks. Focused tests passed 22 cases, including seven new timing tests covering real local-store import/export, timing rejection, edits/reverts, missing segments, replacement cancellation/failure, late results, selected-file changes, phrase search and stale library revisions. Unchanged local-transcription and local-store suites passed 14 and 12 tests. Tests use own WAVs and injected recognition; no Speech prompt, real recognition, hardware audio or original runtime timestamp comparison ran. Formatted recognition paragraphs are not separately stored; timed export retains segment text with millisecond-formatted start markers. See offline-transcript-timing-findings.md. Verification log SHA256: {\"evidence/transcript-timing-local-transcription-verify-20261023.log\": \"57eacd32abab9ca067872fe5948531c4d5f33a5f233d23f249d703baa9af1ff8\", \"evidence/transcript-timing-local-store-verify-20261023.log\": \"7a31ad53ae070d24ec5825955416931dee73c48c26d7e617819f9f3a19a52d61\", \"evidence/transcript-timing-desktop-verify-20261023.log\": \"3dae16820385bfedd235c3746941dd01eec430e44639d2c9609ca41ed395d580\"}. Saved-recording workflow: full desktop184 tests/signing/relocation and store18 tests pass. Own finalized WAV -> injected recognition -> reviewed timed replacement -> history phrase search and timed export preserves audio bytes/inode/mtime and session identity. Tests cover stale source/manifest, cancellation, invalid timings, selection roundtrips and library changes. This does not verify OS recognition, accuracy, native UI or original post-save semantics.",
       "missing_acceptance": "Run authorized real offline recognition and assess recognition/timestamp accuracy. Implement and validate live source/timestamp contracts, diarization and transcript-only lifecycle. Original runtime timestamp parity and full feature parity remain unverified; resolve conflicting short-call labels before enforcing limits."
     },
     {
@@ -3048,7 +3064,7 @@
   "implementation_source_sha256": {
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/ModelCatalog.swift": "0ce55bff3e46e0bb31f8dbb4c126089dc5e9e6e4951a7d78d9c611dabd490f59",
     "projects/krisp/app/desktop/build": "21b650dd02c7eede64282d480610cda27c1bb8699d82d6572e1c59456e3b48bc",
-    "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "74b89d527cd18dc325ae491332d133f44bb11381f8497dce4f03f54134180932",
+    "projects/krisp/app/local-store/Sources/LocalStore/LocalStore.swift": "54f090743e4a12301fd5bbf661840d273bd509d497182e1fb1c6bdb2818dd66c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingStorage.swift": "b1e9a95cadc305e07e69d963151877ade064656468dcd98577cd93a1a8c62bad",
     "projects/krisp/verification/README.md": "08dd08850a382847f51c09cd3448629231da5bacd458fa0ba1f5cc99c78ed885",
     "projects/krisp/verification/audio.py": "d2dde8c9ba620e0a941814737e5107f7005149e90c0dec9d3063ecc2f49f978d",
@@ -3062,12 +3078,12 @@
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/AppleBackend.swift": "bb1a9aaa1212b7a94e51f394e00497af3a5b578d0f687e882f0504982bafb979",
     "projects/krisp/app/local-transcription/Sources/LocalTranscription/OfflineTranscriber.swift": "99b6d405ed8ee8ec2b5117b86c4823178feb6292abbebe0eb1e53cc93b24ee2b",
-    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "f577d1d79c7c91ee2229018a69e4951c7d4f4ac49d68bb75a9a4e6142e82b6cc",
+    "projects/krisp/app/desktop/Sources/LabVoice/ImportTranscription.swift": "fc65546c168c0b1ba9a093a61d19be77208baf84ff36d72c90a1f7698676837b",
     "projects/krisp/app/audio-host/recording.cpp": "104bf19b31b2fccd26b78c4d1bf2e06b03abe15162cc6c0e1649e67ef55a580a",
     "projects/krisp/app/audio-host/route_cli.cpp": "fbac5f519fff0b8040980c44c2281edcefe04977186d7661b871508d326f9ee1",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "013d1609513ebc7e7c6537d79ad170104dbc4c1bb99fb66a0c6e44185127b27c",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "409a88c5a15f5d917bb4925a86fa0fe01ddddd1483a74c22036e82df5a982cd3",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "b40f9841aafa639b625ee943bfdc2f5f72cc9356d399b6da3ba915d54a54591c",
     "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "db149846fda3b742340f544118c07a7a3928990f7eda215b12cc474d6f49bc70",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "7d0af6bcef077276ee9e360ac73a24df14fd31b0f901e193d9247698f27f0efe",
@@ -3223,7 +3239,11 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/Fixtures/LocalHeadsetMatcherCases.json": "11b8603186fa7dcb57daef959d143e8e5bfbd9cb896f475b0d84692eb30bbc19",
     "projects/krisp/app/desktop/Sources/LabVoice/LocalHeadsetCompatibilityStore.swift": "e39e76b1ef79e607f2092b2e06f7c91a30de055f809733ea032cbeaf62f68fcb",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/LocalHeadsetCompatibilityStoreTests.swift": "79654fdac712ae627aebda4b67cf204d4b254a4b3b43b2f72d50b28738898aba",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioInventoryCancellationTests.swift": "8345a1d27108d4e5befd72828246101052f9e8a9f7774c26691bb35339d27f17"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioInventoryCancellationTests.swift": "8345a1d27108d4e5befd72828246101052f9e8a9f7774c26691bb35339d27f17",
+    "projects/krisp/app/local-store/Sources/LocalStore/TranscriptReplacement.swift": "a5ca875bb561cf9b4ec1325d3eaf82b2cfd953a6c16cb12f23cf88a147ec6a37",
+    "projects/krisp/app/local-store/Tests/LocalStoreTests/TranscriptReplacementTests.swift": "0a7931d64cd374b98409cb4b73a335cf506cb5d280d4e747e765b48827341335",
+    "projects/krisp/app/desktop/Sources/LabVoice/SavedSessionTranscription.swift": "9e1bfe51e39feb51498171983c42f1d7f189c550b713dd4f87f6fb88b9735916",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/SavedSessionTranscriptionTests.swift": "b936cbb6bb59d90c96a215316281bd47828c2a8a4a8b30396fff83cb3b32e4d7"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3234,7 +3254,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "Code fingerprints identify 178 source, verification and own-fixture files at the inventory cancellation checkpoint. Full desktop verification passes 177 tests. Native UI, original runtime-policy, OS lifecycle, acoustic and physical routing acceptance remain incomplete.",
+  "source_snapshot_note": "Code fingerprints identify 182 source, verification and own-fixture files at the saved-recording transcription checkpoint. Desktop184/store18 tests pass. Full retained local parity, native UI/OS recognition, lifecycle and physical audio remain incomplete.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
