@@ -458,3 +458,8 @@ The live Watch path now uses recovered native listener/tracker/storage timing an
 ## Local call tracking checkpoint, 2026-10-29
 
 Watch now feeds ordered observation-only call tracking, persistent blocking, call switching and recovered stop/restoration timing. REA recovered missing Call definitions, packaged defaults and native application-version metadata. Complete current snapshots can refresh tracking after missing history; exact original event-diff ordering and capture permission admission remain gaps. Host verification, 237 desktop tests with two opt-in skips, signed packaging and one real helper/controller Stop test passed. See CHECKPOINT.md. Next implement the remaining local automatic recording/ASR join and verify real UI/audio behavior. Driver administrator actions and Speech authorization remain deferred.
+
+
+## Call event ordering checkpoint, 2026-10-29
+
+Recovered DeviceManager addition/removal order and exact stream identity are implemented. Note-taker modes and recorder/ASR joins are mapped. The next production requirement is selected-application capture with a separate microphone lane, not automatic recording of the existing global route mix. Implement target identity admission, an owned process-tap/input session, format/clock handling and verified teardown, then connect call-scoped processing and recording through successful admission events. Preserve independent saved-session transcription until a real stream ASR owner exists. See the latest CHECKPOINT.md section for checks and remaining locale/permission/runtime limits.

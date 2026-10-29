@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Local call tracking, 2026-10-29](#local-call-tracking-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Call event ordering, 2026-10-29](#call-event-ordering-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -766,3 +766,20 @@ A separate status-only Speech preflight reported authorization notDetermined and
 - Desktop log `evidence/desktop-verify-call-tracking.log`, SHA256 `7106af9ed48eb4cfff299df83828aaad1372b1d6fbd32193d08e3a26a019fb5f`.
 - Native integration `evidence/call-tracking-native-controller-20261029.log`, SHA256 `5a73ce4da64fa2fb4de357344206c286a4c6966149811c0b90ce51a930466d08`.
 - Speech preflight `evidence/saved-transcription-preflight-20261028.log`, SHA256 `008133012cec7f440010a01f6b9ce145a7b8a7c09d8e9f24a8bb99f4a263564a`.
+
+
+## Call event ordering, 2026-10-29
+
+REA now recovers the original DeviceManager stream diff. Incoming clients are stably sorted by appId.localeCompare, new identities are appended and emitted first, then missing identities are removed from the retained array in reverse order. Identity is exact app ID, device ID, direction and PID. Names, versions and helper-PID metadata are retained when that identity remains unchanged. The desktop adapter now follows this contract, replacing its previous remove-before-add and name-based comparison. A virtual microphone replacement no longer invents a call restart due solely to the wrong diff order.
+
+Native byte-key order supplies stable ties before application-ID locale sorting. Foundation Locale.current comparison approximates JavaScript's no-options localeCompare. Original Electron resolved locale/ICU equivalence remains unverified. Source callback order is known; the original asynchronous microphone-permission wait can still change completed call-registration order. Current-state baseline recovery and unknown-read policy remain separate reconstruction boundaries.
+
+REA also closes note-taker mode transitions, ASR readiness/event ordering and recorder attachment by ASR stream ID. Recording starts from successful ASR processing events, not directly from call detection; graph changes reattach the existing recording. macOS speaker capture is selected-application audio. The current independent route recorder mixes the full route, so automatic global-route recording was not added as a substitute. See activation-findings.md for evidence and exact scope.
+
+Desktop ./verify passed with 242 tests enumerated, 240 passed and two opt-in skips, plus signed ARM64/macOS12 packaging and relocated resources. Independent GPT 6.1 sol review found no blocking issue in the corrected adapter. Host code is unchanged from the previous passing checkpoint. No real call, native UI, capture, playback, permission prompt or administrator operation ran. A fresh read-only own-helper inventory still reports both private driver endpoints absent with no inventory errors. Full automatic activation and acoustic parity remain incomplete.
+
+Next implement selected-app capture as a separate production input source. The existing route Context requires feed/monitor/hardware aggregation and cannot isolate an app by changing its output UID. A call capture target must retain responsible identity and selected actual process IDs, resolve/revalidate their current CoreAudio object IDs, preserve distinct microphone/app lanes, handle their formats/clocks, and verify callback/aggregate/tap teardown before replacement. Local ASR needs a stream/session owner; the current saved-transcript UI controller is tied to explicit history selection and review. Do not treat either a global route mix or a selected saved row as an equivalent call source.
+
+Desktop log: `evidence/desktop-verify-call-stream-diff.log`, SHA256 `0a190538a1b06707eda91bc01c7f6134d440d9796f5fa0a9d463899e48176696`.
+
+After the full run, one test fixture was strengthened to distinguish native byte order from locale case ordering. The three focused stream-diff tests passed against that final test source. Production source and packaged binary were unchanged. Supplemental log `evidence/desktop-stream-diff-final-test.log`, SHA256 `2250ab94c6c39509c250aa35aa4d0e3a1936abab49f48129dc9028bb7794df21`.

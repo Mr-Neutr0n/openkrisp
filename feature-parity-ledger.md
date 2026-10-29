@@ -506,3 +506,10 @@ The ledger records 208 source and verification fingerprints at this checkpoint.
 The continuous observer now feeds local ordered call state, blocked-name preferences and competing-call controls. Recovered Call definitions, default app-capture choice and delay rules are mapped in activation-findings.md. Responsible-app versions now propagate through the native carrier and desktop. Observation qualification does not admit capture or automatically record. Snapshot event-diff order and present-state recovery are independent adaptations; original permission/event ordering and full automatic activation remain incomplete.
 
 Host release/sanitizer verification, 237 desktop tests with two opt-in skips, signed packaging and relocated resources passed. One actual helper/controller run verified current-observation handling and Stop with 158 successful listener removals. Native UI, actual call transitions and audio parity remain unverified. Exact logs and Speech authorization preflight are recorded in CHECKPOINT.md.
+
+
+## Call event ordering, 2026-10-29
+
+The desktop now applies recovered stable app-ID sorting, add-before-remove callbacks, reverse removal order and exact four-field stream identity. Matching stream metadata stays unchanged. Foundation locale comparison remains an approximation pending Electron locale/ICU comparison. Desktop verification passed 240 tests with two opt-in skips plus signed packaging/relocation. Actual call/UI acceptance remains open.
+
+REA also maps note-taker mode changes and successful-ASR-to-recording joins. Current route recording is a global mix; the original default macOS speaker capture selects an application. The next required backend must isolate selected process audio and keep microphone/app lanes and session ownership distinct. Automatic global-route recording was not substituted for that requirement. Full parity remains incomplete.

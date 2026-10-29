@@ -2010,7 +2010,11 @@
         "ev_2cf465b82ea433b7ae76df9607d53bb649984ab26c63a903ccc0c67074e6e78b",
         "ev_10b206da213ad74b319d3909864b0cfdbcd1bdb3ac8f37f2e209b670f98be415",
         "ev_a1f28157d423fe9c5880b5f8a26c885a884d294966630784e17d339552a776d9",
-        "ev_9302e74f5a6b02fb7f69dd32816ff6e3efd0c7ec304535f66595e1a74e3089db"
+        "ev_9302e74f5a6b02fb7f69dd32816ff6e3efd0c7ec304535f66595e1a74e3089db",
+        "ev_48fb9b49e0cf39105781dddc94421bc8f733e7723df07ac5b896009992e06d6e",
+        "ev_1c87a2bd633937074c5206bb6aa49f51dddb8e80f003fff312c29b04d7808fe9",
+        "ev_d7400aae6c4076376c5724c401845013335e93f66c7c6dfbc545edbcabe22b00",
+        "ev_cede3aa6eaeab45c330ef70715aa3e55713802486f10b406ee91af29677050b6"
       ],
       "implemented_code": [
         "projects/krisp/app/audio-host/audio_process_usage.hpp",
@@ -2032,9 +2036,9 @@
         "projects/krisp/app/audio-host/audio_process_app_version.hpp",
         "projects/krisp/app/audio-host/audio_process_app_version_test.mm"
       ],
-      "implementation": "Native stabilized Watch now feeds ordered local call tracking with exact trimmed name identity, lowercased blocked preferences, first-eligible/current-call selection, switch controls and recovered stop/restoration timing. Packaged all-apps local choice defaults true. Complete observations can refresh present state after gaps; source invalidation cancels timers. Own process/bundle and private endpoints are excluded. Responsible-app version metadata propagates. This observation-only policy does not request capture permission or start ASR/recording. Snapshot remove-before-add ordering and current-state recovery are independent adaptations.",
-      "verified_scope": "Full host release/sanitizer verification passed. Desktop 239 tests enumerated: 237 passed, two opt-in skipped, signed ARM64/macOS12 packaging and relocation passed. Independent implementation and metadata reviews completed. One real helper-to-controller integration passed in 0.318 seconds with 39 rows, zero partial rows, changed publication, zero coalesced frames, and Stop exit0 with158 successful removals. Test checks policy freshness against complete observation, conditional refresh and Stop invalidation. Helper SHA25615ae2102e9d1aa65a587b46f2b15a4d95a1abd0ad9a73cb0818892d8b37fbfea. Actual call transitions and native controls remain unverified.",
-      "missing_acceptance": "Recover original DeviceManager created/removed event ordering and complete effective auto/manual note-taking policy; preserve capture-permission stale-stream recheck when connecting local ASR/recording. Implement older-OS source. Reconcile native unknown-read divergence, timer queue ordering and skipped history. Verify live call transitions, stop/switch/block UI, service restart, sustained use and real recording/transcription. Full activation and acoustic parity remain incomplete."
+      "implementation": "Native stabilized Watch feeds local call tracking, blocked-name preferences, switching and recovered stop/restoration timing. The stream adapter now implements exact(appID,deviceID,direction,PID) identity, stable appID locale sorting, additions before reverse retained-order removals and retained metadata for matching identities. Foundation Locale.current comparison approximates JavaScript localeCompare. Complete observations can refresh present state after gaps; invalidation cancels timers. Capture/ASR/recording admission remains unconnected and no globalmix auto-recorder was substituted for selected-app capture.",
+      "verified_scope": "Desktop ./verify passed 242 enumerated tests: 240 passed and two opt-in skips, with ARM64/macOS12 signing and relocated resources. Three focused stream-diff tests passed after strengthening only the locale-case fixture; production source/package unchanged. Independent review found no blocker. Host and earlier native helper/controller acceptance remain historical and unchanged. No actual call transition, native UI or capture ran in this checkpoint.",
+      "missing_acceptance": "Verify Electron default locale/ICU equivalence and async microphone permission ordering. Implement selected-application capture with immutable process targets and current identity validation, separate microphone/app audio lanes and format/clock handling, then call-scoped local ASR/recording after successful processing admission. Implement older-OS source; reconcile native unknown-read and timing/transport-history differences. Verify actual UI, calls, restart, sustained capture, recordings and acoustic parity."
     },
     {
       "id": "transcription",
@@ -2239,7 +2243,11 @@
         "ev_03e31793b114208efefd2e68567f4341ad706c16f1bd65c44fbcbcf7688f3102",
         "ev_40ab92b005f05d1ca15e14b38419d9339ff5e6ebab8122c1c42d08f414ba06a7",
         "ev_f5df68333651c84d4ff750f1a8f2b785ca8eac0c0baf7a4d84c6353cc0cd9d53",
-        "ev_b861f861d6fd5d73f723fda8b3a71fdd1a9a72d7cb6350823cd37d3735988d92"
+        "ev_b861f861d6fd5d73f723fda8b3a71fdd1a9a72d7cb6350823cd37d3735988d92",
+        "ev_48fb9b49e0cf39105781dddc94421bc8f733e7723df07ac5b896009992e06d6e",
+        "ev_1c87a2bd633937074c5206bb6aa49f51dddb8e80f003fff312c29b04d7808fe9",
+        "ev_d7400aae6c4076376c5724c401845013335e93f66c7c6dfbc545edbcabe22b00",
+        "ev_cede3aa6eaeab45c330ef70715aa3e55713802486f10b406ee91af29677050b6"
       ],
       "implemented_code": [
         {
@@ -3377,8 +3385,8 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/StabilizedAudioUseIntegrationTests.swift": "5884c3bce3a905cb47bab9642fec94da7d9ff95c47f2bcee99563a38f2650b15",
     "projects/krisp/app/audio-host/audio_process_app_version.hpp": "7f43a59b2664dd91a55d036d90cfa75ed5e27245cf9689dcdd0cc60f9f420461",
     "projects/krisp/app/audio-host/audio_process_app_version_test.mm": "cf2d6e0da49a9e29516b9ad264b3759948820c5aee63cc8e77070107351438ba",
-    "projects/krisp/app/desktop/Sources/LabVoice/LocalCallController.swift": "c77f59776decccc16a403adc6d61983567c86b95600c6064b008c0bd5e46880c",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/LocalCallTests.swift": "462af8641f4e7b766e9e9f61d447b8e3bebf9a4392f052d933113a8de19467ad"
+    "projects/krisp/app/desktop/Sources/LabVoice/LocalCallController.swift": "db5c6575f51b46472a598860595a1ef271e61d7e75f19a332825fdcc84cc0c75",
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/LocalCallTests.swift": "2cae3a3128ee709181405803844cb6db2858740e5650d2c026a9aac4a7f8c85c"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3389,7 +3397,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "212 source/verification/own-fixture fingerprints at local call tracking checkpoint. Host release/sanitizer and desktop 237 tests with two opt-in skips passed, plus signed packaging and a real helper/controller observation and Stop test. Native UI, original event ordering, capture admission, automatic recording and full retained parity remain incomplete.",
+  "source_snapshot_note": "212 source/verification/own-fixture fingerprints at recovered call-event-order checkpoint. Desktop 240 tests passed with two opt-in skips, signing/relocation and three focused final-fixture tests. Host unchanged from preceding pass. Selected-app capture, local stream ASR, automatic recording, original locale/permission order and full parity remain incomplete.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

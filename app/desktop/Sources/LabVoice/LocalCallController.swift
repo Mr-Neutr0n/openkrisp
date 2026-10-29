@@ -139,6 +139,37 @@ struct LocalCallPolicy {
     }
 }
 
+enum LocalCallStreamDiff {
+    struct Result {
+        let retained: [GroupedAudioClient]
+        let created: [GroupedAudioClient]
+        let removed: [GroupedAudioClient]
+    }
+    static func same(_ lhs: GroupedAudioClient, _ rhs: GroupedAudioClient) -> Bool {
+        lhs.direction == rhs.direction && lhs.clientPID == rhs.clientPID &&
+            lhs.deviceID == rhs.deviceID && Data(lhs.appID.utf8) == Data(rhs.appID.utf8)
+    }
+    static func reconcile(_ incoming: [GroupedAudioClient], previous: [GroupedAudioClient],
+                          compare: (String, String) -> ComparisonResult) -> Result {
+        // JS sorts appId with no localeCompare options. Stable equal-ID order
+        // preserves the native byte-key order supplied before this stage.
+        let ordered = incoming.enumerated().sorted { lhs, rhs in
+            let result = compare(lhs.element.appID, rhs.element.appID)
+            return result == .orderedSame ? lhs.offset < rhs.offset : result == .orderedAscending
+        }.map(\.element)
+        var retained = previous, created: [GroupedAudioClient] = [], removed: [GroupedAudioClient] = []
+        for client in ordered where !retained.contains(where: { same($0, client) }) {
+            retained.append(client); created.append(client)
+        }
+        // Retain the original metadata for matching identities. Removal visits
+        // the retained array backwards, after every addition has been emitted.
+        for index in retained.indices.reversed() where !ordered.contains(where: { same($0, retained[index]) }) {
+            removed.append(retained.remove(at: index))
+        }
+        return .init(retained: retained, created: created, removed: removed)
+    }
+}
+
 @MainActor final class LocalCallController: ObservableObject {
     static let shared = LocalCallController()
     @Published private(set) var policy = LocalCallPolicy()
@@ -150,9 +181,14 @@ struct LocalCallPolicy {
     private let defaults: UserDefaults
     private let now: () -> TimeInterval
     private let automaticTimers: Bool
+    private let compareApplicationIDs: (String, String) -> ComparisonResult
     init(defaults: UserDefaults = .standard, automaticTimers: Bool = true,
-         now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
+         now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime },
+         compareApplicationIDs: @escaping (String, String) -> ComparisonResult = {
+             $0.compare($1, options: [], locale: Locale.current)
+         }) {
         self.defaults = defaults; self.automaticTimers = automaticTimers; self.now = now
+        self.compareApplicationIDs = compareApplicationIDs
         policy.blocked = (defaults.stringArray(forKey: "localCallBlockedNames") ?? []).map { $0.lowercased() }
         policy.allApps = defaults.object(forKey: "localCallTrackAllApps") as? Bool ?? true
     }
@@ -184,27 +220,23 @@ struct LocalCallPolicy {
         if generation != incoming || !policy.fresh {
             timer?.cancel(); timer = nil; epoch = UUID()
             generation = incoming
-            clients = [.input: replacement(.input), .output: replacement(.output)]
-            policy.reset()
+            clients = [:]; policy.reset()
             for direction in [AudioUsageDirection.input, .output] {
-                for client in clients[direction] ?? [] { add(client, now: timestamp) }
+                let diff = LocalCallStreamDiff.reconcile(replacement(direction), previous: [], compare: compareApplicationIDs)
+                clients[direction] = diff.retained
+                for client in diff.created { add(client, now: timestamp) }
             }
             note = "Tracking refreshed. Earlier call changes are unknown. Tracking does not start recording."
         } else if reason == "changed" {
-            // Full-frame adaptation removes missing usages before adding new
-            // ones. Original DeviceManager event-diff order is unresolved.
             for direction in directions {
-                let next = replacement(direction), previous = clients[direction] ?? []
-                clients[direction] = next
-                for old in previous where !next.contains(where: { same($0, old) }) { remove(old, now: timestamp) }
-                for client in next where !previous.contains(where: { same($0, client) }) { add(client, now: timestamp) }
+                let diff = LocalCallStreamDiff.reconcile(replacement(direction), previous: clients[direction] ?? [], compare: compareApplicationIDs)
+                clients[direction] = diff.retained
+                for client in diff.created { add(client, now: timestamp) }
+                for client in diff.removed { remove(client, now: timestamp) }
             }
             note = "Tracking does not start recording or request microphone access."
         }
         schedule()
-    }
-    private func same(_ lhs: GroupedAudioClient, _ rhs: GroupedAudioClient) -> Bool {
-        lhs.clientPID == rhs.clientPID && lhs.deviceID == rhs.deviceID && lhs.appName.map { Data($0.utf8) } == rhs.appName.map { Data($0.utf8) }
     }
     private func usage(_ client: GroupedAudioClient) -> LocalCallUsage {
         .init(pid: client.clientPID, actualPids: client.actualPids, deviceID: client.deviceID,

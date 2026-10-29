@@ -147,3 +147,52 @@ final class LocalCallPolicyTests: XCTestCase {
         XCTAssertNil(model.policy.current); XCTAssertTrue(model.policy.calls.isEmpty)
     }
 }
+
+final class LocalCallStreamDiffTests: XCTestCase {
+    private func client(_ appID: String, device: String = "10", name: String = "App", pid: Int = 1,
+                        actualPids: String = "1") -> GroupedAudioClient {
+        .init(direction: .input, clientPID: pid, actualPids: actualPids, appName: name, appID: appID,
+              deviceID: device, deviceUID: "dev.hari.labvoice.microphone", sourceObjectID: UInt32(pid), incomplete: false)
+    }
+    private func compare(_ lhs: String, _ rhs: String) -> ComparisonResult {
+        lhs.compare(rhs, options: [], locale: Locale(identifier: "en_US"))
+    }
+    func testExactStreamIdentityKeepsOriginalMetadata() {
+        let original = client("own.app", name: "Original")
+        let metadata = client("own.app", name: "Changed", actualPids: "1,2")
+        let unchanged = LocalCallStreamDiff.reconcile([metadata], previous: [original], compare: compare)
+        XCTAssertTrue(unchanged.created.isEmpty); XCTAssertTrue(unchanged.removed.isEmpty)
+        XCTAssertEqual(unchanged.retained.first?.appName, "Original")
+        XCTAssertEqual(unchanged.retained.first?.actualPids, "1")
+        let replaced = LocalCallStreamDiff.reconcile([client("own.changed", name: "Original")], previous: [original], compare: compare)
+        XCTAssertEqual(replaced.created.map(\.appID), ["own.changed"])
+        XCTAssertEqual(replaced.removed.map(\.appID), ["own.app"])
+        XCTAssertFalse(LocalCallStreamDiff.same(client("é"), client("e\u{301}")))
+    }
+    func testAdditionsAreLocaleSortedWithStableEqualAppIDAndReverseRemoval() {
+        let incoming = [client("z", device: "1"), client("B", device: "1"), client("a", device: "10"), client("a", device: "2")]
+            .sorted { $0.dedupKey.lexicographicallyPrecedes($1.dedupKey) }
+        let previous = [client("old1"), client("old2"), client("old3")]
+        let diff = LocalCallStreamDiff.reconcile(incoming, previous: previous, compare: compare)
+        XCTAssertEqual(diff.created.map(\.appID), ["a", "a", "B", "z"])
+        XCTAssertEqual(diff.created.map(\.deviceID), ["10", "2", "1", "1"])
+        XCTAssertEqual(diff.removed.map(\.appID), ["old3", "old2", "old1"])
+        XCTAssertEqual(diff.retained.map(\.appID), ["a", "a", "B", "z"])
+    }
+    func testVirtualReplacementAddsBeforeRemovalWithoutInventingCallRestart() {
+        var policy = LocalCallPolicy(); policy.allApps = false; policy.reset()
+        let old = client("own.app"), new = client("own.app", device: "11")
+        let oldUsage = LocalCallUsage(pid: 1, actualPids: "1", deviceID: "10", isVirtual: true)
+        policy.add(name: "App", usage: oldUsage, direction: .input, now: 0)
+        policy.add(name: "App", usage: .init(pid: 1, actualPids: "1", deviceID: "20", isVirtual: true), direction: .output, now: 0)
+        let diff = LocalCallStreamDiff.reconcile([new], previous: [old], compare: compare)
+        for client in diff.created {
+            policy.add(name: client.appName!, usage: .init(pid: client.clientPID, actualPids: client.actualPids, deviceID: client.deviceID, isVirtual: true), direction: .input, now: 1)
+        }
+        for client in diff.removed {
+            policy.remove(name: client.appName!, usage: .init(pid: client.clientPID, actualPids: client.actualPids, deviceID: client.deviceID, isVirtual: true), direction: .input, now: 1)
+        }
+        XCTAssertEqual(policy.current, "App"); XCTAssertEqual(policy.calls[0].starts, 1)
+        XCTAssertNil(policy.stopDeadline); XCTAssertEqual(policy.calls[0].input.map(\.deviceID), ["11"])
+    }
+}
