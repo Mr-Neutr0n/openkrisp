@@ -6,6 +6,7 @@ struct AudioView: View {
     @ObservedObject var audio: AudioRouteController
     @ObservedObject private var watch = AudioUseWatchController.shared
     @ObservedObject private var calls = LocalCallController.shared
+    @ObservedObject private var selectedCapture = SelectedAppCaptureController.shared
     @State private var testingMicrophone = false
     @Environment(\.dismiss) private var dismiss
     private var displayWatch: Bool { AudioUseDisplaySource.prefersWatch(watchObservedAt: watch.observedAt, oneShotObservedAt: audio.audioUseObservedAt) }
@@ -120,6 +121,21 @@ struct AudioView: View {
                         if watch.coalescedPublicationTotal > 0 {
                             Text("Some audio-use updates were missed (\(watch.coalescedPublicationTotal)). Refresh tracking to use the current observation.")
                                 .font(.caption).foregroundColor(.secondary)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Selected app audio").font(.headline)
+                        Text("Records only the detected app's outgoing audio. Microphone audio is not included. macOS may request system audio recording access when you start.")
+                            .font(.caption).foregroundColor(.secondary)
+                        HStack {
+                            Button("Record selected app audio") { selectedCapture.start() }.disabled(!selectedCapture.canStart)
+                            Button("Stop selected app recording") { Task { _ = await selectedCapture.stop() } }.disabled(!selectedCapture.engaged)
+                        }
+                        if let name = selectedCapture.selectedName { Text("Selected app: \(name)").font(.caption) }
+                        Text(selectedCapture.message).font(.caption)
+                        if let error = selectedCapture.error { Text(error).font(.caption).foregroundColor(.orange) }
+                        ForEach(selectedCapture.retainedPaths, id: \.self) { path in
+                            Text("Retained app audio files: \(path)").font(.caption).textSelection(.enabled)
                         }
                     }
                     AudioProcessUsageView(snapshot: displayWatch ? watch.snapshot : audio.inventory?.audioProcessUsage,

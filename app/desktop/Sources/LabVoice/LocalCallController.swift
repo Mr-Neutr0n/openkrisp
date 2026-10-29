@@ -28,6 +28,7 @@ struct LocalTrackedCall: Identifiable {
     var confirmed = false
     var started = false
     var starts = 0
+    var activationID = UUID()
     var id: Data { Data(name.utf8) }
     var bothLegs: Bool { !input.isEmpty && !output.isEmpty }
     var noLegs: Bool { input.isEmpty && output.isEmpty }
@@ -80,7 +81,7 @@ struct LocalCallPolicy {
         guard fresh, current == nil else { return }
         stopDeadline = nil
         guard let index = calls.firstIndex(where: { !$0.started && qualified($0) }) else { return }
-        current = calls[index].name; calls[index].started = true; calls[index].starts += 1
+        current = calls[index].name; calls[index].started = true; calls[index].starts += 1; calls[index].activationID = UUID()
     }
     mutating func stop(startNext: Bool) {
         if let index = calls.firstIndex(where: { call in current.map { name in exactCallName(call.name, name) } == true }) {

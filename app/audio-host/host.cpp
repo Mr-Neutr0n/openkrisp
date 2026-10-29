@@ -3,6 +3,7 @@
 #include "device_metadata.hpp"
 #include "audio_process_usage.hpp"
 #include "audio_use_watch.hpp"
+#include "selected_app_capture_cli.hpp"
 #include "route_cli.hpp"
 #include "microphone_test.hpp"
 #include <CoreAudio/CoreAudio.h>
@@ -542,6 +543,7 @@ int aggregatePlan(const std::string &inputUID, const std::string &outputUID) {
 } // namespace
 int main(int argc, char **argv) {
     try {
+        if (argc >= 2 && std::string(argv[1]) == "--capture-selected-app") return labvoice::runSelectedAppCapture(argc, argv);
         if (argc == 2 && std::string(argv[1]) == "--watch-audio-use-stabilized") return labvoice::watchAudioProcessUsage(true);
         if (argc == 2 && std::string(argv[1]) == "--watch-audio-use") return labvoice::watchAudioProcessUsage();
         if (argc == 2 && (std::string(argv[1]) == "--list" || std::string(argv[1]) == "--list-audio-use")) {

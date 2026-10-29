@@ -35,7 +35,7 @@ extension LocalStore {
         let old = expected.session
         let updated = Session(schemaVersion: old.schemaVersion, id: old.id, title: old.title,
                               startedAt: old.startedAt, durationSeconds: old.durationSeconds,
-                              transcript: transcript, recordingFilename: old.recordingFilename)
+                              transcript: transcript, recordingFilename: old.recordingFilename, recordingSource: old.recordingSource)
         let directory = root.appendingPathComponent(old.id.uuidString)
         let temporary = directory.appendingPathComponent(".transcript-" + UUID().uuidString)
         let descriptor = Darwin.open(temporary.path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)

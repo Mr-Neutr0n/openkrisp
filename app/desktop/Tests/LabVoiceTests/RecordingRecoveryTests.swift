@@ -52,6 +52,19 @@ private final class RecoveryPathCapture: @unchecked Sendable {
         XCTAssertEqual(try Data(contentsOf: original.wav), audio)
         XCTAssertEqual(try Data(contentsOf: original.directory.appendingPathComponent("job.json")), metadata)
     }
+    func testSelectedAppRecoveryKeepsTypedSourceAndSpeakerOnlyTitle() async throws {
+        let root = try temporary(), library = try temporary()
+        var original = try job(root)
+        original.recordingSource = RecordingSource(appName: "Fixture", appID: "own.fixture", responsiblePID: 123,
+                                                    processes: [.init(objectID: 8, actualPID: 124)])
+        try JSONEncoder().encode(original).write(to: original.directory.appendingPathComponent("job.json"))
+        let backend = RecordingRecovery(stagingRoot: root)
+        let items = try await backend.scan(), item = try XCTUnwrap(items.first)
+        let saved = try await backend.saveCopy(item, to: location(library))
+        XCTAssertEqual(saved.session.recordingSource, original.recordingSource)
+        XCTAssertTrue(saved.session.title.hasPrefix("Recovered selected app audio: Fixture"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: original.wav.path))
+    }
     func testIncompleteCorruptAndForeignManifestAreListedButNeverAdmitted() async throws {
         let root = try temporary()
         _ = try job(root, bytes: Data("unfinished".utf8))

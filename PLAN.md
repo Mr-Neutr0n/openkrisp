@@ -463,3 +463,8 @@ Watch now feeds ordered observation-only call tracking, persistent blocking, cal
 ## Call event ordering checkpoint, 2026-10-29
 
 Recovered DeviceManager addition/removal order and exact stream identity are implemented. Note-taker modes and recorder/ASR joins are mapped. The next production requirement is selected-application capture with a separate microphone lane, not automatic recording of the existing global route mix. Implement target identity admission, an owned process-tap/input session, format/clock handling and verified teardown, then connect call-scoped processing and recording through successful admission events. Preserve independent saved-session transcription until a real stream ASR owner exists. See the latest CHECKPOINT.md section for checks and remaining locale/permission/runtime limits.
+
+
+## Selected-app source checkpoint, 2026-10-29
+
+An explicit production path now connects selected active process targets to a private native output tap, off-thread WAV conversion, owned desktop lifecycle and local history with source provenance. It is app-output-only, with no physical microphone, processing, live ASR or automatic recording. Native capture has not run. The next implementation must add the microphone lane and timeline handling, then local ASR/recording session coordination. Preserve exact process/call generations across permissions and source changes. Full capture permission, native format/clock/cleanup and original audio acceptance remain separate tests requiring actual use. See CHECKPOINT.md for verification and limitations.

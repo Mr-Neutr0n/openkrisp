@@ -548,19 +548,23 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private var quitTask: Task<Void, Never>?
     private lazy var quit = QuitCoordinator(snapshot: {
         let audio = AudioRouteController.shared, test = MicrophoneTestController.shared
+        let capture = SelectedAppCaptureController.shared
         let recording = audio.recording
         let saved = recording.savedSessionID != nil && !recording.busy
         let recordingActivity = recording.busy ? recording.libraryActivityID : nil
         return QuitSnapshot(recordingActive: recording.busy, audioEngaged: audio.engaged || AudioUseWatchController.shared.engaged,
                             testEngaged: test.engaged,
-                            otherWork: LibraryLocation.shared.switching || LibraryLocation.shared.activities.keys.contains { $0 != recordingActivity } || AudioCaptureAdmission.shared.owner == .recordingRecovery,
-                            recordingSaved: saved, recordingFailure: saved ? nil : recording.error,
+                            otherWork: LibraryLocation.shared.switching || LibraryLocation.shared.activities.keys.contains { $0 != recordingActivity && $0 != capture.libraryActivityID } || AudioCaptureAdmission.shared.owner == .recordingRecovery,
+                            additionalRecordingActive: capture.engaged, additionalRecordingSaved: capture.savedSessionID != nil && !capture.engaged,
+                            additionalRecordingFailure: capture.error, recordingSaved: saved, recordingFailure: saved ? nil : recording.error,
                             stopFailure: AudioUseWatchController.shared.engaged ? AudioUseWatchController.shared.error : audio.error, testFailure: test.error)
     }, confirmSave: { Self.confirmSave(intent: .quit) },
        stopAudio: {
+           async let selectedStopped = SelectedAppCaptureController.shared.stop()
            async let watchStopped = AudioUseWatchController.shared.stop()
            let routeStopped = await AudioRouteController.shared.stop()
-           return await watchStopped && routeStopped
+           let selectedDidStop = await selectedStopped, watchDidStop = await watchStopped
+           return selectedDidStop && watchDidStop && routeStopped
        },
        cleanupTest: { await MicrophoneTestController.shared.cancelAndCleanup() },
        confirmRelaunchSave: { Self.confirmSave(intent: .relaunch) },

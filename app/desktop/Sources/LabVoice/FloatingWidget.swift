@@ -69,6 +69,7 @@ import SwiftUI
 private struct FloatingWidgetView: View {
     @ObservedObject var audio: AudioRouteController
     @ObservedObject var recording: RecordingController
+    @ObservedObject private var selectedCapture = SelectedAppCaptureController.shared
     @AppStorage("appearance") private var appearance: AppAppearance = .system
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -89,6 +90,10 @@ private struct FloatingWidgetView: View {
                     Divider()
                     Text("Recording").font(.subheadline)
                     Text(recording.message).font(.caption)
+                    if selectedCapture.engaged {
+                        Text(selectedCapture.message).font(.caption).foregroundColor(.red)
+                        Button("Stop selected app recording") { Task { _ = await selectedCapture.stop() } }
+                    }
                     if let error = recording.error { Text(error).font(.caption).foregroundColor(.red) }
                     if let error = audio.error { Text(error).font(.caption).foregroundColor(.red) }
                     Text("Mute silences app-route output. Stop audio ends microphone capture. Closing this widget only hides it.")

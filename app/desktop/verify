@@ -16,6 +16,7 @@ assert info["LSMinimumSystemVersion"] == "12.0"
 assert info["CFBundleExecutable"] == "LabVoice"
 assert info["NSSpeechRecognitionUsageDescription"].strip()
 assert info["NSMicrophoneUsageDescription"].strip()
+assert info["NSAudioCaptureUsageDescription"].strip()
 binary = app / "Contents" / "MacOS" / "LabVoice"
 architecture = subprocess.check_output(["lipo", "-archs", str(binary)], text=True).strip()
 assert architecture == "arm64", architecture

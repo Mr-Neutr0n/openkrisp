@@ -306,6 +306,7 @@ struct LibraryView: View {
     @ObservedObject var audio: AudioRouteController
     @ObservedObject var catalog: CatalogModel
     @ObservedObject private var microphoneTest = MicrophoneTestController.shared
+    @ObservedObject private var selectedCapture = SelectedAppCaptureController.shared
     @ObservedObject private var libraryLocation = LibraryLocation.shared
     @State private var showingSettings = false
     @State private var showingAudio = false
@@ -326,8 +327,10 @@ struct LibraryView: View {
                     Text("Lab Voice").font(.title2)
                     Text(audio.statusTitle).font(.caption).foregroundColor(.secondary)
                     if audio.recording.busy { Text(audio.recording.message).font(.caption).foregroundColor(audio.recording.phase == .paused ? .orange : .red) }
+                    if selectedCapture.engaged { Text(selectedCapture.message).font(.caption).foregroundColor(.red) }
                 }
                 Spacer()
+                if selectedCapture.engaged { Button("Stop app recording") { Task { _ = await selectedCapture.stop() } } }
                 if model.busy { ProgressView().controlSize(.small) }
                 Button("Import WAV…") { model.error = nil; importing = true }.disabled(model.busy)
                 Button("Audio…") { showingAudio = true }
@@ -361,6 +364,9 @@ struct LibraryView: View {
                         Text("\(duration(session.durationSeconds)) · Saved \(session.startedAt.formatted())")
                             .foregroundColor(.secondary)
                         HStack {
+                            if let source = session.recordingSource {
+                                Text("Selected app audio: \(source.appName). Microphone audio is not included.").font(.caption).foregroundColor(.secondary)
+                            }
                             Button(model.playing ? "Stop playback" : "Play recording") {
                                 let revision = model.location.snapshot.revision
                                 Task { if model.playing { await model.stop() } else { await model.play(session.id, expectedRevision: revision) } }

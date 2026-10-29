@@ -25,6 +25,9 @@ struct QuitSnapshot: Sendable {
     let audioEngaged: Bool
     let testEngaged: Bool
     let otherWork: Bool
+    var additionalRecordingActive = false
+    var additionalRecordingSaved = false
+    var additionalRecordingFailure: String? = nil
     var recordingSaved = false
     var recordingFailure: String? = nil
     var stopFailure: String? = nil
@@ -67,7 +70,7 @@ struct QuitSnapshot: Sendable {
         inProgress = true
         var approved = false
         defer { inProgress = false; if !approved { gate.cancelQuit(token) } }
-        if initial.recordingActive {
+        if initial.recordingActive || initial.additionalRecordingActive {
             let confirmed = await (intent == .relaunch ? confirmRelaunchSave() : confirmSave())
             if !confirmed { return false }
         }
@@ -75,19 +78,23 @@ struct QuitSnapshot: Sendable {
             reason = snapshot().testFailure ?? "Microphone-test cleanup is not confirmed. Lab Voice will stay open."
             return false
         }
-        if initial.audioEngaged || initial.recordingActive {
+        if initial.audioEngaged || initial.recordingActive || initial.additionalRecordingActive {
             guard await stopAudio() else {
                 reason = snapshot().stopFailure ?? "The audio helper has not stopped. Lab Voice will stay open."
                 return false
             }
         }
         let final = snapshot()
-        guard !final.audioEngaged, !final.testEngaged, !final.recordingActive else {
+        guard !final.audioEngaged, !final.testEngaged, !final.recordingActive, !final.additionalRecordingActive else {
             reason = final.stopFailure ?? "Audio or recording cleanup is still pending. Lab Voice will stay open."
             return false
         }
         if initial.recordingActive, !final.recordingSaved {
             reason = final.recordingFailure ?? "The recording was not saved to the library. Its retained files need attention before quitting."
+            return false
+        }
+        if initial.additionalRecordingActive, !final.additionalRecordingSaved {
+            reason = final.additionalRecordingFailure ?? "Selected app audio was not saved. Its retained files need attention before quitting."
             return false
         }
         if intent == .relaunch {

@@ -23,6 +23,13 @@ public struct Session: Codable, Equatable, Sendable {
     public let durationSeconds: Double
     public let transcript: [TranscriptSegment]
     public let recordingFilename: String?
+    public let recordingSource: RecordingSource?
+    init(schemaVersion: Int, id: UUID, title: String, startedAt: Date, durationSeconds: Double,
+         transcript: [TranscriptSegment], recordingFilename: String?, recordingSource: RecordingSource? = nil) {
+        self.schemaVersion = schemaVersion; self.id = id; self.title = title; self.startedAt = startedAt
+        self.durationSeconds = durationSeconds; self.transcript = transcript
+        self.recordingFilename = recordingFilename; self.recordingSource = recordingSource
+    }
 }
 
 public struct StoreInventory: Sendable {
@@ -70,8 +77,10 @@ public struct LocalStore: Sendable {
     /// Imports an already finalized WAV file. Does not capture, resample, or transcribe audio.
     /// Source bytes remain unchanged. A recording is optional for transcript-only sessions.
     public func save(title: String, startedAt: Date, durationSeconds: Double,
-                     transcript: [TranscriptSegment], recording: URL? = nil) throws -> Session {
+                     transcript: [TranscriptSegment], recording: URL? = nil,
+                     recordingSource: RecordingSource? = nil) throws -> Session {
         guard durationSeconds.isFinite, durationSeconds >= 0,
+              recordingSource == nil || (recording != nil && recordingSource?.isValid == true),
               startedAt.timeIntervalSince1970.isFinite,
               transcript.allSatisfy({ segment in
                   segment.startSeconds.isFinite && segment.endSeconds.isFinite &&
@@ -109,7 +118,7 @@ public struct LocalStore: Sendable {
         }
         let session = Session(schemaVersion: 1, id: id, title: title, startedAt: startedAt,
                               durationSeconds: durationSeconds, transcript: transcript,
-                              recordingFilename: recording == nil ? nil : "recording.wav")
+                              recordingFilename: recording == nil ? nil : "recording.wav", recordingSource: recordingSource)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .deferredToDate
@@ -130,6 +139,7 @@ public struct LocalStore: Sendable {
         decoder.dateDecodingStrategy = .deferredToDate
         let session = try decoder.decode(Session.self, from: Data(contentsOf: manifest))
         guard session.schemaVersion == 1, session.id == id,
+              session.recordingSource == nil || (session.recordingFilename != nil && session.recordingSource?.isValid == true),
               session.durationSeconds.isFinite, session.durationSeconds >= 0,
               session.recordingFilename == nil || session.recordingFilename == "recording.wav",
               session.transcript.allSatisfy({ $0.startSeconds.isFinite && $0.endSeconds.isFinite &&

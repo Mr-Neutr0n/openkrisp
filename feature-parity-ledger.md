@@ -513,3 +513,10 @@ Host release/sanitizer verification, 237 desktop tests with two opt-in skips, si
 The desktop now applies recovered stable app-ID sorting, add-before-remove callbacks, reverse removal order and exact four-field stream identity. Matching stream metadata stays unchanged. Foundation locale comparison remains an approximation pending Electron locale/ICU comparison. Desktop verification passed 240 tests with two opt-in skips plus signed packaging/relocation. Actual call/UI acceptance remains open.
 
 REA also maps note-taker mode changes and successful-ASR-to-recording joins. Current route recording is a global mix; the original default macOS speaker capture selects an application. The next required backend must isolate selected process audio and keep microphone/app lanes and session ownership distinct. Automatic global-route recording was not substituted for that requirement. Full parity remains incomplete.
+
+
+## Selected app audio source, 2026-10-29
+
+Explicit selected-app-output recording now has a native private process-tap source and desktop saved-history path. Exact process targets, cancellation across startup, bounded callback transport, off-thread 48 kHz PCM16 conversion and verified cleanup/import are implemented. Typed source provenance remains visible and survives recovery/transcription replacement.
+
+The source does not include a microphone lane, noise processing, live ASR or automatic call recording. Synthetic native/CLI/file checks and local-store/desktop tests cannot prove actual tap permission, native format mapping or acoustic behavior. Those runtime checks remain unexecuted. Full call recording and retained parity remain incomplete.

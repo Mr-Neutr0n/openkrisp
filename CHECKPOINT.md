@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Call event ordering, 2026-10-29](#call-event-ordering-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Selected app audio source, 2026-10-29](#selected-app-audio-source-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -783,3 +783,27 @@ Next implement selected-app capture as a separate production input source. The e
 Desktop log: `evidence/desktop-verify-call-stream-diff.log`, SHA256 `0a190538a1b06707eda91bc01c7f6134d440d9796f5fa0a9d463899e48176696`.
 
 After the full run, one test fixture was strengthened to distinguish native byte order from locale case ordering. The three focused stream-diff tests passed against that final test source. Production source and packaged binary were unchanged. Supplemental log `evidence/desktop-stream-diff-final-test.log`, SHA256 `2250ab94c6c39509c250aa35aa4d0e3a1936abab49f48129dc9028bb7794df21`.
+
+
+## Selected app audio source, 2026-10-29
+
+Audio now offers explicit recording of the currently selected application's output. It uses active process tuples from the raw observed source, with exact responsible PID/app ID, actual PID/object ID, call activation and watch generation. Unknown, pending, fallback, duplicated or ambiguous targets cannot start. The shared capture lease excludes route, microphone-test and recovery overlap. App and widget status retain a Stop action outside the Audio sheet. This is app-output-only recording; the microphone, noise processing, live ASR and automatic call recording are not included.
+
+The new macOS 14.4+ native source creates a private nonexclusive unmuted process tap and private input aggregate. It never substitutes a global tap, changes hardware output/mute or restores future processes by bundle ID. The source checks exact target identity and tap/aggregate format before and after AudioDeviceStart and during capture. Callback intake stays disabled through startup and any permission wait. A concurrent bounded stdin reader supplies a shared cancellation token; a stale/cancelled startup cannot admit frames. Normal Stop prevents new intake and drains already admitted frames.
+
+The callback copies into a bounded 32-block queue. Off-thread conversion supports Float32 stereo interleaved/planar sources from 8 through 192 kHz and writes 48 kHz stereo PCM16. Invalid buffers, overruns, nonfinite samples, clock discontinuity, target/format change and writer errors prevent completed status. File capacity follows RIFF's 32-bit size with converter/header reserve, not a four-hour quota. TapAutoStart remains false because the SDK says true makes AudioDeviceStart wait for first tap audio; it is not a tap-enable switch. Actual native format mapping and tap behavior remain untested.
+
+Cleanup orders source stop, callback drain, IOProc removal, aggregate destruction and tap destruction. Attempted acquisitions count as owned even when a native operation partially fails. Uncertain cleanup retains callback context until process exit. WAV creation uses an exclusive 0600 fd under the held private directory, AudioFile callbacks and identity revalidation. The CLI bounds target parsing, commands and emitted lines, echoes immutable target/operation/source, and has bounded output delivery. Scoped cleanup joins its control reader and restores signal handlers on exceptional exits.
+
+Desktop saves only after a matching completed result, verified native cleanup, drained successful helper exit and independent WAV/header/format/frame validation. The library destination stays pinned through preparation/import. Typed optional RecordingSource metadata records selected-app-output provenance and survives transcript replacement and recovered copies; legacy manifests/jobs still load. Target selection changes, power and Quit finalize only the owned recording. Failed saves or uncertain cleanup retain staging and cannot be satisfied by an unrelated earlier recording. No automatic recording or transcription was enabled.
+
+Independent GPT 6.1 sol review closed partial native ownership, fd identity, startup cancellation, post-permission target checks, protocol bounds, late-result fences and recovery-provenance gaps. Synthetic lifecycle and file-conversion tests cover these boundaries. A real CLI pipe test uses an injected source and actual WAV writer, verifies successful recording plus cancellation during simulated startup, and never invokes native tap APIs. Conversion fixtures verify 44.1 kHz to 48 kHz output. These checks do not establish live capture or acoustic parity.
+
+Local-store verification passed 20 tests. Desktop verification enumerated 255 tests: 253 passed and two opt-in tests skipped, plus ARM64/macOS12 packaging, signing, system-audio usage-description presence and relocated-resource checks. No live capture, native UI, permission prompt, playback, ASR, driver installation or CoreAudio restart ran.
+
+Next connect a distinct microphone source and its timeline to selected-app capture, then local processing/stream ASR and the recovered ASR-session recording lifecycle. Explicit saved-session transcription remains available separately. Real permission, tap capture, sustained timing, source switching and original-versus-rebuild audio comparison are required before claiming a working full call recorder. Virtual-driver discovery and full retained-feature parity remain incomplete.
+
+- Local store: `evidence/selected-app-local-store-verify-20261029.log`, SHA256 `d228647e2397936f6ad451a85dbc1244cd6bf83ccb68a7ba04faf01349ce303f`.
+- Desktop: `evidence/desktop-verify-selected-app-capture.log`, SHA256 `b685af359b43f556a18a334afd35adf3f6984eae03d270d0cc1215a67fcf0e9d`.
+
+Full host release and sanitizer verification passed against the final source, including native lifecycle, actual synthetic WAV conversion and real CLI/injected-source cancellation tests. Log `evidence/selected-app-host-frozen-verify-20261029.log`, SHA256 `caa8300d6d20648437487480b2f9b35de16620d617c5b7da883417ca5c87b3ec`. The rebuilt helper SHA256 is `84528fe88645349aff6ca7752a873f92aaea81636b1bba443fcfc1121293be35`; it was packaged and tested with injected sources, not used for live capture.

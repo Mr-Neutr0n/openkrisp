@@ -16,7 +16,10 @@ struct RecoverableRecording: Identifiable, Equatable, Sendable {
     fileprivate init(id: UUID, directory: URL, startedAt: Date, frames: UInt64, eligibility: RecordingRecoveryEligibility, admission: RecoveryAdmission?) {
         self.id = id; self.directory = directory; self.startedAt = startedAt; self.frames = frames; self.eligibility = eligibility; self.admission = admission
     }
-    var title: String { admission == nil ? "Retained recording" : "Recovered recording " + startedAt.formatted(date: .abbreviated, time: .shortened) }
+    var title: String {
+        if let source = admission?.recordingSource { return "Recovered selected app audio: " + source.appName + " " + startedAt.formatted(date: .abbreviated, time: .shortened) }
+        return admission == nil ? "Retained recording" : "Recovered recording " + startedAt.formatted(date: .abbreviated, time: .shortened)
+    }
     var durationSeconds: Double { Double(frames) / 48000 }
 }
 protocol RecordingRecoveryServing: Sendable {
@@ -106,7 +109,7 @@ actor RecordingRecovery: RecordingRecoveryServing {
               try snapshotAdmission.unchanged() else { throw RecordingRecoveryError.sourceChanged }
         guard try input.unchanged(), try admit(candidate.directory) == previous else { throw RecordingRecoveryError.sourceChanged }
         let session = try store.save(title: candidate.title, startedAt: candidate.startedAt, durationSeconds: candidate.durationSeconds,
-                                     transcript: [], recording: snapshot)
+                                     transcript: [], recording: snapshot, recordingSource: previous.recordingSource)
         let cleaned = cleanup()
         return RecordingSave(session: session, cleanupWarning: cleaned ? nil : "Copy saved. Temporary cleanup could not be confirmed. Inspect the temporary folder at \(temporary.path).")
         } catch {
@@ -123,12 +126,12 @@ actor RecordingRecovery: RecordingRecoveryServing {
         do { job = try JSONDecoder().decode(RecordingJob.self, from: metadata.read(offset: 0, count: Int(metadata.fingerprint.size))) }
         catch { throw RecordingRecoveryError.invalidMetadata }
         guard job.directory.isFileURL, job.directory.standardizedFileURL.path == directory.standardizedFileURL.path,
-              job.startedAt.timeIntervalSince1970.isFinite else { throw RecordingRecoveryError.invalidMetadata }
+              job.startedAt.timeIntervalSince1970.isFinite, job.recordingSource?.isValid != false else { throw RecordingRecoveryError.invalidMetadata }
         let audio = try RecoveryFile(directory.appendingPathComponent("recording.wav"), directory: false)
         let frames = try audio.frames()
         guard try metadata.unchanged(), try audio.unchanged(), try folder.unchanged(), try base.unchanged() else { throw RecordingRecoveryError.sourceChanged }
         return .init(root: base.fingerprint, directory: folder.fingerprint, metadata: metadata.fingerprint,
-                     audio: audio.fingerprint, startedAt: job.startedAt, frames: frames)
+                     audio: audio.fingerprint, startedAt: job.startedAt, frames: frames, recordingSource: job.recordingSource)
     }
 }
 fileprivate struct RecoveryAdmission: Equatable, Sendable {
@@ -138,6 +141,7 @@ fileprivate struct RecoveryAdmission: Equatable, Sendable {
     let audio: RecoveryFingerprint
     let startedAt: Date
     let frames: UInt64
+    let recordingSource: RecordingSource?
 }
 fileprivate struct RecoveryFingerprint: Equatable, Sendable {
     let device: Int32

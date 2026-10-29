@@ -9,8 +9,9 @@ struct RecordingJob: Codable, Equatable, Sendable {
     let directory: URL
     let startedAt: Date
     let libraryLocation: LibraryLocationSnapshot?
+    var recordingSource: RecordingSource? = nil
     var wav: URL { directory.appendingPathComponent("recording.wav") }
-    var title: String { "Route recording " + startedAt.formatted(date: .abbreviated, time: .shortened) }
+    var title: String { (recordingSource.map { "Selected app audio: " + $0.appName + " " } ?? "Route recording ") + startedAt.formatted(date: .abbreviated, time: .shortened) }
 }
 
 struct RecordingSave: Sendable {
@@ -22,13 +23,18 @@ enum RecordingStorageError: Error { case invalidDirectory, invalidCompletion }
 
 protocol RecordingStoring: Sendable {
     func prepare(operationID: UUID, location: LibraryLocationSnapshot) async throws -> RecordingJob
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot, source: RecordingSource) async throws -> RecordingJob
     func releaseDestination(_ job: RecordingJob) async
     func retainedDirectories() async throws -> [String]
     func retainFailure(_ job: RecordingJob, message: String) async throws
     func saveCompleted(_ job: RecordingJob, path: String, frames: UInt64, sampleRate: Double, channels: UInt32) async throws -> RecordingSave
 }
 
-extension RecordingStoring { func releaseDestination(_ job: RecordingJob) async {} }
+extension RecordingStoring {
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot, source: RecordingSource) async throws -> RecordingJob {
+        var job = try await prepare(operationID: operationID, location: location); job.recordingSource = source; return job
+    }
+    func releaseDestination(_ job: RecordingJob) async {} }
 
 /// All filesystem and AVAudioFile work stays on this actor, away from the main thread.
 actor RecordingStorage: RecordingStoring {
@@ -55,7 +61,11 @@ actor RecordingStorage: RecordingStoring {
     func prepare(operationID: UUID, location: LibraryLocationSnapshot) throws -> RecordingJob {
         try prepareJob(operationID: operationID, location: location)
     }
-    private func prepareJob(operationID: UUID, location: LibraryLocationSnapshot?) throws -> RecordingJob {
+    func prepare(operationID: UUID, location: LibraryLocationSnapshot, source: RecordingSource) throws -> RecordingJob {
+        guard source.isValid else { throw RecordingStorageError.invalidCompletion }
+        return try prepareJob(operationID: operationID, location: location, source: source)
+    }
+    private func prepareJob(operationID: UUID, location: LibraryLocationSnapshot?, source: RecordingSource? = nil) throws -> RecordingJob {
         let admitted = try storeOverride == nil ? location?.open() : nil
         let root = try stagingOverride ?? base().appendingPathComponent("recording-staging", isDirectory: true)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true,
@@ -65,7 +75,7 @@ actor RecordingStorage: RecordingStoring {
         let directory = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false,
                                                attributes: [.posixPermissions: 0o700])
-        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date(), libraryLocation: location)
+        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date(), libraryLocation: location, recordingSource: source)
         try privateWrite(JSONEncoder().encode(job), to: directory.appendingPathComponent("job.json"))
         if let admitted { destinations[job.id] = admitted }
         return job
@@ -113,7 +123,7 @@ actor RecordingStorage: RecordingStoring {
         else if let admitted = destinations[job.id] { store = admitted }
         else { throw RecordingStorageError.invalidCompletion }
         let session = try store.save(title: job.title, startedAt: job.startedAt,
-            durationSeconds: Double(frames) / sampleRate, transcript: [], recording: job.wav)
+            durationSeconds: Double(frames) / sampleRate, transcript: [], recording: job.wav, recordingSource: job.recordingSource)
         var warning: String?
         do { try FileManager.default.removeItem(at: job.directory) }
         catch { warning = "Session saved. Staging cleanup failed; a duplicate remains at \(job.directory.path)." }

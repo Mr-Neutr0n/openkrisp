@@ -324,3 +324,13 @@ The current-state recovery baseline remains an independent reconstruction choice
 This is observation-only qualification. It does not request microphone access, admit capture, start ASR or automatically record. The original stream callback order is recovered. Asynchronous permission completion order and the automatic recording join remain incomplete. In all-app mode both physical directions can qualify; disabling it restricts candidates to the public virtual microphone and speaker. No vendor account, trial or cloud gate is used.
 
 Application versions propagate from responsible-app metadata. An empty version is a recovered valid result; null denotes unknown or rejected metadata. Exact verification and native acceptance limits are in the latest CHECKPOINT.md section.
+
+## Record selected app audio
+
+While Watch has a fresh detected call, Audio offers an explicit selected-app recording action. It records output from the selected application's currently active audio processes. It does not include the microphone, start a route, change playback/mute, run ASR or automatically record a call. The first real use can require macOS system-audio capture permission. No permission prompt or live tap has been exercised by verification. The app and floating widget show an independent recording status and Stop action.
+
+The immutable target includes responsible PID, exact app ID and explicit active process object/PID pairs. Unknown, pending, fallback, ambiguous or changed targets cannot start. Selection, call activation, watch generation and power epochs fence asynchronous preparation and startup results. The helper revalidates actual target identity and source format at admission and during capture. It never falls back to a global tap. This path owns the shared capture lease, so route, microphone-test and recovery capture cannot overlap it.
+
+Stop, a changed selection, power or Quit finalize only this owned capture. A verified result and drained successful helper exit are required before importing its validated 48 kHz stereo PCM16 WAV into the pinned library. Failed or uncertain results retain private staging files. Session metadata and recovered copies retain selected-app-output provenance; explicit saved-session transcription preserves it. No automatic transcript is generated.
+
+This is the application-output source needed for per-app call capture, not a complete call recording implementation. Separate microphone audio, clock alignment, processing/ASR integration and original-versus-rebuild audio acceptance remain incomplete. Local tests use injected sources and synthetic WAVs.

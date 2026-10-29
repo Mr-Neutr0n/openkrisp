@@ -63,6 +63,7 @@ private struct AudioUseWatchEvent: Decodable {
     private var stopTask: Task<Bool, Never>?
     private var processLifetime: AudioUseWatchController?
     var engaged: Bool { child != nil || stopTask != nil }
+    var observationEpoch: String? { operationID.map { $0.uuidString + ":" + String(generation) } }
     var canStart: Bool { !engaged && PowerAdmission.shared.allowed && !QuitGate.shared.quitting }
     init(factory: (() throws -> any AudioHelperChild)? = nil,
          startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 5_000_000_000,

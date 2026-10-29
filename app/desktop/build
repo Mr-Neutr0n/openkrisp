@@ -25,7 +25,7 @@ helper_source = helper_root / "build" / "audio-host"
 if not helper_source.is_file() or helper_source.is_symlink():
     raise RuntimeError("Build app/audio-host with ./verify before packaging desktop.")
 helper_inputs = [helper_root / name for name in (
-    "host.cpp", "device_metadata.hpp", "audio_process_usage.hpp", "audio_process_usage.cpp", "audio_process_usage_native.mm", "audio_process_app_version.hpp", "audio_use_watch.hpp", "audio_use_watch.mm", "audio_use_timing.hpp", "audio_use_timing.cpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
+    "host.cpp", "selected_app_capture_cli.hpp", "selected_app_capture_cli.mm", "call_capture.hpp", "call_capture.cpp", "call_capture_native.mm", "device_metadata.hpp", "audio_process_usage.hpp", "audio_process_usage.cpp", "audio_process_usage_native.mm", "audio_process_app_version.hpp", "audio_use_watch.hpp", "audio_use_watch.mm", "audio_use_timing.hpp", "audio_use_timing.cpp", "route_cli.cpp", "route_cli.hpp", "route_aec_ack.hpp", "routing.cpp", "routing.hpp",
     "coreaudio_backend.cpp", "noise_adapter.hpp", "installed_noise_adapter.hpp", "installed_aec_adapter.hpp", "aec_microphone_chain.hpp", "controls.hpp",
     "control_protocol.cpp", "control_protocol.hpp", "recording.cpp", "recording.hpp", "microphone_test.cpp", "microphone_test.hpp",
     "microphone_test_cli.cpp", "microphone_test_coreaudio.cpp")]
@@ -108,6 +108,7 @@ info = {
     "CFBundleVersion": "1", "LSMinimumSystemVersion": "12.0",
     "NSHighResolutionCapable": True,
     "NSMicrophoneUsageDescription": "Lab Voice captures the microphone you select to route audio and optionally reduce noise on this Mac.",
+    "NSAudioCaptureUsageDescription": "Lab Voice records audio from the app you explicitly select and saves it on this Mac. Microphone audio is not included in selected app recordings.",
     "NSSpeechRecognitionUsageDescription": "Lab Voice uses on-device speech recognition to transcribe WAV files you select. It does not record your microphone.",
 }
 with (app / "Contents" / "Info.plist").open("wb") as handle:
