@@ -23,7 +23,7 @@
     "id": "asr",
     "feature": "configured.asr.asr",
     "localFile": "asr_eng_6.3.0_1.0.kef",
-    "sha256": null,
+    "sha256": "1720c5ef0a7d921fd6e95be04103ad20dab762ce547ed9d43dd339102262e51f",
     "license": {
       "redistribution": "unknown"
     },

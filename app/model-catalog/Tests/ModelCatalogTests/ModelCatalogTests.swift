@@ -77,7 +77,7 @@ final class ModelCatalogTests: XCTestCase {
         try fixture { root in
             let models = try ModelCatalog.installedExpectations()
             XCTAssertEqual(models.count, 11)
-            XCTAssertEqual(models.filter { $0.sha256 != nil }.count, 8)
+            XCTAssertEqual(models.filter { $0.sha256 != nil }.count, 9)
             let downloaded = root.appendingPathComponent("downloaded", isDirectory: true)
             let app = root.appendingPathComponent("app", isDirectory: true)
             try FileManager.default.createDirectory(at: downloaded, withIntermediateDirectories: true)
@@ -87,7 +87,7 @@ final class ModelCatalogTests: XCTestCase {
             let reports = try ModelCatalog.discoverInstalled(appBundle: app, downloadedModels: downloaded)
             XCTAssertEqual(reports.count, 22)
             let found = try XCTUnwrap(reports.first { $0.asset.id == "asr" && $0.location == "downloaded-model-directory" })
-            XCTAssertEqual(found.integrity, .hashUnverified)
+            XCTAssertEqual(found.integrity, .hashMismatch)
             XCTAssertTrue(found.detected)
             XCTAssertTrue(found.unknownLicense)
             XCTAssertFalse(found.inferenceReady)

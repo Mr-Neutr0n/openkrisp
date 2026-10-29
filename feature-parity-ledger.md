@@ -529,3 +529,10 @@ Explicit selected-app recording now optionally includes the selected physical mi
 Desktop admission includes microphone permission, refreshed device identity, call/watch/configuration/power fences and the shared capture lease. History records microphone channel zero, UID/object ID and mixing/timeline policy. Retained staging distinguishes requested source details from verified admission. These changes do not add noise processing, live stream ASR or automatic call recording. Actual permission, native callback layouts, audio quality and sustained capture remain untested.
 
 Host release/sanitizer and injected dual-source CLI/WAV checks passed. LocalStore passed21 tests. Desktop passed265 tests with2opt-in skips and signed ARM64/macOS12 packaging/relocation. Independent GPT6.1sol review found no blocker;236 source fingerprints match. CHECKPOINT.md retains exact logs and hashes.
+
+
+## Local ASR identity and static contract, 2026-10-29
+
+The catalog now pins the installed English ASR6.3 model to accepted REA file-identity evidence. Five catalog tests and the release build passed. Desktop packaging, signing and relocation passed after correcting the expected reference-hash count to nine. No ASR inference was enabled.
+
+The original local wrapper and native feed use separate microphone and speaker streams. Recovered packaged defaults are32kHz mono microphone and48kHz stereo speaker, each with a literal duration value of10. Its unit remains unverified. Full descriptor, callback, queue and lifetime semantics remain the next adapter prerequisites. See live-asr-findings.md; Apple Speech for saved files remains an independent alternative, not original live-ASR parity.

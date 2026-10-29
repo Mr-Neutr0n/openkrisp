@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Selected app and microphone sources, 2026-10-29](#selected-app-and-microphone-sources-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Local ASR identity and contract, 2026-10-29](#local-asr-identity-and-contract-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -833,3 +833,20 @@ Host verification passed across release, ASan/UBSan, synthetic lifecycle/writer 
 - Desktop: 267 tests enumerated, 265 passed and two opt-in skips, plus ARM64/macOS12 packaging, ad-hoc signatures, permission metadata and relocated resources. `evidence/desktop-verify-dual-call-capture.log`, SHA256 `91895b7b9b88cf3bc9497b3e6414f72cea2ac5faa2b2aee6bd55fd177cd111d5`.
 
 Independent GPT 6.1 sol review found no remaining blocker in this checkpoint. The ledger records 236 matching source/verification fingerprints. Native runtime and full parity remain incomplete.
+
+
+## Local ASR identity and contract, 2026-10-29
+
+Accepted REA static hashing established the current English ASR model's exact bytes: `asr_eng_6.3.0_1.0.kef`, 616,329,903 bytes, SHA256 `1720c5ef0a7d921fd6e95be04103ad20dab762ce547ed9d43dd339102262e51f`. Descriptor/path identity remained unchanged; the old exact 6.2.0 path returned ENOENT. Evidence `ev_bffca013e20279822e6caa4b3c7bd70b84ac30caee158b23ccd8681f01d33ee4` exited zero with verified owned-process cleanup. No model was loaded or executed.
+
+The model catalog now pins these bytes and reports a mismatch for an altered ASR file. There are nine reference hashes among eleven configured models. Inference remains unavailable through the catalog. No original weight was copied into the repository; redistribution and runtime compatibility remain unresolved. Packaging exposed and fixed the desktop headless catalog check's old eight-hash assumption.
+
+REA also recovered the local ASR wrapper, distinct directional graph inputs, packaged frame defaults and native vector-copy boundary. The defaults are mono microphone at32kHz and stereo speaker at48kHz, each with a literal duration value of10. The duration unit remains unverified. These defaults do not establish all supported formats or the complete ABI. The existing mixed recording and saved-WAV Apple Speech workflow cannot substitute for this original local pipeline. See live-asr-findings.md for exact evidence and unresolved native descriptor, callback, queue and lifetime requirements.
+
+The next step is a separate installed-ASR provider after those contracts are recovered. Reuse process supervision where suitable, but do not add ASR to the ordinary-NC role map or its synchronous480-sample protocol. Preserve inbound/outbound source identity and the recovered ASR-start-to-recorder admission order. No live transcript feature or automatic recording was enabled in this checkpoint.
+
+- Model catalog: five fixture tests and release build passed. `evidence/asr-catalog-verify-20261029.log`, SHA256 `9638cca987d9a21b15aa50d586f275bbd6fda2485b1d13601b06daad7117bdb2`.
+
+- Desktop resource-only build, signature, ARM64/macOS12 and relocation checks passed; full desktop test suite was not rerun. `evidence/desktop-package-asr-pin.log`, SHA256 `874eba277799b372b1bfd6296f567b6cea658592e726f106711e9fe044082c93`.
+
+No physical audio, permission prompt, UI launch, original processor execution, driver change or CoreAudio restart ran. Full retained parity remains incomplete.

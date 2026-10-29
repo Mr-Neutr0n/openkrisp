@@ -2165,7 +2165,7 @@
           "exists": true
         }
       ],
-      "implementation": "Selected-WAV Apple offline recognition now preserves unchanged recognized segment text, order and timing through desktop review, import, storage and timed export. Manual edits irreversibly invalidate the timing candidate, selected-file changes clear it, and failed/cancelled replacement recognition preserves the previous candidate. Manual text and missing segments retain a recording-wide fallback. Desktop phrase search spans stored word boundaries; LocalStore.search remains per-segment. No live meeting ASR, diarization, speaker labels, transcript-only capture, original ASR model inference or automatic recording transcription. History now supports explicit on-device transcription/review/save of an existing recorded session. Same-session transcript replacement preserves metadata/audio, checks session and source identities, and serializes commits/deletion across windows. Recognition and cancellation leave saved text unchanged until explicit Save. Selection/library/result revisions prevent stale review publication.",
+      "implementation": "Selected-WAV Apple offline recognition now preserves unchanged recognized segment text, order and timing through desktop review, import, storage and timed export. Manual edits irreversibly invalidate the timing candidate, selected-file changes clear it, and failed/cancelled replacement recognition preserves the previous candidate. Manual text and missing segments retain a recording-wide fallback. Desktop phrase search spans stored word boundaries; LocalStore.search remains per-segment. No live meeting ASR, diarization, speaker labels, transcript-only capture, original ASR model inference or automatic recording transcription. History now supports explicit on-device transcription/review/save of an existing recorded session. Same-session transcript replacement preserves metadata/audio, checks session and source identities, and serializes commits/deletion across windows. Recognition and cancellation leave saved text unchanged until explicit Save. Selection/library/result revisions prevent stale review publication. Current installed English ASR6.3.0 model bytes are now pinned in the catalog from accepted REA static hashing. This adds file verification only; original ASR loading and stream inference are not implemented.",
       "verified_scope": "Full desktop verification passed 138 tests and signed packaging/relocation checks. Focused tests passed 22 cases, including seven new timing tests covering real local-store import/export, timing rejection, edits/reverts, missing segments, replacement cancellation/failure, late results, selected-file changes, phrase search and stale library revisions. Unchanged local-transcription and local-store suites passed 14 and 12 tests. Tests use own WAVs and injected recognition; no Speech prompt, real recognition, hardware audio or original runtime timestamp comparison ran. Formatted recognition paragraphs are not separately stored; timed export retains segment text with millisecond-formatted start markers. See offline-transcript-timing-findings.md. Verification log SHA256: {\"evidence/transcript-timing-local-transcription-verify-20261023.log\": \"57eacd32abab9ca067872fe5948531c4d5f33a5f233d23f249d703baa9af1ff8\", \"evidence/transcript-timing-local-store-verify-20261023.log\": \"7a31ad53ae070d24ec5825955416931dee73c48c26d7e617819f9f3a19a52d61\", \"evidence/transcript-timing-desktop-verify-20261023.log\": \"3dae16820385bfedd235c3746941dd01eec430e44639d2c9609ca41ed395d580\"}. Saved-recording workflow: full desktop184 tests/signing/relocation and store18 tests pass. Own finalized WAV -> injected recognition -> reviewed timed replacement -> history phrase search and timed export preserves audio bytes/inode/mtime and session identity. Tests cover stale source/manifest, cancellation, invalid timings, selection roundtrips and library changes. This does not verify OS recognition, accuracy, native UI or original post-save semantics.",
       "missing_acceptance": "Run authorized real offline recognition and assess recognition/timestamp accuracy. Implement and validate live source/timestamp contracts, diarization and transcript-only lifecycle. Original runtime timestamp parity and full feature parity remain unverified; resolve conflicting short-call labels before enforcing limits."
     },
@@ -3243,7 +3243,7 @@
     "projects/krisp/app/audio-host/route_cli.cpp": "fbac5f519fff0b8040980c44c2281edcefe04977186d7661b871508d326f9ee1",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingController.swift": "36d1a0447e2df2db079d471fc3138e06d3549d666bb7126dd5681ffdbc8fee4e",
     "projects/krisp/app/desktop/Sources/LabVoice/RecordingView.swift": "fbff6731fecd8237fa2a9b45cb15df21529798f14fe222cb994503bf81100029",
-    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "90cb08dcf838879264496c97a5495fb99fa4212788589bc6a5f708e9b38f66fc",
+    "projects/krisp/app/desktop/Sources/LabVoice/LabVoiceApp.swift": "f75a0a46a1727cad4fe59b2a2db751033585cb3e20ffd79f53e7562e27150e20",
     "projects/krisp/app/desktop/Sources/LabVoice/Settings.swift": "f86e3b59a7fe4a75520e4c797dbccc3c95a1ddd39d1747b7dbc0c5668fb314ee",
     "projects/krisp/app/noise-engine/noise_engine.hpp": "560dbacec2f8abba3b4495da090cb47e48e49415cd2c42a1407e3c7d5b664dd7",
     "projects/krisp/app/desktop/Sources/LabVoice/FloatingWidget.swift": "e2a911d441a483c9e7019cfebb2ea303adea0967fe7db30d1499274b180a92c1",
@@ -3457,7 +3457,9 @@
     "projects/krisp/app/audio-host/microphone_inspection.cpp": "e4b73d0412ac291daedce75d6886e547d5cb2e258d29736813102d3b2ae891a3",
     "projects/krisp/app/audio-host/microphone_inspection.hpp": "37314ce01e9368660987bef287164f25ed8b90160896345735b25032420c8cb6",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/SelectedCaptureMicrophoneTests.swift": "f69fc2ee48b9df5e490d7814ac170f249bf2622953ec9aa38b2f3addf78f06a2",
-    "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingControllerTests.swift": "13335c82d1c067b527369f62439a74f8f4c1cf788f17f1afd1f81d10af7befbb"
+    "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingControllerTests.swift": "13335c82d1c067b527369f62439a74f8f4c1cf788f17f1afd1f81d10af7befbb",
+    "projects/krisp/app/model-catalog/Sources/ModelCatalog/Resources/installed-expectations.json": "08af571ba20966c42ba092962130469e6e450263e831d8caad011eea4a2996b3",
+    "projects/krisp/app/model-catalog/Tests/ModelCatalogTests/ModelCatalogTests.swift": "6f547f6ee3ed562c706af4e2bc35556d5c1c52d0aef2724b4959eac011f71a83"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3468,7 +3470,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "236 source/verification/own-fixture fingerprints at selected-app plus physical-microphone capture checkpoint. Host release/sanitizer and injected dual-source CLI/WAV drift tests passed; LocalStore21 tests and desktop265 tests passed with2opt-in skips, plus signed ARM64/macOS12 packaging/relocation. Native permissions/runtime/audio acceptance, live ASR and automatic full-call recording remain incomplete.",
+  "source_snapshot_note": "238 source/verification/own-fixture fingerprints at local ASR identity checkpoint. Accepted REA static identity pins current ASR6.3 bytes; five catalog tests/release and desktop resource-only packaging/signing/relocation pass. No model loading/inference or live ASR enabled; full desktop suite remains the prior265pass/2skip run.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",
@@ -3538,6 +3540,13 @@
         "probe_sha256": "28049ba29ee4819cb5f2f38ed4db8a81a7a5ecf13cac7a7da62a88724d8ce89a",
         "scope": "Within-bound byte equality to independently warmed outbound NC oracle at480/4096; cross-bound outputs differ. No realtime, physical audio, quality, original-order or full-parity claim."
       }
+    },
+    "current_asr_model": {
+      "evidence_id": "ev_bffca013e20279822e6caa4b3c7bd70b84ac30caee158b23ccd8681f01d33ee4",
+      "filename": "asr_eng_6.3.0_1.0.kef",
+      "bytes": 616329903,
+      "sha256": "1720c5ef0a7d921fd6e95be04103ad20dab762ce547ed9d43dd339102262e51f",
+      "limit": "Bounded static regular-file hash with unchanged descriptor/path identity; not model loading, inference, offline activation or redistribution permission."
     }
   },
   "scope_counts": {

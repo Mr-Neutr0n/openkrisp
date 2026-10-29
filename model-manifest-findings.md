@@ -25,3 +25,10 @@ The manifest names make noise cancellation, voice cancellation, ASR, diarization
 ## Dedicated downloaded-model folder
 
 A later path-only search limited to KEF/model filenames found all three configured filenames under `~/Library/Application Support/krisp/models/`. This is filesystem discovery, not a successful REA content inventory. No account, transcript, recording, log or credential file was read. REA `inspect_artifact` rejected the directory opening route and the three raw KEF files as unsupported. It did not authenticate their digests or decode them. Presence at these paths does not establish loadability, offline activation or redistribution rights.
+
+
+## Current downloaded ASR identity, 2026-10-29
+
+A bounded REA static read now closes the current ASR file-identity gap. Evidence `ev_bffca013e20279822e6caa4b3c7bd70b84ac30caee158b23ccd8681f01d33ee4` read only the exact current and old ASR paths plus the media addon path. The current `asr_eng_6.3.0_1.0.kef` is a regular 616,329,903-byte file with SHA256 `1720c5ef0a7d921fd6e95be04103ad20dab762ce547ed9d43dd339102262e51f`; descriptor/path identity stayed unchanged while hashing. The exact old 6.2.0 path returned ENOENT. Reader exit was zero, owned-process cleanup was verified, and its temporary root was removed.
+
+No model was loaded or executed, and no directory-wide inventory or user-recording read occurred. This establishes current bytes for catalog validation, not inference compatibility, offline availability or redistribution rights. The two accent model identities remain separate unresolved work. See live-asr-findings.md for the streaming interface investigation.
