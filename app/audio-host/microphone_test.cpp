@@ -14,14 +14,6 @@
 #include <unistd.h>
 
 namespace labvoice {
-bool microphoneTestFormatSupported(const AudioStreamBasicDescription &f) noexcept {
-    const UInt32 flags=kAudioFormatFlagIsFloat|kAudioFormatFlagIsPacked;
-    const bool planar=f.mFormatFlags & kAudioFormatFlagIsNonInterleaved;
-    return f.mSampleRate==48000 && f.mFormatID==kAudioFormatLinearPCM &&
-        (f.mFormatFlags & ~kAudioFormatFlagIsNonInterleaved)==flags && f.mBitsPerChannel==32 &&
-        f.mChannelsPerFrame && f.mChannelsPerFrame<=64 && f.mFramesPerPacket==1 &&
-        f.mBytesPerFrame==(planar?4:f.mChannelsPerFrame*4) && f.mBytesPerPacket==f.mBytesPerFrame;
-}
 MicrophoneCapture::MicrophoneCapture(MicrophoneSpec value)
     : spec(std::move(value)), samples(microphoneTestMaximum) {
     if (!spec.device) throw std::invalid_argument("invalid_microphone_device");

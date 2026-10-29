@@ -365,7 +365,7 @@ struct LibraryView: View {
                             .foregroundColor(.secondary)
                         HStack {
                             if let source = session.recordingSource {
-                                Text("Selected app audio: \(source.appName). Microphone audio is not included.").font(.caption).foregroundColor(.secondary)
+                                Text(source.microphoneUID == nil ? "Selected app audio: \(source.appName). Microphone audio is not included." : "Selected app and microphone audio: \(source.appName). First microphone channel; each source uses half gain.").font(.caption).foregroundColor(.secondary)
                             }
                             Button(model.playing ? "Stop playback" : "Play recording") {
                                 let revision = model.location.snapshot.revision

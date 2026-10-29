@@ -25,6 +25,23 @@ final class RecordingSourceTests: XCTestCase {
         XCTAssertThrowsError(try store.save(title: "No audio", startedAt: Date(), durationSeconds: 0,
                                           transcript: [], recordingSource: source))
     }
+    func testMicrophoneProvenanceRoundTripAndRejectsInconsistentPolicy() throws {
+        let source = RecordingSource(appName: "Own", appID: "own", responsiblePID: 9,
+            processes: [.init(objectID: 7, actualPID: 9)], microphoneUID: "own.mic", microphoneObjectID: 11)
+        XCTAssertTrue(source.isValid)
+        XCTAssertEqual(source.kind, "selected_app_output_and_microphone")
+        XCTAssertEqual(try JSONDecoder().decode(RecordingSource.self, from: JSONEncoder().encode(source)), source)
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(source)) as? [String: Any])
+        for (key, value) in [("mixPolicy", "unknown"), ("timelinePolicy", "unknown"), ("microphoneUID", ""), ("kind", "selected_app_output")] {
+            var malformed = json; malformed[key] = value
+            XCTAssertFalse(try JSONDecoder().decode(RecordingSource.self, from: JSONSerialization.data(withJSONObject: malformed)).isValid)
+        }
+        json["microphoneObjectID"] = 0
+        XCTAssertFalse(try JSONDecoder().decode(RecordingSource.self, from: JSONSerialization.data(withJSONObject: json)).isValid)
+        let pending = RecordingSource(appName: "Own", appID: "own", responsiblePID: 9,
+            processes: [.init(objectID: 7, actualPID: 9)], microphoneUID: "own.mic")
+        XCTAssertTrue(pending.isValid)
+    }
     func testInvalidAndDuplicateTargetsAreRejected() throws {
         let process = RecordingSource.Process(objectID: 7, actualPID: 9)
         XCTAssertFalse(RecordingSource(appName: "Own", appID: "own", responsiblePID: 9, processes: []).isValid)

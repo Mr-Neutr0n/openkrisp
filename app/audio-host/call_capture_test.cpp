@@ -45,6 +45,21 @@ struct Writer:CallCaptureWriter {
     bool write(const float*p,uint32_t n,std::string& error)override{if(s->fail=="write"){error="injected_writer_failure";return false;}s->written+=n;s->samples.insert(s->samples.end(),p,p+n*2);return true;}
     bool close(uint64_t&n,std::string&)override{s->events.push_back("close");n=s->written.load();return true;}
 };
+struct MicShared {CallCaptureDriver::Sink sink=nullptr;void* context=nullptr;std::string fail;std::vector<std::string> events;std::function<void(const char*)> hook;bool destroyed=false;};
+struct Mic:CallCaptureMicrophone {
+ std::shared_ptr<MicShared>s;explicit Mic(std::shared_ptr<MicShared>v):s(v){}~Mic()override{s->destroyed=true;}
+ bool op(const char*name,std::string&error){s->events.push_back(name);if(s->hook)s->hook(name);if(s->fail==name){error=name;return false;}return true;}
+ bool prepare(CallCaptureMicrophoneSpec&spec,std::string&error)override{spec.uid="physical.mic";spec.objectID=77;spec.channels={2};spec.streams={78};spec.format=format();spec.format.mSampleRate=48000;spec.format.mChannelsPerFrame=1;spec.format.mBytesPerFrame=spec.format.mBytesPerPacket=4;return op("micprepare",error);}
+ bool registerIO(CallCaptureDriver::Sink sink,void*c,std::string&error)override{s->sink=sink;s->context=c;return op("micregister",error);}
+ bool start(std::string&error)override{return op("micstart",error);}
+ bool validate(const CallCaptureMicrophoneSpec&,std::string&error)override{return op("micvalidate",error);}
+ bool stop(std::string&error)override{return op("micstop",error);}
+ bool unregisterIO(std::string&error)override{return op("micunregister",error);}
+};
+void feedLane(CallCaptureDriver::Sink sink,void* context,bool mic,unsigned block){
+ float values[512];for(unsigned i=0;i<256;++i){values[2*i]=mic?.4f:.2f;values[2*i+1]=mic?1000.f:-.2f;}
+ AudioBufferList buffers{1,{{2,sizeof values,values}}};AudioTimeStamp time{};time.mSampleTime=block*256;time.mHostTime=1000000000000ULL+uint64_t(std::llround(block*256*1e9/(mic?48000:44100)));time.mFlags=kAudioTimeStampSampleTimeValid|kAudioTimeStampHostTimeValid;sink(context,&buffers,&time);
+}
 void feed(const std::shared_ptr<Shared>&s,double sample=0,uint64_t host=100) {
     float left[]={.1f,.2f,.3f,.4f};float right[]={-.1f,-.2f,-.3f,-.4f};float stereo[]={.1f,-.1f,.2f,-.2f,.3f,-.3f,.4f,-.4f};
     struct Buffers {UInt32 count;AudioBuffer buffers[2];} buffers{};
@@ -123,5 +138,27 @@ int main() {
         {CallCaptureSession session([&]{return good;},std::make_unique<Driver>(shared),std::make_unique<Writer>(shared));assert(session.start(target(),"/fixture.wav",error));feed(shared);auto result=session.stop();assert(!result.completed&&!result.cleanupVerified);}
         assert(!shared->driverDestroyed);feed(shared,8,300); // Retained callback context remains safe and rejects intake.
     }
+    {auto shared=std::make_shared<Shared>();auto microphone=std::make_shared<MicShared>();
+      CallCaptureSession session([&]{return good;},std::make_unique<Driver>(shared),std::make_unique<Writer>(shared),std::make_unique<Mic>(microphone),1e9);
+      assert(session.start(target(),"/dual.wav",error));assert(session.microphoneSpec().objectID==77);
+      for(unsigned i=0;i<10;++i){feedLane(shared->sink,shared->context,false,i);feedLane(microphone->sink,microphone->context,true,i);}
+      auto result=session.stop();assert(result.completed&&result.timeline.outputFrames==result.frames&&result.timeline.microphoneSourceFrames==2560&&result.timeline.appSourceFrames==2560);
+      for(size_t i=0;i<shared->samples.size()/2;++i){assert(std::abs(shared->samples[2*i]-.3f)<1e-5);assert(std::abs(shared->samples[2*i+1]-.1f)<1e-5);}}
+    for(const char* failure:{"micregister","micstart","micvalidate"}){
+      auto shared=std::make_shared<Shared>();auto microphone=std::make_shared<MicShared>();microphone->fail=failure;
+      CallCaptureSession session([&]{return good;},std::make_unique<Driver>(shared),std::make_unique<Writer>(shared),std::make_unique<Mic>(microphone),1e9);
+      assert(!session.start(target(),"/dual.wav",error));auto result=session.stop();assert(!result.completed&&result.cleanupVerified&&result.frames==0);
+      assert(std::find(microphone->events.begin(),microphone->events.end(),"micunregister")!=microphone->events.end());}
+    {auto shared=std::make_shared<Shared>();auto microphone=std::make_shared<MicShared>();
+      microphone->hook=[&](const char*stage){if(std::string(stage)=="micstart"){feedLane(shared->sink,shared->context,false,0);feedLane(microphone->sink,microphone->context,true,0);microphone->fail="micvalidate";}};
+      CallCaptureSession session([&]{return good;},std::make_unique<Driver>(shared),std::make_unique<Writer>(shared),std::make_unique<Mic>(microphone),1e9);
+      assert(!session.start(target(),"/dual.wav",error));auto result=session.stop();assert(!result.completed&&result.cleanupVerified&&result.frames==0&&result.sourceFrames==0);}
+    for(bool failApp:{false,true}){
+      auto shared=std::make_shared<Shared>();auto microphone=std::make_shared<MicShared>();
+      if(failApp)shared->fail="stop";else microphone->fail="micstop";
+      {CallCaptureSession session([&]{return good;},std::make_unique<Driver>(shared),std::make_unique<Writer>(shared),std::make_unique<Mic>(microphone),1e9);
+       assert(session.start(target(),"/dual.wav",error));auto result=session.stop();assert(!result.cleanupVerified&&!result.completed);
+       assert(std::find(shared->events.begin(),shared->events.end(),"stop")!=shared->events.end());assert(std::find(microphone->events.begin(),microphone->events.end(),"micstop")!=microphone->events.end());}
+      assert(!shared->driverDestroyed&&!microphone->destroyed);}
     std::cout<<"Selected-app capture injected lifecycle tests passed.\n";
 }

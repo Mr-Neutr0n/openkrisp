@@ -10,8 +10,9 @@ struct RecordingJob: Codable, Equatable, Sendable {
     let startedAt: Date
     let libraryLocation: LibraryLocationSnapshot?
     var recordingSource: RecordingSource? = nil
+    var captureAdmissionVerified: Bool? = nil
     var wav: URL { directory.appendingPathComponent("recording.wav") }
-    var title: String { (recordingSource.map { "Selected app audio: " + $0.appName + " " } ?? "Route recording ") + startedAt.formatted(date: .abbreviated, time: .shortened) }
+    var title: String { (recordingSource.map { ($0.microphoneUID == nil ? "Selected app audio: " : "Call audio: ") + $0.appName + " " } ?? "Route recording ") + startedAt.formatted(date: .abbreviated, time: .shortened) }
 }
 
 struct RecordingSave: Sendable {
@@ -24,6 +25,7 @@ enum RecordingStorageError: Error { case invalidDirectory, invalidCompletion }
 protocol RecordingStoring: Sendable {
     func prepare(operationID: UUID, location: LibraryLocationSnapshot) async throws -> RecordingJob
     func prepare(operationID: UUID, location: LibraryLocationSnapshot, source: RecordingSource) async throws -> RecordingJob
+    func persistMetadata(_ job: RecordingJob) async throws
     func releaseDestination(_ job: RecordingJob) async
     func retainedDirectories() async throws -> [String]
     func retainFailure(_ job: RecordingJob, message: String) async throws
@@ -32,7 +34,7 @@ protocol RecordingStoring: Sendable {
 
 extension RecordingStoring {
     func prepare(operationID: UUID, location: LibraryLocationSnapshot, source: RecordingSource) async throws -> RecordingJob {
-        var job = try await prepare(operationID: operationID, location: location); job.recordingSource = source; return job
+        var job = try await prepare(operationID: operationID, location: location); job.recordingSource = source; job.captureAdmissionVerified = false; return job
     }
     func releaseDestination(_ job: RecordingJob) async {} }
 
@@ -75,7 +77,7 @@ actor RecordingStorage: RecordingStoring {
         let directory = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false,
                                                attributes: [.posixPermissions: 0o700])
-        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date(), libraryLocation: location, recordingSource: source)
+        let job = RecordingJob(id: UUID(), operationID: operationID, directory: directory, startedAt: Date(), libraryLocation: location, recordingSource: source, captureAdmissionVerified: source == nil ? nil : false)
         try privateWrite(JSONEncoder().encode(job), to: directory.appendingPathComponent("job.json"))
         if let admitted { destinations[job.id] = admitted }
         return job
@@ -92,13 +94,36 @@ actor RecordingStorage: RecordingStoring {
                 return values.isDirectory == true && values.isSymbolicLink != true
             }.map(\.path).sorted()
     }
-    func retainFailure(_ job: RecordingJob, message: String) throws {
+    func persistMetadata(_ job: RecordingJob) throws {
         try plainDirectory(job.directory)
+        if job.recordingSource != nil {
+            let directory = job.directory.path.withCString { Darwin.open($0, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC) }
+            guard directory >= 0 else { throw RecordingStorageError.invalidDirectory }
+            defer { Darwin.close(directory) }
+            var opened = stat()
+            guard Darwin.fstat(directory, &opened) == 0, opened.st_mode & S_IFMT == S_IFDIR,
+                  opened.st_mode & 0o777 == 0o700, opened.st_uid == geteuid() else { throw RecordingStorageError.invalidDirectory }
+            let metadata = job.directory.appendingPathComponent("job.json")
+            let stored = try JSONDecoder().decode(RecordingJob.self, from: Data(contentsOf: metadata))
+            guard stored.id == job.id, stored.operationID == job.operationID, stored.directory == job.directory,
+                  job.recordingSource?.isValid == true else { throw RecordingStorageError.invalidCompletion }
+            let temporary = job.directory.appendingPathComponent(".job-" + UUID().uuidString + ".json")
+            try privateWrite(JSONEncoder().encode(job), to: temporary)
+            let renamed = temporary.path.withCString { source in metadata.path.withCString { destination in Darwin.rename(source, destination) } }
+            if renamed != 0 { let code = errno; try? FileManager.default.removeItem(at: temporary); throw StoreError.io(operation: "recording source metadata", code: code) }
+            var current = stat()
+            guard job.directory.path.withCString({ Darwin.lstat($0, &current) }) == 0,
+                  current.st_dev == opened.st_dev, current.st_ino == opened.st_ino else { throw RecordingStorageError.invalidDirectory }
+            guard Darwin.fsync(directory) == 0 else { throw StoreError.io(operation: "recording metadata directory sync", code: errno) }
+        }
+    }
+    func retainFailure(_ job: RecordingJob, message: String) throws {
+        try persistMetadata(job)
         try privateWrite(Data(message.utf8), to: job.directory.appendingPathComponent("failure-" + UUID().uuidString + ".txt"))
     }
     func saveCompleted(_ job: RecordingJob, path: String, frames: UInt64, sampleRate: Double, channels: UInt32) throws -> RecordingSave {
         defer { destinations.removeValue(forKey: job.id) }
-        guard path == job.wav.path, frames > 0, frames <= UInt64(Int64.max), sampleRate == 48000, channels == 2 else {
+        guard (job.recordingSource == nil || job.captureAdmissionVerified == true), path == job.wav.path, frames > 0, frames <= UInt64(Int64.max), sampleRate == 48000, channels == 2 else {
             throw RecordingStorageError.invalidCompletion
         }
         try plainDirectory(job.directory)

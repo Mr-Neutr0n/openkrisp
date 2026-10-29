@@ -124,11 +124,16 @@ struct AudioView: View {
                         }
                     }
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Selected app audio").font(.headline)
-                        Text("Records only the detected app's outgoing audio. Microphone audio is not included. macOS may request system audio recording access when you start.")
+                        Text("Selected call recording").font(.headline)
+                        Toggle("Include selected microphone", isOn: Binding(get: { selectedCapture.includesMicrophone }, set: selectedCapture.setIncludesMicrophone))
+                        Text(selectedCapture.includesMicrophone
+                             ? "Records the selected app and the physical microphone chosen above. Uses its first input channel at 48 kHz. Both sources use half gain. Only their shared time range is saved. Device rates and levels stay unchanged."
+                             : "Records only the detected app's outgoing audio. Microphone audio is not included.")
+                            .font(.caption).foregroundColor(.secondary)
+                        Text("macOS may request system audio access when you start. Microphone access is requested only when you start with Include selected microphone enabled.")
                             .font(.caption).foregroundColor(.secondary)
                         HStack {
-                            Button("Record selected app audio") { selectedCapture.start() }.disabled(!selectedCapture.canStart)
+                            Button(selectedCapture.includesMicrophone ? "Record app and microphone" : "Record selected app audio") { selectedCapture.start() }.disabled(!selectedCapture.canStart)
                             Button("Stop selected app recording") { Task { _ = await selectedCapture.stop() } }.disabled(!selectedCapture.engaged)
                         }
                         if let name = selectedCapture.selectedName { Text("Selected app: \(name)").font(.caption) }

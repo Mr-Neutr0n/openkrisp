@@ -57,6 +57,7 @@ private final class RecoveryPathCapture: @unchecked Sendable {
         var original = try job(root)
         original.recordingSource = RecordingSource(appName: "Fixture", appID: "own.fixture", responsiblePID: 123,
                                                     processes: [.init(objectID: 8, actualPID: 124)])
+        original.captureAdmissionVerified = true
         try JSONEncoder().encode(original).write(to: original.directory.appendingPathComponent("job.json"))
         let backend = RecordingRecovery(stagingRoot: root)
         let items = try await backend.scan(), item = try XCTUnwrap(items.first)
@@ -64,6 +65,21 @@ private final class RecoveryPathCapture: @unchecked Sendable {
         XCTAssertEqual(saved.session.recordingSource, original.recordingSource)
         XCTAssertTrue(saved.session.title.hasPrefix("Recovered selected app audio: Fixture"))
         XCTAssertTrue(FileManager.default.fileExists(atPath: original.wav.path))
+    }
+    func testUnadmittedRequestedSourceStaysInStageButIsNotClaimedOnRecoveredCopy() async throws {
+        let root = try temporary(), library = try temporary()
+        var original = try job(root)
+        original.recordingSource = RecordingSource(appName: "Requested app", appID: "requested.app", responsiblePID: 123,
+                                                    processes: [.init(objectID: 8, actualPID: 124)], microphoneUID: "requested.microphone")
+        original.captureAdmissionVerified = false
+        let metadata = try JSONEncoder().encode(original)
+        try metadata.write(to: original.directory.appendingPathComponent("job.json"))
+        let backend = RecordingRecovery(stagingRoot: root)
+        let items = try await backend.scan(), item = try XCTUnwrap(items.first)
+        let saved = try await backend.saveCopy(item, to: location(library))
+        XCTAssertNil(saved.session.recordingSource)
+        XCTAssertTrue(saved.session.title.hasPrefix("Recovered recording "))
+        XCTAssertEqual(try Data(contentsOf: original.directory.appendingPathComponent("job.json")), metadata)
     }
     func testIncompleteCorruptAndForeignManifestAreListedButNeverAdmitted() async throws {
         let root = try temporary()

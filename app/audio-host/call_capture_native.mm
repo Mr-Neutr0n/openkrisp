@@ -214,6 +214,9 @@ public:
     }
 };}
 std::unique_ptr<CallCaptureWriter> makeCallCaptureWavWriter() { return std::make_unique<NativeWriter>(); }
+std::unique_ptr<CallCaptureSession> makeNativeCallCaptureSession(const std::string& microphoneUID) {
+    return std::make_unique<CallCaptureSession>(observeAudioProcessUsage,std::make_unique<NativeDriver>(),makeCallCaptureWavWriter(),makeNativeCallCaptureMicrophone(microphoneUID),AudioGetHostClockFrequency());
+}
 std::unique_ptr<CallCaptureSession> makeNativeCallCaptureSession() {
     return std::make_unique<CallCaptureSession>(observeAudioProcessUsage, std::make_unique<NativeDriver>(), makeCallCaptureWavWriter());
 }

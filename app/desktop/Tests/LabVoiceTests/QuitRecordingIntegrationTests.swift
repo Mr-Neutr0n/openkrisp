@@ -9,6 +9,7 @@ private actor QuitFailingRecordingStorage: RecordingStoring {
     func prepare(operationID: UUID, location: LibraryLocationSnapshot) throws -> RecordingJob {
         .init(id: UUID(), operationID: operationID, directory: URL(fileURLWithPath: "/synthetic-quit-staging"), startedAt: Date(), libraryLocation: location)
     }
+    func persistMetadata(_ job: RecordingJob) throws { throw RecordingStorageError.invalidCompletion }
     func retainedDirectories() -> [String] { ["/synthetic-quit-staging"] }
     func retainFailure(_ job: RecordingJob, message: String) { failures += 1 }
     func saveCompleted(_ job: RecordingJob, path: String, frames: UInt64, sampleRate: Double, channels: UInt32) throws -> RecordingSave {

@@ -17,7 +17,7 @@ struct RecoverableRecording: Identifiable, Equatable, Sendable {
         self.id = id; self.directory = directory; self.startedAt = startedAt; self.frames = frames; self.eligibility = eligibility; self.admission = admission
     }
     var title: String {
-        if let source = admission?.recordingSource { return "Recovered selected app audio: " + source.appName + " " + startedAt.formatted(date: .abbreviated, time: .shortened) }
+        if let source = admission?.recordingSource { return (source.microphoneUID == nil ? "Recovered selected app audio: " : "Recovered call audio: ") + source.appName + " " + startedAt.formatted(date: .abbreviated, time: .shortened) }
         return admission == nil ? "Retained recording" : "Recovered recording " + startedAt.formatted(date: .abbreviated, time: .shortened)
     }
     var durationSeconds: Double { Double(frames) / 48000 }
@@ -131,7 +131,7 @@ actor RecordingRecovery: RecordingRecoveryServing {
         let frames = try audio.frames()
         guard try metadata.unchanged(), try audio.unchanged(), try folder.unchanged(), try base.unchanged() else { throw RecordingRecoveryError.sourceChanged }
         return .init(root: base.fingerprint, directory: folder.fingerprint, metadata: metadata.fingerprint,
-                     audio: audio.fingerprint, startedAt: job.startedAt, frames: frames, recordingSource: job.recordingSource)
+                     audio: audio.fingerprint, startedAt: job.startedAt, frames: frames, recordingSource: job.captureAdmissionVerified == true ? job.recordingSource : nil)
     }
 }
 fileprivate struct RecoveryAdmission: Equatable, Sendable {

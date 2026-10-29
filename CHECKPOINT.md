@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Selected app audio source, 2026-10-29](#selected-app-audio-source-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Selected app and microphone sources, 2026-10-29](#selected-app-and-microphone-sources-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -807,3 +807,29 @@ Next connect a distinct microphone source and its timeline to selected-app captu
 - Desktop: `evidence/desktop-verify-selected-app-capture.log`, SHA256 `b685af359b43f556a18a334afd35adf3f6984eae03d270d0cc1215a67fcf0e9d`.
 
 Full host release and sanitizer verification passed against the final source, including native lifecycle, actual synthetic WAV conversion and real CLI/injected-source cancellation tests. Log `evidence/selected-app-host-frozen-verify-20261029.log`, SHA256 `caa8300d6d20648437487480b2f9b35de16620d617c5b7da883417ca5c87b3ec`. The rebuilt helper SHA256 is `84528fe88645349aff6ca7752a873f92aaea81636b1bba443fcfc1121293be35`; it was packaged and tested with injected sources, not used for live capture.
+
+
+## Selected app and microphone sources, 2026-10-29
+
+Explicit selected-app recording now optionally includes the microphone selected in Audio. The mode defaults off and is not persisted. Start holds the shared capture/library leases through permission and fresh device inspection, then rechecks the current call, watch generation, microphone selection, configuration and power state. Changing a pinned source or mode stops the operation without automatic restart. App-only mode never requests microphone permission.
+
+The native helper uses separate app-tap and physical-microphone IOProcs. Both callback intakes remain disabled through both starts and post-start validation. The microphone shares the existing physical-device inspector and captures channel zero from an alive 48 kHz Float32 input without changing device rate or output routing. Stops attempt both lanes even if one fails; uncertain cleanup retains owned callback state.
+
+Adjacent callback host anchors continuously map both independent clocks to common 48 kHz coverage. A 64-tap windowed-sinc interpolator filters and resamples the lanes before an independent half-app/half-microphone stereo mix. The implementation crops nonoverlapping startup data, unmatched tail data and the final unanchored callbacks. It supports 64 through 4096 frames per callback, bounds each timeline lane to 64 blocks, and rejects gaps, overflow or observed clock-rate deviation over one percent. Those limits and the mix policy are independent implementation choices, not recovered original behavior.
+
+Saved history retains app process identity, microphone UID/object ID, channel zero and mix/timeline policy. The helper result additionally reports actual frame counts, crop counts, host/sample anchors and maximum drift. Staging distinguishes requested source metadata from verified capture admission; metadata writes are serialized, and recovery omits source claims unless admission was verified. Earlier manifests remain readable.
+
+No real microphone, process tap, playback, permission prompt, original app execution, driver installation or CoreAudio restart ran in this checkpoint. Physical callback layouts, native capture permission, actual UI/audio quality and sustained operation remain unverified. Live stream ASR, capture noise processing and automatic call recording still require implementation. Original-model redistribution remains unresolved; no original models were added to GitHub. Full retained parity remains incomplete.
+
+Next connect a separate local stream/session owner to the captured lanes using the recovered ASR-start/recording event contract. Do not treat saved-row transcription or automatic whole-route recording as equivalent. Leave administrator-dependent driver discovery and live acceptance for an interactive session.
+
+
+Host verification passed across release, ASan/UBSan, synthetic lifecycle/writer tests and real CLI pipes with injected app/microphone sources. A final supplemental run rebuilt the production helper and repeated all changed capture checks after the final frame-count guard. Tests cover nonzero startup offsets, changing independent drift, timestamped impulse alignment, 192 kHz anti-alias filtering, both-source stop failures, post-start identity changes and pre-admission cancellation. No synthetic pass establishes physical capture quality.
+
+- Full host log: `evidence/call-capture-dual-native-verify-20261029.log`, SHA256 `2c70363c4a10c1a62288e4585d356dd8e4c929aaec8b7a9edef01dc0ef71f7f9`.
+- Final-source capture log: `evidence/call-capture-dual-final-source-verify-20261029.log`, SHA256 `544ebb819dae5c21bf0b35b2e7c78ad8806b79ecfbe0e00c2860fe2e5dd001e4`.
+- Final helper SHA256: `63be5d669c3d7178d70a156e3803e083bf2f4c2b0a26531591347a08a2a40d23`.
+- LocalStore: 21 tests passed; `evidence/dual-source-local-store-verify-20261029.log`, SHA256 `6f23738b47fff10df47fd4c435bc32f6beaefdf33b4c0073a87cdc11077943c4`.
+- Desktop: 267 tests enumerated, 265 passed and two opt-in skips, plus ARM64/macOS12 packaging, ad-hoc signatures, permission metadata and relocated resources. `evidence/desktop-verify-dual-call-capture.log`, SHA256 `91895b7b9b88cf3bc9497b3e6414f72cea2ac5faa2b2aee6bd55fd177cd111d5`.
+
+Independent GPT 6.1 sol review found no remaining blocker in this checkpoint. The ledger records 236 matching source/verification fingerprints. Native runtime and full parity remain incomplete.

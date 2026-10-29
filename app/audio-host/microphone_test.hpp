@@ -9,7 +9,14 @@ namespace labvoice {
 constexpr uint32_t microphoneTestMinimum = 5 * 48000;
 constexpr uint32_t microphoneTestMaximum = 60 * 48000;
 constexpr uint32_t microphoneTestCallbackLimit = 4096;
-bool microphoneTestFormatSupported(const AudioStreamBasicDescription &) noexcept;
+inline bool microphoneTestFormatSupported(const AudioStreamBasicDescription &f) noexcept {
+    const UInt32 flags=kAudioFormatFlagIsFloat|kAudioFormatFlagIsPacked;
+    const bool planar=f.mFormatFlags & kAudioFormatFlagIsNonInterleaved;
+    return f.mSampleRate==48000 && f.mFormatID==kAudioFormatLinearPCM &&
+        (f.mFormatFlags & ~kAudioFormatFlagIsNonInterleaved)==flags && f.mBitsPerChannel==32 &&
+        f.mChannelsPerFrame && f.mChannelsPerFrame<=64 && f.mFramesPerPacket==1 &&
+        f.mBytesPerFrame==(planar?4:f.mChannelsPerFrame*4) && f.mBytesPerPacket==f.mBytesPerFrame;
+}
 struct MicrophoneSpec {
     AudioObjectID device = 0;
     std::vector<UInt32> channels;

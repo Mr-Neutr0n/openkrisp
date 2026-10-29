@@ -8,7 +8,7 @@ if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
   echo 'Build ../noise-engine with its ./verify before audio-host verification.' >&2
   exit 1
 fi
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/audio-host
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/audio-host
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test
 ./build/device-metadata-test
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test-sanitized
@@ -29,23 +29,31 @@ clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror audio_pro
 ./build/audio-use-timing-test
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror audio_process_usage.cpp audio_use_timing.cpp audio_use_timing_test.cpp -o build/audio-use-timing-test-sanitized
 ./build/audio-use-timing-test-sanitized
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_test.cpp -o build/call-capture-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_test.cpp -o build/call-capture-test
 ./build/call-capture-test
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm call_capture_writer_test.mm -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/call-capture-writer-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture_timeline.cpp call_capture_timeline_test.cpp -o build/call-capture-timeline-test
+./build/call-capture-timeline-test
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror call_capture_microphone.mm microphone_inspection.cpp call_capture_microphone_test.mm -framework CoreAudio -framework Foundation -o build/call-capture-microphone-test
+./build/call-capture-microphone-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture_timeline.cpp call_capture_timeline_test.cpp -o build/call-capture-timeline-test-sanitized
+./build/call-capture-timeline-test-sanitized
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture_microphone.mm microphone_inspection.cpp call_capture_microphone_test.mm -framework CoreAudio -framework Foundation -o build/call-capture-microphone-test-sanitized
+./build/call-capture-microphone-test-sanitized
+clang++ -fblocks -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm call_capture_writer_test.mm -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/call-capture-writer-test
 ./build/call-capture-writer-test
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_test.mm control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-test
+clang++ -fblocks -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_test.mm control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-test
 ./build/selected-app-capture-cli-test
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_test.cpp -o build/call-capture-test-sanitized
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_test.cpp -o build/call-capture-test-sanitized
 ./build/call-capture-test-sanitized
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm call_capture_writer_test.mm -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/call-capture-writer-test-sanitized
+clang++ -fblocks -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm call_capture_writer_test.mm -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/call-capture-writer-test-sanitized
 ./build/call-capture-writer-test-sanitized
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_test.mm control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-test-sanitized
+clang++ -fblocks -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_test.mm control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-test-sanitized
 ./build/selected-app-capture-cli-test-sanitized
-clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-fixture
+clang++ -fblocks -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm selected_app_capture_cli.mm selected_app_capture_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework Foundation -framework AppKit -framework AudioToolbox -o build/selected-app-capture-cli-fixture
 python3 selected_app_capture_cli_check.py
 python3 audio_process_usage_check.py
 python3 check.py
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_native.mm audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp provider_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/provider-cli-fixture
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp provider_cli_fixture.cpp control_protocol.cpp -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/provider-cli-fixture
 python3 provider_cli_check.py
 python3 aec_cli_check.py
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include routing_test.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/routing-test
@@ -71,7 +79,7 @@ clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror 
 ./build/microphone-test-test
 clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_test.cpp microphone_test.cpp control_protocol.cpp "$sanitized_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-test-sanitized
 ./build/microphone-test-test-sanitized
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_wire_fixture.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-wire-fixture
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include microphone_test_wire_fixture.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp microphone_inspection.cpp control_protocol.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -o build/microphone-test-wire-fixture
 python3 microphone_test_wire_check.py
 # Synthetic installed-provider bridge. The child is our half-gain fixture only.
 python3 - <<'PY'

@@ -520,3 +520,12 @@ REA also maps note-taker mode changes and successful-ASR-to-recording joins. Cur
 Explicit selected-app-output recording now has a native private process-tap source and desktop saved-history path. Exact process targets, cancellation across startup, bounded callback transport, off-thread 48 kHz PCM16 conversion and verified cleanup/import are implemented. Typed source provenance remains visible and survives recovery/transcription replacement.
 
 The source does not include a microphone lane, noise processing, live ASR or automatic call recording. Synthetic native/CLI/file checks and local-store/desktop tests cannot prove actual tap permission, native format mapping or acoustic behavior. Those runtime checks remain unexecuted. Full call recording and retained parity remain incomplete.
+
+
+## Selected app and microphone checkpoint, 2026-10-29
+
+Explicit selected-app recording now optionally includes the selected physical microphone. The sources retain separate callbacks and clocks until an off-thread common-timeline writer mixes them. Adjacent host anchors correct changing drift; only common covered audio is saved. The independent half-app/half-microphone policy is not a recovered original mixing contract. The physical microphone must provide 48 kHz Float32 input, and dual-source callbacks must contain 64 through 4096 frames.
+
+Desktop admission includes microphone permission, refreshed device identity, call/watch/configuration/power fences and the shared capture lease. History records microphone channel zero, UID/object ID and mixing/timeline policy. Retained staging distinguishes requested source details from verified admission. These changes do not add noise processing, live stream ASR or automatic call recording. Actual permission, native callback layouts, audio quality and sustained capture remain untested.
+
+Host release/sanitizer and injected dual-source CLI/WAV checks passed. LocalStore passed21 tests. Desktop passed265 tests with2opt-in skips and signed ARM64/macOS12 packaging/relocation. Independent GPT6.1sol review found no blocker;236 source fingerprints match. CHECKPOINT.md retains exact logs and hashes.

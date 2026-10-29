@@ -76,6 +76,34 @@ NSDictionary* formatJSON(const AudioStreamBasicDescription& f) {
         @"channels": @(f.mChannelsPerFrame), @"format_id": @(f.mFormatID), @"format_flags": @(f.mFormatFlags),
         @"bits_per_channel": @(f.mBitsPerChannel), @"bytes_per_frame": @(f.mBytesPerFrame)};
 }
+void microphoneJSON(NSMutableDictionary* event, const SelectedAppCaptureOptions& options, const CallCaptureMicrophoneSpec& mic) {
+    event[@"microphone_uid"] = string(options.microphoneUID);
+    event[@"microphone_object_id"] = @(mic.objectID);
+    event[@"microphone_source_format"] = formatJSON(mic.format);
+    event[@"mix_policy"] = @"app_half_mic_half";
+    event[@"timeline_policy"] = @"adjacent_host_anchors_common_overlap";
+}
+NSDictionary* timelineJSON(const CallCaptureTimelineStats& t) {
+    return @{@"output_frames": @(t.outputFrames),
+        @"first_host_time": @(t.firstHostTime),
+        @"end_host_time": @(t.endHostTime),
+        @"app_source_frames": @(t.appSourceFrames),
+        @"microphone_source_frames": @(t.microphoneSourceFrames),
+        @"app_startup_frames": @(t.appStartupFrames),
+        @"microphone_startup_frames": @(t.microphoneStartupFrames),
+        @"app_tail_frames": @(t.appTailFrames),
+        @"microphone_tail_frames": @(t.microphoneTailFrames),
+        @"app_maximum_drift_ppm": @(t.appMaximumDriftPPM),
+        @"microphone_maximum_drift_ppm": @(t.microphoneMaximumDriftPPM),
+        @"app_first_sample_time": @(t.appFirstSampleTime),
+        @"app_last_sample_time": @(t.appLastSampleTime),
+        @"microphone_first_sample_time": @(t.microphoneFirstSampleTime),
+        @"microphone_last_sample_time": @(t.microphoneLastSampleTime),
+        @"app_first_host_time": @(t.appFirstHostTime),
+        @"app_last_host_time": @(t.appLastHostTime),
+        @"microphone_first_host_time": @(t.microphoneFirstHostTime),
+        @"microphone_last_host_time": @(t.microphoneLastHostTime)};
+}
 // No callback writes stdout. A closed or stalled consumer cannot hold a live
 // capture forever at its start acknowledgment.
 bool emit(NSDictionary* event) {
@@ -97,14 +125,15 @@ bool emit(NSDictionary* event) {
 }
 NSMutableDictionary* envelope(const SelectedAppCaptureOptions& options, NSString* event) {
     return [@{@"version": @1, @"event": event, @"operation_id": string(options.operationID),
-        @"target": targetJSON(options.target), @"source": @"selected_app_output",
+        @"target": targetJSON(options.target), @"source": options.microphoneUID.empty() ? @"selected_app_output" : @"selected_app_output_and_microphone",
         @"sample_rate": @48000, @"channels": @2, @"pcm_format": @"pcm16"} mutableCopy];
 }
 }
 bool parseSelectedAppCaptureArguments(int argc, char** argv, SelectedAppCaptureOptions& options, std::string& error) {
     @autoreleasepool {
-        error = "Expected --capture-selected-app --operation-id UUID --target-json JSON --output ABSOLUTE_PATH.";
-        if (argc != 8 || std::string(argv[1]) != "--capture-selected-app") return false;
+        options = {};
+        error = "Expected --capture-selected-app --operation-id UUID --target-json JSON --output ABSOLUTE_PATH [--microphone-uid UID].";
+        if ((argc != 8 && argc != 10) || std::string(argv[1]) != "--capture-selected-app") return false;
         std::set<std::string> seen;
         std::string target;
         for (int index = 2; index < argc; index += 2) {
@@ -113,6 +142,10 @@ bool parseSelectedAppCaptureArguments(int argc, char** argv, SelectedAppCaptureO
             if (key == "--operation-id") options.operationID = value;
             else if (key == "--target-json") target = value;
             else if (key == "--output") options.output = value;
+            else if (key == "--microphone-uid") {
+                if (value.empty() || value.size() > 4096 || !string(value)) return false;
+                options.microphoneUID = value;
+            }
             else return false;
         }
         if (!validOperationID(options.operationID) || options.output.empty() || options.output.front() != '/' ||
@@ -141,13 +174,13 @@ bool parseSelectedAppCaptureArguments(int argc, char** argv, SelectedAppCaptureO
         error.clear(); return true;
     }
 }
-int runSelectedAppCapture(int argc, char** argv, std::function<std::unique_ptr<CallCaptureSession>()> factory) {
+int runSelectedAppCapture(int argc, char** argv, std::function<std::unique_ptr<CallCaptureSession>(const SelectedAppCaptureOptions&)> factory) {
     @autoreleasepool {
         SelectedAppCaptureOptions options; std::string error;
         if (!parseSelectedAppCaptureArguments(argc, argv, options, error)) { std::cerr << error << '\n'; return 64; }
         stopped.store(false);
         SignalScope signals;
-        auto session = factory();
+        auto session = factory ? factory(options) : (options.microphoneUID.empty() ? makeNativeCallCaptureSession() : makeNativeCallCaptureSession(options.microphoneUID));
         if (!session) return 2;
         auto commands = std::make_shared<Commands>();
         const auto cancelled = [commands] { return stopped.load() || commands->requested.load(); };
@@ -156,6 +189,7 @@ int runSelectedAppCapture(int argc, char** argv, std::function<std::unique_ptr<C
         if (cancelled() && started) error = "Capture was stopped during startup.";
         if (started && error.empty()) {
             auto event = envelope(options, @"app_capture_started"); event[@"source_format"] = formatJSON(session->sourceFormat());
+            if (!options.microphoneUID.empty()) microphoneJSON(event, options, session->microphoneSpec());
             if (!emit(event)) error = "Capture acknowledgment could not be delivered.";
         }
         auto nextValidation = std::chrono::steady_clock::now();
@@ -179,6 +213,10 @@ int runSelectedAppCapture(int argc, char** argv, std::function<std::unique_ptr<C
         event[@"error"] = string(result.error.substr(0, 4096)) ?: @"Invalid native diagnostic.";
         event[@"source_format"] = formatJSON(result.sourceFormat); event[@"source_frames"] = @(result.sourceFrames);
         event[@"first_host_time"] = @(result.firstHostTime); event[@"last_host_time"] = @(result.lastHostTime);
+        if (!options.microphoneUID.empty()) {
+            microphoneJSON(event, options, result.microphone);
+            event[@"timeline"] = timelineJSON(result.timeline);
+        }
         const bool delivered = emit(event);
         return delivered && result.completed && result.cleanupVerified ? 0 : 2;
     }

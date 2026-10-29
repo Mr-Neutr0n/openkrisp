@@ -1,10 +1,12 @@
 #include "selected_app_capture_cli.hpp"
 #include <cassert>
 #include <iostream>
+#include <optional>
 using namespace labvoice;
-bool parse(std::string json, std::string output = "/tmp/own/output.wav") {
+bool parse(std::string json, std::string output = "/tmp/own/output.wav", std::optional<std::string> mic = {}) {
     std::vector<std::string> args{"audio-host", "--capture-selected-app", "--operation-id",
         "12345678-1234-1234-1234-123456789abc", "--target-json", json, "--output", output};
+    if (mic) { args.push_back("--microphone-uid"); args.push_back(*mic); }
     std::vector<char*> pointers; for (auto& arg : args) pointers.push_back(arg.data());
     SelectedAppCaptureOptions options; std::string error;
     return parseSelectedAppCaptureArguments(static_cast<int>(args.size()), pointers.data(), options, error);
@@ -18,5 +20,10 @@ int main() {
     assert(!parse(R"({"responsible_pid":123,"app_id":"own.app\u0000other","processes":[{"object_id":4,"actual_pid":124}]})"));
     assert(!parse(R"({"responsible_pid":123,"app_id":"own.app","processes":[{"object_id":4,"actual_pid":124}],"global":true})"));
     assert(!parse(R"({"responsible_pid":123,"app_id":"own.app","processes":[{"object_id":4,"actual_pid":124}]})", "relative.wav"));
+    const auto target = R"({"responsible_pid":123,"app_id":"own.app","processes":[{"object_id":4,"actual_pid":124}]})";
+    assert(parse(target, "/tmp/own/output.wav", "own.microphone"));
+    assert(!parse(target, "/tmp/own/output.wav", ""));
+    assert(!parse(target, "/tmp/own/output.wav", std::string(4097, 'x')));
+    assert(!parse(target, "/tmp/own/output.wav", std::string("\xff")));
     std::cout << "Selected-app CLI admission parsing tests passed. No source constructed or started.\n";
 }

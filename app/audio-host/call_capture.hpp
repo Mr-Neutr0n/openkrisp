@@ -1,5 +1,6 @@
 #pragma once
 #include "audio_process_usage.hpp"
+#include "call_capture_timeline.hpp"
 #include <CoreAudio/CoreAudio.h>
 #include <memory>
 #include <string>
@@ -8,12 +9,21 @@
 namespace labvoice {
 struct CallCaptureProcess { AudioObjectID objectID = 0; int actualPID = 0; };
 struct CallCaptureTarget { int responsiblePID = 0; std::string appID; std::vector<CallCaptureProcess> processes; };
+struct CallCaptureMicrophoneSpec {
+    std::string uid;
+    AudioObjectID objectID=0;
+    std::vector<UInt32> channels;
+    std::vector<AudioObjectID> streams;
+    AudioStreamBasicDescription format{}; // Selected channel zero, mono 48 kHz.
+};
 struct CallCaptureResult {
     bool completed = false, cleanupVerified = true;
     std::string path, error;
     uint64_t frames = 0, sourceFrames = 0, firstHostTime = 0, lastHostTime = 0;
     double firstSampleTime = 0, lastSampleTime = 0;
     AudioStreamBasicDescription sourceFormat{};
+    CallCaptureMicrophoneSpec microphone;
+    CallCaptureTimelineStats timeline;
     std::vector<std::string> cleanup;
 };
 bool validateCallCaptureTarget(const CallCaptureTarget&, const AudioProcessSnapshot&, std::string& error);
@@ -38,6 +48,16 @@ public:
     virtual bool destroyAggregate(std::string&) = 0;
     virtual bool destroyTap(std::string&) = 0;
 };
+class CallCaptureMicrophone {
+public:
+    virtual ~CallCaptureMicrophone()=default;
+    virtual bool prepare(CallCaptureMicrophoneSpec&,std::string&)=0;
+    virtual bool registerIO(CallCaptureDriver::Sink,void*,std::string&)=0;
+    virtual bool start(std::string&)=0;
+    virtual bool validate(const CallCaptureMicrophoneSpec&,std::string&)=0;
+    virtual bool stop(std::string&)=0;
+    virtual bool unregisterIO(std::string&)=0;
+};
 class CallCaptureWriter {
 public:
     virtual ~CallCaptureWriter() = default;
@@ -48,7 +68,8 @@ public:
 class CallCaptureSession {
 public:
     using Observe = std::function<AudioProcessSnapshot()>;
-    CallCaptureSession(Observe, std::unique_ptr<CallCaptureDriver>, std::unique_ptr<CallCaptureWriter>);
+    CallCaptureSession(Observe, std::unique_ptr<CallCaptureDriver>, std::unique_ptr<CallCaptureWriter>,
+                       std::unique_ptr<CallCaptureMicrophone> = {}, double hostTicksPerSecond = 0);
     ~CallCaptureSession();
     CallCaptureSession(const CallCaptureSession&) = delete;
     // cancelled may run on the audio callback: it must be noexcept, lock-free,
@@ -59,6 +80,7 @@ public:
     // Control-thread liveness check. Failure disables intake permanently.
     bool validateCurrentTarget(std::string& error);
     AudioStreamBasicDescription sourceFormat() const;
+    CallCaptureMicrophoneSpec microphoneSpec() const;
     CallCaptureResult stop();
 private:
     struct State;
@@ -66,6 +88,9 @@ private:
 };
 // Construction has no hardware side effects. Only start() creates native objects.
 std::unique_ptr<CallCaptureSession> makeNativeCallCaptureSession();
+std::unique_ptr<CallCaptureSession> makeNativeCallCaptureSession(const std::string& microphoneUID);
+std::unique_ptr<CallCaptureMicrophone> makeNativeCallCaptureMicrophone(const std::string& uid);
+bool silenceUnexpectedCallCaptureOutputs(AudioBufferList*) noexcept;
 // File-only conversion factory also permits synthetic writer verification.
 std::unique_ptr<CallCaptureWriter> makeCallCaptureWavWriter();
 }

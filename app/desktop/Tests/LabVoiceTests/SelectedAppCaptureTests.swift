@@ -1,11 +1,15 @@
 import XCTest
 import Foundation
 import LocalStore
+import AVFoundation
 @testable import LabVoice
 
-@MainActor private final class SelectedCaptureFixtureChild: AudioHelperChild {
+@MainActor final class SelectedCaptureFixtureChild: AudioHelperChild {
     var running = false, drains = true, cleanup = true
     var launches = 0, stopCommands = 0
+    var microphoneUID: String?
+    var microphoneObjectID: UInt32 = 42
+    var mixPolicy = "app_half_mic_half"
     var arguments: [String] = []
     private var line: ((String) -> Void)?, exit: ((HelperExit) -> Void)?
     private(set) var target: [String: Any] = [:]
@@ -16,11 +20,19 @@ import LocalStore
         XCTAssertFalse(arguments.contains("--route")); XCTAssertFalse(arguments.contains("--input"))
         operation = arguments[2]; path = arguments[6]
         target = try JSONSerialization.jsonObject(with: Data(arguments[4].utf8)) as! [String: Any]
+        if let index = arguments.firstIndex(of: "--microphone-uid") { microphoneUID = arguments[index + 1] }
     }
     func raw(_ object: [String: Any]) { line?(String(decoding: try! JSONSerialization.data(withJSONObject: object), as: UTF8.self)) }
     func envelope(_ event: String) -> [String: Any] {
-        ["version": 1, "event": event, "operation_id": operation, "target": target, "source": "selected_app_output",
-         "sample_rate": 48000, "channels": 2, "pcm_format": "pcm16", "source_format": ["sample_rate": 44100, "channels": 2]]
+        var value: [String: Any] = ["version": 1, "event": event, "operation_id": operation, "target": target,
+            "source": microphoneUID == nil ? "selected_app_output" : "selected_app_output_and_microphone",
+            "sample_rate": 48000, "channels": 2, "pcm_format": "pcm16", "source_format": ["sample_rate": 44100, "channels": 2]]
+        if let microphoneUID {
+            value["microphone_uid"] = microphoneUID; value["microphone_object_id"] = microphoneObjectID
+            value["microphone_source_format"] = ["sample_rate": 48000, "channels": 1]
+            value["mix_policy"] = mixPolicy; value["timeline_policy"] = "adjacent_host_anchors_common_overlap"
+        }
+        return value
     }
     func started(wrongTarget: Bool = false) {
         var object = envelope("app_capture_started")
@@ -58,6 +70,7 @@ private actor DelayedSelectedCaptureStorage: RecordingStoring {
     }
     func waiting() -> Bool { pending != nil }
     func resume() { pending?.resume(); pending = nil }
+    func persistMetadata(_ job: RecordingJob) async throws { try await base.persistMetadata(job) }
     func retainedDirectories() async throws -> [String] { try await base.retainedDirectories() }
     func retainFailure(_ job: RecordingJob, message: String) async throws { try await base.retainFailure(job, message: message) }
     func releaseDestination(_ job: RecordingJob) async { await base.releaseDestination(job) }
