@@ -292,7 +292,7 @@ The opt-in listener integration check can be run from `app/desktop` with `LABVOI
 
 Audio offers **Observe audio use** while stopped. It shows a one-time snapshot of active app audio, grouped by responsible application, with unavailable or failed-read states. Refresh Devices clears the observation. Pending observations use the existing cancellation, power and Quit protections. No process metadata is saved by the app.
 
-The snapshot does not detect calls or start recording. Two-leg call qualification, blocked-app preferences and competing-call switching remain incomplete. Native UI interaction and active-device runtime mapping still need acceptance.
+The one-shot snapshot does not detect calls or start recording. The continuous Watch path feeds the local call tracker described below. Native UI interaction and active-device runtime mapping still need acceptance.
 
 The desktop normalizes input devices with the recovered two-pass algorithm: remove devices without input streams, then remove output overlaps, visiting ascending device IDs and stopping each pass at one remaining input. An unknown property blocks only the branch that needs it. Output usage remains independent. Grouped clients retain sorted unique helper PIDs, including idle siblings, and use the native byte-exact application-ID plus decimal-device-ID deduplication key. The first candidate in ascending process-object order survives.
 
@@ -307,10 +307,20 @@ The streaming helper sends bounded JSON lines. The desktop limits each line to 6
 
 Suspend and Quit stop the observer concurrently with existing audio cleanup, so it does not delay recording finalization. Resume does not restart watching. Ownership cleanup and successful native Remove calls are separate results: a vanished process object can have its listener registration retired only after fresh absence and invalid-object checks. The UI reports those registrations separately.
 
-The real helper has passed bounded attach/detach and two-process appearance/disappearance checks. Native desktop Watch/Stop interaction, CoreAudio service restart, active input/output changes and long-running observation remain unverified. Watch now requests the native stabilized mode; call qualification remains incomplete and watching never starts recording.
+The real helper has passed bounded attach/detach and two-process appearance/disappearance checks. Native desktop Watch/Stop interaction, CoreAudio service restart, active input/output changes and long-running observation remain unverified. Watch requests native stabilized mode and feeds observation-only call tracking. Watching never starts recording.
 
 Watch applies recovered timing in the native helper, before desktop delivery. Brief changes can be delayed or disappear before publication. The controller requires explicit timing mode, source state, publication reason and direction flags. Readiness is distinct from a directional change. During restart recovery it retains the prior view as stale instead of displaying the reset as an observed absence. Transient source-read errors keep the helper alive for recovery.
 
 Unknown per-process reads preserve last published usage with explicit stale markers. This differs from the original native loader's default/partial error behavior and remains a parity gap. Bounded latest-only delivery reports merged publication counts; the current full snapshot can be valid even when intermediate transition history is incomplete.
 
-The opt-in `StabilizedAudioUseIntegrationTests` test uses the real helper through the production Swift controller, with an exact helper SHA admission pin. It skips in ordinary verification. Its single accepted run verified stabilized readiness and Stop without starting audio. This does not establish live transition timing, restart behavior or native UI acceptance.
+The opt-in `StabilizedAudioUseIntegrationTests` test uses the real helper through the production Swift controller, with an exact helper SHA admission pin. It skips in ordinary verification. Its bounded accepted runs verified stabilized observation and Stop without starting audio. The latest run also checks call-state handling against observation completeness and invalidation on Stop. This does not establish live transition timing, restart behavior or native UI acceptance.
+
+## Local call tracking
+
+Watching now feeds a local call controller. It tracks ordered microphone and speaker usage, selects the first eligible call, retains a current call until its stop delay expires, and supports blocking, unblocking and switching calls. The all-apps choice defaults to true, matching the recovered packaged local choice. Names use ECMAScript trimming and exact UTF-8 identity; blocked names use exact lowercased identity. Settings persist only in this app.
+
+The current-state baseline and per-direction remove-before-add snapshot adapter are independent reconstruction choices. Native clients retain their UTF-8 concatenated app/device key order instead of display PID order. Missing history is not reconstructed. Complete observations can refresh the baseline after failures, mode changes or missed publications. Stale input, restart, Stop and power events cancel pending selection timers. Private routing endpoints, the app bundle and its own responsible process are excluded from call candidates.
+
+This is observation-only qualification. It does not request microphone access, admit capture, start ASR or automatically record. The original stream-created/removed event ordering, permission boundary and automatic recording join remain incomplete. In all-app mode both physical directions can qualify; disabling it restricts candidates to the public virtual microphone and speaker. No vendor account, trial or cloud gate is used.
+
+Application versions propagate from responsible-app metadata. An empty version is a recovered valid result; null denotes unknown or rejected metadata. Exact verification and native acceptance limits are in the latest CHECKPOINT.md section.

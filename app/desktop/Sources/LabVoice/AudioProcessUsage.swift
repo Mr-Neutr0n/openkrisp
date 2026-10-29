@@ -26,6 +26,7 @@ struct AudioProcessUsage: Decodable, Identifiable, Sendable {
     let responsiblePIDResolution: String
     let appName: String?
     let appID: String?
+    var appVersion: String? = nil
     let processBundleID: String?
     let responsibleBundleID: String?
     var usageStale: Bool? = nil
@@ -37,7 +38,7 @@ struct AudioProcessUsage: Decodable, Identifiable, Sendable {
     enum CodingKeys: String, CodingKey {
         case objectID = "object_id", actualPID = "actual_pid", responsiblePID = "responsible_pid"
         case responsiblePIDFallback = "responsible_pid_fallback", responsiblePIDResolution = "responsible_pid_resolution"
-        case appName = "app_name", appID = "app_id", processBundleID = "process_bundle_id", responsibleBundleID = "responsible_bundle_id"
+        case appName = "app_name", appID = "app_id", appVersion = "app_version", processBundleID = "process_bundle_id", responsibleBundleID = "responsible_bundle_id"
         case usageStale = "usage_stale", stabilizationPending = "stabilization_pending"
         case input, output, errors
     }

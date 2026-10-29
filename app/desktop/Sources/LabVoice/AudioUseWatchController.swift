@@ -49,6 +49,7 @@ private struct AudioUseWatchEvent: Decodable {
     @Published private(set) var listenersInvalidObjectRetired: UInt64?
     @Published private(set) var listenersRemoveFailed: UInt64?
     @Published private(set) var cleanupNote: String?
+    let calls: LocalCallController
     private let factory: () throws -> any AudioHelperChild
     private let startupTimeout, stopTimeout: UInt64
     private var child: (any AudioHelperChild)?
@@ -64,13 +65,16 @@ private struct AudioUseWatchEvent: Decodable {
     var engaged: Bool { child != nil || stopTask != nil }
     var canStart: Bool { !engaged && PowerAdmission.shared.allowed && !QuitGate.shared.quitting }
     init(factory: (() throws -> any AudioHelperChild)? = nil,
-         startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 5_000_000_000) {
+         startupTimeout: UInt64 = 10_000_000_000, stopTimeout: UInt64 = 5_000_000_000,
+         calls: LocalCallController? = nil) {
+        self.calls = calls ?? LocalCallController.shared
         self.factory = factory ?? { SystemAudioHelperChild(url: try AudioHelperServices.packagedURL(), outputMode: .streaming(maxLineBytes: 614400)) }
         self.startupTimeout = startupTimeout; self.stopTimeout = stopTimeout
     }
     func start() {
         guard canStart else { return }
         let id = UUID()
+        calls.invalidate("Waiting for fresh directional publications.")
         do {
             let process = try factory()
             child = process; operationID = id; powerRevision = PowerAdmission.shared.revision
@@ -121,11 +125,13 @@ private struct AudioUseWatchEvent: Decodable {
             changedDirections = directions.compactMap(AudioUsageDirection.init(rawValue:))
             deadline?.cancel(); deadline = nil
             if source == "restarting" {
+                calls.invalidate("Tracking paused. Audio-use source is restarting.")
                 stale = true; phase = .reconnecting
                 error = String((snapshot.errors.isEmpty ? "The audio-use source is reconnecting." : snapshot.errors.joined(separator: " ")).prefix(4096))
                 return // Reset notifications are not an observed absence of apps.
             }
             guard snapshot.status == "available" else {
+                calls.invalidate("Tracking paused. Audio-use observation is unavailable.")
                 stale = true; phase = .watching
                 error = String((snapshot.errors.isEmpty ? "Audio-use observation is temporarily unavailable." : snapshot.errors.joined(separator: " ")).prefix(4096))
                 return // A recoverable read failure does not terminate the source.
@@ -135,6 +141,8 @@ private struct AudioUseWatchEvent: Decodable {
                 fail("The audio-use helper omitted stabilized usage provenance.", id: id); return
             }
             self.snapshot = snapshot; observedAt = Date(); timingMode = "stabilized"
+            calls.receive(snapshot: snapshot, generation: event.generation, reason: reason,
+                          directions: changedDirections, coalesced: coalesced)
             stale = child?.running != true; error = nil; phase = .watching
         case "audio_use_error":
             preserveCleanupReport(event)
@@ -151,9 +159,20 @@ private struct AudioUseWatchEvent: Decodable {
             } else { contradictory = false }
             guard !contradictory else { fail("The audio-use helper returned contradictory listener-cleanup results.", id: id); return }
             preserveCleanupReport(event)
+            calls.invalidate("Tracking stopped. Audio-use helper acknowledged shutdown.")
             stoppedAcknowledged = true; publicationAllowed = false; stale = true
         default: fail("The audio-use helper returned an unknown stream event.", id: id)
         }
+    }
+    var canRebaseCallTracking: Bool {
+        phase == .watching && !stale && publicationAllowed && child?.running == true &&
+            sourceState == "running" && publicationReason != "read_error" && PowerAdmission.shared.allowed &&
+            powerRevision == PowerAdmission.shared.revision && snapshot != nil
+    }
+    func rebaseCallTracking() {
+        guard canRebaseCallTracking, let snapshot else { return }
+        calls.invalidate("Rebuilding current-state baseline.")
+        calls.receive(snapshot: snapshot, generation: generation, reason: "readiness", directions: [], coalesced: 0)
     }
     private static func validPublication(source: String, status: String, reason: String, directions: [String]) -> Bool {
         guard directions == [] || directions == ["input"] || directions == ["output"] || directions == ["input", "output"] else { return false }
@@ -186,6 +205,7 @@ private struct AudioUseWatchEvent: Decodable {
     }
     private func fail(_ message: String, id: UUID) {
         guard operationID == id else { return }
+        calls.invalidate("Tracking paused. Audio-use observation failed.")
         error = message; stale = true; publicationAllowed = false; phase = .failed
         deadline?.cancel(); deadline = nil
         Task { [weak self] in
@@ -195,6 +215,7 @@ private struct AudioUseWatchEvent: Decodable {
     }
     private func exited(_ event: HelperExit, id: UUID) {
         guard operationID == id else { return }
+        calls.invalidate("Tracking paused. Audio-use helper exited.")
         exitEvent = event; stale = true; publicationAllowed = false
         deadline?.cancel(); deadline = nil
         updateCleanupOutcome()
@@ -211,6 +232,7 @@ private struct AudioUseWatchEvent: Decodable {
         }
     }
     func revokeForPowerEvent() {
+        calls.invalidate("Tracking paused for a power event.")
         publicationAllowed = false; stale = true
         deadline?.cancel(); deadline = nil
     }
@@ -218,6 +240,7 @@ private struct AudioUseWatchEvent: Decodable {
     // drained exited helper can release ownership even if native teardown failed.
     // A live/undrained helper stays owned and blocks restart until Stop succeeds.
     func stop() async -> Bool {
+        calls.invalidate("Tracking stopped. Start watching to resume.")
         if let stopTask { return await stopTask.value }
         guard let process = child, let id = operationID else { stale = true; phase = .idle; return true }
         publicationAllowed = false; stale = true; phase = .stopping

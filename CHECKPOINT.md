@@ -1,6 +1,6 @@
 # Checkpoint
 
-Latest verified work: [Native audio-use timing, 2026-10-28](#native-audio-use-timing-2026-10-28). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Local call tracking, 2026-10-29](#local-call-tracking-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -744,3 +744,25 @@ No original code, physical audio, administrator action or actual CoreAudio resta
 - `evidence/audio-use-stabilized-final-host-verify-20261028.log`, SHA256 `7dbe723eb3275c5fe746f094681d24335e7e1b747f3f12f1ac5c3c30810d4b14`.
 - `evidence/audio-use-stabilized-final-desktop-verify-20261028.log`, SHA256 `a2c5ec901b73686505a14d535d7279568a608c6cb81aec65aa1092e7b948e44e`.
 - `evidence/audio-use-stabilized-native-controller-20261028.log`, SHA256 `cac0062e93e9b00bc985e60529f1c627f5ea53a50b80e9425149f2cdb7515fd4`.
+
+
+## Local call tracking, 2026-10-29
+
+The continuous Watch path now feeds local call tracking with ordered microphone/speaker usage, immediate first-eligible selection, retained current-call stop timing, and visible block/unblock/switch controls. The all-apps setting defaults to true from the recovered packaged choice. Names use ECMAScript trimming and exact UTF-8 identity; blocked names use exact lowercased identity. Safari adds 300 ms to the recovered 1000 ms stop and 500 ms restored-leg classification thresholds. The start threshold is not an initial-start delay. Stop, restart, errors and power changes cancel policy timers and invalidate current identity.
+
+Complete snapshots can establish or refresh present call state after missing history. This baseline does not reconstruct prior call transitions. Native client-map key order is retained separately from PID display order. Full-snapshot remove-before-add event adaptation remains an independent reconstruction choice because the original DeviceManager event-diff contract is unresolved. The app excludes its own process/bundle and private feed/monitor endpoints from call candidates.
+
+This is observation-only tracking. It does not request microphone access or automatically start capture, transcription or recording. All-app mode can qualify two physical directions without the original capture-permission admission. Disabling it restricts tracked clients to the public virtual microphone/speaker. These boundaries are explicit; automatic activation parity is not established.
+
+REA recovered Call usage identity/order, packaged local defaults, delay clamps, restart behavior and responsible-app version lookup. The helper now reads the responsible application's Contents/Info.plist, accepts CFBundleShortVersionString including an empty string, then falls back to CFBundleVersion only for an absent/invalid first value. Missing metadata yields an empty version; independent bounds failures remain null with errors. Version metadata reaches grouped clients and the initial tracked call. See activation-findings.md for evidence identities and remaining event/permission boundaries.
+
+Full host release/sanitizer verification passed. Desktop verification enumerated 239 tests: 237 passed and two opt-in tests skipped. Signed ARM64/macOS12 packaging and relocated resources passed. Independent GPT 6.1 sol review closed native-order, atomic baseline, private/self routing, exact name identity, stopped-event invalidation and guarded-refresh issues. Metadata review found no remaining issue.
+
+One real helper-to-production-controller test passed in 0.318 seconds against helper SHA256 `15ae2102e9d1aa65a587b46f2b15a4d95a1abd0ad9a73cb0818892d8b37fbfea`. It observed 39 process rows, no partial rows, a changed publication and zero coalesced publications. The test checks call freshness against observation completeness, refresh eligibility when complete, and invalidation on Stop. Stop exited zero with 158 successful listener removals, no retirements/failures and no fallback signal. This does not verify live call transitions, native UI controls or original event ordering. No capture, playback, permission prompt, driver change or CoreAudio restart ran.
+
+A separate status-only Speech preflight reported authorization notDetermined and on-device recognizer support for en-US and en_IN. Its standalone execution identity does not establish packaged-app authorization. Real saved-session recognition remains untested; no permission request or speech synthesis ran. Administrator-dependent driver discovery remains deferred. Next complete original stream-event ordering and capture admission, connect local recording/ASR activation, and perform actual UI/audio comparisons. Full retained-feature and acoustic parity remain incomplete.
+
+- Host log `evidence/call-tracking-host-verify-20261029.log`, SHA256 `10856f453e2c9fe670de5d3cdd784e196fb10c212cb44a55d2a2903db9699ad3`.
+- Desktop log `evidence/desktop-verify-call-tracking.log`, SHA256 `7106af9ed48eb4cfff299df83828aaad1372b1d6fbd32193d08e3a26a019fb5f`.
+- Native integration `evidence/call-tracking-native-controller-20261029.log`, SHA256 `5a73ce4da64fa2fb4de357344206c286a4c6966149811c0b90ce51a930466d08`.
+- Speech preflight `evidence/saved-transcription-preflight-20261028.log`, SHA256 `008133012cec7f440010a01f6b9ce145a7b8a7c09d8e9f24a8bb99f4a263564a`.

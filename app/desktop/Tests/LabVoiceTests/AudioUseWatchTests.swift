@@ -7,6 +7,26 @@ import XCTest
         for _ in 0..<2000 { if condition() { return }; try await Task.sleep(nanoseconds: 1_000_000) }
         XCTFail("Observer fixture did not progress")
     }
+    func testCallTrackingFollowsWatchReadinessRestartStopAndPowerFences() async throws {
+        let suite = "watch-call-tests-\(UUID())", defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let calls = LocalCallController(defaults: defaults, automaticTimers: false)
+        let child = WatchFixtureChild(), watch = AudioUseWatchController(factory: { child }, calls: calls)
+        watch.start()
+        child.snapshot(sequence: 1, generation: 1, object: 10, activeInput: true, activeOutput: true)
+        XCTAssertEqual(calls.policy.current, "Fixture")
+        calls.setAllApps(false); XCTAssertNil(calls.policy.current)
+        watch.rebaseCallTracking(); XCTAssertTrue(calls.policy.calls.isEmpty)
+        calls.setAllApps(true); watch.rebaseCallTracking(); XCTAssertEqual(calls.policy.current, "Fixture")
+        child.snapshot(sequence: 2, generation: 2, object: 10, status: "unavailable", source: "restarting", reason: "restart_begin")
+        XCTAssertNil(calls.policy.current); XCTAssertFalse(calls.policy.fresh)
+        watch.rebaseCallTracking(); XCTAssertNil(calls.policy.current)
+        child.snapshot(sequence: 3, generation: 2, object: 10, activeInput: true, activeOutput: true)
+        XCTAssertEqual(calls.policy.current, "Fixture")
+        watch.revokeForPowerEvent(); XCTAssertNil(calls.policy.current)
+        watch.rebaseCallTracking(); XCTAssertNil(calls.policy.current)
+        _ = await watch.stop(); XCTAssertNil(calls.policy.current)
+    }
     func testSnapshotReadinessGenerationAndLateCallbacksNeverOverwriteReplacement() async throws {
         let first = WatchFixtureChild(), second = WatchFixtureChild(); var created = 0
         let model = AudioUseWatchController(factory: { created += 1; return created == 1 ? first : second })
@@ -213,7 +233,7 @@ import XCTest
     private func emit(_ object: [String: Any]) { raw(String(decoding: try! JSONSerialization.data(withJSONObject: object), as: UTF8.self)) }
     func snapshot(sequence: UInt64, generation: UInt64, object: Int, status: String = "available",
                   mode: String = "stabilized", source: String = "running", reason: String? = nil,
-                  directions: [String] = [], usageStale: Bool = false, pending: Bool = false, empty: Bool = false, includeProvenance: Bool = true, coalesced: UInt64? = 0, activeInput: Bool = false) {
+                  directions: [String] = [], usageStale: Bool = false, pending: Bool = false, empty: Bool = false, includeProvenance: Bool = true, coalesced: UInt64? = 0, activeInput: Bool = false, activeOutput: Bool = false) {
         self.sequence = sequence; self.generation = generation
         var row: [String: Any] = ["object_id": object, "actual_pid": 10, "responsible_pid": 20, "responsible_pid_fallback": false,
             "responsible_pid_resolution": "responsibility_lookup", "app_name": "Fixture", "app_id": "own.fixture",
@@ -221,6 +241,7 @@ import XCTest
             "usage_stale": usageStale, "stabilization_pending": pending,
             "input": ["running": false, "devices": []], "output": ["running": false, "devices": []]]
         if activeInput { row["input"] = ["running": true, "devices": [["object_id": 100, "uid": "own.fixture.input", "has_input_streams": true]]] }
+        if activeOutput { row["output"] = ["running": true, "devices": [["object_id": 200, "uid": "own.fixture.output", "has_input_streams": false]]] }
         if !includeProvenance { row.removeValue(forKey: "usage_stale"); row.removeValue(forKey: "stabilization_pending") }
         var envelope: [String: Any] = ["version": 1, "event": "audio_use_snapshot", "sequence": sequence, "generation": generation,
             "timing_mode": mode, "source_state": source,

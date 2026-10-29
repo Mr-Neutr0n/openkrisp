@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 struct AudioView: View {
     @ObservedObject var audio: AudioRouteController
     @ObservedObject private var watch = AudioUseWatchController.shared
+    @ObservedObject private var calls = LocalCallController.shared
     @State private var testingMicrophone = false
     @Environment(\.dismiss) private var dismiss
     private var displayWatch: Bool { AudioUseDisplaySource.prefersWatch(watchObservedAt: watch.observedAt, oneShotObservedAt: audio.audioUseObservedAt) }
@@ -94,6 +95,32 @@ struct AudioView: View {
                     if let note = watch.cleanupNote { Text(note).font(.caption).foregroundColor(.secondary) }
                     if displayWatch {
                         Text(watch.stale ? "Last observation. Audio use may have changed." : "Watching audio-use changes.").font(.caption).foregroundColor(.secondary)
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Call tracking").font(.headline)
+                        Text(calls.note).font(.caption).foregroundColor(.secondary)
+                        Button("Refresh call tracking") { watch.rebaseCallTracking() }.disabled(!watch.canRebaseCallTracking)
+                        Toggle("Track calls from all apps", isOn: Binding(get: { calls.policy.allApps }, set: { calls.setAllApps($0); watch.rebaseCallTracking() }))
+                        Text("When off, tracking uses only the public Lab Voice microphone and speaker. Tracking uses observed audio use. This does not start recording or request microphone access.")
+                            .font(.caption).foregroundColor(.secondary)
+                        Text(calls.policy.fresh ? "Current: \(calls.policy.current ?? "None")" : "Current: Unknown. Tracking is paused.").font(.caption)
+                        ForEach(calls.policy.calls) { call in
+                            HStack {
+                                Text(call.name + (calls.policy.fresh ? (calls.policy.qualified(call) ? " · call detected" : " · waiting or blocked") : " · last observed")).font(.caption)
+                                Spacer()
+                                let blocked = calls.policy.isBlocked(call.name)
+                                Button(blocked ? "Unblock" : "Block") { calls.setBlocked(call.name, blocked: !blocked) }
+                                Button("Switch") { calls.switchTo(call.name) }
+                                    .disabled(!calls.policy.fresh || calls.policy.current == nil || calls.policy.isCurrent(call.name) || !calls.policy.qualified(call))
+                            }
+                        }
+                        ForEach(Array(calls.policy.blocked.sorted().filter { blocked in !calls.policy.calls.contains { Data($0.name.lowercased().utf8) == Data(blocked.utf8) } }.enumerated()), id: \.offset) { _, name in
+                            HStack { Text(name + " · blocked").font(.caption); Spacer(); Button("Unblock") { calls.setBlocked(name, blocked: false) } }
+                        }
+                        if watch.coalescedPublicationTotal > 0 {
+                            Text("Some audio-use updates were missed (\(watch.coalescedPublicationTotal)). Refresh tracking to use the current observation.")
+                                .font(.caption).foregroundColor(.secondary)
+                        }
                     }
                     AudioProcessUsageView(snapshot: displayWatch ? watch.snapshot : audio.inventory?.audioProcessUsage,
                         observedAt: displayWatch ? watch.observedAt : audio.audioUseObservedAt,

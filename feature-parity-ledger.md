@@ -499,3 +499,10 @@ Watch now uses recovered source-side listener, tracker and storage timing. Initi
 One actual native-helper-to-production-Swift-controller readiness/Stop test passed against the exact helper hash. Full host verification and 225 desktop tests passed, with two opt-in skips and packaging/relocation checks. This does not verify live activity timing, real service restart, original runtime parity or complete automatic activation. Exact logs and remaining scope are in CHECKPOINT.md.
 
 The ledger records 208 source and verification fingerprints at this checkpoint.
+
+
+## Local call tracking, 2026-10-29
+
+The continuous observer now feeds local ordered call state, blocked-name preferences and competing-call controls. Recovered Call definitions, default app-capture choice and delay rules are mapped in activation-findings.md. Responsible-app versions now propagate through the native carrier and desktop. Observation qualification does not admit capture or automatically record. Snapshot event-diff order and present-state recovery are independent adaptations; original permission/event ordering and full automatic activation remain incomplete.
+
+Host release/sanitizer verification, 237 desktop tests with two opt-in skips, signed packaging and relocated resources passed. One actual helper/controller run verified current-observation handling and Stop with 158 successful listener removals. Native UI, actual call transitions and audio parity remain unverified. Exact logs and Speech authorization preflight are recorded in CHECKPOINT.md.

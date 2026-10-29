@@ -1,4 +1,5 @@
 #include "audio_process_usage.hpp"
+#include "audio_process_app_version.hpp"
 #import <AppKit/AppKit.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <dlfcn.h>
@@ -66,6 +67,9 @@ AudioProcessSnapshot observeAudioProcessUsage() {
             AudioProcessApp result;
             NSRunningApplication* app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
             result.name = text(app.localizedName, result, "app_name"); result.bundleID = text(app.bundleIdentifier, result, "responsible_bundle_id");
+            NSURL* infoURL = [app.bundleURL URLByAppendingPathComponent:@"Contents/Info.plist"];
+            NSDictionary* info = infoURL ? [NSDictionary dictionaryWithContentsOfURL:infoURL] : nil;
+            result.version = audioProcessAppVersion(info, result);
             char path[PROC_PIDPATHINFO_MAXSIZE]{};
             if (proc_pidpath(pid, path, sizeof path) > 0) {
                 const auto slash = std::strrchr(path, '/');

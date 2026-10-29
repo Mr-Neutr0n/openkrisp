@@ -453,3 +453,8 @@ Explicit live observation is implemented through the native helper and desktop. 
 ## Native timing checkpoint, 2026-10-28
 
 The live Watch path now uses recovered native listener/tracker/storage timing and timed restart recovery. Source-state and publication metadata separate readiness, change, reset and errors. A real native-helper-to-Swift-controller readiness/Stop test passed; activity timing and actual restart remain unverified. See CHECKPOINT.md and activation-findings.md. Next recover missing Call leg definitions and implement local activation, blocked-app and competing-call behavior without cloud gates.
+
+
+## Local call tracking checkpoint, 2026-10-29
+
+Watch now feeds ordered observation-only call tracking, persistent blocking, call switching and recovered stop/restoration timing. REA recovered missing Call definitions, packaged defaults and native application-version metadata. Complete current snapshots can refresh tracking after missing history; exact original event-diff ordering and capture permission admission remain gaps. Host verification, 237 desktop tests with two opt-in skips, signed packaging and one real helper/controller Stop test passed. See CHECKPOINT.md. Next implement the remaining local automatic recording/ASR join and verify real UI/audio behavior. Driver administrator actions and Speech authorization remain deferred.

@@ -41,6 +41,14 @@ int main(int argc, char**) {
     assert(process.output.running == false && process.output.devices->empty() && deviceReads == 1);
     assert(!process.errors.empty());
     if (argc > 1) { std::cout << audioProcessUsageJSON(snapshot) << '\n'; return 0; }
+    assert(process.appVersion == "");
+    app.version = "2.3";
+    assert(readAudioProcessUsage(reader).processes.at(0).appVersion == "2.3");
+    app.version = std::string(4097, 'v');
+    assert(!readAudioProcessUsage(reader).processes.at(0).appVersion);
+    app.version = ""; app.errors = {"app_version: oversized UTF-8 metadata."};
+    assert(!readAudioProcessUsage(reader).processes.at(0).appVersion);
+    app.errors.clear();
     streamFailure = true;
     auto missingStreams = readAudioProcessUsage(reader).processes.at(0);
     assert(missingStreams.input.running == true && missingStreams.input.devices->at(0).uid == "dev.hari.labvoice.feed");

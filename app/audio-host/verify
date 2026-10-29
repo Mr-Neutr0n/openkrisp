@@ -13,6 +13,10 @@ clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror device_me
 ./build/device-metadata-test
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test-sanitized
 ./build/device-metadata-test-sanitized
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror audio_process_app_version_test.mm -framework Foundation -o build/audio-process-app-version-test
+./build/audio-process-app-version-test
+clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror audio_process_app_version_test.mm -framework Foundation -o build/audio-process-app-version-test-sanitized
+./build/audio-process-app-version-test-sanitized
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror audio_process_usage.cpp audio_process_usage_test.cpp -o build/audio-process-usage-test
 ./build/audio-process-usage-test
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror audio_process_usage.cpp audio_process_usage_test.cpp -o build/audio-process-usage-test-sanitized

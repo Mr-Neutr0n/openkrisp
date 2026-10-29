@@ -59,15 +59,17 @@ AudioProcessSnapshot readAudioProcessUsage(const AudioProcessReader &reader) {
             process.responsibleResolution = !responsible ? "actual_pid_symbol_unavailable" : *responsible <= 0 ? "actual_pid_nonpositive_result" : "responsibility_lookup";
             process.responsiblePID = process.responsibleFallback ? process.actualPID : responsible;
             auto app = reader.app(*process.responsiblePID);
-            bool nameInvalid = false, bundleInvalid = false;
+            bool nameInvalid = false, bundleInvalid = false, versionInvalid = false;
             for (const auto& error : app.errors) {
                 nameInvalid = nameInvalid || error.rfind("app_name:", 0) == 0;
                 bundleInvalid = bundleInvalid || error.rfind("responsible_bundle_id:", 0) == 0;
+                versionInvalid = versionInvalid || error.rfind("app_version:", 0) == 0;
             }
             for (auto field : {&app.name, &app.binaryName, &app.bundleID, &app.version}) {
                 if (field->size() > 4096 || field->size() > textBudget) {
                     nameInvalid = nameInvalid || field == &app.name;
                     bundleInvalid = bundleInvalid || field == &app.bundleID;
+                    versionInvalid = versionInvalid || field == &app.version;
                     field->clear(); process.errors.push_back("Application metadata exceeds snapshot text bound.");
                 }
                 else textBudget -= field->size();
@@ -76,7 +78,7 @@ AudioProcessSnapshot readAudioProcessUsage(const AudioProcessReader &reader) {
             const auto name = nameInvalid ? std::string() : app.name.empty() ? app.binaryName : app.name;
             if (!name.empty()) process.appName = name;
             else process.errors.push_back("Application name is unavailable.");
-            if (!app.version.empty()) process.appVersion = app.version;
+            if (!versionInvalid) process.appVersion = app.version;
             std::optional<std::string> bundle;
             try { bundle = readText(id, kAudioProcessPropertyBundleID); process.processBundleID = bundle; }
             catch (const std::exception& error) { process.errors.push_back(std::string("process_bundle_id: ") + error.what()); }

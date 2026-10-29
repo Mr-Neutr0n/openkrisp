@@ -308,3 +308,50 @@ The independent stabilized mode therefore records its unknown-read policy as a p
 The implementation uses one deterministic native serial queue and a 20 ms source timer. Due listener rows are the only existing-process rows admitted from a bulk read. Its deterministic processing order is listener sampling, tracker promotion, then storage flushing. Original listener/tracker/storage dispatch timers use separate global-queue callbacks and locks; the exact winner of a same-millisecond lock race is not claimed. Bounded transport can coalesce full diagnostic frames while retaining directional invalidations for coalesced available frames. Initial all-idle readiness, immediate restart warning and richer raw diagnostics are labeled carrier events rather than invented native directional callbacks.
 
 The wire exposes `coalesced_publications` whenever the bounded latest-publication slot replaces unsent producer frames. Same-generation available frames retain the union of directional invalidations; failure and generation replacement retain the loss count without joining incompatible directional data. The storage-created comparison map is not an acknowledgment from a wire consumer. A complete current snapshot and a gap count therefore do not prove that every distinct timed transition was delivered. Pure tests cover unsent active-to-empty changed transitions, failure/generation boundaries, and taking the slot before a new publication.
+
+## Call objects, local defaults and timers, 2026-10-29
+
+The previously retained CLI captures were recovered and checked. `call-source-cli-20261028-v1.result.json` has accepted Evidence `ev_2cf465b82ea433b7ae76df9607d53bb649984ab26c63a903ccc0c67074e6e78b`. V2 has accepted Evidence `ev_10b206da213ad74b319d3909864b0cfdbcd1bdb3ac8f37f2e209b670f98be415`. Both execute only the authored static ASAR reader under a network-denying sandbox. Original application code does not execute. Their raw terminal frames retain the output; the truncation flag concerns cumulative rendered terminal frames. V2 retains all 148,701 raw bytes. Before/after archive digests remain `40269da405babcd79c18780715c63625d0bb7035f03a480b1732fe067ba911b4`, with BootstrapApp member digest `bbaedd07bcd78d093f1011a41e3aeca92707c1f77fc7cca03305ffd4cd90cff0`.
+
+A focused static follow-up, Evidence `ev_a1f28157d423fe9c5880b5f8a26c885a884d294966630784e17d339552a776d9`, closes constructor defaults and clamp expressions. Its private result is `call-source-cli-20261029-v3.result.json`. That file contains REA's TOON output despite the suffix. The process exited zero with verified cleanup. No audio, application launch, network or administrator action occurred.
+
+### Directional call state
+
+`Call` initializes empty microphone/speaker usage and history arrays. Last-active device/process fields start undefined. Capture modes start as DEVICE for microphone and APPLICATION for speaker on macOS. It creates a UUID and retains app name, version, app ID and creation time passed by CallFactory. `hasBothLegs` means both directional usage arrays are nonempty. `hasNoLegs` means both are empty. Active app/device information is the first element for that direction; `hasKrispDeviceUsage` checks any element.
+
+`deviceUsageIndex` matches exact PID and appInfo.deviceId within the specified direction. `addDeviceUsage` inserts only when this identity is absent. It prepends if the direction is microphone and app calls are enabled, or if the device is Krisp. Otherwise it appends. Before prepending to a nonempty array it saves the former first element's PID, actualPids, device ID and isKrisp state as last-active values. A duplicate does not replace stored usage. Device history still appends if it has no element whose id equals appInfo.deviceId. Removal uses the same identity. Removing the first element saves the removed identity and isKrisp state, rather than the new first element.
+
+`confirm` sets confirmedAt. `isStarted` requires startedAt with no stoppedAt. `stop` clears confirmation and sets stoppedAt. A stopped Call that still has legs stays in the calls array and becomes eligible for selection. Starting it again creates a new UUID, sets createdAt to the previous stoppedAt, clears stoppedAt and resets processing counters. This is a new call session on an existing object.
+
+### Preference and event scope
+
+The UserChoices alias `_Ha` maps to APP_CALLS_SETTING_STATE and defaults to true. BLOCKED_USER_APPS defaults to an empty array. MEETING_ASSISTANT_MODE and LAST_MEETING_ASSISTANT_MODE default to RecordAndTranscript. These are packaged defaults, not observations of the installed user's effective settings.
+
+CallService.appCallsEnabled starts false before initialization. `updateAppCallsEnabled` combines the stored local choice with app_capture_mode not being false, then accepts an explicit captureStreamEnabled config override. It combines that result with OS, driverless preset and account availability. Account/preset policy is part of the original implementation; it must not become a new local account dependency in OpenKrisp.
+
+The MeetingAssistantViewModel `onAppCallConfirmed` method only appends the confirmed call and opens JOIN_NEW_MEETING if an in-person meeting is active. This handler alone does not start recording or transcription. The ParallelCallDetectedAddon separately tracks confirmed/started calls and notifies when a call is already started and assistant mode is not Off. Full effective note-taking mode transitions remain a separate contract.
+
+### Exact delay behavior
+
+| Delay | Packaged default | Clamp or adjustment |
+| --- | --- | --- |
+| Stop | 1000 ms | 100 through 3000 ms |
+| Start classification | 500 ms | 50 through 2500 ms, then at most stop delay minus 10 ms |
+| Explicit restart | 1000 ms | No clamp recovered in this constructor path |
+| Safari extra delay | 300 ms | Added to stop delay and restored-leg classification threshold |
+
+There is no initial start-delay timer in `startNextAppCall`. It selects immediately from array order when no current identity exists. The start delay classifies a restored leg while a stop timer was pending. Registering a restored current call with both legs cancels that timer, then computes floor of elapsed milliseconds. With app capture enabled, it emits APP_CALL_CHANGED and returns if the last-active device differs from the new device, or elapsed is strictly less than start delay plus app extra delay. Otherwise it stops with start-next false and resumes normal selection. Equality takes the stop/reselect branch when device identity is unchanged.
+
+Removing a usage from the current call emits APP_CALL_CHANGED if both legs remain and app calls are enabled. With app calls disabled, it emits that event only if the active microphone is Krisp; otherwise it stops with start-next true. Losing a leg starts one stop timer at stop delay plus app extra delay. Additional removals do not reset it. A non-current call is removed only when it has no legs.
+
+`stopCurrentCall(startNext=true, initiator)` disposes the stop timer first. It stops a started call, emits stop, removes it only if no legs remain, clears current identity, then selects another call if startNext is true. `restartCurrentCall` stops with start-next false, schedules the 1000 ms restart callback, and that callback clears the restart timer then invokes startNextAppCall. startNextAppCall also cancels a pending restart timer before scanning eligible calls.
+
+AudioService's retained snapshot handler updates Krisp-filtered in-use accounting. Call registration/removal comes through separate created/removed stream handlers. Therefore a reconstruction's full-snapshot remove-before-add order is not established by this AudioService handler alone. DeviceManager's complete event-diff order remains unresolved.
+
+### Application version metadata
+
+REA Evidence `ev_9302e74f5a6b02fb7f69dd32816ff6e3efd0c7ec304535f66595e1a74e3089db` inspects GetApplicationVersionByPID at `0x47140` in the same observed addon digest. Its complete dossier is retained in `activation-app-version-20261029.result.json`. The earlier LoadAudioProcInfo callsite supplies the responsible PID.
+
+The helper obtains NSRunningApplication for that PID, takes its bundleURL and appends `Contents/Info.plist`. It loads that URL as an NSDictionary. It first reads CFBundleShortVersionString, accepts an NSString with a non-null UTF8 pointer, and returns its bytes. An empty NSString is accepted and does not trigger fallback. An absent value, wrong type or null pointer falls back to CFBundleVersion with the same checks. A missing application, bundle URL or dictionary, or two invalid values, yields an empty string. This is static decompiler and assembly evidence, not live metadata observation.
+
+The initial guessed native symbol was rejected and corrected to the provider-returned address. No capture cleanup retry, owner signalling or provider repair occurred. The addon remains selected after this focused query because the earlier global capture-owner condition makes closure unconfirmed.

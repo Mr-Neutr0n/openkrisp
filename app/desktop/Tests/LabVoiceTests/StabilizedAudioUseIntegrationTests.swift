@@ -20,8 +20,12 @@ import CryptoKit
         guard before == expected.lowercased(), FileManager.default.isExecutableFile(atPath: helper.path) else {
             XCTFail("The own helper does not match the explicitly pinned executable."); return
         }
+        let suite = "native-call-observation-tests-\(UUID())"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let calls = LocalCallController(defaults: defaults, automaticTimers: false)
         let child = ObservedNativeWatchChild(url: helper)
-        let controller = AudioUseWatchController(factory: { child }, startupTimeout: 8_000_000_000, stopTimeout: 3_000_000_000)
+        let controller = AudioUseWatchController(factory: { child }, startupTimeout: 8_000_000_000, stopTimeout: 3_000_000_000, calls: calls)
         var thrown: Error?
         controller.start()
         do {
@@ -33,6 +37,19 @@ import CryptoKit
             XCTAssertEqual(controller.sourceState, "running"); XCTAssertEqual(controller.timingMode, "stabilized")
             XCTAssertEqual(controller.phase, .watching); XCTAssertFalse(controller.stale)
             XCTAssertTrue(controller.error == nil, "Source diagnostic present; contents intentionally not logged.")
+            if let snapshot = controller.snapshot {
+                let complete = AudioUsageGrouping.group(snapshot).complete && snapshot.processes.allSatisfy { $0.usageStale == false }
+                XCTAssertEqual(calls.policy.fresh, complete)
+                if complete {
+                    XCTAssertTrue(controller.canRebaseCallTracking)
+                    controller.rebaseCallTracking()
+                    XCTAssertTrue(calls.policy.fresh)
+                    XCTAssertTrue(calls.note.contains("Tracking refreshed"))
+                    if let current = calls.policy.current {
+                        XCTAssertTrue(calls.policy.calls.contains { $0.name == current && calls.policy.qualified($0) })
+                    }
+                } else { XCTAssertNil(calls.policy.current) }
+            }
             XCTAssertTrue(controller.snapshot?.processes.allSatisfy { $0.usageStale != nil && $0.stabilizationPending != nil } == true)
         } catch { thrown = error }
         // Assertions do not bypass cleanup. A failed startup or cancelled test
@@ -44,6 +61,7 @@ import CryptoKit
             print("Native watch fallback process drain: \(fallbackDrained)")
         }
         XCTAssertTrue(stopped); XCTAssertFalse(controller.engaged); XCTAssertFalse(child.running)
+        XCTAssertNil(calls.policy.current); XCTAssertFalse(calls.policy.fresh); XCTAssertNil(calls.policy.stopDeadline)
         XCTAssertTrue(controller.cleanupVerified)
         XCTAssertEqual(child.status, 0); XCTAssertEqual(child.retainedStdoutBytes, 0)
         XCTAssertEqual(child.diagnosticBytes, 0)

@@ -29,6 +29,7 @@ struct GroupedAudioClient: Identifiable, Sendable {
     let actualPids: String?
     let appName: String?
     let appID: String
+    var appVersion: String? = nil
     let deviceID: String
     let deviceUID: String?
     let sourceObjectID: UInt32
@@ -133,7 +134,7 @@ enum AudioUsageGrouping {
                 let actualPids = siblingsComplete ? siblingPIDs[owner, default: []].sorted().map(String.init).joined(separator: ",") : nil
                 for device in devices {
                     let client = GroupedAudioClient(direction: direction, clientPID: owner, actualPids: actualPids,
-                        appName: record.appName, appID: appID, deviceID: String(device.objectID), deviceUID: device.uid,
+                        appName: record.appName, appID: appID, appVersion: record.appVersion, deviceID: String(device.objectID), deviceUID: device.uid,
                         sourceObjectID: record.objectID, incomplete: !record.errors.isEmpty || !siblingsComplete || device.uid == nil || record.appName == nil || record.usageStale == true,
                         stale: record.usageStale == true, stabilizationPending: record.stabilizationPending == true)
                     let previous = direction == .input ? inputKeys[client.dedupKey] : outputKeys[client.dedupKey]
