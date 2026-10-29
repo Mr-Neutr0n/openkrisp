@@ -327,12 +327,14 @@ OSStatus propertyValue(AudioObjectID id, const AudioObjectPropertyAddress *a, UI
                 return put(&list, direction ? sizeof list : offsetof(AudioBufferList, mBuffers));
             }
             }
+        if ((scope == kAudioObjectPropertyScopeInput ||
+             scope == kAudioObjectPropertyScopeOutput) &&
+            s == kAudioDevicePropertySafetyOffset)
+            return scalar(UInt32{0});
         if (direction)
             switch (s) {
             case kAudioDevicePropertyLatency:
                 return scalar(input(id) ? routeDelay : 0);
-            case kAudioDevicePropertySafetyOffset:
-                return scalar(0);
             case kAudioDevicePropertyDeviceCanBeDefaultDevice:
             case kAudioDevicePropertyDeviceCanBeDefaultSystemDevice:
                 return scalar(!hidden(id));

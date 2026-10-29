@@ -1,6 +1,16 @@
 # Checkpoint
 
-Latest verified work: [Local ASR identity and contract, 2026-10-29](#local-asr-identity-and-contract-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+## Current status: independent audio acceptance
+
+- Latest real-workflow evidence: the approved CoreAudio restart loaded the exact diagnostic driver in a new HAL process. All four device registrations then failed on an opposite-direction SafetyOffset query. No microphone-to-meeting-app audio has passed yet.
+- Implemented in source: independent virtual endpoints, RNNoise processing and route controls. The narrow SafetyOffset fix is now implemented. Fixtures: the old driver fails its new regression; corrected diagnostic packaging and host tests pass. Real workflow: corrected-driver discovery is the next test.
+- Current blocker: virtual-device registration. A guarded replacement of the verified old bundle with the tested correction is in progress, with rollback retained.
+- Next acceptance test: confirm all four UIDs after replacement/restart, then run the existing bounded virtual HAL transfer test before physical microphone and meeting-app acceptance.
+- User action: approve the pending macOS administrator dialog if shown. Later microphone permission and a short meeting-app input test may require participation. Prior temporary absence is not being treated as a continuing deferral.
+
+The next milestone is the standalone RNNoise audio path. ASR and other unrelated parity gaps remain in the backlog; optional installed-provider research is parked.
+
+Latest verified work: [Driver discovery failure isolated, 2026-10-29](#driver-discovery-failure-isolated-2026-10-29). Earlier sections retain historical implementation and evidence limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -850,3 +860,26 @@ The next step is a separate installed-ASR provider after those contracts are rec
 - Desktop resource-only build, signature, ARM64/macOS12 and relocation checks passed; full desktop test suite was not rerun. `evidence/desktop-package-asr-pin.log`, SHA256 `874eba277799b372b1bfd6296f567b6cea658592e726f106711e9fe044082c93`.
 
 No physical audio, permission prompt, UI launch, original processor execution, driver change or CoreAudio restart ran. Full retained parity remains incomplete.
+
+
+## Driver discovery failure isolated, 2026-10-29
+
+The current milestone is the standalone physical microphone to RNNoise to virtual microphone to meeting-app path. Optional installed-provider research is parked. Completed ASR static findings are preserved in live-asr-findings.md and live-asr-results-findings.md; they do not change this milestone.
+
+Revalidation confirmed installed diagnostic tree `5ca286e9483c605f82ecdfabeb830fd640dd5cd534eef3f390a4bef0b98dea95`. CoreAudio94316 and driver service94405 still predated the October13 diagnostic installation. The user approved the macOS prompt for a guarded restart. New CoreAudio92169 and driver service92178 started October29 at19:19:34 local. Their real HAL trace records factory/query/Initialize success and all four driver-local DeviceList IDs, followed by each device failing its opposite-direction SafetyOffset read. Client UID translations remain zero. These PIDs are observations, not future control targets.
+
+This real-path failure justified a narrow source correction: SafetyOffset returns UInt32 zero for both input/output scopes on every device, while global scope remains unsupported. Stream/channel directionality and latency behavior are unchanged. The new all-device/all-scope regression failed on the old implementation, then passed with the fix. Diagnostic packaging and its two host-test variants passed, with discovery tracing retained.
+
+Prepared package SHA256 `121766fbd9766e89e342a94f26de3c016b76a2523acc6ceb4f08ade9c737cda8`; expected new signed tree `0456512890ff8ecd4ab48e2c3e330e24e66cd29f3d6202859e1b10071bcaa26f`. The corrected bundle has not yet passed actual HAL discovery. A guarded administrator workflow is waiting for OS authorization. It verifies the old tree and exact new package, retains a rollback bundle, installs only this driver, verifies the result and requests one restart. Do not reinstall again or infer success from the prepared artifact.
+
+Next verify all four UIDs after that workflow, then run the existing exact-UID virtual HAL test. Only after it passes, test the physical48k microphone with independent RNNoise and actual meeting-app input. Existing route mode also opens a physical output; keep its speaker leg muted/gainzero and meeting-app output on the physical device until microphone acceptance passes. No full-path latency/dropout/quality measurement or physical capture has occurred. Source, fixture and real-workflow status remain separate.
+
+- `evidence/independent-driver-current-20261029.json`, SHA256 `3a2d81ea5353ca325b73a46947eaf9279630cfdd71426e4bbe2fcd5dcdbafedb`.
+
+- `evidence/independent-driver-before-restart-20261029.json`, SHA256 `e946e48b7e20d9ee505c37c2c47c1b7f5e51ac344a3f74f99db1ded26426ad2e`.
+
+- `evidence/independent-driver-after-restart-20261029.json`, SHA256 `8e2f1949d4fc45c2c3ad17c95a75e0ebf18a45f69269008711e2a0bd11f5890e`.
+
+- `evidence/independent-driver-after-restart-trace-20261029.log`, SHA256 `578c38c50df464981bacd1154f684ede755091ea6f7e0a939a778851a07f85af`.
+
+- `evidence/independent-driver-safety-package-20261029.log`, SHA256 `76134affe82b712f9ebe20a59c6200731fa98be50b7a1558023b6e894583f8a5`.

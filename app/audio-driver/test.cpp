@@ -165,8 +165,19 @@ static void routing(AudioServerPlugInDriverRef d) {
     assert(read<UInt32>(d, 4, kAudioStreamPropertyLatency) == 0);
     assert(read<UInt32>(d, 9, kAudioStreamPropertyLatency) == 0);
     assert(read<UInt32>(d, 3, kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput) == 0);
-    assert(read<UInt32>(d, 2, kAudioDevicePropertySafetyOffset, kAudioObjectPropertyScopeInput) ==
-           0);
+    // CoreAudio discovery queries both scopes even on single-direction devices.
+    for (auto id : {2u, 3u, 6u, 7u}) {
+        for (auto scope : {kAudioObjectPropertyScopeInput, kAudioObjectPropertyScopeOutput})
+            assert(read<UInt32>(d, id, kAudioDevicePropertySafetyOffset, scope) == 0);
+        auto safety = address(kAudioDevicePropertySafetyOffset);
+        UInt32 bytes = 0;
+        UInt32 value = 99;
+        assert(!(*d)->HasProperty(d, id, 0, &safety));
+        assert((*d)->GetPropertyDataSize(d, id, 0, &safety, 0, nullptr, &bytes) ==
+               kAudioHardwareUnknownPropertyError);
+        assert((*d)->GetPropertyData(d, id, 0, &safety, 0, nullptr, sizeof value, &bytes,
+                                     &value) == kAudioHardwareUnknownPropertyError);
+    }
     for (auto id : {2u, 3u, 6u, 7u}) {
         AudioServerPlugInClientInfo client{};
         client.mClientID = 21;
