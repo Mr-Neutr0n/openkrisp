@@ -6,7 +6,7 @@ openkrisp is an independent reconstruction of local Krisp capabilities. The curr
 
 [Project website](https://open-krisp.harikp.com)
 
-**Developer preview.** Virtual-device transfer and physical microphone routing into FFmpeg pass on the development Mac, including Start and Stop in the packaged app. Zoom lists and runs both virtual devices. Separate accent-engine probes convert speech with the exact installed original models and native engine; live app integration is in progress. Real calls, sustained timing and acoustic quality still require acceptance. [CHECKPOINT.md](CHECKPOINT.md) records the evidence. There is no supported end-user release yet.
+**Developer preview.** Virtual-device transfer and physical microphone routing into FFmpeg pass on the development Mac, including Start and Stop in the packaged app. Zoom lists and runs both virtual devices. Accent-engine probes and installed physical-to-virtual routing convert speech with the exact installed original models and native engine. The native helper stops cleanly after capture; a full corrected GUI repeat remains limited by an accessibility-tool timeout. Real calls, sustained timing and acoustic quality still require acceptance. [CHECKPOINT.md](CHECKPOINT.md) records the evidence. [Download the developer preview](https://github.com/Mr-Neutr0n/openkrisp/releases/tag/v0.1.0-preview.1). It is unsigned and not notarized.
 
 ## What is here
 
@@ -58,6 +58,16 @@ The Python-only measurement checks also run on other systems:
 These checks validate known signal transformations. They do not measure speech quality or establish original-versus-rebuild parity.
 
 ## Try the development app
+
+[Download the Mac installer](https://github.com/Mr-Neutr0n/openkrisp/releases/download/v0.1.0-preview.1/OpenKrisp-development.pkg), or run:
+
+```sh
+curl -fsSL https://open-krisp.harikp.com/install.sh | /bin/bash
+```
+
+The script verifies the pinned package before opening macOS Installer. This preview requires Apple Silicon and macOS 13.5 and supports fresh Lab Voice app/driver paths only. Restart your Mac after first installation to load the driver. It does not disable security settings or download original models.
+
+For accent conversion, open **Lab Voice** in Applications, then Audio. Select your physical microphone/speaker at 48 kHz and enable **Convert my accent (experimental)**. Choose your supported local Krisp app and `ar_outbound_wb_c_ma_3.11.0_1.0.kef` from your existing model directory. Press **Validate accent conversion**, then Start. Use **Lab Voice Microphone** as the input in your calling app. The runtime is bundled; model files remain external. Full corrected GUI automation and sustained call quality remain acceptance gaps in the checkpoint.
 
 Open the built `Lab Voice.app` to use the local library. Audio starts only through an explicit capture action. The default library is `~/Library/Application Support/Lab Voice/sessions`. Import copies the selected WAV into that library. Transcript export uses a new destination. Session deletion requires confirmation.
 

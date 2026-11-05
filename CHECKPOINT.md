@@ -1,15 +1,15 @@
 # Checkpoint
 
-## Current status: accent integration
+## Current status: developer preview
 
-- All four virtual endpoints pass bounded HAL transfer. Zoom 7.1.9 lists and selects the public microphone and speaker after a measured scoped TransportType correction. CoreAudio confirms Zoom runs both selected devices. No meeting or remote participant was tested.
-- The packaged desktop app starts the physical microphone through RNNoise and captures nonzero audio from the virtual microphone into FFmpeg. Stop completes and all endpoints return idle. No microphone prompt appeared in that run.
-- Separate accent-engine probes now process Indian-English speech through the exact installed original native engine and both installed AR models. The catalog declares US output. The physical-to-virtual accent route passes through the packaged helper. Desktop source and packaging pass; GUI accent Start remains unverified after CUA timed out at the file picker.
-- User feedback accepts the first converted Rishi clip as reasonable but rejects its synthetic source voice. A separate ElevenLabs Raj Indian-English conversion now passes; original and converted listening clips are available privately. This is not a full speech-quality or accent-parity result.
-- The product remote is public. The separate private website is deployed through Cloudflare with GA4 consent and Search Console verification. The bundled-runtime development installer passed structural checks and installed locally. Its normal driver loaded after a separate guarded CoreAudio restart; installed-path audio acceptance is pending.
-- No user action is currently pending. Full retained parity, audible playback, sustained timing and real-call acceptance remain open. Local XCTest is unavailable; native and production packaging checks run separately while hosted macOS CI runs the Swift suites.
+- Installed app, normal virtual-audio driver and bundled official Node runtime pass their exact identity/signature checks. Four-endpoint HAL transfer and Zoom device selection/process use pass.
+- Accent conversion uses the exact installed Krisp native engine and AR models. File inference, physical-microphone routing to the virtual microphone and external capture pass. The real native helper wrapper now stops its worker cleanly after a reproduced Foundation process-group termination bug was corrected.
+- The installed GUI reached accent validation, Start and capture before that Stop defect. The corrected full GUI repeat remains limited by intermittent CUA file-picker timeouts. A separate actual-wrapper REA route verifies the fixed native teardown with the real model; it is not mislabeled as a complete GUI test.
+- Hari accepted the ElevenLabs Raj conversion and selected Priyanka and Muthu for synthetic website demos. Both demos are live. Redesigned players, the real release download, Terminal installer and AI setup-prompt controls are published.
+- The product repository is public; website source is private and hosted through Cloudflare. GA4 consent and Search Console ownership/sitemap setup are complete. T3 is rooted at the grouping folder with sibling product and website repositories.
+- Hari explicitly chose an unsigned development preview without Apple Developer membership. No notarization or full-parity claim is made. Original models/addon remain external. Real calls, sustained timing, model tails and full retained feature parity remain open.
 
-Latest verified work: [Live accent integration, 2026-11-05](#live-accent-integration-2026-11-05). The [workspace reorganization](#workspace-reorganization-2026-11-05) records current paths. Earlier sections are historical observations, including their PIDs and installed trees.
+Latest verified work: [Installed native shutdown acceptance, 2026-11-05](#installed-native-shutdown-acceptance-2026-11-05). The [workspace reorganization](#workspace-reorganization-2026-11-05) records current paths. Earlier sections retain historical PIDs, installed trees and acceptance limits.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -1028,3 +1028,29 @@ An owned Foundation fixture established that `Process.terminate()` signals the h
 Source/evidence report: `../evidence/installed-readiness-and-stop-correction-20261105.json`, SHA256 `c8a5310a11de2ded90ad402bda57835e31443b7e6f10c11994092ccabf7452a0`. The prior GUI REA failures and cleanup limits remain retained. New actual-class regression evidence: `../evidence/actual-helper-stop-regression-20261105.json`.
 
 A guarded app-only replacement installed corrected app tree `1b7d4b81211e76c9ff356585c234afed31ab904f88c0dfbfca0ff7e1ec734f03`, retaining the prior app at `/var/tmp/openkrisp-app-rollback-5awnq8mw/Lab Voice.app`. Driver tree `6bf56396b72fdea9dae7885aa64646ce907cb837ba94cf0ea3452ae1f96d676e` was unchanged and no CoreAudio restart ran. Actual corrected GUI Start/capture/Stop and refreshed-package acceptance remain in progress. New hosted Swift tests are required for the bundled-runtime/Stop source. Hari explicitly chose to ship a development preview without Apple Developer membership; no signing or notarization claim is made.
+
+
+## Installed native shutdown acceptance, 2026-11-05
+
+The corrected actual SystemAudioHelperChild implementation ran against the installed helper, exact bundled Node and external outbound AR model under REA `ev_b974f5725e2788b5bebd11b031212562ff552b59e2dc4ad4632da7e4d0c16f32`. It started the physical route, captured 7.264 seconds externally, called the corrected terminate method, received accent_stopped with clean=true, drained both pipes and reaped helper exit 0. The worker processed 856 frames with one explicit empty, 803 callbacks all 512 frames and no transport fault. FFmpeg exited0. Output contains 348672 mono 48kHz samples, 331784 nonzero, peak 0.4131. Owned-group cleanup and temporary-root removal are verified; unrelated platform-process attribution limits remain.
+
+Final private acceptance report: `../evidence/installed-helper-stop-final-acceptance-20261105.json`, SHA256 `8da9cf53a25aff5dbe81d94fdbd9ee67b2123b8b77d5bbeab9afa3a77dffe0cf`. Raw REA artifact SHA256 `d749b1bfd6f48df0b3b90b5290c9b77130d1e21d622a339a8a981bfa6aba1487`. The exact source identity is retained alongside the extracted actual class, so this is the real Foundation wrapper and SDK teardown, not a substitute stop implementation.
+
+Installed app tree remains `1b7d4b81211e76c9ff356585c234afed31ab904f88c0dfbfca0ff7e1ec734f03`, driver tree `6bf56396b72fdea9dae7885aa64646ce907cb837ba94cf0ea3452ae1f96d676e`. The app is closed and all four virtual endpoints are idle. No driver mutation or CoreAudio restart followed the app-only correction.
+
+The corrected full GUI attempt failed at the CUA file-picker backend before model validation or Start. It is retained as a tooling limit. No additional GUI retry or speculative source change followed. Full corrected GUI acceptance remains open even though its actual native wrapper's Start/capture/Stop path is now proved.
+
+The refreshed combined package contains that exact installed app and unchanged normal driver. Package SHA256 `0775e67fba89276095560d5da24c76fdb01ee4d51dbb4a08907a62685389d948`, size 46813417 bytes, manifest SHA256 `2cc98e91df6bbee5769d60b093d1edad2b09a5bf4b4ac7e11126ae9d4a7e5525`. Expanded payloads, signatures, exact Node/license/provenance, guard fixtures and source/target checks pass. Full verification log SHA256 `48a60928783c2c52b091a5c645cf9b3c44f78c1831fddc6f3ab703eafd1f2770`.
+
+The website installer wrapper pins that package, verifies SHA256 before opening macOS Installer, refuses existing app/driver targets and never restarts audio. Bash 3.2 syntax and 21 offline guard fixtures pass. Script SHA256 `a7193ceac1a7495e11417eae09f8e6a77285b51d097f4ff945c8843315e5c327`. Public release passed hosted run 42034470675 at source commit `6d54e4e869a911c88d491cddf3c7d22d397aea9f`.
+
+
+## Published developer preview, 2026-11-05
+
+Hosted run `42034470675` passed the entire root verification at `6d54e4e869a911c88d491cddf3c7d22d397aea9f`: all native/AR/host components, signed/relocated resources, Node release admission, combined-installer expansion/guards and 271 desktop tests with 2 opt-in skips and zero failures. The new actual-helper grandchild regression is included. Local XCTest is still unavailable; this is a hosted result. Private complete log SHA256 `1d64acd98a57a0ecd7764aab0e7fc11f48310fba2be9f20dd2be58819dc22a8b` at `../evidence/ci-bundled-stop-success-20261105.log`.
+
+Release https://github.com/Mr-Neutr0n/openkrisp/releases/tag/v0.1.0-preview.1 is public and marked prerelease. An unauthenticated public download returned HTTP 200 and 46813417 bytes matching SHA256 `0775e67fba89276095560d5da24c76fdb01ee4d51dbb4a08907a62685389d948`. GitHub's asset digest matches. The release also contains SHA256SUMS and a minimal public provenance manifest. The fixed app/driver payload identities are those recorded above; no original Krisp files are redistributed.
+
+Private website commit `945edc2` is deployed through Cloudflare version `81f12a37-7bdd-4dfc-bb7a-6aa454fcd218`. Public HTML, versioned JS/config and install.sh return 200 with the expected digests. The enabled download points to the public verified package. The compact Priyanka/Muthu players support keyboard seeking, exclusive playback and native fallback. Terminal and AI-prompt copying support manual fallback. Browser checks covered actual published clips and widths 320/390/1200 with no document overflow. Visual component renders are retained privately because browser screenshot backends timed out; these are not mislabeled as native screenshots.
+
+The public command is `curl -fsSL https://open-krisp.harikp.com/install.sh | /bin/bash`. It opens macOS Installer only after the pinned package verifies, supports fresh paths only and does not restart audio or capture the microphone. Original local models remain required. Developer preview signing/notarization limits, full corrected GUI repeat, sustained call timing, model tails and full retained-feature parity remain open and visible. No new implementation source changed after the successful hosted run.
