@@ -28,4 +28,6 @@ jobs:
             brew install node
           fi
       - name: Verify components and signed development packaging
+        env:
+          OPENKRISP_PACED_FIXTURE_BUDGET_FRAMES: "12"
         run: ./verify

@@ -14,7 +14,7 @@ Run the changed component's `./verify` on an Apple Silicon Mac with the requirem
 
 Reproduce an audio bug through the real user path before adding a regression. Use owned or explicitly authorized samples. Record hardware, OS, app build and route settings when they affect the result. Keep live capture, audible playback, driver installation and CoreAudio restart as separate acceptance steps. Follow [install-notes.md](app/audio-driver/install-notes.md) for driver work.
 
-GitHub Actions checks numerical fixtures on Linux and runs root `./verify` on an Apple Silicon macOS runner with Xcode. These jobs do not install the driver or prove live audio behavior.
+GitHub Actions checks numerical fixtures on Linux and runs root `./verify` on an Apple Silicon macOS runner with Xcode. These jobs do not install the driver or prove live audio behavior. The hosted macOS job gives the positive synthetic paced AEC fixture 12 scheduling frames through `OPENKRISP_PACED_FIXTURE_BUDGET_FRAMES`. Local defaults remain 2 frames in release and 4 under sanitizers. Exact-output and forced-failure checks remain active. This test setting does not change production buffering or establish latency acceptance.
 
 ## Files and reports
 

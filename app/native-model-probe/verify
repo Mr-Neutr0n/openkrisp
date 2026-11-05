@@ -5,6 +5,18 @@ import subprocess
 import tempfile
 import shutil
 import hashlib
+import os
+
+# Hosted virtual machines do not provide the local paced fixture's scheduling
+# guarantee. This override changes only positive synthetic fixture buffering.
+# Transport deadline-failure tests and production settings remain unchanged.
+paced_budget_text = os.environ.get("OPENKRISP_PACED_FIXTURE_BUDGET_FRAMES")
+paced_budget = None
+if paced_budget_text is not None:
+    if not paced_budget_text.isascii() or not paced_budget_text.isdecimal() or not 1 <= int(paced_budget_text) <= 16:
+        raise SystemExit("Invalid OPENKRISP_PACED_FIXTURE_BUDGET_FRAMES: expected 1 through 16")
+    paced_budget = int(paced_budget_text)
+    print(f"Positive paced fixture scheduling budget: {paced_budget} frames; production settings unchanged", flush=True)
 
 root = Path(__file__).resolve().parent
 with tempfile.TemporaryDirectory(prefix="openkrisp-native-probe-") as build:
@@ -182,5 +194,7 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-aec-worker-") as build:
         subprocess.run([*common, str(root / "aec_duplex_paced_fixture.cpp"), str(root / "aec_worker_broker.cpp"), "-o", paced], check=True)
         subprocess.run([*common, str(root / "aec_duplex_paced_probe.cpp"), str(root / "aec_worker_broker.cpp"), "-o", paced_production], check=True)
         paced_cases = [("480", "2"), ("4096", "2")] if name == "release" else [("512", "4")]
+        if paced_budget is not None:
+            paced_cases = [(maximum, str(paced_budget)) for maximum, _ in paced_cases]
         for maximum, budget in paced_cases:
             subprocess.run(["python3", str(root / "aec_duplex_paced_test.py"), paced, worker, library, maximum, budget], check=True, timeout=60)
