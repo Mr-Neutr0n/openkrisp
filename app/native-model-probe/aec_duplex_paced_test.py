@@ -23,7 +23,13 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-paced-') as temporary:
     def command(output,maximum=maximum,budget=budget):
         return [fixture,worker,worker_sha,library,library_sha,str(microphone),str(reference),str(output),maximum,budget]
     destination=root/'output'
-    result=subprocess.run(command(destination),capture_output=True,text=True,check=True,timeout=25)
+    try:
+        result=subprocess.run(command(destination),capture_output=True,text=True,check=True,timeout=25)
+    except subprocess.CalledProcessError as error:
+        # Preserve the native timing/publication failure instead of only its argv.
+        print(error.stdout, file=sys.stderr, end="")
+        print(error.stderr, file=sys.stderr, end="")
+        raise
     metadata=json.loads(result.stdout)
     assert metadata==json.loads((destination/'metadata.json').read_text())
     delay=metadata['delaySamples'];total=480000+delay
