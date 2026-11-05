@@ -1,6 +1,7 @@
 #include "transport.hpp"
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <thread>
 using krisp_local::Transport;
@@ -36,11 +37,21 @@ int main() {
     Transport ring(2, 31);
     std::atomic<uint64_t> hint{0};
     std::atomic<bool> done{false};
+    std::atomic<bool> firstObserved{false};
     std::thread producer([&] {
         for (uint64_t frame = 1; frame <= 200000; ++frame) {
             float pair[] = {float(frame), -float(frame)};
             assert(ring.write(frame, pair, 1, 0));
             hint.store(frame);
+            // Admit one stable read before racing slot replacement. A scheduler
+            // may otherwise finish every write during the reader's first miss.
+            if (frame == 1) {
+                const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+                while (!firstObserved.load()) {
+                    assert(std::chrono::steady_clock::now() < deadline);
+                    std::this_thread::yield();
+                }
+            }
         }
         done.store(true);
     });
@@ -51,6 +62,7 @@ int main() {
         const auto copied = ring.read(frame, pair, 1, 0, 0);
         if (copied) {
             assert(pair[0] == float(frame) && pair[1] == -float(frame));
+            if (frame == 1) firstObserved.store(true);
             ++checked;
         } else assert(pair[0] == 0 && pair[1] == 0);
         // Race a reader against writes into the same slot across many wraps.

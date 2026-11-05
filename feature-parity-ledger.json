@@ -3581,7 +3581,8 @@
     "projects/krisp/app/installer/test_preinstall.py": "faebe08ac6f5eab350959e3361bc0d3a5e93855de819c6d17c8a7f831e2f2831",
     "projects/krisp/app/installer/verify": "1241d55a9fec872ff5f9f7fd2cdbb5d405b8b91cf1822716fe5f0f06eb8bf4ee",
     "projects/krisp/verification/plot_noise_comparison.py": "a39baf81340f4a85c2b8bdec796f0f3e5126a8c2c6e2dc1e857e659ea12ad4ee",
-    "projects/krisp/.github/workflows/fixtures.yml": "0b540add22e49193bce85edcd43a498052c3d259a509a25d414b94f26a71b150"
+    "projects/krisp/.github/workflows/fixtures.yml": "0b540add22e49193bce85edcd43a498052c3d259a509a25d414b94f26a71b150",
+    "projects/krisp/app/audio-transport/test.cpp": "829f72dbdfc4930a61d944e36c45d1cfd2b33f339f57dd9f690dbbf1220e76be"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",

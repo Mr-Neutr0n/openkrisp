@@ -987,3 +987,10 @@ Actual GUI accent Start remains pending. The first REA app attempt reached the d
 Frozen private integration report: `../evidence/accent-live-and-app-integration-20261105.json`, SHA256 `7a61edc471341fa8b7a24ee2007d887ec308ec2bfc0d5925a4eb70b6222a87a9`. It lists all 18 source files and their fingerprints. Host verify log SHA256 `3bc4e8a43ed7693e6324cf9558fc0407d5318adea6ca00ea13e7b665bf71b830`; final relocated-resource log SHA256 `c15cb6028cfa934b3133714540de6f4c0ce6cc9ad7878b4d88b78edbbd5b570c`.
 
 This build still uses the reviewed external Homebrew Node identity. A separately signed official Node runtime is staged privately for a Homebrew-free installer, but is not admitted by this source checkpoint. Original addon/models remain external and are not redistributed. Installer runtime acceptance, GUI accent Start, real calls, sustained latency and full retained parity remain open.
+
+
+## Concurrency fixture scheduling correction, 2026-11-05
+
+The first hosted run of accent commit `59b6b9913914388dd938e5bcb6e561e1c96bb7dc` failed before reaching AR tests. The older transport stress fixture asserted that at least one read raced successfully, but the scheduler could complete all writes between the reader's initial miss and its done check. Stable final-frame verification was never reached. This is not evidence of an audio-transport data defect.
+
+The fixture now requires one checked stable frame before racing slot replacement, with a bounded 5-second admission deadline. Existing complete-frame, failed-read silence and final-frame assertions remain. No production transport source or queue behavior changed. Full transport verification passes release, ASan/UBSan, TSan and cross-process lifetime checks. Private log: `../evidence/transport-concurrency-handshake-20261105.log`, SHA256 `e52de98bd7a3e3bed526752460b6ffa80389836093934d5eebd0d4ae2bd6b6d0`. The failed hosted log is `../evidence/ci-transport-starvation-20261105.log`. The updated AR checkpoint still awaits a complete hosted run.
