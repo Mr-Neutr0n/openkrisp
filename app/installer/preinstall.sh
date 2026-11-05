@@ -10,8 +10,14 @@ fail() {
 [ "$(/usr/sbin/sysctl -n hw.optional.arm64 2>/dev/null || true)" = "1" ] || fail "An Apple Silicon Mac is required."
 version=$(/usr/bin/sw_vers -productVersion)
 major=${version%%.*}
+remaining=${version#*.}
+[ "$remaining" != "$version" ] || fail "Cannot verify the macOS version."
+minor=${remaining%%.*}
 case "$major" in ''|*[!0-9]*) fail "Cannot verify the macOS version." ;; esac
-[ "$major" -ge 12 ] || fail "macOS 12 or later is required."
+case "$minor" in ''|*[!0-9]*) fail "Cannot verify the macOS version." ;; esac
+if [ "$major" -lt 13 ] || { [ "$major" -eq 13 ] && [ "$minor" -lt 5 ]; }; then
+    fail "macOS 13.5 or later is required."
+fi
 
 app='/Applications/Lab Voice.app'
 driver='/Library/Audio/Plug-Ins/HAL/LabVoiceAudio.driver'

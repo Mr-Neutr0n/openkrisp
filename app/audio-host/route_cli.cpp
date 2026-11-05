@@ -237,9 +237,10 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
         std::cout << ",\"accent_direction\":\"outbound\",\"accent_target\":\"us\",\"accent_backend\":\"accent-direct\""
                   << ",\"accent_model_sha256\":" << jsonString(accent_engine::outboundModelSHA256)
                   << ",\"accent_addon_sha256\":" << jsonString(accent_engine::addonSHA256)
-                  << ",\"accent_node_sha256\":" << jsonString(accent_engine::nodeSHA256)
+                  << ",\"accent_node_sha256\":" << jsonString(settings.nodeSha256)
                   << ",\"accent_adapter_sha256\":" << jsonString(settings.adapterSha256)
                   << ",\"accent_sample_rate\":48000,\"accent_frame_samples\":480,\"accent_scheduling_budget_frames\":2"
+                  << ",\"accent_current_callback_frames\":" << accent->current()
                   << ",\"accent_maximum_callback_frames\":" << accent->maximum()
                   << ",\"accent_transport_delay_samples\":" << accent->delay()
                   << ",\"accent_empty_policy\":\"silence-time-slot\"";
@@ -261,12 +262,16 @@ int runRoute(const std::string &input, const std::string &output, bool microphon
     }
     const bool changed = !interrupted;
     recording.service(session, true);
+    const auto accentFault = accent ? static_cast<unsigned>(accent->fault()) : 0;
     const bool stopped = session.stop();
     const bool workerStopped = !installed || installed->stop();
     const bool aecStopped = !aec || aec->stop();
     const bool accentStopped = !accent || accent->stop();
     if (accent) std::cout << "{\"event\":\"accent_stopped\",\"input_frames\":" << accent->processed()
-        << ",\"empty_frames\":" << accent->empty() << ",\"clean\":" << (accentStopped ? "true" : "false") << "}" << std::endl;
+        << ",\"empty_frames\":" << accent->empty() << ",\"callback_count\":" << accent->callbackCount()
+        << ",\"observed_min_callback_frames\":" << accent->observedMinimum()
+        << ",\"observed_max_callback_frames\":" << accent->observedMaximum()
+        << ",\"transport_fault_before_stop\":" << accentFault << ",\"clean\":" << (accentStopped ? "true" : "false") << "}" << std::endl;
     restore();
     if (!workerStopped) {
         std::cerr << "Installed provider failed: " << installed->error() << '\n';

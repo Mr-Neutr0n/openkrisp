@@ -33,9 +33,10 @@ See [COMPARISON.md](COMPARISON.md) for the current controlled engine experiment 
 
 Requirements:
 
-- An Apple Silicon Mac and macOS 12 or later. Some capture and OS integration features need a newer system.
+- An Apple Silicon Mac and macOS 13.5 or later for the bundled desktop distribution. Owned audio and driver components retain macOS 12 targets.
 - Xcode with Swift 6, Clang, the macOS SDK and XCTest support. Some Command Line Tools installations omit XCTest and cannot run the Swift test suites.
-- Python 3 and Node.js on `PATH`.
+- Python 3 and Node.js on `PATH` for building and fixture checks.
+- `gpgv` from GnuPG to verify the pinned official Node release. The desktop packages that signed runtime; users do not need Homebrew or a separate Node installation.
 - Node C API headers at `/opt/homebrew/include/node/node_api.h` for the experimental adapter build.
 
 ```sh
@@ -77,6 +78,7 @@ The app and driver use ad-hoc development signatures. They are not notarized. Bu
 | [`app/native-model-probe`](app/native-model-probe) | Experimental installed-provider adapters and owned fixtures |
 | [`app/accent-engine`](app/accent-engine) | Separate installed accent-model broker and adapter |
 | [`app/installer`](app/installer) | Development app and driver package |
+| [`app/node-runtime`](app/node-runtime) | Signed official Node runtime, provenance and complete license |
 | [`verification`](verification) | Deterministic audio generation and numerical comparison |
 
 ## Evidence and limits

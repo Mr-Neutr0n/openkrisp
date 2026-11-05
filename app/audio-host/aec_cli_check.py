@@ -30,13 +30,13 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-cli-') as temporary:
     speaker=['--speaker-noise-suppression','--speaker-provider','installed-krisp']
     for name in ['node','worker','addon','model','adapter','library']:
         speaker+=['--speaker-provider-'+name,'/fixture/'+name]
-    for name in ['node-sha256','adapter-sha256']:speaker+=['--speaker-provider-'+name,'a'*64]
+    for name in ['node-sha256','adapter-sha256']:speaker+=['--speaker-provider-'+name,'1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040' if name=='node-sha256' else 'a'*64]
     result=subprocess.run(base+complete+speaker,capture_output=True,text=True,check=True,timeout=5)
     assert json.loads(result.stdout)['speaker']['role']=='inbound'
     microphone=['--microphone-noise-suppression','--microphone-provider','installed-krisp']
     for name in ['node','worker','addon','model','adapter','library']:
         microphone+=['--provider-'+name,'/microphone-fixture/'+name]
-    for name in ['node-sha256','adapter-sha256']:microphone+=['--provider-'+name,'c'*64]
+    for name in ['node-sha256','adapter-sha256']:microphone+=['--provider-'+name,'1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040' if name=='node-sha256' else 'c'*64]
     profiles=[(['--noise-suppression'],False,False),
               (['--microphone-noise-suppression','--speaker-noise-suppression'],False,False),
               (microphone,True,False),(microphone+speaker,True,True),
@@ -56,7 +56,8 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-cli-') as temporary:
             assert ack['provider_model_role']=='outbound'
             assert ack['provider_model_sha256']=='12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d'
             assert ack['provider_addon_sha256']=='adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755'
-            assert ack['provider_adapter_sha256']==ack['provider_node_sha256']=='c'*64
+            assert ack['provider_adapter_sha256']=='c'*64
+            assert ack['provider_node_sha256']=='1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040'
             assert ack['provider_delay_samples']==5760 and ack['provider_maximum_callback_frames']==4096
             assert value['microphone']['role']=='outbound'
         else:

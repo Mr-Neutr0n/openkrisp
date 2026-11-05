@@ -31,7 +31,7 @@ static krisp_probe::InstalledWorkerSettings ncSettings() {
     krisp_probe::InstalledWorkerSettings s;
     s.nodePath="/fixture/node";s.workerPath="/fixture/worker";s.addonPath="/fixture/addon";
     s.modelPath="/fixture/model";s.adapterPath="/fixture/adapter";s.libraryPath="/fixture/library";
-    s.nodeSha256=std::string(64,'a');s.adapterSha256=std::string(64,'b');return s;
+    s.nodeSha256="1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";s.adapterSha256=std::string(64,'b');return s;
 }
 namespace {
 void writeFloats(const std::string& path,const std::vector<float>& values) {

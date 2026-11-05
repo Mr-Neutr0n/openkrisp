@@ -70,6 +70,7 @@ class Worker {
     bool exchange(const float* input, float* output, std::size_t count) noexcept { return transport_.exchange(input, output, count); }
     bool healthy() const noexcept { return !finished_.load(std::memory_order_acquire) && transport_.fault() == Transport<>::Fault::none; }
     std::string error() const { return finished_.load(std::memory_order_acquire) ? error_ : std::string{}; }
+    auto fault() const noexcept { return transport_.fault(); }
     std::size_t delay() const noexcept { return transport_.actualDelaySamples(); }
     std::uint64_t processed() const noexcept { return processed_.load(std::memory_order_acquire); }
     std::uint64_t empty() const noexcept { return empty_.load(std::memory_order_acquire); }

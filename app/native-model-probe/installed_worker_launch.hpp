@@ -7,6 +7,8 @@
 #include <unistd.h>
 
 namespace krisp_probe {
+inline constexpr const char* bundledNodeSHA256 = "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4";
+inline constexpr const char* reviewedHomebrewNodeSHA256 = "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";
 enum class InstalledModelRole { outbound, inbound, outboundHVC };
 inline constexpr const char* installedOutboundModelSHA256 = "12110c114a3c6c4e2a00c26b22d06463239d096da9f7b71a948fd3a7005b355d";
 inline constexpr const char* installedInboundModelSHA256 = "d1e4e2a94fe27dec1a8fd5a7b36cfac38d183a110f738156d85d1317f98fac8a";
@@ -89,6 +91,8 @@ inline WorkerLaunchConfig buildInstalledWorkerLaunch(const InstalledWorkerSettin
     for(const auto* value:{&settings.nodePath,&settings.workerPath,&settings.addonPath,&settings.modelPath,&settings.adapterPath,&settings.libraryPath})path(*value);
     if(settings.libraryPath.find_first_of("\n\r:")!=std::string::npos)throw std::invalid_argument("Expected one library directory");
     digest(settings.nodeSha256);digest(settings.adapterSha256);
+    if (settings.nodeSha256 != bundledNodeSHA256 && settings.nodeSha256 != reviewedHomebrewNodeSHA256)
+        throw std::invalid_argument("Unreviewed Node SHA256");
     if(!std::isfinite(settings.suppressionLevel) || settings.suppressionLevel<0 || settings.suppressionLevel>100)throw std::invalid_argument("Invalid suppression level");
     const auto tokenText=tokenHex(token);
     std::ostringstream level;level.imbue(std::locale::classic());level<<std::setprecision(std::numeric_limits<double>::max_digits10)<<settings.suppressionLevel;

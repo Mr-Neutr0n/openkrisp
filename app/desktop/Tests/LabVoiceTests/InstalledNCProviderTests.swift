@@ -21,7 +21,7 @@ final class InstalledNCResolverTests: XCTestCase {
         try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: node.path)
         let digest = String(repeating: "a", count: 64)
         let files = Dictionary(uniqueKeysWithValues: InstalledNCResolver.runtimeFiles.map { ($0, digest) })
-        let manifest: [String: Any] = ["schemaVersion": 1, "nodeSha256": InstalledNCConfiguration.reviewedNodeSHA256, "files": files]
+        let manifest: [String: Any] = ["schemaVersion": 1, "nodeSha256": InstalledNodeRuntime.bundledSHA256, "files": files]
         let manifestURL = runtime.appendingPathComponent("runtime-manifest.json")
         try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
         let hash: @Sendable (URL) throws -> String = { url in

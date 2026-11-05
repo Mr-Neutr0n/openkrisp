@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "version": "26.13.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "minimumMacOS": "13.5",
+  "archive": {
+    "url": "https://nodejs.org/download/release/v26.13.0/node-v26.13.0-darwin-arm64.tar.xz",
+    "sha256": "6f5b3187d9df9fc007e881167905bc7d69ad26450ddc377c83d63256a2495b6e",
+    "bytes": 30647096,
+    "root": "node-v26.13.0-darwin-arm64"
+  },
+  "signedChecksums": {
+    "url": "https://nodejs.org/download/release/v26.13.0/SHASUMS256.txt.asc",
+    "sha256": "1670dd3eebeb6be820e78faf68b9caf33b7434d55701249138fb426103bca1a0",
+    "signerFingerprint": "C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C"
+  },
+  "releaseKeyring": {
+    "commit": "481637f813e912c4aa3622d7964ab426c97b8e8d",
+    "url": "https://raw.githubusercontent.com/nodejs/release-keys/481637f813e912c4aa3622d7964ab426c97b8e8d/gpg/pubring.kbx",
+    "sha256": "610b8d249da3d5733f5a128def2dd0294dbbf5b5713e6ca2529db8db419dee00"
+  },
+  "signature": {
+    "identifier": "node",
+    "teamIdentifier": "HX7739G8FX",
+    "preserveOriginalBytes": true
+  },
+  "files": {
+    "node": {
+      "sha256": "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4",
+      "bytes": 147346864
+    },
+    "LICENSE": {
+      "sha256": "8e603aa87c70d36e497004f0dec63111511cb61b7d65ace12e10ea791599286c",
+      "bytes": 156386
+    }
+  }
+}

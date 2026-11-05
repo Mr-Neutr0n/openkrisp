@@ -5,7 +5,12 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const net = require('node:net');
 const ADDON = 'adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755';
-const NODE = '1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040';
+const NODE = '533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4';
+const HOMEBREW_NODE = '1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040';
+function reviewedNode(value) {
+    if (value !== NODE && value !== HOMEBREW_NODE) throw Error('Unreviewed AR Node SHA256');
+    return value;
+}
 const MODELS = Object.freeze({
     outbound: Object.freeze({ filename: 'ar_outbound_wb_c_ma_3.11.0_1.0.kef',
         sha256: '8ada1e4c3d2b3ef3c1440e39dfdfb825c7b0a4c0695c9e0ba6b06b576f124855' }),
@@ -45,11 +50,12 @@ function identify(options) {
     if (!model) throw Error('direction must be outbound or inbound');
     for (const key of ['addonPath', 'modelPath', 'adapterPath']) absolute(options[key], key);
     digest(options.adapterSHA256, 'adapterSHA256');
+    reviewedNode(options.nodeSHA256);
     if (path.basename(options.modelPath) !== model.filename) throw Error('AR filename does not match direction');
     const result = { node: fileIdentity(fs.realpathSync(process.execPath)),
         addon: fileIdentity(options.addonPath), model: fileIdentity(options.modelPath),
         adapter: fileIdentity(options.adapterPath) };
-    for (const [key, expected] of [['node', NODE], ['addon', ADDON], ['model', model.sha256], ['adapter', options.adapterSHA256]])
+    for (const [key, expected] of [['node', options.nodeSHA256], ['addon', ADDON], ['model', model.sha256], ['adapter', options.adapterSHA256]])
         if (result[key].sha256 !== expected) throw Error('Unreviewed AR ' + key + ' SHA256');
     return result;
 }
@@ -66,4 +72,4 @@ function deniedNetwork() {
         socket.connect({ host: '127.0.0.1', port: 9 });
     });
 }
-module.exports = { ADDON, NODE, MODELS, absolute, digest, fileIdentity, identify, unchanged, deniedNetwork };
+module.exports = { ADDON, NODE, HOMEBREW_NODE, reviewedNode, MODELS, absolute, digest, fileIdentity, identify, unchanged, deniedNetwork };

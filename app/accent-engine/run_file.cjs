@@ -8,7 +8,7 @@ const crypto = require('node:crypto');
 const identity = require('./identity.cjs');
 function parse(args) {
     const names = { '--addon': 'addonPath', '--model': 'modelPath', '--adapter': 'adapterPath',
-        '--adapter-sha256': 'adapterSHA256', '--direction': 'direction', '--input': 'inputPath',
+        '--adapter-sha256': 'adapterSHA256', '--node-sha256': 'nodeSHA256', '--direction': 'direction', '--input': 'inputPath',
         '--input-sha256': 'inputSHA256', '--output': 'outputPath' };
     const result = {};
     for (let i = 0; i < args.length; i += 2) {

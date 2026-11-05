@@ -7,7 +7,8 @@
 namespace accent_engine {
 enum class Direction { outbound, inbound };
 inline constexpr const char* addonSHA256 = "adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755";
-inline constexpr const char* nodeSHA256 = "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";
+inline constexpr const char* nodeSHA256 = "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4";
+inline constexpr const char* homebrewNodeSHA256 = "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";
 inline constexpr const char* outboundModelSHA256 = "8ada1e4c3d2b3ef3c1440e39dfdfb825c7b0a4c0695c9e0ba6b06b576f124855";
 inline constexpr const char* inboundModelSHA256 = "73a59147ba88d0075e6a688f3cc641c5a46a6ffbb591c2f386b3affdb3e781df";
 inline const char* directionName(Direction value) {
@@ -27,6 +28,7 @@ inline const char* modelSHA256(Direction value) {
 struct InstalledAccentSettings {
     std::string nodePath, workerPath, addonPath, modelPath, adapterPath, libraryPath;
     std::string adapterSha256;
+    std::string nodeSha256 = nodeSHA256;
     Direction direction = Direction::outbound;
 };
 namespace launch_detail {
@@ -65,12 +67,14 @@ inline WorkerLaunchConfig buildInstalledAccentLaunch(const InstalledAccentSettin
     if (settings.libraryPath.find_first_of("\n\r:") != std::string::npos)
         throw std::invalid_argument("Expected one accent library directory");
     digest(settings.adapterSha256);
+    if (settings.nodeSha256 != nodeSHA256 && settings.nodeSha256 != homebrewNodeSHA256)
+        throw std::invalid_argument("Unreviewed accent Node SHA256");
     const std::string role = directionName(settings.direction), model = modelSHA256(settings.direction);
     const auto tokenText = tokenHex(token);
     const std::string config = "{\"parentPID\":" + std::to_string(getpid()) +
         ",\"direction\":" + json(role) + ",\"addonPath\":" + json(settings.addonPath) +
         ",\"modelPath\":" + json(settings.modelPath) + ",\"adapterPath\":" + json(settings.adapterPath) +
-        ",\"adapterSHA256\":" + json(settings.adapterSha256) + ",\"token\":" + json(tokenText) + "}";
+        ",\"adapterSHA256\":" + json(settings.adapterSha256) + ",\"nodeSHA256\":" + json(settings.nodeSha256) + ",\"token\":" + json(tokenText) + "}";
     WorkerLaunchConfig result;
     result.executable = "/usr/bin/sandbox-exec";
     result.arguments = {"-p", "(version 1) (allow default) (deny network*)", "/usr/bin/env", "-i",
@@ -78,7 +82,7 @@ inline WorkerLaunchConfig buildInstalledAccentLaunch(const InstalledAccentSettin
         settings.nodePath, settings.workerPath, config};
     result.environment = {"PATH=/usr/bin:/bin"};
     result.expectedReadyLine = "OKARREADY1 " + tokenText + " accent-direct 48000 480 " + role + " us " +
-        addonSHA256 + " " + model + " " + settings.adapterSha256 + " " + nodeSHA256 + "\n";
+        addonSHA256 + " " + model + " " + settings.adapterSha256 + " " + settings.nodeSha256 + "\n";
     result.token = token;
     result.startupTimeout = std::chrono::milliseconds(30000);
     result.frameTimeout = std::chrono::milliseconds(500);

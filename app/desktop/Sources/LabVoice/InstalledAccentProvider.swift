@@ -6,11 +6,12 @@ struct InstalledAccentConfiguration: Equatable, Sendable {
     static let modelFilename = "ar_outbound_wb_c_ma_3.11.0_1.0.kef"
     static let modelSHA256 = "8ada1e4c3d2b3ef3c1440e39dfdfb825c7b0a4c0695c9e0ba6b06b576f124855"
     static let addonSHA256 = "adde50ff549700fd535fb9cc8e42d45fa36dca02131009ded727a10625ae8755"
-    static let nodeSHA256 = "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+    static let nodeSHA256 = InstalledNodeRuntime.bundledSHA256
+    var selectedNodeSHA256 = InstalledNodeRuntime.bundledSHA256
     var arguments: [String] {
         ["--accent-node", nodePath, "--accent-worker", workerPath, "--accent-addon", addonPath,
          "--accent-model", modelPath, "--accent-adapter", adapterPath, "--accent-library", libraryPath,
-         "--accent-adapter-sha256", adapterSHA256]
+         "--accent-adapter-sha256", adapterSHA256, "--accent-node-sha256", selectedNodeSHA256]
     }
 }
 // Admission only hashes user-selected local files. It never opens the model,
@@ -53,7 +54,8 @@ actor InstalledAccentResolver {
                     throw InstalledNCError.invalid("Packaged accent resource changed: \(name)")
                 }
             }
-            guard try hash(node) == InstalledAccentConfiguration.nodeSHA256,
+            let selectedNodeSHA256 = try hash(node)
+            guard InstalledNodeRuntime.reviewedSHA256.contains(selectedNodeSHA256),
                   try hash(addon) == InstalledAccentConfiguration.addonSHA256 else {
                 throw InstalledNCError.invalid("The selected app or Node runtime is not the reviewed version.")
             }
@@ -62,7 +64,7 @@ actor InstalledAccentResolver {
             }
             return InstalledAccentConfiguration(nodePath: node.path, workerPath: runtime.appendingPathComponent("worker.cjs").path,
                 addonPath: addon.path, modelPath: model.path, adapterPath: runtime.appendingPathComponent("accent-probe.node").path,
-                libraryPath: library.path, adapterSHA256: manifest.files["accent-probe.node"]!)
+                libraryPath: library.path, adapterSHA256: manifest.files["accent-probe.node"]!, selectedNodeSHA256: selectedNodeSHA256)
         }.value
     }
 }
@@ -96,16 +98,17 @@ struct AccentStartup: Decodable, Sendable {
         guard let expected else { return values.isEmpty }
         func text(_ key: String) -> String? { if case .text(let result) = values["accent_" + key] { return result }; return nil }
         func number(_ key: String) -> Int? { if case .number(let result) = values["accent_" + key] { return result }; return nil }
-        let required: Set<String> = ["direction", "target", "backend", "model_sha256", "addon_sha256", "node_sha256", "adapter_sha256", "sample_rate", "frame_samples", "scheduling_budget_frames", "maximum_callback_frames", "transport_delay_samples", "empty_policy"]
+        let required: Set<String> = ["direction", "target", "backend", "model_sha256", "addon_sha256", "node_sha256", "adapter_sha256", "sample_rate", "frame_samples", "scheduling_budget_frames", "maximum_callback_frames", "current_callback_frames", "transport_delay_samples", "empty_policy"]
         guard Set(values.keys) == Set(required.map { "accent_" + $0 }),
               text("direction") == "outbound", text("target") == "us", text("backend") == "accent-direct",
               text("model_sha256") == InstalledAccentConfiguration.modelSHA256,
               text("addon_sha256") == InstalledAccentConfiguration.addonSHA256,
-              text("node_sha256") == InstalledAccentConfiguration.nodeSHA256,
+              text("node_sha256") == expected.selectedNodeSHA256,
               text("adapter_sha256") == expected.adapterSHA256,
               number("sample_rate") == 48000, number("frame_samples") == 480,
               number("scheduling_budget_frames") == 2, text("empty_policy") == "silence-time-slot",
               let maximum = number("maximum_callback_frames"), (1...4096).contains(maximum),
+              let current = number("current_callback_frames"), (1...maximum).contains(current),
               number("transport_delay_samples") == ((maximum + 958) / 480 + 2) * 480 else { return false }
         return true
     }

@@ -9,7 +9,7 @@ base = [str(binary), '--route', '--input', 'fixture-input', '--output', 'fixture
 complete = []
 for name in ['node', 'worker', 'addon', 'model', 'adapter', 'library']:
     complete += ['--accent-' + name, '/fixture/' + name]
-complete += ['--accent-adapter-sha256', 'a' * 64]
+complete += ['--accent-adapter-sha256', 'a' * 64, '--accent-node-sha256', '533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4']
 okay = subprocess.run(base + complete, capture_output=True, text=True, timeout=5)
 assert okay.returncode == 0, okay.stderr
 result = json.loads(okay.stdout)
@@ -20,7 +20,9 @@ for suffix in [[], ['--speaker-noise-suppression']]:
     assert result.returncode == 0, result.stderr
 bad = list(complete)
 bad[1] = 'relative'
-for args in [complete[:-2], complete + ['--accent-node', '/other'], complete + ['--accent-target', 'uk'],
+unknown = list(complete)
+unknown[-1] = 'a' * 64
+for args in [unknown, complete[:-2], complete + ['--accent-node', '/other'], complete + ['--accent-target', 'uk'],
              complete + ['--accent-direction', 'inbound'], complete + ['--microphone-noise-suppression'],
              complete + ['--aec-provider', 'installed-krisp', '--aec-worker', '/fixture/worker',
                          '--aec-worker-sha256', 'a' * 64, '--aec-library', '/fixture/library'], bad]:

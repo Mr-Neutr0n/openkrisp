@@ -38,11 +38,6 @@ struct AudioView: View {
         panel.allowsMultipleSelection = false
         if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledApp(url) }
     }
-    private func chooseProviderNode() {
-        let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.canChooseFiles = true
-        panel.allowsMultipleSelection = false; panel.message = "Choose the reviewed Node executable."
-        if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledNode(url) }
-    }
     private func chooseAccentModel() {
         let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.canChooseFiles = true
         panel.allowsMultipleSelection = false
@@ -164,11 +159,10 @@ struct AudioView: View {
                             .font(.caption).foregroundColor(.secondary)
                         HStack {
                             Button("Choose Krisp app…", action: chooseProviderApp)
-                            Button("Choose Node runtime…", action: chooseProviderNode)
                             Button("Choose accent model…", action: chooseAccentModel)
                         }.disabled(controlsLocked || audio.accentValidating)
                         Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
-                        Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
+                        if audio.installedNode == nil { Text("Bundled audio runtime is missing. Reinstall the app.").font(.caption).foregroundColor(.red) }
                         Text(audio.accentModel?.path ?? "No local accent model selected").font(.caption).textSelection(.enabled)
                         Button("Validate accent conversion") { Task { await audio.validateInstalledAccent() } }
                             .disabled(controlsLocked || audio.accentValidating || audio.installedApp == nil || audio.installedNode == nil || audio.accentModel == nil)
@@ -225,10 +219,9 @@ struct AudioView: View {
                     if audio.microphoneProvider == .installedKrisp || audio.speakerProvider == .installedKrisp {
                         HStack {
                             Button("Choose Krisp app…", action: chooseProviderApp)
-                            Button("Choose Node runtime…", action: chooseProviderNode)
                         }.disabled(controlsLocked || audio.providerValidating)
                         Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
-                        Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
+                        if audio.installedNode == nil { Text("Bundled audio runtime is missing. Reinstall the app.").font(.caption).foregroundColor(.red) }
                         Button("Validate selected installed providers") { Task { await audio.validateInstalledProvider() } }
                             .disabled(controlsLocked || audio.providerValidating || audio.installedApp == nil || audio.installedNode == nil || audio.requestedInstalledRoles.isEmpty || audio.requiresHeadsetConfirmation)
                         if audio.providerValidating { ProgressView().controlSize(.small) }

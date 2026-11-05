@@ -20,8 +20,11 @@ try {
     for (const direction of ['outbound-hvc-lfb', 'nc-inbound-mwb', 'unverified'])
         assert.throws(() => identity.identify({ direction }));
     const options = { direction: 'outbound', addonPath: '/owned/addon', adapterPath: '/owned/adapter',
-        modelPath: '/external/ar_inbound_wb_c_3.12.0_1.0.kef', adapterSHA256: 'a'.repeat(64) };
+        modelPath: '/external/ar_inbound_wb_c_3.12.0_1.0.kef', nodeSHA256: identity.NODE, adapterSHA256: 'a'.repeat(64) };
     assert.throws(() => identity.identify(options), /filename.*direction/);
+    assert.equal(identity.reviewedNode(identity.NODE), identity.NODE);
+    assert.equal(identity.reviewedNode(identity.HOMEBREW_NODE), identity.HOMEBREW_NODE);
+    assert.throws(() => identity.reviewedNode('a'.repeat(64)), /Unreviewed/);
     assert.notEqual(identity.MODELS.outbound.sha256, identity.MODELS.inbound.sha256);
     assert.throws(() => identity.digest('1'.repeat(63), 'fixture'));
     assert.throws(() => identity.absolute('relative', 'fixture'));

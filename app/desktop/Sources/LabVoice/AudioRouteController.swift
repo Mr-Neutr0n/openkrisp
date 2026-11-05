@@ -101,11 +101,11 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let resolveAEC: (URL) async throws -> InstalledAECConfiguration
     private var aecValidationID = UUID()
     @Published private(set) var installedApp: URL?
-    @Published private(set) var installedNode: URL?
+    @Published private(set) var installedNode: URL? = InstalledNodeRuntime.packagedURL()
     @Published private(set) var installedConfiguration: InstalledNCConfiguration?
     @Published private(set) var installedSpeakerConfiguration: InstalledNCConfiguration?
     @Published private(set) var providerValidating = false
-    @Published private(set) var providerStatus = "Choose the installed Krisp app and reviewed Node runtime."
+    @Published private(set) var providerStatus = "Choose the installed Krisp app."
     private let resolveProvider: (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration
     private var providerValidationID = UUID()
     @Published private(set) var desiredControls = AudioControlSnapshot()
@@ -281,7 +281,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     private func invalidateProvider() {
         providerValidationID = UUID(); installedConfiguration = nil; installedSpeakerConfiguration = nil; providerValidating = false
-        providerStatus = "Validate the selected app and Node runtime before Start."
+        providerStatus = "Validate the selected installed files before Start."
     }
     private func invalidateAEC() {
         aecValidationID = UUID(); installedAECConfiguration = nil; aecValidating = false

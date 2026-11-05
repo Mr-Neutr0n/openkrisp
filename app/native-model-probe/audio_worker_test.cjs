@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'), fs=require('node:fs'), os=require('node:os'), path=require('node:path'), crypto=require('node:crypto');
 const {runWorker,admit,fileHash,ADDON_SHA256,MODEL_SHA256,INBOUND_MODEL_SHA256,OUTBOUND_HVC_MODEL_SHA256,validateConfig}=require('./audio_worker.cjs');
 const {encode,Parser}=require('./worker_protocol.cjs');
-const config={addonPath:'/fixture/addon',modelPath:'/fixture/model',adapterPath:'/fixture/adapter',adapterSha256:'a'.repeat(64),nodeSha256:'b'.repeat(64),token:'19'.repeat(16),suppressionLevel:100,bypass:false,parentPID:process.ppid,modelRole:'outbound',modelSha256:MODEL_SHA256};
+const config={addonPath:'/fixture/addon',modelPath:'/fixture/model',adapterPath:'/fixture/adapter',adapterSha256:'a'.repeat(64),nodeSha256:'1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040',token:'19'.repeat(16),suppressionLevel:100,bypass:false,parentPID:process.ppid,modelRole:'outbound',modelSha256:MODEL_SHA256};
 function fixture(options={}, selected=config) {
   let loaded=0,opened=0,closed=0,offset=0;const writes=[],events=[];
   const input=options.input || Buffer.alloc(0);
@@ -19,7 +19,7 @@ function fixture(options={}, selected=config) {
   return {deps,writes,events,stats:()=>({loaded,opened,closed})};
 }
 (async()=>{
-  for(const change of [{extra:true},{addonPath:'relative'},{modelPath:'/bad\0path'},{adapterSha256:'bad'},{nodeSha256:'C'.repeat(64)},{token:'0'},{suppressionLevel:NaN},{bypass:1},{parentPID:1},{parentPID:1.5}]){
+  for(const change of [{nodeSha256:'a'.repeat(64)},{extra:true},{addonPath:'relative'},{modelPath:'/bad\0path'},{adapterSha256:'bad'},{nodeSha256:'C'.repeat(64)},{token:'0'},{suppressionLevel:NaN},{bypass:1},{parentPID:1},{parentPID:1.5}]){
     const f=fixture();await assert.rejects(runWorker({...config,...change},f.deps));assert.equal(f.stats().loaded,0);
   }
   for(const change of [{modelRole:'inbound'},{modelSha256:INBOUND_MODEL_SHA256},

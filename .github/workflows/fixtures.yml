@@ -27,6 +27,9 @@ jobs:
           if ! test -f /opt/homebrew/include/node/node_api.h; then
             brew install node
           fi
+          if ! command -v gpgv >/dev/null; then
+            brew install gnupg
+          fi
       - name: Verify components and signed development packaging
         env:
           OPENKRISP_PACED_FIXTURE_BUDGET_FRAMES: "12"

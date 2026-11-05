@@ -58,9 +58,12 @@ def inspect_bundle(bundle, identifier, executable):
     if info.get("CFBundleIdentifier") != identifier or info.get("CFBundleExecutable") != executable:
         raise RuntimeError("Unexpected bundle identity")
     if identifier == APP_ID:
+        if info.get("LSMinimumSystemVersion") != "13.5":
+            raise RuntimeError("Bundled Node distribution must declare macOS 13.5")
         notice = bundle / "Contents/Resources/helper/notices/RNNoise-COPYING"
         if not notice.is_file() or notice.read_bytes() != (PRODUCT / "app/noise-engine/vendor/rnnoise/COPYING").read_bytes():
             raise RuntimeError("RNNoise distribution notice is missing or changed")
+        run("python3", PRODUCT / "app/node-runtime/verify", "--runtime", bundle / "Contents/Resources/helper/node-runtime")
     run("codesign", "--verify", "--deep", "--strict", bundle)
     signature = subprocess.run(["codesign", "--display", "--verbose=4", str(bundle)],
                                capture_output=True, text=True, check=True)
@@ -79,8 +82,9 @@ def inspect_bundle(bundle, identifier, executable):
             raise RuntimeError("Payload executable is not ARM64: " + relative)
         commands = subprocess.check_output(["otool", "-l", str(path)], text=True)
         versions = re.findall(r"^\s*minos\s+(\d+)\.(\d+)", commands, re.M)
-        if not versions or any(tuple(map(int, version)) > (12, 0) for version in versions):
-            raise RuntimeError("Payload executable does not target macOS 12: " + relative)
+        maximum = (13, 5) if identifier == APP_ID else (12, 0)
+        if not versions or any(tuple(map(int, version)) > maximum for version in versions):
+            raise RuntimeError("Payload executable exceeds the declared deployment target: " + relative)
     return files, info
 
 
@@ -221,11 +225,12 @@ def main():
                     "appFiles": app_files, "driverFiles": driver_files, "driverSourceSHA256": driver_source,
                     "preinstallSHA256": hashlib.sha256(preinstall.encode()).hexdigest(),
                     "payloadPaths": sorted(expected), "archiveMetadataAppleDouble": metadata_hashes,
-                    "minimumMacOS": "12.0", "architecture": "arm64", "driverDiscoveryTrace": False,
-                    "signature": "ad-hoc bundles, unsigned package; not notarized", "existingTargets": "refused, including identical bundles",
+                    "minimumMacOS": "13.5", "architecture": "arm64", "driverDiscoveryTrace": False,
+                    "nodeRuntimeSHA256": "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4",
+                    "signature": "ad-hoc app/driver, original Developer ID Node runtime, unsigned package; not notarized", "existingTargets": "refused, including identical bundles",
                     "automaticActions": [], "verification": ["driver host tests and test-hook variant", "signed input snapshot equality",
-                    "ARM64/macOS12 executable metadata", "exact payload whitelist and AppleDouble bounds", "expanded bundle hashes and signatures",
-                    "bundle identifiers, RNNoise notice and fixed install locations", "relocation disabled", "single reviewed preinstall, no postinstall", "unsigned package"]}
+                    "ARM64/macOS13.5 app and macOS12 driver executable metadata", "exact payload whitelist and AppleDouble bounds", "expanded bundle hashes and signatures",
+                    "bundle identifiers, RNNoise and complete Node notices, pinned Node provenance/signature and fixed install locations", "relocation disabled", "single reviewed preinstall, no postinstall", "unsigned package"]}
         (output / "package-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
         (output / "preinstall-review.txt").write_text(preinstall)
         print("Package:", destination)

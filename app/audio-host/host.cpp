@@ -592,6 +592,7 @@ int main(int argc, char **argv) {
                         throw std::invalid_argument("Repeated or incomplete accent option");
                     const std::string value=argv[i];
                     if (flag=="--accent-node") accentSettings.nodePath=value;
+                    else if (flag=="--accent-node-sha256") accentSettings.nodeSha256=value;
                     else if (flag=="--accent-worker") accentSettings.workerPath=value;
                     else if (flag=="--accent-addon") accentSettings.addonPath=value;
                     else if (flag=="--accent-model") accentSettings.modelPath=value;
@@ -695,7 +696,7 @@ int main(int argc, char **argv) {
                 provider.installedSpeaker = std::move(speakerSettings);
             }
             if (!accentFlags.empty()) {
-                if (accentFlags.size()!=7 || microphone || installedProvider || installedAEC)
+                if (accentFlags.size()!=8 || microphone || installedProvider || installedAEC)
                     throw std::invalid_argument("Accent requires all runtime options and microphone NC/AEC disabled");
                 (void)accent_engine::buildInstalledAccentLaunch(accentSettings,{});
                 provider.installedAccent=std::move(accentSettings);

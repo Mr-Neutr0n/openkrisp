@@ -7,7 +7,7 @@ static InstalledWorkerSettings settings() {
     s.nodePath="/runtime/node";s.workerPath="/package/audio_worker.cjs";
     s.addonPath="/installed/a\"b\\c\t\n\x01/é.node";s.modelPath="/installed/model";
     s.adapterPath="/package/adapter";s.libraryPath="/installed/libraries";
-    s.nodeSha256=std::string(64,'a');s.adapterSha256=std::string(64,'b');
+    s.nodeSha256="1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";s.adapterSha256=std::string(64,'b');
     s.suppressionLevel=37.5;s.bypass=true;return s;
 }
 int main(int argc,char** argv) {
@@ -57,6 +57,12 @@ int main(int argc,char** argv) {
     }
     for(auto member:{&InstalledWorkerSettings::nodeSha256,&InstalledWorkerSettings::adapterSha256})for(const auto& invalid:{std::string(64,'A'),std::string(63,'a'),std::string(64,'g')}) {
         auto bad=s;bad.*member=invalid;bool rejected=false;try{buildInstalledWorkerLaunch(bad,token);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);
+    }
+    {
+        auto selected=s;selected.nodeSha256=bundledNodeSHA256;
+        assert(buildInstalledWorkerLaunch(selected,token).expectedReadyLine.ends_with(std::string(bundledNodeSHA256)+"\n"));
+        selected.nodeSha256=std::string(64,'a');bool rejected=false;
+        try{buildInstalledWorkerLaunch(selected,token);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);
     }
     for(double invalid:{-1.,101.,std::numeric_limits<double>::infinity(),std::numeric_limits<double>::quiet_NaN()}) {
         auto bad=s;bad.suppressionLevel=invalid;bool rejected=false;try{buildInstalledWorkerLaunch(bad,token);}catch(const std::invalid_argument&){rejected=true;}assert(rejected);

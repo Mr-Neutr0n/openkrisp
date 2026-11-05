@@ -11,7 +11,7 @@ static krisp_probe::InstalledWorkerSettings settings() {
     s.nodePath="/fixture/node"; s.workerPath="/fixture/worker";
     s.addonPath="/fixture/addon"; s.modelPath="/fixture/model";
     s.adapterPath="/fixture/adapter"; s.libraryPath="/fixture/library";
-    s.nodeSha256=std::string(64,'a'); s.adapterSha256=std::string(64,'b'); return s;
+    s.nodeSha256="1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"; s.adapterSha256=std::string(64,'b'); return s;
 }
 static InstalledNoiseAdapter::WorkerFactory fixture(const char* node,const char* script,const char* mode) {
     return [=](krisp_probe::WorkerLaunchConfig built,std::string& error,krisp_probe::ProviderBufferingConfig buffering) {
@@ -57,7 +57,7 @@ int main(int argc,char** argv) {
         assert(adapter && error.empty() && adapter->healthy());
         assert(adapter->maximumCallbackFrames()==512 && adapter->actualDelaySamples()==1440);
         assert(adapter->speakerNoiseEnabled()==speakerEnabled);
-        assert(adapter->nodeSha256()==std::string(64,'a') && adapter->adapterSha256()==std::string(64,'b'));
+        assert(adapter->nodeSha256()=="1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040" && adapter->adapterSha256()==std::string(64,'b'));
         NoiseAdapter reference(false,speakerEnabled);
         std::array<float,480> mic{},feed{},discard{};
         std::array<float,960> monitor{},playback{},expectedPlayback{};

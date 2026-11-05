@@ -12,7 +12,7 @@ app = root / ".build" / "app" / "Lab Voice.app"
 with (app / "Contents" / "Info.plist").open("rb") as handle:
     info = plistlib.load(handle)
 assert info["CFBundleIdentifier"] == "dev.labvoice.desktop"
-assert info["LSMinimumSystemVersion"] == "12.0"
+assert info["LSMinimumSystemVersion"] == "13.5"
 assert info["CFBundleExecutable"] == "LabVoice"
 assert info["NSSpeechRecognitionUsageDescription"].strip()
 assert info["NSMicrophoneUsageDescription"].strip()
@@ -40,7 +40,7 @@ def verify_worker(resources):
     manifest = json.loads((worker / "runtime-manifest.json").read_text())
     assert set(manifest) == {"schemaVersion", "nodeSha256", "files"}
     assert manifest["schemaVersion"] == 1
-    assert manifest["nodeSha256"] == "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+    assert manifest["nodeSha256"] == "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4"
     assert set(manifest["files"]) == names
     for name, digest in manifest["files"].items():
         assert digest == hashlib.sha256((worker / name).read_bytes()).hexdigest()
@@ -54,7 +54,7 @@ def verify_worker(resources):
 def verify_aec_worker(resources):
     helper_dir = resources / "helper"
     assert helper_dir.is_dir() and not helper_dir.is_symlink()
-    assert {file.name for file in helper_dir.iterdir()} == {"audio-host", "notices", "installed-worker", "aec-worker", "accent-worker"}
+    assert {file.name for file in helper_dir.iterdir()} == {"audio-host", "notices", "installed-worker", "aec-worker", "accent-worker", "node-runtime"}
     worker_dir = helper_dir / "aec-worker"
     assert worker_dir.is_dir() and not worker_dir.is_symlink()
     assert {file.name for file in worker_dir.iterdir()} == {"aec-worker", "runtime-manifest.json"}
@@ -80,7 +80,7 @@ def verify_accent_worker(resources):
     manifest = json.loads((worker / "runtime-manifest.json").read_text())
     assert set(manifest) == {"schemaVersion", "nodeSha256", "files"}
     assert manifest["schemaVersion"] == 1
-    assert manifest["nodeSha256"] == "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+    assert manifest["nodeSha256"] == "533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4"
     assert set(manifest["files"]) == names
     for name, digest in manifest["files"].items():
         assert digest == hashlib.sha256((worker / name).read_bytes()).hexdigest()
@@ -91,6 +91,7 @@ def verify_accent_worker(resources):
     assert subprocess.check_output(["lipo", "-archs", str(adapter)], text=True).strip() == "arm64"
     assert "minos 12.0" in subprocess.check_output(["otool", "-l", str(adapter)], text=True)
 
+subprocess.run([str(root.parent / "node-runtime" / "verify"), "--runtime", str(app / "Contents" / "Resources" / "helper" / "node-runtime")], check=True)
 verify_accent_worker(app / "Contents" / "Resources")
 verify_aec_worker(app / "Contents" / "Resources")
 verify_worker(app / "Contents" / "Resources")
@@ -108,11 +109,12 @@ with tempfile.TemporaryDirectory(prefix="labvoice-bundle-check-") as temporary:
     verify_worker(relocated / "Contents" / "Resources")
     verify_aec_worker(relocated / "Contents" / "Resources")
     verify_accent_worker(relocated / "Contents" / "Resources")
+    subprocess.run([str(root.parent / "node-runtime" / "verify"), "--runtime", str(relocated / "Contents" / "Resources" / "helper" / "node-runtime")], check=True)
     # Only metadata listing is allowed here. Never run --route or request mic access.
     devices = json.loads(subprocess.check_output([str(relocated_helper), "--list"], text=True))
     assert devices["operation"] == "read_only_inventory"
     assert len(devices["companion_devices"]) == 2
-print("Verified ARM64 bundle, macOS 12 deployment target, metadata, and ad-hoc signature.")
+print("Verified ARM64 bundle, macOS 13.5 app minimum and macOS 12 owned-binary deployment target, metadata, and ad-hoc signature.")
 print("Headless resource check passed. No UI launch, visual QA, or interactive workflow tests performed.")
 print("Own installed-worker and AEC worker resources, signed executable digests and fixed external library identities verified after relocation. No installed vendor assets loaded.")
 print("Controller tests use injected permission, recognition and route processes. No OS prompt, recognition or live route ran.")

@@ -37,7 +37,7 @@ int main(int argc,char** argv) {
         settings.nodePath="/fixture/node";settings.workerPath="/fixture/worker";
         settings.addonPath="/fixture/addon";settings.modelPath="/fixture/model";
         settings.adapterPath="/fixture/adapter";settings.libraryPath="/fixture/lib";
-        settings.nodeSha256=std::string(64,'a');settings.adapterSha256=std::string(64,'b');
+        settings.nodeSha256="1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040";settings.adapterSha256=std::string(64,'b');
         settings.modelRole=role;settings.modelSha256=installedModelSha256(role);
         auto c=config(argv[1],argv[2],"normal");
         c.expectedReadyLine=buildInstalledWorkerLaunch(settings,c.token).expectedReadyLine;

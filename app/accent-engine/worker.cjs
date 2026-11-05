@@ -4,12 +4,13 @@
 const fs = require('node:fs');
 const identity = require('./identity.cjs');
 const wire = require('./wire.cjs');
-const KEYS = ['addonPath', 'modelPath', 'adapterPath', 'adapterSHA256', 'direction', 'token', 'parentPID'];
+const KEYS = ['addonPath', 'modelPath', 'adapterPath', 'adapterSHA256', 'direction', 'token', 'parentPID', 'nodeSHA256'];
 function config(value) {
     if (!value || Array.isArray(value) || Object.keys(value).length !== KEYS.length ||
         KEYS.some(key => !Object.hasOwn(value, key))) throw Error('Invalid AR configuration keys');
     for (const key of ['addonPath', 'modelPath', 'adapterPath']) identity.absolute(value[key], key);
     identity.digest(value.adapterSHA256, 'adapterSHA256');
+    identity.reviewedNode(value.nodeSHA256);
     if (!Object.hasOwn(identity.MODELS, value.direction) || !/^[0-9a-f]{32}$/.test(value.token) ||
         !Number.isInteger(value.parentPID) || value.parentPID <= 1 || value.parentPID > 2147483647)
         throw Error('Invalid AR direction, token or parent PID');
@@ -84,7 +85,7 @@ async function runWorker(value, dependencies = {}) {
         if (typeof session?.process !== 'function' || typeof session.close !== 'function') throw Error('Invalid AR session');
         const write = dependencies.write || (bytes => fs.writeSync(3, bytes, 0, bytes.length, null));
         const read = dependencies.read || (bytes => fs.readSync(0, bytes, 0, bytes.length, null));
-        writeAll(write, Buffer.from(`OKARREADY1 ${value.token} accent-direct 48000 480 ${value.direction} us ${identity.ADDON} ${identity.MODELS[value.direction].sha256} ${value.adapterSHA256} ${identity.NODE}\n`, 'ascii'));
+        writeAll(write, Buffer.from(`OKARREADY1 ${value.token} accent-direct 48000 480 ${value.direction} us ${identity.ADDON} ${identity.MODELS[value.direction].sha256} ${value.adapterSHA256} ${value.nodeSHA256}\n`, 'ascii'));
         return runSession({ token: Buffer.from(value.token, 'hex'), read, write, session,
             afterClose() { identity.unchanged(before, identify(value)); } });
     } finally {

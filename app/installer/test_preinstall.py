@@ -15,13 +15,21 @@ with tempfile.TemporaryDirectory(prefix="openkrisp-installer-guard-") as tempora
         "/Library/Audio/Plug-Ins/HAL/LabVoiceAudio.driver", str(driver))
     assert text.count(str(app)) == text.count(str(driver)) == 1
     script = root / "preinstall"
-    script.write_text(text)
-    script.chmod(0o755)
-    def result(volume="/"):
+    version_command = "version=$(/usr/bin/sw_vers -productVersion)"
+    assert text.count(version_command) == 1
+    def result(volume="/", version="13.5"):
+        script.write_text(text.replace(version_command, "version='" + version + "'"))
+        script.chmod(0o755)
         return subprocess.run([str(script), "fixture", "fixture", volume], capture_output=True, text=True)
     assert result().returncode == 0
     assert result("/Volumes/Other").returncode == 1
     checks = 2
+    for version in ["12.7.6", "13.4.1", "13", "invalid", "13:5.4", "13.5:0"]:
+        assert result(version=version).returncode == 1
+        checks += 1
+    for version in ["13.5", "13.5.1", "14.0", "26.1"]:
+        assert result(version=version).returncode == 0
+        checks += 1
     for target in [app, driver]:
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text("retained content")

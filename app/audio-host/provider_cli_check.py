@@ -10,7 +10,7 @@ complete = ['--microphone-noise-suppression', '--microphone-provider', 'installe
 for flag in ['node', 'worker', 'addon', 'model', 'adapter', 'library']:
     complete += ['--provider-' + flag, '/fixture/' + flag]
 for flag in ['node-sha256', 'adapter-sha256']:
-    complete += ['--provider-' + flag, 'a' * 64]
+    complete += ['--provider-' + flag, '1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040' if flag == 'node-sha256' else 'a' * 64]
 cases = [
     (complete + ['--provider-model-role', 'inbound'], 'Unsupported microphone model role'),
     (complete + ['--provider-model-role', 'unknown'], 'Unsupported microphone model role'),

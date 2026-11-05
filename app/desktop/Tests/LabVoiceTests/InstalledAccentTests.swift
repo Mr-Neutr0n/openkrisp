@@ -31,6 +31,11 @@ final class AccentResolverTests: XCTestCase {
         let resolver = InstalledAccentResolver()
         let admitted = try await resolver.resolve(app: app,node: node,model: model,runtime: runtime,hash: hash)
         XCTAssertEqual(admitted.modelPath,model.path); XCTAssertEqual(admitted.adapterSHA256,digest)
+        XCTAssertEqual(admitted.selectedNodeSHA256,InstalledNodeRuntime.bundledSHA256)
+        let retained = try await resolver.resolve(app: app,node: node,model: model,runtime: runtime,hash: { url in
+            url == node ? InstalledNodeRuntime.homebrewSHA256 : try hash(url)
+        })
+        XCTAssertEqual(retained.selectedNodeSHA256,InstalledNodeRuntime.homebrewSHA256)
         do {
             _ = try await resolver.resolve(app: app,node: node,model: root.appendingPathComponent("renamed.kef"),runtime: runtime,hash: { _ in InstalledAccentConfiguration.modelSHA256 })
             XCTFail("Admitted a filename the worker will reject")
@@ -56,7 +61,7 @@ final class AccentStartupTests: XCTestCase {
          "accent_node_sha256": InstalledAccentConfiguration.nodeSHA256,
          "accent_adapter_sha256": accentFixture().adapterSHA256,
          "accent_sample_rate": 48000, "accent_frame_samples": 480, "accent_scheduling_budget_frames": 2,
-         "accent_maximum_callback_frames": 512, "accent_transport_delay_samples": 2400, "accent_empty_policy": "silence-time-slot"]
+         "accent_maximum_callback_frames": 512, "accent_current_callback_frames": 512, "accent_transport_delay_samples": 2400, "accent_empty_policy": "silence-time-slot"]
     }
     func testSeparateExactAdmissionAndUnexpectedFields() throws {
         let options = AudioRouteOptions(inputUID: "mic", outputUID: "speaker", microphoneNoise: false, speakerNoise: false, installedAccent: accentFixture())
@@ -64,6 +69,13 @@ final class AccentStartupTests: XCTestCase {
             try JSONDecoder().decode(AudioStartup.self, from: JSONSerialization.data(withJSONObject: value)).matches(options)
         }
         XCTAssertTrue(try matches(acknowledgment()))
+        var alternate = accentFixture(); alternate.selectedNodeSHA256 = InstalledNodeRuntime.homebrewSHA256
+        let alternateOptions = AudioRouteOptions(inputUID: "mic",outputUID: "speaker",microphoneNoise: false,speakerNoise: false,installedAccent: alternate)
+        XCTAssertFalse(try JSONDecoder().decode(AudioStartup.self,from: JSONSerialization.data(withJSONObject: acknowledgment())).matches(alternateOptions))
+        var alternateAck = acknowledgment(); alternateAck["accent_node_sha256"] = alternate.selectedNodeSHA256
+        XCTAssertTrue(try JSONDecoder().decode(AudioStartup.self,from: JSONSerialization.data(withJSONObject: alternateAck)).matches(alternateOptions))
+        alternate.selectedNodeSHA256 = String(repeating: "a",count: 64)
+        XCTAssertFalse(AudioRouteOptions(inputUID: "mic",outputUID: "speaker",microphoneNoise: false,speakerNoise: false,installedAccent: alternate).validProviderRoles)
         for (field, value) in [("accent_direction", "inbound"), ("accent_target", "uk"), ("accent_model_sha256", "wrong"),
                                ("accent_empty_policy", "drop"), ("accent_unexpected", "x"), ("provider_model_role", "outbound")] {
             var changed = acknowledgment(); changed[field] = value; XCTAssertFalse(try matches(changed))

@@ -14,6 +14,7 @@ const MODEL_IDENTITIES = Object.freeze({outbound:MODEL_SHA256,inbound:INBOUND_MO
 // EPERM is only a prerequisite, not proof of full isolation. Hashing precedes
 // require/native.open path reopening and does not atomically bind loaded images.
 // Caller owns fd0 requests, fd3 responses, fd1/2 redirection and kill deadlines.
+const REVIEWED_NODES = new Set(['533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4','1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040']);
 const KEYS = ['addonPath','modelPath','adapterPath','adapterSha256','nodeSha256','token','suppressionLevel','bypass','parentPID','modelRole','modelSha256'];
 function validateConfig(config) {
   if (!config || typeof config !== 'object' || Array.isArray(config) || Object.keys(config).length !== KEYS.length || KEYS.some(k=>!Object.hasOwn(config,k))) throw new Error('Invalid config keys');
@@ -21,6 +22,7 @@ function validateConfig(config) {
   if (typeof config.modelRole !== 'string' || !Object.hasOwn(MODEL_IDENTITIES,config.modelRole) ||
       config.modelSha256 !== MODEL_IDENTITIES[config.modelRole]) throw new Error('Model role and SHA256 mismatch');
   for (const key of ['adapterSha256','nodeSha256','modelSha256']) if (typeof config[key] !== 'string' || !/^[0-9a-f]{64}$/.test(config[key])) throw new Error('Invalid SHA256');
+  if (!REVIEWED_NODES.has(config.nodeSha256)) throw new Error('Unreviewed Node SHA256');
   if (typeof config.token !== 'string' || !/^[0-9a-f]{32}$/.test(config.token)) throw new Error('Invalid token');
   if (typeof config.bypass !== 'boolean' || !Number.isFinite(config.suppressionLevel) || config.suppressionLevel<0 || config.suppressionLevel>100) throw new Error('Invalid processing options');
   if (!Number.isInteger(config.parentPID) || config.parentPID <= 1 || config.parentPID > 2147483647) throw new Error('Invalid expected parent PID');

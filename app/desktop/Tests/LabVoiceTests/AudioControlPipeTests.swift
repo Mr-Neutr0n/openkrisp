@@ -53,6 +53,44 @@ import Foundation
         let ended = await child.waitForExit(timeoutNanoseconds: 2_000_000_000)
         XCTAssertTrue(ended)
     }
+    func testTerminateLetsHelperCloseItsOwnedWorker() async throws {
+        let child = SystemAudioHelperChild(url: URL(fileURLWithPath: "/usr/bin/python3"))
+        var rows: [String] = [], result: HelperExit?
+        // The grandchild must remain alive until the helper sends close and
+        // receives its acknowledgment. Group SIGTERM reproduces the GUI bug.
+        let script = """
+        import signal,subprocess,sys,time
+        stopping=False
+        def stop(signum,frame):
+         global stopping
+         stopping=True
+        signal.signal(signal.SIGTERM,stop)
+        worker=subprocess.Popen([sys.executable,'-u','-c',"import sys; print('ready',flush=True); assert sys.stdin.readline().strip()=='close'; print('closed',flush=True)"],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)
+        assert worker.stdout.readline().strip()=='ready'
+        print('ready',flush=True)
+        sys.stdin.read()
+        while not stopping:time.sleep(.001)
+        time.sleep(.05)
+        try:
+         worker.stdin.write('close\\n');worker.stdin.flush();worker.stdin.close()
+         output=worker.stdout.read();status=worker.wait(timeout=2)
+        except Exception:
+         output='';status=worker.wait(timeout=2)
+        okay=status==0 and output.strip()=='closed'
+        print('worker_closed' if okay else 'worker_close_failed',flush=True)
+        sys.exit(0 if okay else 1)
+        """
+        try child.launch(arguments: ["-u", "-c", script], line: { rows.append($0) }, exit: { result = $0 })
+        defer { child.terminate() }
+        try await wait { rows.contains("ready") }
+        child.terminate()
+        let ended = await child.waitForExit(timeoutNanoseconds: 5_000_000_000)
+        XCTAssertTrue(ended)
+        let event = try XCTUnwrap(result)
+        XCTAssertEqual(event.status, 0, event.diagnostic)
+        XCTAssertTrue(rows.contains("worker_closed"))
+        XCTAssertFalse(child.running)
+    }
     func testSwiftSnapshotAgainstActualCppControlProtocol() async throws {
         let desktop = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let fixture = desktop.deletingLastPathComponent().appendingPathComponent("audio-host/build/control-wire-fixture")

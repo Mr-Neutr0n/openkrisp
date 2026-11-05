@@ -45,8 +45,10 @@ requires a new session. The worker loads these owned resources together:
 - `identity.cjs`
 - `accent-probe.node`, built from `native_probe.cpp`
 
-The existing reviewed Node executable and external library directory are also
-needed. No original dependency is copied by this component. The caller clears
+An exact reviewed Node executable and the external Krisp library directory are
+also needed. Desktop packaging defaults to the signed official runtime from
+`../node-runtime`; the reviewed Homebrew identity remains a separate option.
+No original Krisp dependency is copied by this component. The caller clears
 the environment; the launch builder permits only `PATH` and the required
 `DYLD_LIBRARY_PATH` inside the deny-network sandbox.
 

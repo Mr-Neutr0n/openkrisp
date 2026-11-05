@@ -47,9 +47,9 @@ assert.throws(() => execute(complete, { session: {
 } }), /Invalid AR native/);
 assert.equal(closedOnFailure, 1);
 const validConfig = { addonPath: '/external/addon', modelPath: '/external/model', adapterPath: '/owned/adapter',
-    adapterSHA256: 'a'.repeat(64), direction: 'outbound', token: token.toString('hex'), parentPID: 123 };
+    adapterSHA256: 'a'.repeat(64), nodeSHA256: require('./identity.cjs').NODE, direction: 'outbound', token: token.toString('hex'), parentPID: 123 };
 assert.equal(worker.config(validConfig).direction, 'outbound');
-for (const change of [{ direction: 'outbound-hvc-lfb' }, { token: 'bad' }, { parentPID: 0 }, { arbitrary: true }])
+for (const change of [{ nodeSHA256: 'a'.repeat(64) }, { direction: 'outbound-hvc-lfb' }, { token: 'bad' }, { parentPID: 0 }, { arbitrary: true }])
     assert.throws(() => worker.config({ ...validConfig, ...change }));
 async function main() {
     let loaded = 0;

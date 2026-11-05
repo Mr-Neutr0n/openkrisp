@@ -127,17 +127,18 @@ actor InstalledNCResolver {
         guard lstat(manifestURL.path, &manifestStat) == 0, manifestStat.st_mode & S_IFMT == S_IFREG,
               manifestStat.st_size > 0, manifestStat.st_size <= 65536 else { throw InstalledNCError.invalid("Packaged runtime manifest is missing or invalid.") }
         let manifest = try JSONDecoder().decode(InstalledRuntimeManifest.self, from: Data(contentsOf: manifestURL))
-        guard manifest.schemaVersion == 1, manifest.nodeSha256 == InstalledNCConfiguration.reviewedNodeSHA256,
+        guard manifest.schemaVersion == 1, manifest.nodeSha256 == InstalledNodeRuntime.bundledSHA256,
               Set(manifest.files.keys) == Self.runtimeFiles,
               manifest.files.values.allSatisfy({ $0.count == 64 && $0.allSatisfy { "0123456789abcdef".contains($0) } }) else { throw InstalledNCError.invalid("Packaged runtime identity is unsupported.") }
         for filename in Self.runtimeFiles {
             guard try hash(runtime.appendingPathComponent(filename)) == manifest.files[filename] else { throw InstalledNCError.invalid("Packaged worker file failed SHA256 validation: \(filename)") }
         }
-        guard try hash(resolvedNode) == manifest.nodeSha256 else { throw InstalledNCError.invalid("Choose the reviewed Node runtime. Its SHA256 does not match.") }
+        let selectedNodeSHA256 = try hash(resolvedNode)
+        guard InstalledNodeRuntime.reviewedSHA256.contains(selectedNodeSHA256) else { throw InstalledNCError.invalid("The audio runtime SHA256 is not reviewed.") }
         guard try hash(addon) == InstalledNCConfiguration.addonSHA256 else { throw InstalledNCError.invalid("The installed addon is not the reviewed version.") }
         guard try hash(model) == role.modelSHA256 else { throw InstalledNCError.invalid("The exact \(role.rawValue) NC model is missing or changed.") }
         return InstalledNCConfiguration(nodePath: resolvedNode.path, workerPath: runtime.appendingPathComponent("audio_worker.cjs").path,
             addonPath: addon.path, modelPath: model.path, adapterPath: runtime.appendingPathComponent("native-probe.node").path,
-            libraryPath: library.path, nodeSHA256: manifest.nodeSha256, adapterSHA256: manifest.files["native-probe.node"]!, modelRole: role)
+            libraryPath: library.path, nodeSHA256: selectedNodeSHA256, adapterSHA256: manifest.files["native-probe.node"]!, modelRole: role)
     }
 }

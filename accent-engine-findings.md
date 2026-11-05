@@ -36,7 +36,7 @@ catalog entries in the current archive, not model-filename interpretation.
 This pass did not establish every original variant, user eligibility,
 download decision, headset restriction or currently active desktop setting.
 The local use of installed files does not establish redistribution rights.
-The product contains neither model nor vendor binary.
+The product distributes no Krisp model or original Krisp binary.
 
 ## Native contract
 
@@ -195,6 +195,87 @@ sample sounds better, preserves identity or reaches the declared US accent.
 Those judgments need human listening. No playback or real call was performed.
 The generated audio remains private.
 
+## Selected synthetic website samples
+
+The user informally reported that the Raj conversion sounds great, but that
+its source sounds only mildly Indian. This is one listener's file-sample
+feedback, not a blinded score, real call or full acoustic parity result.
+The user then selected both of these additional fixed-script pairs for the
+website:
+
+| Source | Voice / model | Metadata selection basis | Source duration | Converted RMS / peak | REA Evidence |
+| --- | --- | --- | ---: | ---: | --- |
+| Muthu | `uBy7Ka07RtFbWRbno0s3` / `eleven_multilingual_v2` | Library description specifies thick Tamil accent; verified English `en-IN` | 12.910 s | 0.05171 / 0.51859 | `ev_7968776f9b1ad2ea97730af2f2d1a51609a8dd92d8ee5a8896d89a9f40a2d117` |
+| Priyanka | `T536A2SFCG4AEDVTRucQ` / `eleven_multilingual_v2` | Hindi-primary account voice; selected multilingual model supported | 12.678 s | 0.07928 / 0.85600 | `ev_0c1cc05d8bbc295d4705bdf3dea17d9a750cae97beb86aee25d7ebf0b0eea464` |
+
+Each source used one 195-character request and the same non-sensitive sales
+script. No recordings were uploaded and no new voice clone was created.
+Both complete sources were resampled to mono 48 kHz and padded with trailing
+zeros to 15 seconds. Both converted outputs contain 1,499 native frames,
+719,520 finite samples, one explicit empty startup reply and zero clipped
+samples. Each run confirms teardown, exits 0, verifies owned-group cleanup
+and removes its temporary root. Muthu retains unrelated platform-process
+attribution limits; Priyanka has fully verified recorded cleanup.
+
+The four selected web MP3s are mono 48 kHz, 128 kbps. The originals decode
+to 720,000 samples and the converted files to 719,520. No gain normalization,
+speech cut, time stretch or delay compensation was applied. This is a
+synthetic file demonstration of the local adapter, not a live call or the
+full original Krisp graph. Playback is user initiated. The private handoff
+manifest retains source/output/content hashes, voice settings, REA identities,
+the user selection and publication authorization. Its SHA256 is
+`f6bfcc57d271768d5cda62a1820754884048947594dde4afabffa7d6dd03ce65`.
+Raw audio remains outside the public product repository.
+
+The [official publishing rules](https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform)
+permit paid-plan non-Beta output for commercial use subject to the required
+rights, terms and use policy. Subscription inspection returned
+`401 missing_permissions`; no private billing/account fields were retained.
+The user supplied account/rights assurance and explicitly authorized these
+website demos. The exact API tier remains technically unverified. That
+record does not establish redistribution rights for the installed original
+models or SDK.
+
+## Official Node runtime compatibility
+
+The official signed ARM64 Node 26.13.0 binary is preserved byte-for-byte with
+SHA256 `533bd644c5ae0e0ea3a80e433aad16b817447ccba1e1eea701875eac80cb75d4`,
+147,346,864 bytes. Installer provenance records signed release checksums,
+the original Node.js Foundation signature, license and minimum macOS 13.5.
+The initial runtime tests used private candidate Node identity gates and
+left product admission unchanged. The original native addon, models and
+owned adapters still pass their exact identity checks.
+
+| Runtime/model case | REA Evidence | Output on ten-second fixture |
+| --- | --- | --- |
+| AR outbound | `ev_fc16299ee5b56e44a74eee64d3b081e07eeed7f0188a7124a6b478b2b96f577a` | 999 frames, byte-identical to reviewed Homebrew output |
+| AR inbound | `ev_0df679d2c6e0b20b414c01ca68def3b347cb9dccb96db86e1bfdc0936dec91e1` | 999 frames, byte-identical to reviewed Homebrew output |
+| Ordinary NC outbound | `ev_39771790f0884d2fda3453b157ed01f2ace82897e0e2e2af06490ce6e385a72b` | 1,000 frames, 480,000 finite samples |
+| Ordinary NC inbound | `ev_a4da4984fb998e55390fa6e3ed5490330093be468e6870c74a8e97c8455fcc15` | 1,000 frames, 480,000 finite samples |
+| NC-ABI `outbound-hvc-lfb` candidate | `ev_426ef41437099b4c3b305520e81b1e8df0aad5b182677660d4e17ee06c04c1e4` | 1,000 frames, 480,000 finite samples |
+
+All five captures exit 0, confirm native teardown, retain raw terminal output
+and verify owned process-group cleanup and temporary-root removal. Recorded
+unrelated platform-process attribution limits remain. The HVC case uses the
+exact model `hs.c6.f.m.75df8f.berlin.kef`, SHA256
+`54e2913ea45734adc3323407e43f55b14afade256ab4da6226c2b6e30604cbf4`.
+It proves that candidate role on this runtime, not the full original desktop
+BVC dispatch or competing-speaker quality. ASR, other roles, sustained live
+load and every supported macOS version are outside this runtime test.
+The private five-role summary SHA256 is
+`6f3d7b9632c992934bd6e7ddea04c8cc9d1b62fd19a708cf0168bc033d30bc76`.
+
+The later packaged helper uses the bundled official runtime and passes
+physical microphone → outbound AR → virtual microphone → FFmpeg under REA
+`ev_1a827ac347c30579f706125930ae054cc3b5d976ade64d595f7abea31f9eea36`.
+Both processes exit 0, teardown completes, one explicit native-empty result
+is reported and no transport fault occurs. The startup acknowledgment declares a current 512-sample HAL callback
+quantum, separate from the 480-sample native processing contract. The
+reported 5,760-sample host scheduling buffer is 120 ms and is distinct from
+model delay. This is physical-route acceptance. GUI AR validation and Start
+remain unverified after file-picker automation timed out. No remote call
+or live human speech-quality acceptance follows from it.
+
 ## Worker and host integration
 
 The separate C++ API and exact readiness identity are documented in
@@ -275,9 +356,8 @@ The model catalog now records both current AR hashes, and its release build
 passes. Local Command Line Tools still lack XCTest, so its updated Swift
 test was not run here.
 
-Remaining acceptance includes live route integration, default-off UI and
-clear provider admission, speech listening by a person, real microphone and
-call samples, source/target variant coverage, sustained CPU/deadline behavior,
+Remaining acceptance includes GUI AR Start, real-call speech and accent
+quality, source/target variant coverage, sustained CPU/deadline behavior,
 headset restrictions, tail behavior and comparison with the full original
 desktop workflow. Offline AR execution closes a concrete implementation gap;
 it does not close the accent feature family or full retained-feature parity.

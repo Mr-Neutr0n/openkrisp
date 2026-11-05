@@ -51,6 +51,9 @@ struct AudioRouteOptions: Equatable, Sendable {
     var installedAEC: InstalledAECConfiguration? = nil
     var installedAccent: InstalledAccentConfiguration? = nil
     var validProviderRoles: Bool {
+        (installedProvider == nil || InstalledNodeRuntime.reviewedSHA256.contains(installedProvider!.nodeSHA256)) &&
+        (installedSpeakerProvider == nil || InstalledNodeRuntime.reviewedSHA256.contains(installedSpeakerProvider!.nodeSHA256)) &&
+        (installedAccent == nil || InstalledNodeRuntime.reviewedSHA256.contains(installedAccent!.selectedNodeSHA256)) &&
         (installedProvider == nil || (microphoneNoise && (installedProvider?.modelRole == .outbound || installedProvider?.modelRole == .outboundHVC))) &&
         (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound)) &&
         !(installedAEC != nil && installedProvider?.modelRole == .outboundHVC) &&
@@ -410,7 +413,12 @@ enum AudioHelperError: Error, LocalizedError {
     private func closeInput() { try? input?.close(); input = nil }
     func terminate() {
         closeInput()
-        if let process, process.isRunning { process.terminate() }
+        // Foundation's terminate() signals this child's process group on macOS.
+        // The helper owns worker close/ACK/reaping. Signal only the helper so
+        // its workers remain alive until that bounded teardown completes.
+        if let process, process.isRunning, process.processIdentifier > 1 {
+            _ = Darwin.kill(process.processIdentifier, SIGTERM)
+        }
     }
     func waitForExit(timeoutNanoseconds: UInt64) async -> Bool {
         let start = DispatchTime.now().uptimeNanoseconds

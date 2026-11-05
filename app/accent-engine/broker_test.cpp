@@ -40,6 +40,14 @@ int main(int argc,char** argv) {
         settings.adapterPath="/fixture/adapter";settings.libraryPath="/fixture/lib";
         settings.adapterSha256=std::string(64,'b');settings.direction=direction;
         auto c=config(argv[1],argv[2],"normal");
+        for (const auto* digest : {nodeSHA256,homebrewNodeSHA256}) {
+            settings.nodeSha256=digest;
+            assert(buildInstalledAccentLaunch(settings,c.token).expectedReadyLine.ends_with(std::string(digest)+"\n"));
+        }
+        settings.nodeSha256=std::string(64,'a');
+        bool rejected=false;
+        try { (void)buildInstalledAccentLaunch(settings,c.token); } catch(const std::invalid_argument&) { rejected=true; }
+        assert(rejected); settings.nodeSha256=nodeSHA256;
         c.expectedReadyLine=buildInstalledAccentLaunch(settings,c.token).expectedReadyLine;
         c.arguments[2]=c.expectedReadyLine.substr(0,c.expectedReadyLine.size()-1);
         { WorkerBroker b(c);assert(b.start() && b.close());reaped(b.childPID()); }
