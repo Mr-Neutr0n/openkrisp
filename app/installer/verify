@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""Verify preflight fixtures and inspect a new package. Never install it."""
+from pathlib import Path
+import subprocess
+
+root = Path(__file__).resolve().parent
+subprocess.run(["python3", str(root / "test_preinstall.py")], check=True)
+subprocess.run([str(root / "package")], check=True)

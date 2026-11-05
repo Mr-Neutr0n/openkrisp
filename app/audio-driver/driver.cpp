@@ -18,12 +18,40 @@
 
 namespace {
 #ifdef LABVOICE_DISCOVERY_TRACE
-std::atomic<unsigned> traceCount{0};
+std::atomic<UInt64> traceCount{0};
+std::atomic<unsigned> traceFailureCount{0};
+struct TraceClient {
+    std::atomic<pid_t> pid{0};
+    std::atomic<unsigned> count{0};
+};
+TraceClient traceClients[16];
+bool traceClient(pid_t pid) {
+    if (pid <= 0) return false;
+    for (auto &client : traceClients) {
+        pid_t observed = client.pid.load(std::memory_order_relaxed);
+        if (observed == 0) {
+            client.pid.compare_exchange_strong(observed, pid, std::memory_order_relaxed);
+            if (observed == 0) observed = pid;
+        }
+        if (observed == pid)
+            return client.count.fetch_add(1, std::memory_order_relaxed) < 512;
+    }
+    return false;
+}
 void discoveryTrace(const char *operation, AudioObjectID id,
                     const AudioObjectPropertyAddress *address, UInt32 qualifierSize,
-                    const void *qualifier, OSStatus status, UInt32 size, const void *data) {
-    const unsigned index = traceCount.fetch_add(1);
-    if (index >= 512) return;
+                    const void *qualifier, OSStatus status, UInt32 size, const void *data,
+                    pid_t caller = 0) {
+    const UInt64 index = traceCount.fetch_add(1, std::memory_order_relaxed);
+    // Separate bounded budgets keep a late client and failed property reads
+    // observable after HAL's initial discovery. No audio IO calls this logger.
+    const bool clientEvent = traceClient(caller);
+    const bool failedRead = status != noErr &&
+        (std::strcmp(operation, "get") == 0 || std::strcmp(operation, "size") == 0 ||
+         std::strcmp(operation, "set") == 0);
+    const bool failureEvent = failedRead &&
+        traceFailureCount.fetch_add(1, std::memory_order_relaxed) < 256;
+    if (index >= 512 && !clientEvent && !failureEvent) return;
     UInt32 selectors[3]{};
     if (address) { selectors[0] = address->mSelector; selectors[1] = address->mScope; selectors[2] = address->mElement; }
     UInt32 classes[2]{}, values[4]{};
@@ -38,8 +66,8 @@ void discoveryTrace(const char *operation, AudioObjectID id,
         address->mSelector == kAudioObjectPropertyControlList))
         std::memcpy(values, data, std::min<size_t>(size, sizeof values));
     os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEFAULT,
-        "LVDiscovery n=%{public}u op=%{public}s id=%{public}u sel=%{public}08x scope=%{public}08x element=%{public}u qbytes=%{public}u q0=%{public}08x q1=%{public}08x status=%{public}d bytes=%{public}u v0=%{public}08x v1=%{public}08x v2=%{public}08x v3=%{public}08x",
-        index, operation, id, selectors[0], selectors[1], selectors[2], qualifierSize,
+        "LVDiscovery n=%{public}llu caller=%{public}d op=%{public}s id=%{public}u sel=%{public}08x scope=%{public}08x element=%{public}u qbytes=%{public}u q0=%{public}08x q1=%{public}08x status=%{public}d bytes=%{public}u v0=%{public}08x v1=%{public}08x v2=%{public}08x v3=%{public}08x",
+        index, caller, operation, id, selectors[0], selectors[1], selectors[2], qualifierSize,
         classes[0], classes[1], status, size, values[0], values[1], values[2], values[3]);
 }
 #define LV_TRACE(...) discoveryTrace(__VA_ARGS__)
@@ -278,8 +306,6 @@ OSStatus propertyValue(AudioObjectID id, const AudioObjectPropertyAddress *a, UI
                 return str(deviceUID(id));
             case kAudioDevicePropertyModelUID:
                 return str(CFSTR("dev.hari.labvoice.model.v1"));
-            case kAudioDevicePropertyTransportType:
-                return scalar(kAudioDeviceTransportTypeVirtual);
             case kAudioDevicePropertyDeviceIsAlive:
                 return scalar(1);
             case kAudioDevicePropertyDeviceIsRunning:
@@ -316,6 +342,8 @@ OSStatus propertyValue(AudioObjectID id, const AudioObjectPropertyAddress *a, UI
         if (global || scope == kAudioObjectPropertyScopeInput ||
             scope == kAudioObjectPropertyScopeOutput)
             switch (s) {
+            case kAudioDevicePropertyTransportType:
+                return scalar(kAudioDeviceTransportTypeVirtual);
             case kAudioDevicePropertyStreams: {
                 AudioObjectID sid = streamID(id);
                 return put(&sid, (global || direction) ? sizeof sid : 0);
@@ -376,10 +404,10 @@ OSStatus propertyValue(AudioObjectID id, const AudioObjectPropertyAddress *a, UI
 }
 OSStatus property(AudioObjectID id, const AudioObjectPropertyAddress *address, UInt32 qualifierSize,
                   const void *qualifier, UInt32 capacity, UInt32 *size, void *data,
-                  [[maybe_unused]] const char *operation) {
+                  [[maybe_unused]] const char *operation, [[maybe_unused]] pid_t caller) {
     const OSStatus status = propertyValue(id, address, qualifierSize, qualifier, capacity, size, data);
     LV_TRACE(operation, id, address, qualifierSize, qualifier, status,
-             (status == noErr && size) ? *size : 0, data);
+             (status == noErr && size) ? *size : 0, data, caller);
     return status;
 }
 ULONG addref(void *d) {
@@ -481,14 +509,14 @@ OSStatus config(AudioServerPlugInDriverRef d, AudioObjectID id, UInt64, void *) 
     return valid(d, id) || !device(id) ? kAudioHardwareBadObjectError
                                        : kAudioHardwareUnsupportedOperationError;
 }
-Boolean has(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t,
+Boolean has(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t caller,
             const AudioObjectPropertyAddress *a) {
     UInt32 n = 0;
     if (valid(d, id)) {
-        LV_TRACE("has", id, a, 0, nullptr, kAudioHardwareBadObjectError, 0, nullptr);
+        LV_TRACE("has", id, a, 0, nullptr, kAudioHardwareBadObjectError, 0, nullptr, caller);
         return false;
     }
-    return property(id, a, 0, nullptr, 0, &n, nullptr, "has") == noErr;
+    return property(id, a, 0, nullptr, 0, &n, nullptr, "has", caller) == noErr;
 }
 OSStatus settable(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t p,
                   const AudioObjectPropertyAddress *a, Boolean *out) {
@@ -499,31 +527,33 @@ OSStatus settable(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t p,
     *out = false;
     return noErr;
 }
-OSStatus size(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t,
+OSStatus size(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t caller,
               const AudioObjectPropertyAddress *a, UInt32 qs, const void *q, UInt32 *out) {
     if (valid(d, id)) {
-        LV_TRACE("size", id, a, qs, q, kAudioHardwareBadObjectError, 0, nullptr);
+        LV_TRACE("size", id, a, qs, q, kAudioHardwareBadObjectError, 0, nullptr, caller);
         return kAudioHardwareBadObjectError;
     }
-    return property(id, a, qs, q, 0, out, nullptr, "size");
+    return property(id, a, qs, q, 0, out, nullptr, "size", caller);
 }
-OSStatus get(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t,
+OSStatus get(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t caller,
              const AudioObjectPropertyAddress *a, UInt32 qs, const void *q, UInt32 n, UInt32 *out,
              void *data) {
     if (valid(d, id)) {
-        LV_TRACE("get", id, a, qs, q, kAudioHardwareBadObjectError, 0, nullptr);
+        LV_TRACE("get", id, a, qs, q, kAudioHardwareBadObjectError, 0, nullptr, caller);
         return kAudioHardwareBadObjectError;
     }
     if (!data) {
-        LV_TRACE("get", id, a, qs, q, kAudioHardwareIllegalOperationError, 0, nullptr);
+        LV_TRACE("get", id, a, qs, q, kAudioHardwareIllegalOperationError, 0, nullptr, caller);
         return kAudioHardwareIllegalOperationError;
     }
-    return property(id, a, qs, q, n, out, data, "get");
+    return property(id, a, qs, q, n, out, data, "get", caller);
 }
 OSStatus set(AudioServerPlugInDriverRef d, AudioObjectID id, pid_t p,
              const AudioObjectPropertyAddress *a, UInt32, const void *, UInt32, const void *) {
-    return has(d, id, p, a) ? kAudioHardwareUnsupportedOperationError
-                            : kAudioHardwareUnknownPropertyError;
+    const OSStatus status = has(d, id, p, a) ? kAudioHardwareUnsupportedOperationError
+                                            : kAudioHardwareUnknownPropertyError;
+    LV_TRACE("set", id, a, 0, nullptr, status, 0, nullptr, p);
+    return status;
 }
 OSStatus running(AudioServerPlugInDriverRef d, AudioObjectID id, UInt32 client, bool start) {
     if (valid(d, id) || !device(id))

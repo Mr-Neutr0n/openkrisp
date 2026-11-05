@@ -462,10 +462,10 @@ struct LibraryView: View {
         if CommandLine.arguments.contains("--verify-model-catalog") {
             do {
                 let models = try ModelCatalog.installedExpectations()
-                guard models.count == 11, models.filter({ $0.sha256 != nil }).count == 9 else {
+                guard models.count == 11, models.filter({ $0.sha256 != nil }).count == 11 else {
                     throw CatalogError.invalidManifest
                 }
-                print("Packaged model catalog resolved: 11 entries, 9 reference digests, no weights.")
+                print("Packaged model catalog resolved: 11 entries, 11 reference digests, no weights.")
                 exit(0)
             } catch {
                 fputs("Packaged model catalog failed: \(error)\n", stderr)

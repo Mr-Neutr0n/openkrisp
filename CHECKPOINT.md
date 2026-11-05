@@ -1,14 +1,15 @@
 # Checkpoint
 
-## Current status: independent audio acceptance
+## Current status: accent integration
 
-- Latest real-workflow evidence: all four virtual endpoints register. The real HAL transfer test passes mono/stereo transfer, silence and producer restart. Physical microphone capture with RNNoise passes. A separate FFmpeg client captured nonzero audio from the virtual microphone through the combined route with clean process exits.
-- Implemented correction: scoped device latency/default eligibility and aggregate AudioSubDevice drift readback. Host, sanitizer, packaging and relocated-resource checks pass for the changed native components.
-- Current blocker: Zoom 7.1.9 omits both public endpoints from its device menus. FFmpeg can use the virtual microphone. Meeting-app compatibility and speech quality remain open.
-- Next acceptance: subagents own Zoom diagnosis, original-versus-rebuild measurements and remaining REA gaps. Accent conversion and full retained parity remain incomplete.
-- User action: none currently pending. Administrator installation/restarts completed. The microphone test helper has access; the packaged desktop app's separate native permission workflow remains unverified.
+- All four virtual endpoints pass bounded HAL transfer. Zoom 7.1.9 lists and selects the public microphone and speaker after a measured scoped TransportType correction. CoreAudio confirms Zoom runs both selected devices. No meeting or remote participant was tested.
+- The packaged desktop app starts the physical microphone through RNNoise and captures nonzero audio from the virtual microphone into FFmpeg. Stop completes and all endpoints return idle. No microphone prompt appeared in that run.
+- Separate accent-engine probes now process Indian-English speech through the exact installed original native engine and both installed AR models. The catalog declares US output. The physical-to-virtual accent route passes through the packaged helper. Desktop source and packaging pass; GUI accent Start remains unverified after CUA timed out at the file picker.
+- User feedback accepts the first converted Rishi clip as reasonable but rejects its synthetic source voice. A separate ElevenLabs Raj Indian-English conversion now passes; original and converted listening clips are available privately. This is not a full speech-quality or accent-parity result.
+- The product remote is public. The separate private website is deployed through Cloudflare with GA4 consent and Search Console verification. A development installer pipeline passes structural checks; its accent-capable rebuild and installation test remain pending.
+- No user action is currently pending. Full retained parity, audible playback, sustained timing and real-call acceptance remain open. Local XCTest is unavailable; native and production packaging checks run separately while hosted macOS CI runs the Swift suites.
 
-Latest verified work: [Live RNNoise route acceptance, 2026-11-05](#live-rnnoise-route-acceptance-2026-11-05). Earlier sections are historical observations, including their PIDs and installed trees.
+Latest verified work: [Live accent integration, 2026-11-05](#live-accent-integration-2026-11-05). The [workspace reorganization](#workspace-reorganization-2026-11-05) records current paths. Earlier sections are historical observations, including their PIDs and installed trees.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -405,7 +406,7 @@ Use separate AECDuplexTransport/AECDuplexWorker types and leave NC transport unc
 
 A callback can yield several model frames but supplies only one host-time anchor. Do not repeat that anchor as distinct frame timestamps or invent host ticks. Initially clear wire host-time validity for the epoch and retain callback anchor plus sample offset in local provenance. Any future conversion to frame-origin host times needs an explicit validated clock mapping. Epoch or sample-continuity loss requires a fresh worker.
 
-Keep deterministic initial silence and delayed output. Test scheduling budgets of two and four frames; do not choose a production delay solely from one unpaced timing observation. The conservative formula is `(ceil((maximumCallbackFrames + 479) / 480) + budgetFrames) * 480`. At maximum4096 and budget4 this is6720 samples/140ms, which is a test configuration rather than parity acceptance. A missing result at its scheduled sample faults and silences the whole microphone callback block, even if the IPC timeout has not expired. Never skip/repeat results or silently change latency.
+Keep deterministic initial silence and delayed output. Test scheduling budgets of two and four frames; do not choose a production delay solely from one unpaced timing observation. The conservative formula is `(ceil((maximumCallbackFrames + 479) / 480) + budgetFrames) * 480`. At maximum 4096 and budget4 this is6720 samples/140ms, which is a test configuration rather than parity acceptance. A missing result at its scheduled sample faults and silences the whole microphone callback block, even if the IPC timeout has not expired. Never skip/repeat results or silently change latency.
 
 Next tests cover sample-exact paired accumulation for1/479/480/481/512/4096 and mixed partitions, unequal fractional lane origins, host-anchor provenance, exact startup delay, stalls/bursts, out-of-order results, overflow/clock faults and callback allocation guards. Keep worker construction/service/close/destruction on one owner thread and retain ownership through failed callback removal. Later route tests must compare reference bytes to committed final playback after speaker DSP and gain/mute. Paced throughput and physical audio acceptance remain separate gates.
 
@@ -926,3 +927,63 @@ The marketing source is a separate private repository, `Mr-Neutr0n/open-krisp-si
 - Private evidence `evidence/audio-host-verify-admission-final-20261105.log`, SHA256 `c972d104e19f8329be3ccfe7796599efc81d115a8298c71362b742d58e407259`.
 
 - Private evidence `evidence/desktop-resource-verify-20261105.log`, SHA256 `6d3157ed39184221c50f524f713052a5457fd892e24fc62b67b594be8f231d60`.
+
+
+## Workspace reorganization, 2026-11-05
+
+The product repository moved without history rewriting from the grouping folder to `product/`. The private website repository moved from `~/Developer/solo/open-krisp-site` to sibling `website/`. Shared `evidence/` and `analysis-runtime/` stay at the grouping root. The Git heads and all393 tracked product-file contents were preserved, including dirty diagnostic changes and the uncommitted comparison artifacts.
+
+Current absolute product root: `/Users/harikp/Developer/solo/reverse-engineering-lab/projects/krisp/product`.
+Current website root: `/Users/harikp/Developer/solo/reverse-engineering-lab/projects/krisp/website`.
+
+Root AGENTS.md routes future work to each repository. T3's project workspace remains the grouping root by the user's request, so one project contains both repositories. The main thread uses that root; product-owning subagents use `product/` explicitly. Six Codex thread working-directory records, the exact trust entry and path-keyed recent-file metadata migrated with private backups. Historical session rollouts, completed REA scenarios/results and their hashes were not rewritten. The migration record is `../evidence/reorg-20261105/`.
+
+Private evidence paths written as `evidence/...` in historical sections resolve from the grouping root. New commands use the current product path and sibling `../evidence`. Pending administrator guards must be derived anew with the migrated package path and revalidated process identity. The tested TransportType scope fix remains uninstalled at the move boundary. No audio, DNS, cloud deployment or Git visibility changed because of this directory move.
+
+
+## Zoom and packaged desktop acceptance, 2026-11-05
+
+Caller-specific diagnostics established that Zoom queried device TransportType using input and output scopes. The previous driver returned unknown-property errors. The corrected driver provides the same virtual transport type at global, input and output scopes, with no routing or audio-layout change. A regression fixture failed against the old source, then normal and diagnostic driver suites passed.
+
+The guarded installation used package SHA256 `825cc00a3da437eea8ebecd2872513aea992877086c808f5f63a95283f07fd42` and installed signed tree `6e91a3bfee7bda196b0016b07e05bd05787fb4aef674e0c2161fc0aae93fdd4a`. The prior bundle remains at `/var/tmp/openkrisp-driver-rollback-pt4k7dt5/LabVoiceAudio.driver`. The migrated guard and complete installation log are private under `../evidence/`. This supersedes the earlier Zoom omission and installed-tree observations, not their historical records.
+
+Zoom 7.1.9 lists and selects both public devices. Native process observation reports Zoom running the exact microphone and speaker with no per-process errors. Concurrent physical-microphone RNNoise routing into FFmpeg captured 345088 mono samples at 48kHz, or 7.189 seconds, with nonzero audio and clean exits. Exact-tree HAL tests passed all four endpoints with zero steady mismatches or missing producer stamps across initial and restarted epochs. Zoom device and volume settings were restored, and Settings was closed. No meeting, test playback or remote participant ran.
+
+Private acceptance record: `../evidence/zoom-and-route-acceptance-20261105.json`, SHA256 `4eac667c8cba6ec523d27f6b7d6f045d0da6b69e2ccbcefada672824d7f5fe40`.
+
+The canonical packaged desktop app then selected the built-in microphone, RNNoise and muted speaker output. Its explicit Start reached helper-acknowledged Audio running. External FFmpeg captured 342016 mono samples at 48kHz, or 7.125 seconds, with 11478 nonzero samples. The UI Stop returned stopped, unlocked controls and no saved session; all four endpoints were idle afterward. No permission prompt appeared. This establishes effective microphone admission for this app run, not independent inspection of the System Settings permission database. No deliberate speech-quality test or audible playback ran.
+
+Private desktop record: `../evidence/native-desktop-acceptance-20261105.json`, SHA256 `fe73e30131056f4860fa5dc3ad59fa4e2f2a016ad715f84422f93ec4786bb42b`. App binary SHA256 `680364b979fb5093c8d19b6079e38d953b92af430b93af8dd52f0103905e6cdc` identifies this pre-accent-integration build.
+
+Separate REA accent inference now exists in `app/accent-engine`. See `accent-engine-findings.md` and `COMPARISON.md` for exact identities, explicit startup-empty frames and cleanup limits. Both external original models and the native addon remain outside the repository and installer. The new live accent host/UI source is not accepted by the preceding RNNoise run.
+
+
+## ElevenLabs source comparison, 2026-11-05
+
+The user requested a better Indian-English source after listening to the Rishi conversion. The comparison agent used the existing Pivot credential in memory for one fixed, non-sensitive 195-character ElevenLabs request. Pivot was not modified and no recording was uploaded. Actual API metadata selected Raj - Professional Indian English, voice `wJ5MX7uuKXZwFqGdWM4N`, verified `en-IN` for `eleven_v4`.
+
+The complete 10.4-second utterance was decoded to mono 48kHz and padded with explicit caller-added silence to 15 seconds. Local conversion through the frozen outbound AR broker returned 1499 model frames, one startup-empty reply, 719520 finite output samples, zero clipped samples and clean worker exit. REA `ev_7701dc33ee8b66f6375caf44c86543af42af0fb7887fb2ddff94b8e2a0b03220` verified owned-group cleanup and temporary-root removal, retaining one unrelated platform-process attribution limit. No gain normalization, delay trimming or speech time stretch was applied.
+
+Listening files are `../evidence/model-probes/elevenlabs-accent-20261105/elevenlabs-raj-original.wav` and `elevenlabs-raj-converted.wav`. Metrics SHA256 `cc27d2af779a0c3b15d5b24f8d81a49ed6a7a68ba827875c95d213eea41702cd`. Hari listened to this pair and described the converted result as great and said he thinks it works. He found the source only mildly Indian-accented and requested a stronger source for a possible website demo. This is positive individual feedback, not a blinded study. This proves local conversion execution on the improved source; it does not certify an accent, voice-identity preservation or complete quality parity.
+
+
+## Hosted baseline verification, 2026-11-05
+
+GitHub Actions run `42026157297` passed both numerical and full ARM64 macOS component verification at commit `5da25224f8b4023432698a96add0b908d57c7626`. The desktop suite executed 267 tests with 2 opt-in skips and zero failures, followed by development packaging and relocated-resource checks. The hosted positive paced-CPU fixture uses an explicit 12-frame scheduling budget; default application/release queue settings are unchanged. Exact-output and forced-failure/deadline fixtures remain active.
+
+Private complete log: `../evidence/ci-macos-baseline-success-20261105.log`, SHA256 `d397da7c8cceaf3f999b348dcc7f9622e19050d086011cc6f0c47b377d0599de`. This run predates the new accent and combined-installer source. Those changes require a new run and are not covered by this result. Local XCTest remains unavailable.
+
+
+## Live accent integration, 2026-11-05
+
+The packaged helper passed Built-in Microphone -> installed outbound AR -> Lab Voice Microphone -> external FFmpeg under REA `ev_1382f89912368631bd18065311d034b47a44b204af1bdc82ab5f1240eb500b8e`. Both route and capture exited 0. The model processed 994 input frames with one explicit empty reply and confirmed teardown. The capture contains 346112 mono 48kHz samples, or 7.2107 seconds, with 257939 nonzero samples. Physical speech quality was not evaluated.
+
+The host schedules 5760 samples, or 120ms, for the admitted maximum 4096-sample callback. That queue delay is separate from the model waveform delay, whose exact contract remains unknown. Explicit model-empty replies occupy silent time slots and have a separate counter; host silence is not reported as converted output. The desktop exposes outbound accent default-off, exact installed-file validation and strict startup identity. Microphone NC/AEC composition is rejected for this first accent path; speaker processing remains separate.
+
+The complete host suite passes release, ASan/UBSan and TSan, including startup, partition, empty, deadline, sequence and cleanup fixtures. Production Swift build, ad-hoc strict signatures and relocated-resource checks pass. Independent review found no blocker after a renamed-model admission mismatch was corrected. Local XCTest remains unavailable, so new desktop tests await hosted CI.
+
+Actual GUI accent Start remains pending. The first REA app attempt reached the default idle timeout at a file picker. A separate longer-idle attempt hit CUA AX/screenshot timeout `-10005`; a fresh CUA session repeated that backend error. The app main thread sampled responsive in its normal AppKit event loop. No installed model was validated or started in either GUI attempt. The exact owned app process was stopped with command/binary checks. Failures and cleanup-attribution limits remain retained; no source correction was invented from the automation failure.
+
+Frozen private integration report: `../evidence/accent-live-and-app-integration-20261105.json`, SHA256 `7a61edc471341fa8b7a24ee2007d887ec308ec2bfc0d5925a4eb70b6222a87a9`. It lists all 18 source files and their fingerprints. Host verify log SHA256 `3bc4e8a43ed7693e6324cf9558fc0407d5318adea6ca00ea13e7b665bf71b830`; final relocated-resource log SHA256 `c15cb6028cfa934b3133714540de6f4c0ce6cc9ad7878b4d88b78edbbd5b570c`.
+
+This build still uses the reviewed external Homebrew Node identity. A separately signed official Node runtime is staged privately for a Homebrew-free installer, but is not admitted by this source checkpoint. Original addon/models remain external and are not redistributed. Installer runtime acceptance, GUI accent Start, real calls, sustained latency and full retained parity remain open.

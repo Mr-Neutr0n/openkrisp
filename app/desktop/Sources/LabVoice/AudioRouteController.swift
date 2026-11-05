@@ -11,13 +11,13 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     private let captureAdmission = AudioCaptureAdmission.shared
     private var admissionObservation: AnyCancellable?
     private var recordingObservation: AnyCancellable?
-    @Published private(set) var inventory: AudioInventory? { didSet { audioUseObservedAt = nil; invalidateProvider(); invalidateAEC() } }
+    @Published private(set) var inventory: AudioInventory? { didSet { audioUseObservedAt = nil; invalidateProvider(); invalidateAEC(); invalidateAccent() } }
     @Published private(set) var audioUseObservedAt: Date?
     @Published private(set) var loading = false
     @Published private(set) var phase: AudioRoutePhase = .idle { didSet { if phase != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: phase == .idle ? .stopped : (phase == .running ? .started : .stateChanged), severity: .info) } } }
     @Published private(set) var activeOptions: AudioRouteOptions?
     @Published private(set) var error: String? { didSet { if error != nil && error != oldValue { DiagnosticEventLog.shared.append(component: .audio, code: .operationFailed, severity: .error) } } }
-    @Published var inputUID = "" { didSet { if oldValue != inputUID { invalidateProvider(); invalidateAEC() } } }
+    @Published var inputUID = "" { didSet { if oldValue != inputUID { invalidateProvider(); invalidateAEC(); invalidateAccent() } } }
     private let headsetStore: HeadsetConfirmationStore
     @Published private(set) var headsetConfirmations: [HeadsetConfirmation]
     var selectedMicrophone: AudioHardwareDevice? { inventory?.devices.first { $0.uid == inputUID && $0.input.channels > 0 } }
@@ -42,7 +42,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     private func applyCompatibility(_ result: LocalHeadsetCacheLoad) {
         compatibilityStatus = result.failure ?? "Offline list loaded: \(result.lists.allowed.count) allowed, \(result.lists.blocked.count) blocked."
-        if result.loaded { compatibilityLists = result.lists; invalidateProvider(); invalidateAEC() }
+        if result.loaded { compatibilityLists = result.lists; invalidateProvider(); invalidateAEC(); invalidateAccent() }
     }
     var compatibilityDescription: String {
         switch selectedCompatibility {
@@ -63,28 +63,36 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         guard canEditHeadsetConfirmations, let device = selectedMicrophone, device.alive == 1,
               let name = device.interfaceName, !name.isEmpty,
               headsetStore.confirm(name: name) else { return }
-        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
+        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC(); invalidateAccent()
     }
     func removeHeadsetConfirmation(name: String) {
         guard canEditHeadsetConfirmations, headsetStore.remove(name: name) else { return }
-        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC()
+        headsetConfirmations = headsetStore.entries; invalidateProvider(); invalidateAEC(); invalidateAccent()
     }
     func resetHeadsetConfirmations() {
         guard canEditHeadsetConfirmations, headsetStore.reset() else { return }
         headsetConfirmations = headsetStore.entries; installedMicrophoneMode = .backgroundVoice
-        invalidateProvider(); invalidateAEC()
+        invalidateProvider(); invalidateAEC(); invalidateAccent()
     }
     @Published var outputUID = ""
     @Published var microphoneNoise = false { didSet { if oldValue != microphoneNoise { invalidateAEC(); if microphoneProvider == .installedKrisp { invalidateProvider() } } } }
     @Published var speakerNoise = false { didSet { if oldValue != speakerNoise, speakerProvider == .installedKrisp { invalidateProvider() } } }
     @Published var microphoneProvider: NoiseProvider = .rnnoise { didSet { if oldValue != microphoneProvider, microphoneNoise { invalidateProvider() } } }
     @Published var installedMicrophoneMode: InstalledMicrophoneMode = .ordinaryNC {
-        didSet { if oldValue != installedMicrophoneMode { invalidateProvider(); invalidateAEC() } }
+        didSet { if oldValue != installedMicrophoneMode { invalidateProvider(); invalidateAEC(); invalidateAccent() } }
     }
     var selectedMicrophoneRole: InstalledNCModelRole { selectedCompatibility.compatible ? .outboundHVC : .outbound }
     var unsupportedHVCWithAEC: Bool {
         echoCancellation && microphoneNoise && microphoneProvider == .installedKrisp && selectedMicrophoneRole == .outboundHVC
     }
+    @Published var accentConversion = false { didSet { if oldValue != accentConversion { invalidateAccent() } } }
+    @Published private(set) var accentModel: URL?
+    @Published private(set) var installedAccentConfiguration: InstalledAccentConfiguration?
+    @Published private(set) var accentValidating = false
+    @Published private(set) var accentStatus = "Choose your local outbound accent model."
+    private var accentValidationID = UUID()
+    private let resolveAccent: (URL, URL, URL) async throws -> InstalledAccentConfiguration
+    var unsupportedAccentCombination: Bool { accentConversion && (microphoneNoise || echoCancellation) }
     @Published var speakerProvider: NoiseProvider = .rnnoise { didSet { if oldValue != speakerProvider, speakerNoise { invalidateProvider() } } }
     @Published var echoCancellation = false { didSet { if oldValue != echoCancellation { invalidateAEC() } } }
     @Published private(set) var installedAECConfiguration: InstalledAECConfiguration?
@@ -152,7 +160,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         }
     }
     var canStart: Bool {
-        guard !requiresHeadsetConfirmation, !unsupportedHVCWithAEC, phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
+        guard !requiresHeadsetConfirmation, !unsupportedHVCWithAEC, !unsupportedAccentCombination, !accentValidating,
+              !(accentConversion && installedAccentConfiguration == nil), phase == .idle, !loading, !providerValidating, !aecValidating, !recording.busy,
               !(echoCancellation && installedAECConfiguration == nil),
               !(microphoneNoise && microphoneProvider == .installedKrisp && installedConfiguration?.modelRole != selectedMicrophoneRole),
               !(speakerNoise && speakerProvider == .installedKrisp && installedSpeakerConfiguration?.modelRole != .inbound), captureAdmission.available, !LibraryLocation.shared.switching, let inventory, inventory.driverPresent else { return false }
@@ -164,6 +173,8 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         compatibilityStore = LocalHeadsetCompatibilityStore()
         let loaded = compatibilityStore.load(preserving: .init()); compatibilityLists = loaded.lists; compatibilityStatus = loaded.failure ?? "Offline compatibility list loaded."
         recording = RecordingController()
+        let accentResolver = InstalledAccentResolver()
+        resolveAccent = { app, node, model in try await accentResolver.resolve(app: app, node: node, model: model, runtime: InstalledAccentResolver.packagedDirectory()) }
         let aecResolver = InstalledAECResolver()
         resolveAEC = { app in try await aecResolver.resolve(app: app, runtime: InstalledAECResolver.packagedDirectory()) }
         let resolver = InstalledNCResolver()
@@ -190,12 +201,16 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
          resolveInstalledProvider: @escaping (URL, URL, InstalledNCModelRole) async throws -> InstalledNCConfiguration = { app, node, role in
              try await InstalledNCResolver().resolve(app: app, node: node, runtime: InstalledNCResolver.packagedDirectory(), role: role)
          },
+         resolveInstalledAccent: @escaping (URL, URL, URL) async throws -> InstalledAccentConfiguration = { app, node, model in
+             try await InstalledAccentResolver().resolve(app: app, node: node, model: model, runtime: InstalledAccentResolver.packagedDirectory())
+         },
          resolveInstalledAEC: @escaping (URL) async throws -> InstalledAECConfiguration = { app in
              try await InstalledAECResolver().resolve(app: app, runtime: InstalledAECResolver.packagedDirectory())
          }) {
         self.headsetStore = headsetStore ?? HeadsetConfirmationStore(); self.headsetConfirmations = self.headsetStore.entries
         self.compatibilityStore = compatibilityStore ?? LocalHeadsetCompatibilityStore()
         let loaded = self.compatibilityStore.load(preserving: .init()); compatibilityLists = loaded.lists; compatibilityStatus = loaded.failure ?? "Offline compatibility list loaded."
+        self.resolveAccent = resolveInstalledAccent
         self.resolveAEC = resolveInstalledAEC
         self.recording = recording ?? RecordingController()
         self.resolveProvider = resolveInstalledProvider
@@ -234,11 +249,35 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
     }
     func selectInstalledApp(_ url: URL) {
         guard phase == .idle else { return }
-        installedApp = url; invalidateProvider(); invalidateAEC()
+        installedApp = url; invalidateProvider(); invalidateAEC(); invalidateAccent()
     }
     func selectInstalledNode(_ url: URL) {
         guard phase == .idle else { return }
-        installedNode = url; invalidateProvider()
+        installedNode = url; invalidateProvider(); invalidateAccent()
+    }
+    func selectAccentModel(_ url: URL) {
+        guard phase == .idle else { return }
+        accentModel = url; invalidateAccent()
+    }
+    private func invalidateAccent() {
+        accentValidationID = UUID(); installedAccentConfiguration = nil; accentValidating = false
+        accentStatus = "Validate your selected local accent files before Start."
+    }
+    func validateInstalledAccent() async {
+        guard PowerAdmission.shared.allowed, phase == .idle, accentConversion, !accentValidating,
+              let app = installedApp, let node = installedNode, let model = accentModel else { return }
+        let id = UUID(); accentValidationID = id; accentValidating = true; installedAccentConfiguration = nil
+        accentStatus = "Checking the local accent model and worker identities…"
+        do {
+            let configuration = try await resolveAccent(app,node,model)
+            guard accentValidationID == id, phase == .idle, accentConversion else { return }
+            installedAccentConfiguration = configuration
+            accentStatus = "Outbound US accent model ready. Speech quality testing is pending."
+        } catch {
+            guard accentValidationID == id else { return }
+            accentStatus = error.localizedDescription
+        }
+        if accentValidationID == id { accentValidating = false }
     }
     private func invalidateProvider() {
         providerValidationID = UUID(); installedConfiguration = nil; installedSpeakerConfiguration = nil; providerValidating = false
@@ -293,14 +332,14 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         if providerValidationID == id { providerValidating = false }
     }
     func startupWait(for options: AudioRouteOptions) -> UInt64 {
-        let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1) + (options.installedAEC == nil ? 0 : 1)
+        let workers = (options.installedProvider == nil ? 0 : 1) + (options.installedSpeakerProvider == nil ? 0 : 1) + (options.installedAEC == nil ? 0 : 1) + (options.installedAccent == nil ? 0 : 1)
         return workers > 0 ? UInt64(workers) * 30_000_000_000 + 10_000_000_000 : startupTimeout
     }
     // No permission request or --route launch occurs until this explicit Start action.
     private var powerRecordingPending = false
     func revokeForPowerEvent() {
         if recording.busy { powerRecordingPending = true }
-        invalidateProvider(); invalidateAEC()
+        invalidateProvider(); invalidateAEC(); invalidateAccent()
         startTask?.cancel()
         inventoryQuery?.cancelled = true
         recording.objectWillChange.send()
@@ -323,7 +362,7 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
         return .stopped
     }
     func refreshForPowerResume() async -> String? {
-        invalidateProvider(); invalidateAEC(); inventory = nil
+        invalidateProvider(); invalidateAEC(); invalidateAccent(); inventory = nil
         await refresh(allowSuspended: true)
         guard inventory != nil, !loading else { return error ?? "Device refresh did not complete. Retry Wake." }
         return nil
@@ -334,9 +373,10 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                                         microphoneNoise: microphoneNoise, speakerNoise: speakerNoise,
                                         installedProvider: microphoneNoise && microphoneProvider == .installedKrisp ? installedConfiguration : nil,
                                         installedSpeakerProvider: speakerNoise && speakerProvider == .installedKrisp ? installedSpeakerConfiguration : nil,
-                                        installedAEC: echoCancellation ? installedAECConfiguration : nil)
+                                        installedAEC: echoCancellation ? installedAECConfiguration : nil,
+                                        installedAccent: accentConversion ? installedAccentConfiguration : nil)
         guard options.validProviderRoles else { return }
-        let providerAdmissionID = providerValidationID, aecAdmissionID = aecValidationID
+        let providerAdmissionID = providerValidationID, aecAdmissionID = aecValidationID, accentAdmissionID = accentValidationID
         let initialControls = desiredControls
         let id = UUID()
         guard captureAdmission.acquire(id, owner: .route) else { return }
@@ -354,6 +394,9 @@ enum AudioRoutePhase { case idle, authorizing, starting, running, stopping }
                 self.clear(); return
             }
             guard self.providerValidationID == providerAdmissionID, self.aecValidationID == aecAdmissionID,
+                  self.accentValidationID == accentAdmissionID,
+                  self.accentConversion == (options.installedAccent != nil),
+                  self.microphoneNoise == options.microphoneNoise, self.echoCancellation == (options.installedAEC != nil),
                   self.inputUID == options.inputUID,
                   options.installedProvider == nil || self.selectedMicrophoneRole == options.installedProvider?.modelRole,
                   options.installedProvider?.modelRole != .outboundHVC ||

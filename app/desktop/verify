@@ -54,7 +54,7 @@ def verify_worker(resources):
 def verify_aec_worker(resources):
     helper_dir = resources / "helper"
     assert helper_dir.is_dir() and not helper_dir.is_symlink()
-    assert {file.name for file in helper_dir.iterdir()} == {"audio-host", "notices", "installed-worker", "aec-worker"}
+    assert {file.name for file in helper_dir.iterdir()} == {"audio-host", "notices", "installed-worker", "aec-worker", "accent-worker"}
     worker_dir = helper_dir / "aec-worker"
     assert worker_dir.is_dir() and not worker_dir.is_symlink()
     assert {file.name for file in worker_dir.iterdir()} == {"aec-worker", "runtime-manifest.json"}
@@ -71,6 +71,27 @@ def verify_aec_worker(resources):
     assert subprocess.check_output(["lipo", "-archs", str(worker)], text=True).strip() == "arm64"
     assert any(line.strip() == "minos 12.0" for line in subprocess.check_output(["otool", "-l", str(worker)], text=True).splitlines())
 
+def verify_accent_worker(resources):
+    worker = resources / "helper" / "accent-worker"
+    names = {"accent-probe.node", "worker.cjs", "wire.cjs", "identity.cjs"}
+    assert worker.is_dir() and not worker.is_symlink()
+    assert {file.name for file in worker.iterdir()} == names | {"runtime-manifest.json"}
+    assert all(file.is_file() and not file.is_symlink() for file in worker.iterdir())
+    manifest = json.loads((worker / "runtime-manifest.json").read_text())
+    assert set(manifest) == {"schemaVersion", "nodeSha256", "files"}
+    assert manifest["schemaVersion"] == 1
+    assert manifest["nodeSha256"] == "1ef99ea25fe70c9b67e7efe768ef8ee22148d3cabc703db6131b57aeb617d040"
+    assert set(manifest["files"]) == names
+    for name, digest in manifest["files"].items():
+        assert digest == hashlib.sha256((worker / name).read_bytes()).hexdigest()
+        if name != "accent-probe.node":
+            assert (worker / name).read_bytes() == (root.parent / "accent-engine" / name).read_bytes()
+    adapter = worker / "accent-probe.node"
+    subprocess.run(["codesign", "--verify", "--strict", str(adapter)], check=True)
+    assert subprocess.check_output(["lipo", "-archs", str(adapter)], text=True).strip() == "arm64"
+    assert "minos 12.0" in subprocess.check_output(["otool", "-l", str(adapter)], text=True)
+
+verify_accent_worker(app / "Contents" / "Resources")
 verify_aec_worker(app / "Contents" / "Resources")
 verify_worker(app / "Contents" / "Resources")
 # Copy out of the package build tree so no SwiftPM absolute build-path fallback
@@ -86,6 +107,7 @@ with tempfile.TemporaryDirectory(prefix="labvoice-bundle-check-") as temporary:
     subprocess.run(["codesign", "--verify", "--strict", str(relocated_helper)], check=True)
     verify_worker(relocated / "Contents" / "Resources")
     verify_aec_worker(relocated / "Contents" / "Resources")
+    verify_accent_worker(relocated / "Contents" / "Resources")
     # Only metadata listing is allowed here. Never run --route or request mic access.
     devices = json.loads(subprocess.check_output([str(relocated_helper), "--list"], text=True))
     assert devices["operation"] == "read_only_inventory"

@@ -43,6 +43,12 @@ struct AudioView: View {
         panel.allowsMultipleSelection = false; panel.message = "Choose the reviewed Node executable."
         if panel.runModal() == .OK, let url = panel.url { audio.selectInstalledNode(url) }
     }
+    private func chooseAccentModel() {
+        let panel = NSOpenPanel(); panel.canChooseDirectories = false; panel.canChooseFiles = true
+        panel.allowsMultipleSelection = false
+        panel.message = "Choose your local outbound accent model. No files are downloaded or copied."
+        if panel.runModal() == .OK, let url = panel.url { audio.selectAccentModel(url) }
+    }
     private func chooseCompatibilityList() {
         let panel = NSOpenPanel(); panel.allowedContentTypes = [.json]; panel.allowsMultipleSelection = false
         if panel.runModal() == .OK, let url = panel.url { audio.importCompatibilityList(at: url) }
@@ -148,8 +154,29 @@ struct AudioView: View {
                         watching: displayWatch && watch.phase == .watching, stale: displayWatch && watch.stale,
                         stabilized: displayWatch && watch.timingMode == "stabilized")
                     Divider()
+                    Text("Accent conversion").font(.headline)
+                    Toggle("Convert my accent (experimental)", isOn: Binding(get: { audio.accentConversion }, set: { enabled in
+                        if enabled { audio.microphoneNoise = false; audio.echoCancellation = false }
+                        audio.accentConversion = enabled
+                    })).disabled(controlsLocked)
+                    if audio.accentConversion {
+                        Text("Uses your locally installed outbound model with a US English target. Adds speech delay. Accent quality and intelligibility still need listening tests. Microphone noise reduction and echo cancellation are disabled in this mode.")
+                            .font(.caption).foregroundColor(.secondary)
+                        HStack {
+                            Button("Choose Krisp app…", action: chooseProviderApp)
+                            Button("Choose Node runtime…", action: chooseProviderNode)
+                            Button("Choose accent model…", action: chooseAccentModel)
+                        }.disabled(controlsLocked || audio.accentValidating)
+                        Text(audio.installedApp?.path ?? "No installed app selected").font(.caption).textSelection(.enabled)
+                        Text(audio.installedNode?.path ?? "No Node runtime selected").font(.caption).textSelection(.enabled)
+                        Text(audio.accentModel?.path ?? "No local accent model selected").font(.caption).textSelection(.enabled)
+                        Button("Validate accent conversion") { Task { await audio.validateInstalledAccent() } }
+                            .disabled(controlsLocked || audio.accentValidating || audio.installedApp == nil || audio.installedNode == nil || audio.accentModel == nil)
+                        if audio.accentValidating { ProgressView().controlSize(.small) }
+                        Text(audio.accentStatus).font(.caption).textSelection(.enabled)
+                    }
                     Text("Noise processing").font(.headline)
-                    Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked)
+                    Toggle("Reduce microphone noise", isOn: $audio.microphoneNoise).disabled(controlsLocked || audio.accentConversion)
                     Picker("Microphone provider", selection: $audio.microphoneProvider) {
                         ForEach(NoiseProvider.allCases) { provider in Text(provider.title).tag(provider) }
                     }.disabled(controlsLocked)
@@ -213,7 +240,7 @@ struct AudioView: View {
                         Text("Choose noise cancellation or turn off echo cancellation before Start.").font(.caption).foregroundColor(.secondary)
                     }
                     Toggle("Cancel speaker echo", isOn: $audio.echoCancellation)
-                        .disabled(controlsLocked)
+                        .disabled(controlsLocked || audio.accentConversion)
                     if audio.echoCancellation {
                         Button("Choose Krisp app…", action: chooseProviderApp)
                             .disabled(controlsLocked || audio.aecValidating)
@@ -228,7 +255,7 @@ struct AudioView: View {
                     Text("Start captures the selected microphone and routes speaker audio. Each enabled direction uses its selected provider.")
                         .font(.caption).foregroundColor(.secondary)
                     if let active = audio.activeOptions, audio.phase == .running {
-                        Text("Microphone: \(active.installedAEC != nil ? (active.microphoneNoise ? "echo cancellation then noise reduction" : "echo cancellation") : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : (active.installedProvider?.modelRole == .outboundHVC ? "experimental background voice" : "installed Krisp outbound NC")) : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
+                        Text("Microphone: \(active.installedAccent != nil ? "accent conversion, US target" : active.installedAEC != nil ? (active.microphoneNoise ? "echo cancellation then noise reduction" : "echo cancellation") : active.microphoneNoise ? (active.installedProvider == nil ? "RNNoise" : (active.installedProvider?.modelRole == .outboundHVC ? "experimental background voice" : "installed Krisp outbound NC")) : "unprocessed"). Speaker: \(active.speakerNoise ? (active.installedSpeakerProvider == nil ? "RNNoise" : "installed Krisp inbound NC, mono") : "unprocessed").")
                             .font(.caption)
                     }
                     Divider()

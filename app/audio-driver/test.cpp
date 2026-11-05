@@ -44,9 +44,15 @@ static void discoveryProperties(AudioServerPlugInDriverRef d) {
     for (auto id : {2u, 3u, 6u, 7u}) {
         const bool input = id == 2 || id == 7;
         const bool hidden = id == 6 || id == 7;
+        assert(read<UInt32>(d, id, kAudioDevicePropertyTransportType) ==
+               kAudioDeviceTransportTypeVirtual);
         for (auto scope : {kAudioObjectPropertyScopeOutput, kAudioObjectPropertyScopeInput}) {
             const bool direction = scope == (input ? kAudioObjectPropertyScopeInput
                                                   : kAudioObjectPropertyScopeOutput);
+            // Zoom and Control Center query transport metadata using direction
+            // scopes. Their real reads must agree with the global device type.
+            assert(read<UInt32>(d, id, kAudioDevicePropertyTransportType, scope) ==
+                   kAudioDeviceTransportTypeVirtual);
             assert(read<UInt32>(d, id, kAudioDevicePropertySafetyOffset, scope) == 0);
             assert(read<UInt32>(d, id, kAudioDevicePropertyLatency, scope) ==
                    (direction && input ? 960u : 0u));

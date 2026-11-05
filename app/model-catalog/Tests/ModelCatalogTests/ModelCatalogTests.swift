@@ -77,7 +77,11 @@ final class ModelCatalogTests: XCTestCase {
         try fixture { root in
             let models = try ModelCatalog.installedExpectations()
             XCTAssertEqual(models.count, 11)
-            XCTAssertEqual(models.filter { $0.sha256 != nil }.count, 9)
+            XCTAssertEqual(models.filter { $0.sha256 != nil }.count, 11)
+            XCTAssertEqual(models.first { $0.id == "ar-inbound-wb-c" }?.sha256,
+                "73a59147ba88d0075e6a688f3cc641c5a46a6ffbb591c2f386b3affdb3e781df")
+            XCTAssertEqual(models.first { $0.id == "ar-outbound-wb-c" }?.sha256,
+                "8ada1e4c3d2b3ef3c1440e39dfdfb825c7b0a4c0695c9e0ba6b06b576f124855")
             let downloaded = root.appendingPathComponent("downloaded", isDirectory: true)
             let app = root.appendingPathComponent("app", isDirectory: true)
             try FileManager.default.createDirectory(at: downloaded, withIntermediateDirectories: true)

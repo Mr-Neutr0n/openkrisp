@@ -8,7 +8,7 @@ if [ ! -f "$release_lib" ] || [ ! -f "$sanitized_lib" ]; then
   echo 'Build ../noise-engine with its ./verify before audio-host verification.' >&2
   exit 1
 fi
-clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp route_cli.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/audio-host
+clang++ -mmacosx-version-min=12.0 -fblocks -std=c++20 -O2 -Wall -Wextra -Werror -I../noise-engine/vendor/rnnoise/include host.cpp selected_app_capture_cli.mm call_capture.cpp call_capture_timeline.cpp call_capture_native.mm call_capture_microphone.mm microphone_inspection.cpp audio_process_usage.cpp audio_process_usage_native.mm audio_use_watch.mm audio_use_timing.cpp route_cli.cpp ../accent-engine/worker_broker.cpp ../native-model-probe/worker_broker.cpp ../native-model-probe/aec_worker_broker.cpp microphone_test_cli.cpp microphone_test.cpp microphone_test_coreaudio.cpp control_protocol.cpp routing.cpp recording.cpp coreaudio_backend.cpp "$release_lib" -framework CoreAudio -framework CoreFoundation -framework AppKit -framework AudioToolbox -o build/audio-host
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O2 -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test
 ./build/device-metadata-test
 clang++ -mmacosx-version-min=12.0 -std=c++20 -O1 -g -fsanitize=address,undefined -Wall -Wextra -Werror device_metadata_test.cpp -o build/device-metadata-test-sanitized
@@ -127,3 +127,17 @@ with tempfile.TemporaryDirectory(prefix='openkrisp-aec-route-') as temporary:
         subprocess.run([*common, '-fblocks', *flags, '-I../noise-engine/vendor/rnnoise/include', 'aec_microphone_chain_probe_test.cpp', 'routing.cpp', 'recording.cpp', str(probe / 'aec_worker_broker.cpp'), str(probe / 'worker_broker.cpp'), rnnoise, '-framework', 'CoreAudio', '-framework', 'CoreFoundation', '-o', str(comparison)], check=True)
         subprocess.run([str(comparison), str(worker), str(fixture), digest, node, str(root / 'aec_microphone_chain_probe_fixture.cjs')], check=True, timeout=120)
 PY
+
+# Accent transport uses our synthetic half-gain worker, never installed assets.
+python3 - <<'PYAR'
+from pathlib import Path
+import shutil, subprocess
+root = Path.cwd()
+node = str(Path(shutil.which('node')).resolve())
+for name, flags in [('release', ['-O2']), ('sanitized', ['-O1', '-g', '-fsanitize=address,undefined']), ('thread', ['-O1', '-g', '-fsanitize=thread'])]:
+    binary = root / 'build' / ('accent-transport-' + name)
+    subprocess.run(['clang++', '-mmacosx-version-min=12.0', '-std=c++20', '-pthread', '-Wall', '-Wextra', '-Werror', *flags,
+                    'accent_transport_test.cpp', '../accent-engine/worker_broker.cpp', '-o', str(binary)], check=True)
+    subprocess.run([str(binary), node, str(root.parent / 'accent-engine/broker_fixture.cjs')], check=True, timeout=20)
+PYAR
+python3 accent_cli_check.py

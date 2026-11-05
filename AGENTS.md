@@ -29,6 +29,14 @@ yet established.
 - Update the checkpoint and source fingerprints after verified changes. Record
   what was tested and which runtime requirements remain open.
 
+## Workspace layout
+
+- This repository is `product/` in the grouping workspace. The private marketing
+  repository is its sibling `../website/`. Keep Git commands inside the selected repository.
+- Private evidence and the analysis runtime live at `../evidence/` and
+  `../analysis-runtime/`. Historical capture paths remain unchanged. Create new
+  scenarios for new source paths instead of editing accepted evidence.
+
 ## Repository boundaries
 
 - Keep original models, binaries, assets and compatibility lists external.

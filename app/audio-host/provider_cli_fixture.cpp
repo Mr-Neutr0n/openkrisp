@@ -31,6 +31,10 @@ int runRoute(const std::string&, const std::string&, bool microphone, bool speak
                   <<labvoice::microphoneChainStartupFields(*options.installedAEC,5760,4096,2,microphone,
                                                           options.installed ? &*options.installed : nullptr,ncDelay)<<'}';
     }
+    if (options.installedAccent) {
+        std::cout << ",\"accent\":{\"direction\":\"outbound\",\"model\":"
+            << labvoice::jsonString(options.installedAccent->modelPath) << '}';
+    }
     std::cout << "}\n";
     return 0;
 }

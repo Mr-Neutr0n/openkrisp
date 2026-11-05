@@ -6,22 +6,28 @@ openkrisp is an independent reconstruction of local Krisp capabilities. The curr
 
 [Project website](https://open-krisp.harikp.com)
 
-**Work in progress.** Real virtual-device transfer and physical microphone routing into an independent FFmpeg capture now pass on the development Mac. Zoom currently omits the devices from its menus. Meeting-app use, audible playback and acoustic quality still require acceptance. [CHECKPOINT.md](CHECKPOINT.md) records the current runtime result. Accent conversion is not implemented. There is no supported end-user release yet.
+**Developer preview.** Virtual-device transfer and physical microphone routing into FFmpeg pass on the development Mac, including Start and Stop in the packaged app. Zoom lists and runs both virtual devices. Separate accent-engine probes convert speech with the exact installed original models and native engine; live app integration is in progress. Real calls, sustained timing and acoustic quality still require acceptance. [CHECKPOINT.md](CHECKPOINT.md) records the evidence. There is no supported end-user release yet.
 
 ## What is here
 
 | Area | Implemented in source | Acceptance still required |
 | --- | --- | --- |
-| Noise reduction | Independent RNNoise processing for microphone and speaker audio | Meeting-app compatibility, sustained timing and speech quality |
-| Virtual audio | Independent microphone, speaker and internal companion endpoints | Discovery and bounded HAL transfer pass locally; meeting-app use remains open |
+| Noise reduction | Independent RNNoise processing for microphone and speaker audio | Real-call acceptance, sustained timing and speech quality |
+| Virtual audio | Independent microphone, speaker and internal companion endpoints | Discovery, bounded HAL transfer and Zoom device selection pass locally; real calls remain open |
 | Recording | Route recording, pause/resume, selected-app recording with optional microphone, retained-file recovery | Native permissions, real capture and original recording comparison |
 | Local library | WAV import/playback, search, transcript export, library selection and saved-session transcription | Complete native workflow acceptance and OS Speech recognition |
 | Desktop | SwiftUI/AppKit app, floating controls, diagnostics, login controls and power-event handling | Original interaction parity and hardware lifecycle testing |
-| Installed providers | Experimental bridges to exact, user-selected local NC, background-voice and AEC files | Live audio quality, latency and compatibility beyond reviewed identities |
+| Installed providers | Experimental bridges to exact, user-selected local NC, accent, background-voice and AEC files | Live audio quality, latency and compatibility beyond reviewed identities |
 
 Implemented controls have no payment gate. Cloud storage, accounts, meeting bots, uploads and product analytics are excluded. Live captions, diarization, automatic call recording and full feature parity remain incomplete. The [feature ledger](feature-parity-ledger.md) separates retained requirements, evidence and gaps. Its feature counts are not completion percentages.
 
 The default RNNoise engine does not need an installed Krisp app. Optional installed providers require separately obtained local files. This repository does not include or download Krisp binaries, models, icons or compatibility lists.
+
+## Local workspace
+
+The development workspace groups this public repository in `product/` and the private marketing repository in `../website/`. Private evidence and analysis dependencies stay in the grouping folder, outside both repositories. A normal GitHub clone still has `app/`, `verification/` and `./verify` at its own repository root.
+
+See [COMPARISON.md](COMPARISON.md) for the current controlled engine experiment and retained-feature gaps.
 
 ## Build and verify
 
@@ -69,6 +75,8 @@ The app and driver use ad-hoc development signatures. They are not notarized. Bu
 | [`app/local-transcription`](app/local-transcription) | Explicit on-device Apple Speech adapter |
 | [`app/model-catalog`](app/model-catalog) | Confined file validation and external model identities |
 | [`app/native-model-probe`](app/native-model-probe) | Experimental installed-provider adapters and owned fixtures |
+| [`app/accent-engine`](app/accent-engine) | Separate installed accent-model broker and adapter |
+| [`app/installer`](app/installer) | Development app and driver package |
 | [`verification`](verification) | Deterministic audio generation and numerical comparison |
 
 ## Evidence and limits

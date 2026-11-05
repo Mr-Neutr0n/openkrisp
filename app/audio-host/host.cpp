@@ -582,11 +582,24 @@ int main(int argc, char **argv) {
             speakerSettings.modelSha256 = krisp_probe::installedInboundModelSHA256;
             bool installedProvider = false, installedSpeaker = false, installedAEC = false;
             krisp_probe::InstalledAECWorkerSettings aecSettings;
-            std::set<std::string> aecFlags;
+            std::set<std::string> aecFlags, accentFlags;
+            accent_engine::InstalledAccentSettings accentSettings;
             std::set<std::string> providerFlags, speakerProviderFlags;
             for (int i = 6; i < argc; ++i) {
                 const std::string flag = argv[i];
-                if (flag.rfind("--aec-",0)==0) {
+                if (flag.rfind("--accent-",0)==0) {
+                    if (!accentFlags.insert(flag).second || ++i==argc)
+                        throw std::invalid_argument("Repeated or incomplete accent option");
+                    const std::string value=argv[i];
+                    if (flag=="--accent-node") accentSettings.nodePath=value;
+                    else if (flag=="--accent-worker") accentSettings.workerPath=value;
+                    else if (flag=="--accent-addon") accentSettings.addonPath=value;
+                    else if (flag=="--accent-model") accentSettings.modelPath=value;
+                    else if (flag=="--accent-adapter") accentSettings.adapterPath=value;
+                    else if (flag=="--accent-library") accentSettings.libraryPath=value;
+                    else if (flag=="--accent-adapter-sha256") accentSettings.adapterSha256=value;
+                    else throw std::invalid_argument("Unknown accent option");
+                } else if (flag.rfind("--aec-",0)==0) {
                     if(!aecFlags.insert(flag).second || ++i==argc)
                         throw std::invalid_argument("Repeated or incomplete AEC option");
                     const std::string value=argv[i];
@@ -680,6 +693,12 @@ int main(int argc, char **argv) {
                     throw std::invalid_argument("Installed provider requires speaker suppression and all runtime options");
                 (void)krisp_probe::buildInstalledWorkerLaunch(speakerSettings, {});
                 provider.installedSpeaker = std::move(speakerSettings);
+            }
+            if (!accentFlags.empty()) {
+                if (accentFlags.size()!=7 || microphone || installedProvider || installedAEC)
+                    throw std::invalid_argument("Accent requires all runtime options and microphone NC/AEC disabled");
+                (void)accent_engine::buildInstalledAccentLaunch(accentSettings,{});
+                provider.installedAccent=std::move(accentSettings);
             }
             return runRoute(argv[3], argv[5], microphone, speaker, controls, provider);
         }

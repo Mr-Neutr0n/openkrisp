@@ -10,6 +10,8 @@ cd "$(dirname "$0")"
 ./app/model-catalog/verify
 ./app/noise-engine/verify
 ./app/native-model-probe/verify
+./app/accent-engine/verify
 ./app/audio-host/verify
 ./app/native-model-probe/build_aec_worker
 ./app/desktop/verify
+./app/installer/verify

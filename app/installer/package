@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+"""Prepare and inspect a combined development installer. Never install it."""
+from package_installer import main
+
+main()

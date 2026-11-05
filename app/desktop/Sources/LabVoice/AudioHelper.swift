@@ -49,10 +49,12 @@ struct AudioRouteOptions: Equatable, Sendable {
     var installedProvider: InstalledNCConfiguration? = nil
     var installedSpeakerProvider: InstalledNCConfiguration? = nil
     var installedAEC: InstalledAECConfiguration? = nil
+    var installedAccent: InstalledAccentConfiguration? = nil
     var validProviderRoles: Bool {
         (installedProvider == nil || (microphoneNoise && (installedProvider?.modelRole == .outbound || installedProvider?.modelRole == .outboundHVC))) &&
         (installedSpeakerProvider == nil || (speakerNoise && installedSpeakerProvider?.modelRole == .inbound)) &&
-        !(installedAEC != nil && installedProvider?.modelRole == .outboundHVC)
+        !(installedAEC != nil && installedProvider?.modelRole == .outboundHVC) &&
+        !(installedAccent != nil && (microphoneNoise || installedProvider != nil || installedAEC != nil))
     }
     var arguments: [String] {
         var args = ["--route", "--input", inputUID, "--output", outputUID]
@@ -61,10 +63,12 @@ struct AudioRouteOptions: Equatable, Sendable {
         if microphoneNoise, let installedProvider { args += installedProvider.arguments }
         if speakerNoise, let installedSpeakerProvider { args += installedSpeakerProvider.arguments(speaker: true) }
         if let installedAEC { args += installedAEC.arguments }
+        if let installedAccent { args += installedAccent.arguments }
         return args
     }
 }
 struct AudioStartup: Decodable, Sendable {
+    private let accent: AccentStartup
     let event: String
     let operationID: String?
     let microphone: AudioChannelControl?
@@ -139,6 +143,7 @@ struct AudioStartup: Decodable, Sendable {
         init?(intValue: Int) { return nil }
     }
     init(from decoder: Decoder) throws {
+        accent = try AccentStartup(from: decoder)
         let values = try decoder.container(keyedBy: CodingKeys.self)
         event = try values.decode(String.self, forKey: .event)
         operationID = try values.decodeIfPresent(String.self, forKey: .operationID)
@@ -188,7 +193,7 @@ struct AudioStartup: Decodable, Sendable {
         return AudioControlSnapshot(microphone: microphone, speaker: speaker)
     }
     func matches(_ expected: AudioRouteOptions) -> Bool {
-        guard expected.validProviderRoles, inputUID == expected.inputUID, outputUID == expected.outputUID,
+        guard accent.matches(expected.installedAccent), expected.validProviderRoles, inputUID == expected.inputUID, outputUID == expected.outputUID,
               microphoneNoise == expected.microphoneNoise, speakerNoise == expected.speakerNoise else { return false }
         func lane(noise: Bool, configuration: InstalledNCConfiguration?, role: InstalledNCModelRole,
                   name: String?, modelRole: String?, roleField: String, model: String?, addon: String?, adapter: String?, node: String?, delay: Int?, maximum: Int?) -> Bool {
@@ -202,7 +207,11 @@ struct AudioStartup: Decodable, Sendable {
             return !roleFieldNames.contains(roleField) && name == (noise ? "rnnoise" : "none") && model == nil && addon == nil && adapter == nil && node == nil && delay == nil && maximum == nil
         }
         let microphoneMatches: Bool
-        if let aec = expected.installedAEC {
+        if expected.installedAccent != nil {
+            guard aecFieldNames.isEmpty, chainFieldNames.isEmpty, microphoneNCFieldNames.isEmpty,
+                  microphoneProvider == "installed-accent" else { return false }
+            microphoneMatches = true
+        } else if let aec = expected.installedAEC {
             let required: Set<String> = ["aec_provider", "aec_worker_sha256", "aec_library_sha256", "aec_delay_samples",
                 "aec_maximum_callback_frames", "aec_scheduling_budget_frames", "aec_forward_rate", "aec_forward_channels",
                 "aec_reference_rate", "aec_reference_channels"]
