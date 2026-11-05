@@ -20,26 +20,45 @@ void require(OSStatus status, const char *operation) {
     if (status)
         throw std::runtime_error(std::string(operation) + " OSStatus=" + std::to_string(status));
 }
+std::string hex(UInt32 value) {
+    constexpr char digits[] = "0123456789abcdef";
+    std::string result(8, '0');
+    for (unsigned i = 0; i < 8; ++i)
+        result[7 - i] = digits[(value >> (i * 4)) & 15];
+    return "0x" + result;
+}
+void requireProperty(OSStatus status, const char *operation, AudioObjectID id,
+                     const AudioObjectPropertyAddress &address) {
+    if (status)
+        throw std::runtime_error(std::string(operation) + " object=" + std::to_string(id) +
+                                 " selector=" + hex(address.mSelector) + " scope=" +
+                                 hex(address.mScope) + " element=" +
+                                 std::to_string(address.mElement) + " OSStatus=" +
+                                 std::to_string(status));
+}
 template <class T>
 T scalar(AudioObjectID id, UInt32 selector, UInt32 scope = kAudioObjectPropertyScopeGlobal) {
     const auto a = property(selector, scope);
     T result{};
     UInt32 size = sizeof result;
-    require(AudioObjectGetPropertyData(id, &a, 0, nullptr, &size, &result), "HAL property read");
+    requireProperty(AudioObjectGetPropertyData(id, &a, 0, nullptr, &size, &result),
+                    "HAL property read", id, a);
     if (size != sizeof result)
         throw std::runtime_error("HAL scalar property size mismatch");
     return result;
 }
-std::vector<unsigned char> bytes(AudioObjectID id, UInt32 selector, UInt32 scope) {
+std::vector<unsigned char> bytes(AudioObjectID id, UInt32 selector, UInt32 scope,
+                                  UInt32 qualifierSize = 0, const void *qualifier = nullptr) {
     const auto a = property(selector, scope);
     UInt32 size = 0;
-    require(AudioObjectGetPropertyDataSize(id, &a, 0, nullptr, &size), "HAL property size");
+    requireProperty(AudioObjectGetPropertyDataSize(id, &a, qualifierSize, qualifier, &size),
+                    "HAL property size", id, a);
     if (size > 1048576)
         throw std::runtime_error("HAL property read bound exceeded");
     std::vector<unsigned char> result(size);
     if (size)
-        require(AudioObjectGetPropertyData(id, &a, 0, nullptr, &size, result.data()),
-                "HAL array read");
+        requireProperty(AudioObjectGetPropertyData(id, &a, qualifierSize, qualifier, &size, result.data()),
+                        "HAL array read", id, a);
     if (size > result.size())
         throw std::runtime_error("HAL property grew");
     result.resize(size);
@@ -47,8 +66,9 @@ std::vector<unsigned char> bytes(AudioObjectID id, UInt32 selector, UInt32 scope
 }
 template <class T>
 std::vector<T> array(AudioObjectID id, UInt32 selector,
-                     UInt32 scope = kAudioObjectPropertyScopeGlobal) {
-    const auto data = bytes(id, selector, scope);
+                     UInt32 scope = kAudioObjectPropertyScopeGlobal,
+                     UInt32 qualifierSize = 0, const void *qualifier = nullptr) {
+    const auto data = bytes(id, selector, scope, qualifierSize, qualifier);
     if (data.size() % sizeof(T))
         throw std::runtime_error("HAL array property size mismatch");
     std::vector<T> result(data.size() / sizeof(T));
@@ -258,10 +278,31 @@ Layout CoreAudioBackend::inspect(AudioObjectID aggregate, const Selection &selec
         array<AudioObjectID>(aggregate, kAudioAggregateDevicePropertyActiveSubDeviceList);
     if (active.size() != expected.size())
         throw std::runtime_error("Aggregate member inactive");
-    std::map<std::string, UInt32> drift;
+    std::vector<std::string> activeUIDs;
     for (auto id : active)
-        drift.emplace(string(id, kAudioDevicePropertyDeviceUID),
-                      scalar<UInt32>(id, kAudioSubDevicePropertyDriftCompensation));
+        activeUIDs.push_back(string(id, kAudioDevicePropertyDeviceUID));
+    auto expectedUIDs = expected;
+    std::sort(activeUIDs.begin(), activeUIDs.end());
+    std::sort(expectedUIDs.begin(), expectedUIDs.end());
+    if (activeUIDs != expectedUIDs)
+        throw std::runtime_error("Aggregate active member identity mismatch");
+    // ActiveSubDeviceList contains the underlying AudioDevice IDs. Drift is an
+    // AudioSubDevice property on the aggregate's owned member objects instead.
+    const AudioClassID subdeviceClass = kAudioSubDeviceClassID;
+    const auto subdevices = array<AudioObjectID>(aggregate, kAudioObjectPropertyOwnedObjects,
+                                                 kAudioObjectPropertyScopeGlobal,
+                                                 sizeof subdeviceClass, &subdeviceClass);
+    if (subdevices.size() != expected.size())
+        throw std::runtime_error("Aggregate subdevice object count mismatch");
+    std::map<std::string, UInt32> drift;
+    for (auto id : subdevices) {
+        if (scalar<UInt32>(id, kAudioObjectPropertyClass) != kAudioSubDeviceClassID ||
+            scalar<AudioObjectID>(id, kAudioObjectPropertyOwner) != aggregate)
+            throw std::runtime_error("Aggregate subdevice object ownership mismatch");
+        if (!drift.emplace(string(id, kAudioDevicePropertyDeviceUID),
+                           scalar<UInt32>(id, kAudioSubDevicePropertyDriftCompensation)).second)
+            throw std::runtime_error("Aggregate subdevice UID duplicated");
+    }
     for (const auto &uid : expected)
         if (!drift.count(uid) || bool(drift[uid]) != (uid != feed && uid != monitor))
             throw std::runtime_error("Aggregate drift setting readback mismatch");

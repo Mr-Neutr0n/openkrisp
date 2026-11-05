@@ -536,3 +536,10 @@ Host release/sanitizer and injected dual-source CLI/WAV checks passed. LocalStor
 The catalog now pins the installed English ASR6.3 model to accepted REA file-identity evidence. Five catalog tests and the release build passed. Desktop packaging, signing and relocation passed after correcting the expected reference-hash count to nine. No ASR inference was enabled.
 
 The original local wrapper and native feed use separate microphone and speaker streams. Recovered packaged defaults are32kHz mono microphone and48kHz stereo speaker, each with a literal duration value of10. Its unit remains unverified. Full descriptor, callback, queue and lifetime semantics remain the next adapter prerequisites. See live-asr-findings.md; Apple Speech for saved files remains an independent alternative, not original live-ASR parity.
+
+
+## Native route acceptance, 2026-11-05
+
+Actual HAL discovery and bounded mono/stereo transfer now pass for all four independent endpoints. Physical microphone capture with RNNoise and the combined physical-to-virtual route into FFmpeg pass with clean exits. The corrected driver preserves 960-frame input transport latency. Native aggregate drift verification now uses AudioSubDevice objects. See the latest CHECKPOINT section for exact artifacts and limits.
+
+Zoom currently omits the public devices. Speech quality, audible playback, sustained timing, complete original workflow comparison, accent conversion and other retained gaps remain open. The current root verification is not a combined pass: local XCTest is unavailable. Native suites and production desktop packaging/resource checks pass separately. These results do not close any entire retained family as full original parity.

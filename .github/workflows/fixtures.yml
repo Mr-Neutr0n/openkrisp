@@ -1,0 +1,31 @@
+name: Audio fixtures
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  numerical-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify known audio transformations
+        run: ./verification/verify
+
+  macos-components:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Prepare native adapter headers
+        run: |
+          test "$(uname -m)" = arm64
+          if ! test -f /opt/homebrew/include/node/node_api.h; then
+            brew install node
+          fi
+      - name: Verify components and signed development packaging
+        run: ./verify

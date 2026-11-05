@@ -327,17 +327,21 @@ OSStatus propertyValue(AudioObjectID id, const AudioObjectPropertyAddress *a, UI
                 return put(&list, direction ? sizeof list : offsetof(AudioBufferList, mBuffers));
             }
             }
-        if ((scope == kAudioObjectPropertyScopeInput ||
-             scope == kAudioObjectPropertyScopeOutput) &&
-            s == kAudioDevicePropertySafetyOffset)
-            return scalar(UInt32{0});
+        // HAL reads both directions while constructing a device, including a
+        // direction with no streams. Its latency and default eligibility are zero.
+        if (scope == kAudioObjectPropertyScopeInput || scope == kAudioObjectPropertyScopeOutput)
+            switch (s) {
+            case kAudioDevicePropertySafetyOffset:
+                return scalar(0);
+            case kAudioDevicePropertyLatency:
+                return scalar(direction && input(id) ? routeDelay : 0);
+            case kAudioDevicePropertyDeviceCanBeDefaultDevice:
+                return scalar(direction && !hidden(id));
+            case kAudioDevicePropertyDeviceCanBeDefaultSystemDevice:
+                return scalar(direction && !input(id) && !hidden(id));
+            }
         if (direction)
             switch (s) {
-            case kAudioDevicePropertyLatency:
-                return scalar(input(id) ? routeDelay : 0);
-            case kAudioDevicePropertyDeviceCanBeDefaultDevice:
-            case kAudioDevicePropertyDeviceCanBeDefaultSystemDevice:
-                return scalar(!hidden(id));
             case kAudioDevicePropertyPreferredChannelsForStereo: {
                 UInt32 cs[] = {1, input(id) ? 1u : 2u};
                 return put(cs, sizeof cs);

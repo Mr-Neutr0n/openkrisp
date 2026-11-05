@@ -13,6 +13,14 @@ The bundle identity is `dev.hari.labvoice.audio`. All devices use packed Float32
 
 The format targets come from `../../driver-declarations.json` and `../../driver-runtime-findings.md`. Mono devices declare the observed 480-frame nominal buffer and 15..480 range. Stereo devices declare the observed 512-frame nominal buffer and 15..960 range. Those observations do not prove original defaults or host negotiation behavior. The input device latency now declares this implementation's 960-frame route delay. Stream latency and safety offset remain zero. No physical or processing latency has been measured.
 
+## Discovery property scopes
+
+CoreAudio's real discovery sequence reads SafetyOffset and device Latency in both input and output scopes, even when a direction has no streams. Both properties now return a UInt32 in each direction. Device latency remains 960 frames for actual microphone and monitor input streams, and zero for output or absent directions. SafetyOffset remains zero. Global scope and non-main elements remain unsupported for these directional scalars.
+
+Default-device eligibility is also readable in both directions. A direction with no stream and each hidden endpoint return false. Only the public speaker's output direction can be the system default output. Stream lists and stream configuration still report no streams for an absent direction. Preferred stereo channels remain available only for the actual direction.
+
+The regression follows the two-scope reads in the November 5 real HAL trace. It fails against the preceding SafetyOffset-only driver, then passes with the correction in both standalone host variants. This source fix does not establish installed discovery or audio acceptance. Install the exact reviewed package through the guarded workflow in `install-notes.md`, then run the read-only UID probe before any routing test.
+
 ## Frame routing
 
 The app feeds processed mono data to App Feed. The driver stores that output in a mono ring. Public Microphone reads that ring. Public Speaker stores its stereo output in a separate ring. App Monitor reads that ring for the app to process and send to hardware.

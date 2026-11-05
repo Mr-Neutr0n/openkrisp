@@ -37,6 +37,63 @@ T read(AudioServerPlugInDriverRef d, AudioObjectID id, UInt32 selector,
            size == sizeof(T));
     return result;
 }
+// Replays the two-scope discovery reads observed in the real HAL trace. An
+// absent direction has no streams and zero latency, but its scalar properties
+// still exist so HAL can finish constructing a single-direction device.
+static void discoveryProperties(AudioServerPlugInDriverRef d) {
+    for (auto id : {2u, 3u, 6u, 7u}) {
+        const bool input = id == 2 || id == 7;
+        const bool hidden = id == 6 || id == 7;
+        for (auto scope : {kAudioObjectPropertyScopeOutput, kAudioObjectPropertyScopeInput}) {
+            const bool direction = scope == (input ? kAudioObjectPropertyScopeInput
+                                                  : kAudioObjectPropertyScopeOutput);
+            assert(read<UInt32>(d, id, kAudioDevicePropertySafetyOffset, scope) == 0);
+            assert(read<UInt32>(d, id, kAudioDevicePropertyLatency, scope) ==
+                   (direction && input ? 960u : 0u));
+            assert(read<UInt32>(d, id, kAudioDevicePropertyDeviceCanBeDefaultDevice, scope) ==
+                   UInt32(direction && !hidden));
+            assert(read<UInt32>(d, id, kAudioDevicePropertyDeviceCanBeDefaultSystemDevice, scope) ==
+                   UInt32(direction && !input && !hidden));
+            auto streams = address(kAudioDevicePropertyStreams, scope);
+            UInt32 bytes = 99;
+            assert((*d)->HasProperty(d, id, 0, &streams));
+            assert((*d)->GetPropertyDataSize(d, id, 0, &streams, 0, nullptr, &bytes) == noErr);
+            assert(bytes == (direction ? sizeof(AudioObjectID) : 0));
+            AudioObjectID stream = 99;
+            assert((*d)->GetPropertyData(d, id, 0, &streams, 0, nullptr, sizeof stream,
+                                         &bytes, &stream) == noErr);
+            assert(direction ? stream == (id == 2 ? 4u : id == 3 ? 5u : id == 6 ? 8u : 9u)
+                             : stream == 99);
+            auto configuration = address(kAudioDevicePropertyStreamConfiguration, scope);
+            AudioBufferList buffers{};
+            assert((*d)->GetPropertyData(d, id, 0, &configuration, 0, nullptr,
+                                         sizeof buffers, &bytes, &buffers) == noErr);
+            assert(buffers.mNumberBuffers == UInt32(direction));
+            assert(bytes == (direction ? sizeof buffers : offsetof(AudioBufferList, mBuffers)));
+            if (direction)
+                assert(buffers.mBuffers[0].mNumberChannels == (id == 2 || id == 6 ? 1u : 2u));
+        }
+        for (auto selector : {kAudioDevicePropertySafetyOffset, kAudioDevicePropertyLatency,
+                              kAudioDevicePropertyDeviceCanBeDefaultDevice,
+                              kAudioDevicePropertyDeviceCanBeDefaultSystemDevice}) {
+            auto scalar = address(selector);
+            UInt32 bytes = 0;
+            UInt32 value = 99;
+            assert(!(*d)->HasProperty(d, id, 0, &scalar));
+            assert((*d)->GetPropertyDataSize(d, id, 0, &scalar, 0, nullptr, &bytes) ==
+                   kAudioHardwareUnknownPropertyError);
+            assert((*d)->GetPropertyData(d, id, 0, &scalar, 0, nullptr, sizeof value, &bytes,
+                                         &value) == kAudioHardwareUnknownPropertyError);
+            scalar.mScope = kAudioObjectPropertyScopeInput;
+            assert((*d)->GetPropertyData(d, id, 0, &scalar, 0, nullptr, sizeof value - 1,
+                                         &bytes, &value) == kAudioHardwareBadPropertySizeError);
+            assert(value == 99);
+            scalar.mElement = 1;
+            assert(!(*d)->HasProperty(d, id, 0, &scalar));
+        }
+    }
+    std::cout << "PASS: all-device discovery scopes, latency, default eligibility, empty directions\n";
+}
 static void routing(AudioServerPlugInDriverRef d) {
     for (auto id : {2u, 3u, 6u, 7u}) {
         AudioServerPlugInClientInfo client{};
@@ -165,19 +222,6 @@ static void routing(AudioServerPlugInDriverRef d) {
     assert(read<UInt32>(d, 4, kAudioStreamPropertyLatency) == 0);
     assert(read<UInt32>(d, 9, kAudioStreamPropertyLatency) == 0);
     assert(read<UInt32>(d, 3, kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput) == 0);
-    // CoreAudio discovery queries both scopes even on single-direction devices.
-    for (auto id : {2u, 3u, 6u, 7u}) {
-        for (auto scope : {kAudioObjectPropertyScopeInput, kAudioObjectPropertyScopeOutput})
-            assert(read<UInt32>(d, id, kAudioDevicePropertySafetyOffset, scope) == 0);
-        auto safety = address(kAudioDevicePropertySafetyOffset);
-        UInt32 bytes = 0;
-        UInt32 value = 99;
-        assert(!(*d)->HasProperty(d, id, 0, &safety));
-        assert((*d)->GetPropertyDataSize(d, id, 0, &safety, 0, nullptr, &bytes) ==
-               kAudioHardwareUnknownPropertyError);
-        assert((*d)->GetPropertyData(d, id, 0, &safety, 0, nullptr, sizeof value, &bytes,
-                                     &value) == kAudioHardwareUnknownPropertyError);
-    }
     for (auto id : {2u, 3u, 6u, 7u}) {
         AudioServerPlugInClientInfo client{};
         client.mClientID = 21;
@@ -284,6 +328,7 @@ int main(int argc, char **argv) {
     AudioServerPlugInHostInterface host{};
     host.PropertiesChanged = changed;
     assert((*d)->Initialize(d, &host) == noErr);
+    discoveryProperties(d);
     // HAL discovery requests children by class. Streams are not controls or boxes.
     auto owned = address(kAudioObjectPropertyOwnedObjects);
     AudioClassID qualifier = kAudioBoxClassID;

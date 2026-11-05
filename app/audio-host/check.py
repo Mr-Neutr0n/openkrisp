@@ -55,6 +55,16 @@ def aggregate(input_uid, output_uid):
     assert composition['uid'].startswith('dev.hari.labvoice.aggregate.')
     assert len({m['uid'] for m in composition['subdevices']}) == len(composition['subdevices'])
     assert composition['subdevices'][0]['drift'] == 0
+    # Inspect this plan's member snapshot. Installed companions can now share a
+    # known clock; absent or unknown clocks still require monitor compensation.
+    companions = plan['members'][:2]
+    assert [m['uid'] for m in companions] == ['dev.hari.labvoice.feed', 'dev.hari.labvoice.monitor']
+    clocks = [m['device']['clock_domain'] if m['present'] else 0 for m in companions]
+    common_clock = clocks[0] != 0 and clocks[0] == clocks[1]
+    assert plan['companion_clock_confirmed'] is common_clock
+    assert composition['subdevices'][1]['drift'] == int(not common_clock)
+    if not common_clock:
+        assert any('common nonzero clock domain must be confirmed' in b for b in plan['blockers'])
     assert all(m['drift quality'] == 96 for m in composition['subdevices'])
     assert plan['lifecycle_plan'] and plan['blockers']
     return plan
@@ -63,7 +73,6 @@ same = aggregate('dev.hari.labvoice.test.missing-hardware', 'dev.hari.labvoice.t
 assert len(same['composition_proposal']['subdevices']) == 3
 hardware = same['members'][-1]
 assert set(hardware['roles']) == {'physical_microphone_input', 'physical_speaker_output'}
-assert same['composition_proposal']['subdevices'][1]['drift'] == 1  # Clock not confirmed, safe proposal.
 if inputs and outputs:
     proposal = aggregate(inputs[0]['uid'], outputs[0]['uid'])
     assert len(proposal['composition_proposal']['subdevices']) == len({inputs[0]['uid'], outputs[0]['uid'], 'dev.hari.labvoice.feed', 'dev.hari.labvoice.monitor'})

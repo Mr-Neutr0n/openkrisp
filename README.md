@@ -1,91 +1,86 @@
 # openkrisp
 
-Private checkpoint repository: [Mr-Neutr0n/openkrisp](https://github.com/Mr-Neutr0n/openkrisp). Work resumed on 2026-10-15; [CHECKPOINT.md](CHECKPOINT.md) records the verified baseline and pending work. This is an independent local reconstruction, with no trial period, paid tiers, subscription checks, or usage quotas. All implemented local features are available without payment. Retained local features from the original paid or hidden feature set are in scope for independent implementation; unfinished features remain unavailable until implemented and verified.
+Local audio tools for Apple Silicon Macs. Open source, with no account, trial or subscription.
 
-Work in progress. This project builds a desktop app and independent audio and storage components, but no complete Krisp replacement. The approved development driver installation succeeded, but HAL cannot yet resolve its expected devices. Registration diagnosis is in progress. Full parity remains unverified.
+openkrisp is an independent reconstruction of local Krisp capabilities. The current app is a development build named **Lab Voice**. It combines RNNoise processing, virtual audio devices, local recording and a native macOS library. This project is not affiliated with Krisp.
 
-The reference is the installed macOS Krisp at `~/Applications/krisp.app`. It changed from 3.16.8 to 3.17.9 during inspection; `version-change-findings.md` separates those identities. REA provides the original-app evidence. New implementation code uses ordinary development tools. GPT 6.1 sol workers contribute separate components and evidence analysis.
+[Project website](https://open-krisp.harikp.com)
 
-## Current implementation
+**Work in progress.** Real virtual-device transfer and physical microphone routing into an independent FFmpeg capture now pass on the development Mac. Zoom currently omits the devices from its menus. Meeting-app use, audible playback and acoustic quality still require acceptance. [CHECKPOINT.md](CHECKPOINT.md) records the current runtime result. Accent conversion is not implemented. There is no supported end-user release yet.
 
-| Component | Implemented | Still missing |
+## What is here
+
+| Area | Implemented in source | Acceptance still required |
 | --- | --- | --- |
-| `app/audio-transport` | Timestamped mono/stereo rings, same-user shared-memory ABI, stale-producer silence | Audio-service integration, scheduling and latency measurements |
-| `app/local-store` | Completed-session import, transcript search/export, interrupted-save visibility and strict selected-folder reopening | Recovery actions, original-format comparison |
-| `app/audio-driver` | Virtual devices, hidden companion endpoints and bounded internal audio routing | System-host verification, app capture integration and latency measurements |
-| `app/desktop` | Native history, persisted library folder selection, explicit macOS 13+ launch-at-login controls, search, WAV import, playback, transcript export, appearance, an optional floating control panel, model validation, explicit on-device WAV transcription, audio routing, live app-route mute/volume controls explicit recording with pause/resume and history save, selected-app recording with an optional physical microphone, and a temporary Original/RNNoise microphone comparison | Full workflow verification, actual audio routing and original UI parity |
-| `app/model-catalog` | Confined file validation, SHA256 checks and explicit license metadata | Model inference integration |
-| `app/native-model-probe` | Persistent installed-model sessions, supervised Node worker and callback queue connection, with synthetic and REA broker tests | Live desktop/CoreAudio provider acceptance, sustained timing and speech-quality parity |
-| `app/noise-engine` | Independent RNNoise processor, arbitrary-size callback adapter and optional mic/speaker processing in the routing helper | Speech-quality comparison and end-to-end latency |
-| `app/audio-host` | Device discovery, private aggregate backend, optional noise suppression, atomic app-route mute/gain, bounded background WAV recording, temporary physical-microphone capture and paired RNNoise processing, selected-app plus microphone capture with clock alignment, and desktop helper integration | Real HAL and hardware verification; original device-volume curve and synchronization |
-| `app/local-transcription` | Strict on-device Speech framework adapter, cancellation and error handling | User-consented OS recognition test, language/quality parity |
-| `verification` | Deterministic audio fixtures and numerical comparison | Original-versus-rebuild stream measurements |
+| Noise reduction | Independent RNNoise processing for microphone and speaker audio | Meeting-app compatibility, sustained timing and speech quality |
+| Virtual audio | Independent microphone, speaker and internal companion endpoints | Discovery and bounded HAL transfer pass locally; meeting-app use remains open |
+| Recording | Route recording, pause/resume, selected-app recording with optional microphone, retained-file recovery | Native permissions, real capture and original recording comparison |
+| Local library | WAV import/playback, search, transcript export, library selection and saved-session transcription | Complete native workflow acceptance and OS Speech recognition |
+| Desktop | SwiftUI/AppKit app, floating controls, diagnostics, login controls and power-event handling | Original interaction parity and hardware lifecycle testing |
+| Installed providers | Experimental bridges to exact, user-selected local NC, background-voice and AEC files | Live audio quality, latency and compatibility beyond reviewed identities |
 
-Each directory documents its build and limits. `./verify` runs component checks, including the experimental native adapter's host-only fixtures. It requires Apple Silicon macOS, Xcode command-line tools, Node on PATH and Node headers at `/opt/homebrew/include/node`. No check installs a HAL plug-in, restarts the system audio service or loads Krisp. Separate REA captures verify bounded installed-model processing; speech quality, accent conversion and transcription parity remain unverified.
+Implemented controls have no payment gate. Cloud storage, accounts, meeting bots, uploads and product analytics are excluded. Live captions, diarization, automatic call recording and full feature parity remain incomplete. The [feature ledger](feature-parity-ledger.md) separates retained requirements, evidence and gaps. Its feature counts are not completion percentages.
 
-Run `./verify` to build and check the components in dependency order, including the desktop app. After the audio helper is built, `app/desktop/build` can rebuild the desktop alone; it rejects a missing or stale helper. The output is `app/desktop/.build/app/Lab Voice.app`. It has an ad-hoc signature for local development. It stores imported sessions under `~/Library/Application Support/Lab Voice/sessions` when launched. REA verified initial rendering, Settings reachability, Light appearance, persistence, and a later Dark/System roundtrip. REA observed the Audio sheet with audio stopped; its lower recording layout, live controls and transcription workflow still require further interactive verification. See `desktop-runtime-findings.md`. Its layout is a temporary independent design.
+The default RNNoise engine does not need an installed Krisp app. Optional installed providers require separately obtained local files. This repository does not include or download Krisp binaries, models, icons or compatibility lists.
 
-## Evidence and scope
+## Build and verify
 
-- `PLAN.md` tracks the requested outcome and unresolved access and model decisions.
-- `feature-parity-ledger.md` maps retained, excluded and unresolved feature groups to implementation evidence and missing acceptance checks. Paid status does not exclude local capabilities.
-- `catalog-current-feature-map.md` groups all 1014 current text keys; `catalog-feature-map.md` retains the earlier 997-key map. Labels do not prove reachable workflows or defaults.
-- `feature-findings.md` and `native-findings.md` map wrapper and native boundaries.
-- `driver-runtime-findings.md` records the original devices' observed declarations.
-- `ui-runtime-map.md` maps observed settings and separates current saved selections from unknown defaults.
-- `audio-controls-findings.md` maps original mute, volume curves and device-control boundaries, including unresolved runtime state.
-- `recording-findings.md` separates original recording features and documents the observed native recorder contracts.
-- `noise-test-findings.md` records original temporary comparison labels and separates them from independent capture and duration choices.
-- `model-provider-contract.md` records the installed addon's recovered call contracts and bounded model-loading probes.
-- `cloud-exclusion-map.md` traces identified telemetry and remote-service boundaries with coverage limits.
-- `parity-verification-plan.md` defines the comparisons still required.
+Requirements:
 
-The reconstruction excludes cloud storage, account services, meeting bots, report uploads, and analytics. Both an independent engine and an optional installed-model path are in scope. Bundled Krisp code, models, icons, and raw evidence have not been placed in a public release. Git ignores the private evidence and analysis runtime directories. The requested original-weight publication still requires established redistribution terms. The independent RNNoise source and included model retain their upstream notices under `app/noise-engine/vendor/rnnoise`.
+- An Apple Silicon Mac and macOS 12 or later. Some capture and OS integration features need a newer system.
+- Xcode with Swift 6, Clang, the macOS SDK and XCTest support. Some Command Line Tools installations omit XCTest and cannot run the Swift test suites.
+- Python 3 and Node.js on `PATH`.
+- Node C API headers at `/opt/homebrew/include/node/node_api.h` for the experimental adapter build.
 
-This private repository is an unfinished source checkpoint, not a parity release. It remains in the lab experiment directory.
+```sh
+git clone https://github.com/Mr-Neutr0n/openkrisp.git
+cd openkrisp
+./verify
+```
 
+The root command runs the component suites, sanitizer fixtures and signed development packaging checks. It writes the app to `app/desktop/.build/app/Lab Voice.app`. It does not install a driver, restart CoreAudio, load Krisp, request microphone access or perform a live call test. Read-only device and process inventory checks can run during verification.
 
-## Recording verification checkpoint
+For a smaller change, run that component's `./verify`. After dependencies have been built, `app/desktop/build` rebuilds the app and rejects missing or stale helpers. See the [desktop build notes](app/desktop/README.md) for packaging and runtime details.
 
-The root `./verify` passed all ten suites with exit 0 after recording integration and lifecycle fixes. Private log: `evidence/combined-verify-recording.log`. The desktop has 32 passing tests. Synthetic Swift-to-C++ pipe tests validate recording commands, PCM16 finalization, active-frame duration and history import. The signed app build and relocated-resource checks pass. No actual audio was captured. The approved driver installation and CoreAudio restart succeeded, but exact endpoint lookup failed, so real routing remains untested pending registration diagnosis.
+The Python-only measurement checks also run on other systems:
 
+```sh
+./verification/verify
+```
 
-## Temporary microphone comparison verification
+These checks validate known signal transformations. They do not measure speech quality or establish original-versus-rebuild parity.
 
-The combined `./verify` passed all ten component suites after temporary microphone comparison integration, with 46 desktop tests and signed-bundle checks. Synthetic tests cover the Original/RNNoise pair, cancellation, capture ownership and cleanup retry. Private log: `evidence/combined-verify-microphone-test.log`. Actual microphone capture, audible comparison and permission attribution remain untested. The driver diagnostic restart remains deferred while the user is away.
+## Try the development app
 
+Open the built `Lab Voice.app` to use the local library. Audio starts only through an explicit capture action. The default library is `~/Library/Application Support/Lab Voice/sessions`. Import copies the selected WAV into that library. Transcript export uses a new destination. Session deletion requires confirmation.
 
-## Library-location verification checkpoint
+The app and driver use ad-hoc development signatures. They are not notarized. Building the app does not install its virtual audio driver. Driver installation and a CoreAudio restart affect system audio and are separate administrator actions. Review [installation and rollback notes](app/audio-driver/install-notes.md) before any driver work. Do not use a call as the first hardware test.
 
-Implemented persisted existing-folder selection and reopen without data migration or fallback. Shared admission covers active library work, transcription, capture and recording; stale dialogs/results carry revision checks. Recording preparation validates and retains the admitted destination store through final save, rejects same-path replacement and retains failed staging. Missing or invalid preferences remain recoverable through the chooser.
+## Source layout
 
-The root `./verify` passed all ten component suites with exit 0, including 54 desktop and 12 local-store tests. Eight focused desktop location tests cover real temporary library imports, restart persistence, missing-folder recovery, stale dialog/results, cancelled authorization and replaced recording destinations. Both independent reviews accepted the changes. Private log: `evidence/combined-verify-library-location.log`. Native picker interaction, real audio routing and original parity remain unverified. No administrator or live audio action ran.
+| Path | Purpose |
+| --- | --- |
+| [`app/desktop`](app/desktop) | Native desktop app and controller tests |
+| [`app/audio-driver`](app/audio-driver) | CoreAudio plug-in and bounded HAL tests |
+| [`app/audio-host`](app/audio-host) | Routing, capture, device observation and helper protocol |
+| [`app/audio-transport`](app/audio-transport) | Timestamped audio rings and shared-memory transport |
+| [`app/noise-engine`](app/noise-engine) | RNNoise integration and allocation tests |
+| [`app/local-store`](app/local-store) | Local sessions, recording provenance and transcript storage |
+| [`app/local-transcription`](app/local-transcription) | Explicit on-device Apple Speech adapter |
+| [`app/model-catalog`](app/model-catalog) | Confined file validation and external model identities |
+| [`app/native-model-probe`](app/native-model-probe) | Experimental installed-provider adapters and owned fixtures |
+| [`verification`](verification) | Deterministic audio generation and numerical comparison |
 
+## Evidence and limits
 
-## Local diagnostics checkpoint, 2026-10-15
+The original app is inspected only through REA. Reports retain artifact identities, failures and coverage limits. The original changed version during research; [version-change-findings.md](version-change-findings.md) separates those observations. Static findings and synthetic tests do not prove runtime or acoustic parity.
 
-Implemented private local report export with bounded typed current-run events/status, optional occurrence date/system metadata and an explicitly selected PCM16 mono/stereo WAV sample. Existing destinations and replaced output directories fail without overwriting user files; cleanup tracks owned files. No cloud upload or automatic capture exists.
+Start with [CHECKPOINT.md](CHECKPOINT.md), the [feature ledger](feature-parity-ledger.md) and the [comparison plan](parity-verification-plan.md). Component READMEs explain their own contracts. Historical reports can describe older states; the latest verified checkpoint and actual runtime state take precedence. Raw evidence, generated audio, builds and the analysis runtime stay outside Git.
 
-Desktop `./verify` passed 68 tests plus signed ARM64/macOS 12 packaging and relocated-resource checks. Other nine components remain unchanged from the preceding combined verification. Private log `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings/Diagnostics and observed the native form/current status with audio stopped (evidence `ev_c6e9c71877d065d8aee3a404e566c8bc43611817c26e89c4e7011e48d7899d5b`). Save/sample picker workflows, historical log parity and original report schema remain unverified. No audio or administrator action ran.
+## Contribute
 
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before sending a change. Use [GitHub issues](https://github.com/Mr-Neutr0n/openkrisp/issues) for reproducible bugs and bounded feature work. Do not attach private call recordings, credentials or proprietary model files. See [SECURITY.md](SECURITY.md) for private vulnerability reports.
 
-## Launch-at-login verification
+## License
 
-Added explicit ServiceManagement registration controls with actual OS status and activation refresh. macOS 12 reports this feature unavailable. Desktop verification passed 73 tests and packaging checks. Native registration, approval and launch after login remain unverified; development did not change login items. See `startup-findings.md` and `CHECKPOINT.md`.
-
-
-## Finalized recording recovery
-
-Audio can review retained independent recording folders and explicitly save a copy of validated finalized audio into the selected library. Sources remain untouched. Partial WAVs and `.pending` imports are not repaired. Desktop verification passed 86 tests and packaging checks; native recovery UI and real audio remain unverified. See `recovery-findings.md` and `CHECKPOINT.md`.
-
-
-## Save before quit
-
-Normal Quit now confirms Save and quit for active recordings and checks that saving succeeded. Failed saves keep the app open. Pending library/recovery/diagnostic work blocks quit, and shutdown blocks new work. Desktop verification passed 97 tests and packaging checks. Native dialogs and actual OS termination remain unverified. See `quit-findings.md` and `CHECKPOINT.md`.
-
-
-## Experimental installed-model microphone processing
-
-In Audio, enable microphone noise reduction and choose Installed Krisp outbound NC. Select the installed Krisp app and the reviewed external Node runtime, then validate. Validation reads identities only. Start remains the explicit microphone-capture action. This development build accepts only the tested Node digest and exact outbound addon/model version; another runtime or model fails validation. Selections last for the current app session. Speaker reduction still uses RNNoise.
-
-The bundle includes our native adapter and three worker scripts. It includes no Krisp binary, model or dependency library. The adapter targets macOS 12, but installed-provider runtime compatibility has only been exercised on this Mac. Live routing, end-to-end latency and quality remain unverified. The driver admission test is still deferred.
+Project-owned code and documentation use the [MIT license](LICENSE). Vendored RNNoise uses its own BSD-style license, retained in [COPYING](app/noise-engine/vendor/rnnoise/COPYING). [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) records that boundary and the local patch. No license in this repository grants rights to external Krisp code, model weights, assets or trademarks.

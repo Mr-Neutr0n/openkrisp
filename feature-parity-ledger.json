@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-10-29",
+  "snapshot_date": "2026-11-05",
   "target": "Krisp 3.17.9 current retained catalog; independent app currently uses provisional Lab Voice name, planned repository name openkrisp",
   "purpose": "Gap audit, not completion or runtime parity certification",
   "scope_policy": "Retain established local paid/hidden capabilities without account/trial/plan gates. Exclude analytics, cloud services, vendor accounts and billing enforcement. Investigate unresolved local/service boundaries; an independent local adaptation of a cloud-backed feature is a recommendation, not an authorized implementation requirement.",
@@ -3231,8 +3231,8 @@
     "projects/krisp/app/audio-host/controls.hpp": "7bc30ced07e637c899ed9e98284a5a4da01c8e01bef8a89a9bcbc06f187b3608",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioControls.swift": "ba2a1b8342403879dd5b217805a65b2c14a6bbd9c7f4bbad5c4f0548340b3244",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioView.swift": "e84f07863fd338ef77c440d61dde25332e1266ed72e0cb96b25e3251bcb8bb32",
-    "projects/krisp/app/audio-driver/driver.cpp": "7bfc6b7b179e24e86bff4da00e5e1a53dc13fcdd159e13902b6c10fa349a8c41",
-    "projects/krisp/app/audio-host/coreaudio_backend.cpp": "f1cb358676578116a77ee630d2deab48d3a576bf92694cff41ac1940d0f932e2",
+    "projects/krisp/app/audio-driver/driver.cpp": "d25dfbc46814984831559df2c81a96bc23f5f2cef69a67b1082fc07ce938c251",
+    "projects/krisp/app/audio-host/coreaudio_backend.cpp": "121490c8a83a68ef623dfc2a82a77c136a47656367e3f4093bc1e6d1d941bcc1",
     "projects/krisp/app/audio-host/routing.cpp": "7c9dbf04de0df447ac3a27637ab251a2c88c8f398736ace71f3020d013bcdb6d",
     "projects/krisp/app/desktop/Sources/LabVoice/AudioRouteController.swift": "1e6b819c74b3d9f11315e1177fa4f43ae0f7d59be4f97f693a900feb7718cec5",
     "projects/krisp/app/audio-host/noise_adapter.hpp": "97a795c3a8afcb56e50b6ebf084181fadff73262e5e98494fd713d1279ad1117",
@@ -3391,7 +3391,7 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/HeadsetConfirmationTests.swift": "c008b31696a1861374fd0b8732c7859ee2ca2a205c517925c9e0b2799dcb5ee0",
     "projects/krisp/app/audio-host/device_metadata.hpp": "372913fe2e2650898d99c265352d9c72b479f8a1e60829819056af3896e95c03",
     "projects/krisp/app/audio-host/device_metadata_test.cpp": "e3b30aab423d6db08e5b906cce168df9828f168bf700a0919c70a13d7e8de1e6",
-    "projects/krisp/app/audio-host/check.py": "5e56b12aa12965fcaeb7f5ab95caba623b8e853cc30f46c7ee7876630fec3ce0",
+    "projects/krisp/app/audio-host/check.py": "0f7dec652528ea7027003e90cb3a7a315b92bfbe1dc43718d4d0280a21b1cbb5",
     "projects/krisp/app/desktop/Package.swift": "b9cfb2c235d11e40dd1499c923647fa2c802b0415ae837a9291fbb37e115d714",
     "projects/krisp/app/desktop/Sources/LabVoice/LocalHeadsetCompatibility.swift": "d941705af3a2085fc148433c29efa9a04783ef0d1243b35697abef9a39621c28",
     "projects/krisp/app/desktop/Tests/LabVoiceTests/AudioDeviceMetadataTests.swift": "d5f19fcaa9038df96cc3a448f72c9b2115981b1e9cfc6385abc741832b4354c0",
@@ -3460,7 +3460,9 @@
     "projects/krisp/app/desktop/Tests/LabVoiceTests/RecordingControllerTests.swift": "13335c82d1c067b527369f62439a74f8f4c1cf788f17f1afd1f81d10af7befbb",
     "projects/krisp/app/model-catalog/Sources/ModelCatalog/Resources/installed-expectations.json": "08af571ba20966c42ba092962130469e6e450263e831d8caad011eea4a2996b3",
     "projects/krisp/app/model-catalog/Tests/ModelCatalogTests/ModelCatalogTests.swift": "6f547f6ee3ed562c706af4e2bc35556d5c1c52d0aef2724b4959eac011f71a83",
-    "projects/krisp/app/audio-driver/test.cpp": "ab41fc2cb715ce8be7060e1b63768d9707cd0bf9add3322d50a91dd0acc8b808"
+    "projects/krisp/app/audio-driver/test.cpp": "5a4c0621fa9f98b428d823065d5130cb715e597294b37ef9956531f73eb80043",
+    "projects/krisp/app/audio-driver/hal-test/hal_test.cpp": "cd0bac70cd86b12e45d324ee7fa181761e80d9fb878648c5310de901e1d770e4",
+    "projects/krisp/app/audio-driver/hal-test/verify": "790ce61fe095388d178d5baa0edff57322dd40c79f0ee0d34778ff4427f45c4e"
   },
   "read_only_audit_limits": [
     "No app launch, actual audio, installation, admin action, network publication or original setting changes.",
@@ -3471,7 +3473,7 @@
     "Some README remaining-work sections lag implemented source; source takes precedence for implemented presence, runtime verification remains bounded."
   ],
   "missing_code_paths": [],
-  "source_snapshot_note": "239 implementation/verification fingerprints. Independent audio milestone: actual HAL restart reproduces discovery rejection at opposite-direction SafetyOffset; narrow fix and new regression/package checks pass, replacement awaits OS administrator authorization. Corrected real discovery, physical RNNoise routing and meeting-app acceptance remain unverified. Optional ASR research is parked.",
+  "source_snapshot_note": "241 implementation/verification fingerprints at native route acceptance. Real HAL transfer and physical RNNoise-to-virtual FFmpeg capture pass. Full changed native suites and desktop production/resource-only checks pass. Root verify stops at missing XCTest. Zoom compatibility, speech quality, accent inference and full retained parity remain open.",
   "artifact_identity_registry": {
     "current_catalog": {
       "evidence_id": "ev_58c2d2c98cd0dc8a434233efa30e9e4448d97ecb7441ea8fc36caaa79099b6f4",

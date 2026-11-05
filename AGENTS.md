@@ -36,4 +36,6 @@ yet established.
 - Do not commit raw private evidence, generated audio, builds or analysis runtime.
   These remain excluded by `.gitignore` and component ignore files.
 - Inspect the repository Git identity before committing. Do not add agent
-  coauthors. Publish to the configured private remote only.
+  coauthors. Publish product source to the configured `Mr-Neutr0n/openkrisp` remote. Keep
+  marketing source in its separate private repository. Audit tracked files and
+  reachable history before widening repository visibility.

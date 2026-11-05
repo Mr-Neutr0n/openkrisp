@@ -20,9 +20,9 @@ namespace {
 constexpr uint64_t delay = 960;
 constexpr uint32_t capacity = 32768, maximumFrames = 4096;
 static_assert(std::atomic<uint64_t>::is_always_lock_free && std::atomic<uint32_t>::is_always_lock_free);
-enum Phase : uint32_t { startup, warmup, steady, gap, stoppedWarm, stopped, restartWarm, restarted, phases };
+enum Phase : uint32_t { startup, warmup, steady, gap, stoppedWarm, stopped, restartWarm, restarted, teardown, phases };
 const char* phaseNames[] = {"startup_consumer_only", "producer_warmup", "steady_epoch1", "intentional_zero_gap",
-                            "producer_stop_settle", "producer_stopped_over_250ms", "restart_warmup", "steady_epoch2"};
+                            "producer_stop_settle", "producer_stopped_over_250ms", "restart_warmup", "steady_epoch2", "teardown"};
 struct Record {
     std::atomic<uint64_t> revision{0}, frame{UINT64_MAX};
     std::atomic<uint32_t> epoch{0};
@@ -197,10 +197,29 @@ void inspect(Endpoint& endpoint, bool requireIdle) {
     if (rate != 48000 || bool(hidden) != endpoint.hidden) throw std::runtime_error("endpoint rate or visibility differs");
     if (!endpoint.producer && read<UInt32>(endpoint.device, kAudioDevicePropertyLatency, scope) != delay)
         throw std::runtime_error("input device does not declare expected 960-frame route delay");
-    const auto plugin = read<AudioObjectID>(endpoint.device, kAudioObjectPropertyOwner);
+    // Published devices are owned by HAL, not the AudioServerPlugIn object.
+    // Bind the exact bundle and ask that plug-in to translate this exact UID.
+    CFStringRef bundle = CFSTR("dev.hari.labvoice.audio");
+    AudioObjectID plugin = kAudioObjectUnknown;
+    auto pluginAddress = address(kAudioHardwarePropertyTranslateBundleIDToPlugIn);
+    size = sizeof(plugin);
+    status = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pluginAddress,
+                                        sizeof(bundle), &bundle, &size, &plugin);
+    if (status || size != sizeof(plugin) || plugin == kAudioObjectUnknown)
+        throw std::runtime_error("exact driver bundle translation failed");
     auto identity = read<CFStringRef>(plugin, kAudioPlugInPropertyBundleID);
-    const bool ownPlugin = identity && CFEqual(identity, CFSTR("dev.hari.labvoice.audio"));
+    const bool bundleMatches = identity && CFEqual(identity, bundle);
     if (identity) CFRelease(identity);
+    CFStringRef uid = CFStringCreateWithCString(nullptr, endpoint.uid, kCFStringEncodingUTF8);
+    if (!uid) throw std::bad_alloc();
+    AudioObjectID pluginDevice = kAudioObjectUnknown;
+    auto deviceAddress = address(kAudioPlugInPropertyTranslateUIDToDevice);
+    size = sizeof(pluginDevice);
+    status = AudioObjectGetPropertyData(plugin, &deviceAddress, sizeof(uid), &uid,
+                                        &size, &pluginDevice);
+    CFRelease(uid);
+    const bool ownPlugin = bundleMatches && status == noErr && size == sizeof(pluginDevice) &&
+                           pluginDevice == endpoint.device;
     if (!ownPlugin || read<UInt32>(endpoint.device, kAudioDevicePropertyTransportType) != kAudioDeviceTransportTypeVirtual ||
         read<UInt32>(endpoint.device, kAudioDevicePropertyClockDomain) != 0x4c564143)
         throw std::runtime_error("endpoint owner, virtual transport, or shared clock domain differs");
@@ -277,6 +296,9 @@ int run(bool audio) {
         interval(*harness, restartWarm, 100); interval(*harness, restarted, 800);
     } catch (const std::exception& error) { okay = false; errors.emplace_back(error.what()); }
     if (audio) {
+        // Stopping a producer deliberately invalidates its route. Do not score
+        // consumer callbacks during teardown as active steady-state transfer.
+        harness->phase.store(teardown);
         for (auto* endpoint : harness->all()) {
             auto status = stop(*endpoint);
             if (status) { okay = false; errors.emplace_back(std::string("cleanup stop ") + endpoint->uid + ": " + std::to_string(status)); }

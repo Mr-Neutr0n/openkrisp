@@ -2,15 +2,13 @@
 
 ## Current status: independent audio acceptance
 
-- Latest real-workflow evidence: the approved CoreAudio restart loaded the exact diagnostic driver in a new HAL process. All four device registrations then failed on an opposite-direction SafetyOffset query. No microphone-to-meeting-app audio has passed yet.
-- Implemented in source: independent virtual endpoints, RNNoise processing and route controls. The narrow SafetyOffset fix is now implemented. Fixtures: the old driver fails its new regression; corrected diagnostic packaging and host tests pass. Real workflow: corrected-driver discovery is the next test.
-- Current blocker: virtual-device registration. A guarded replacement of the verified old bundle with the tested correction is in progress, with rollback retained.
-- Next acceptance test: confirm all four UIDs after replacement/restart, then run the existing bounded virtual HAL transfer test before physical microphone and meeting-app acceptance.
-- User action: approve the pending macOS administrator dialog if shown. Later microphone permission and a short meeting-app input test may require participation. Prior temporary absence is not being treated as a continuing deferral.
+- Latest real-workflow evidence: all four virtual endpoints register. The real HAL transfer test passes mono/stereo transfer, silence and producer restart. Physical microphone capture with RNNoise passes. A separate FFmpeg client captured nonzero audio from the virtual microphone through the combined route with clean process exits.
+- Implemented correction: scoped device latency/default eligibility and aggregate AudioSubDevice drift readback. Host, sanitizer, packaging and relocated-resource checks pass for the changed native components.
+- Current blocker: Zoom 7.1.9 omits both public endpoints from its device menus. FFmpeg can use the virtual microphone. Meeting-app compatibility and speech quality remain open.
+- Next acceptance: subagents own Zoom diagnosis, original-versus-rebuild measurements and remaining REA gaps. Accent conversion and full retained parity remain incomplete.
+- User action: none currently pending. Administrator installation/restarts completed. The microphone test helper has access; the packaged desktop app's separate native permission workflow remains unverified.
 
-The next milestone is the standalone RNNoise audio path. ASR and other unrelated parity gaps remain in the backlog; optional installed-provider research is parked.
-
-Latest verified work: [Driver discovery failure isolated, 2026-10-29](#driver-discovery-failure-isolated-2026-10-29). Earlier sections retain historical implementation and evidence limits.
+Latest verified work: [Live RNNoise route acceptance, 2026-11-05](#live-rnnoise-route-acceptance-2026-11-05). Earlier sections are historical observations, including their PIDs and installed trees.
 
 Hari resumed work on 2026-10-15 and requested autonomous progress with GPT 6.1 sol workers. Implementation has resumed from the private checkpoint tag `checkpoint-2026-10-13`. Password-dependent system changes remain deferred while Hari is away. The implementation and verification below include library-location selection, local diagnostics and launch-at-login controls. The original pause tag remains available.
 
@@ -36,7 +34,7 @@ The private local log is `evidence/combined-verify-library-location.log`, SHA256
 
 After diagnostics integration, the desktop `./verify` passed 68 tests, signed ARM64/macOS 12 packaging and relocated-resource checks. The other nine components are unchanged from the combined pass above. Private log: `evidence/desktop-verify-diagnostics.log`, SHA256 `fb545d92a705ccaf2b38318016fe61b8f46714fd534bd9402a31da8d2aba090b`. REA opened Settings and Diagnostics in the built app and captured the form/current status with audio stopped. Native save/sample picker workflows remain unverified. A later label-only accessibility change names the issue description editor explicitly; its release build passed. VoiceOver behavior has not been exercised.
 
-## Exact Mac state
+## Historical Mac state before 2026-11-05
 
 The diagnostic independent driver is installed at `/Library/Audio/Plug-Ins/HAL/LabVoiceAudio.driver`. Its signed file-tree SHA256 is `5ca286e9483c605f82ecdfabeb830fd640dd5cd534eef3f390a4bef0b98dea95`. CoreAudio PID 94316 started at 10:27:21 Asia/Kolkata, before the diagnostic replacement. The final restart did not run. Diagnostic-driver loading is unverified. Earlier normal builds registered the plug-in but published no devices; the class-qualifier fix did not resolve that. No live route has run.
 
@@ -883,3 +881,48 @@ Next verify all four UIDs after that workflow, then run the existing exact-UID v
 - `evidence/independent-driver-after-restart-trace-20261029.log`, SHA256 `578c38c50df464981bacd1154f684ede755091ea6f7e0a939a778851a07f85af`.
 
 - `evidence/independent-driver-safety-package-20261029.log`, SHA256 `76134affe82b712f9ebe20a59c6200731fa98be50b7a1558023b6e894583f8a5`.
+
+
+## Live RNNoise route acceptance, 2026-11-05
+
+Read the current source and runtime state before reusing any PID below. The earlier Codex session ended on an unapproved administrator dialog. Its main transcript and three retained child sessions were reviewed. The work has resumed with REA and native acceptance assigned to subagents.
+
+The SafetyOffset-only correction installed successfully but exposed the next real discovery failure: opposite-direction device Latency. The complete scoped scalar correction now answers both directions for SafetyOffset, Latency and default eligibility. Actual input latency remains 960 frames. Absent directions return zero latency and false eligibility. Only the public speaker output can be a system default. Normal/diagnostic host tests and package checks passed, including a regression that failed the prior source.
+
+Installed corrected signed tree: `dc97ceaec314bb2cbb991c261faf82443453b7bdc3e3fb42656f8e67285c413d`. Package SHA256: `fbfdeea593c637f967356928b8acdfb27b239549549894ad2a0663cb72e2dbb7`. The guarded replacement preserved the previous bundle under `/var/tmp/openkrisp-driver-rollback-yfld96gc/`. A later guarded restart changed no files and reset discovery diagnostics for the Zoom investigation. Administrator actions used the earlier authorization and current exact-tree/process checks. No other driver was replaced.
+
+All four exact UIDs now translate. The HAL acceptance helper needed two real-path corrections. Published devices have HAL ownership, so driver admission now translates the exact bundle and verifies that plug-in's exact UID mapping. Teardown callbacks are reported separately from steady transfer because producer stop intentionally invalidates the route. The successful real run has zero steady mismatches, no missing producer stamps in either steady epoch, zero invalid timestamps/layout/overlap and exact 960-frame transfer for mono and stereo. Startup and stopped silence, zero interval and producer restart pass. This is bounded virtual-audio evidence, not physical latency or acoustic parity.
+
+An 8.234-second physical MacBook microphone capture completed with matched 395264-frame, 48 kHz PCM16 original/RNNoise files. Clean capture teardown preceded processing. No audible playback occurred. Speech content and perceptual quality were not established.
+
+The first combined route exposed a separate native backend defect: drift compensation was queried on an underlying AudioDevice. The backend now enumerates the aggregate's owned AudioSubDevice objects, checks class/owner/unique UID membership and reads drift there. Active device UIDs remain separately checked. Property failures include object, selector, scope and element. The corrected route started with microphone RNNoise enabled and speaker mute/gain zero. An independent FFmpeg AVFoundation client then captured 335872 frames, 6.997 seconds, of nonzero 48 kHz mono audio from Lab Voice Microphone. Both processes exited zero. No default audio device or hardware sample rate changed. This establishes a bounded physical microphone to independent virtual-client path.
+
+Zoom 7.1.9, freshly launched and logged out, omitted Lab Voice Microphone and Speaker from its Audio menus. No meeting was joined, audio test button pressed or audio device selection changed. Public device membership, alive state, visibility and default eligibility pass read-only checks. Scoped IsHidden reads differ from built-in devices, but no observed Zoom caller yet establishes that as the cause. The 512-entry driver trace filled before the initial Zoom check. A fresh unchanged-driver restart is being investigated by the runtime subagent. Do not claim meeting-app acceptance or patch a guessed volume/mute requirement.
+
+REA refreshed exact original identities. Both external accent models are present and hashed, but no accent inference path is implemented. Original outbound NC processed the same one-second physical input through the reviewed packaged worker in REA: evidence `ev_b2ccad3391fd91c11db3d7c17da42b3f23f5897340e19def9b51153b87dcfa0b`, zero queue deadline faults and clean teardown. Removing its explicit 2400-sample transport delay does not remove unknown model delay or prove speech preservation. The ambient amplitude comparison is not an acoustic parity verdict. Full retained REA and runtime comparison remain open.
+
+Verification: RNNoise release/sanitizers, normal/diagnostic driver suites and package checks, HAL helper release/sanitizers, full native-model component and full audio-host component passed. Audio-host's read-only check now derives companion drift expectations from the reported clock domains instead of assuming missing devices. Production desktop build and resource-only signature/ARM64/macOS12/relocation checks passed with the current helper. Root `./verify` stopped at local-store because the installed Command Line Tools omit XCTest. Swift test suites were not rerun successfully and must not be reported as a combined pass.
+
+Public release preparation added the project MIT license, RNNoise/external-provider notices, contributor/security guidance, current README and Linux/macOS fixture CI. The reachable-history audit found no binary artifact, prohibited raw evidence path or high-confidence secret candidate among 968 text blobs across 60 baseline commits. It is a bounded publication audit, not an exhaustive code-origin or legal conclusion. Original models/binaries/assets and private audio remain ignored and external.
+
+The marketing source is a separate private repository, `Mr-Neutr0n/open-krisp-site`. Cloudflare Workers serves https://open-krisp.harikp.com. GA4 uses the requested Google account and requires visitor consent. Search Console verified ownership and accepted a two-page sitemap with zero errors. The site labels accent conversion as a future goal. Website deployment is not product acceptance.
+
+- Private evidence `evidence/driver-discovery-scopes-verify-20261105.log`, SHA256 `f574e1fc82214ae0e656e6aaa760628b02e3b3f97e0539fa6b78bfad5f34655a`.
+
+- Private evidence `evidence/driver-discovery-scopes-package-20261105.log`, SHA256 `9eedee6aec95a98345eba5fb08db3f305cf27c128dda4336985daf822b98493d`.
+
+- Private evidence `evidence/hal-helper-verify-20261105.log`, SHA256 `174d8aff229a52f2645e5944c35578531ac817980b7da016bcfb1f482e4c0def`.
+
+- Private evidence `evidence/hal-transfer-corrected-20261105.jsonl`, SHA256 `760097cc15bea9cdac0cb57ab8ebbbd2bad63da68785c824f88bc129f631525a`.
+
+- Private evidence `evidence/microphone-acceptance-20261105.log`, SHA256 `1968c78877ad2748190fc307d6f2c2972f7c92cbc78a8a07206ffbe11943b42a`.
+
+- Private evidence `evidence/physical-rnnoise-route-final-20261105.log`, SHA256 `c52b67e1d25b14353dde7c3b5a36be414595b62e134bd1fbf6e7e2e71936f33e`.
+
+- Private evidence `evidence/physical-rnnoise-route-metrics-20261105.json`, SHA256 `d55c21d905bb112fa3abb6fe00572af02afc874a244ca83b9625f096bd462937`.
+
+- Private evidence `evidence/native-model-verify-20261105.log`, SHA256 `27fa4898b40c0dadccfd52bc7d07fb8f6c0374d9882ccb9c1d4e39913d019a6a`.
+
+- Private evidence `evidence/audio-host-verify-admission-final-20261105.log`, SHA256 `c972d104e19f8329be3ccfe7796599efc81d115a8298c71362b742d58e407259`.
+
+- Private evidence `evidence/desktop-resource-verify-20261105.log`, SHA256 `6d3157ed39184221c50f524f713052a5457fd892e24fc62b67b594be8f231d60`.
